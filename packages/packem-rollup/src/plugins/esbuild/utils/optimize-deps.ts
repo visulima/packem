@@ -19,6 +19,17 @@ const slash = (p: string) => p.replaceAll("\\", "/");
 
 const { parseAsync } = rsModuleLexer;
 
+const ALL_FILES_RE = /.*/;
+
+interface ResolvePluginData {
+    __resolving_dep_path__?: boolean;
+}
+
+interface LoadPluginData {
+    absolute: string;
+    resolveDir: string;
+}
+
 const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsResult> => {
     // eslint-disable-next-line unicorn/prevent-abbreviations
     const cacheDir = findCacheDirSync("@visulima/packem/optimize-deps", {
@@ -44,23 +55,25 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
         plugins: [
             {
                 name: "optimize-deps",
-                async setup(build) {
-                    build.onResolve({ filter: /.*/ }, async (arguments_: OnResolveArgs): Promise<OnResolveResult | null | undefined> => {
+                setup(build) {
+                    build.onResolve({ filter: ALL_FILES_RE }, async (arguments_: OnResolveArgs): Promise<OnResolveResult | null | undefined> => {
                         if (options.exclude?.includes(arguments_.path)) {
                             return {
                                 external: true,
                             };
                         }
 
+                        const pluginData = arguments_.pluginData as ResolvePluginData | undefined;
+
                         // eslint-disable-next-line no-underscore-dangle
-                        if (arguments_.pluginData?.__resolving_dep_path__) {
+                        if (pluginData?.__resolving_dep_path__) {
                             return undefined; // use default resolve algorithm
                         }
 
                         if (options.include.includes(arguments_.path)) {
                             const resolved = await build.resolve(arguments_.path, {
                                 kind: "import-statement",
-                                pluginData: { __resolving_dep_path__: true },
+                                pluginData: { __resolving_dep_path__: true } satisfies ResolvePluginData,
                                 resolveDir: arguments_.resolveDir,
                             });
 
@@ -74,16 +87,16 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
                                 pluginData: {
                                     absolute: resolved.path,
                                     resolveDir: arguments_.resolveDir,
-                                },
+                                } satisfies LoadPluginData,
                             };
                         }
 
                         return undefined;
                     });
 
-                    build.onLoad({ filter: /.*/, namespace: "optimize-deps" }, async (arguments_) => {
-                        const { absolute, resolveDir } = arguments_.pluginData;
-                        const sourceCode = readFileSync(absolute) as unknown as string;
+                    build.onLoad({ filter: ALL_FILES_RE, namespace: "optimize-deps" }, async (arguments_) => {
+                        const { absolute, resolveDir } = arguments_.pluginData as LoadPluginData;
+                        const sourceCode = readFileSync(absolute);
                         const { output } = await parseAsync({ input: [{ code: sourceCode, filename: absolute }] });
                         const exported = output[0]?.exports ?? [];
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- generic plugin wrapper bridges Rollup's wide hook signatures (any-typed) with `unknown` cache values; matching Rollup's internal AnyFunction shape is required for ObjectHook compatibility. */
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
 import type { FileCache } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
@@ -5,12 +6,40 @@ import type { ObjectHook, Plugin } from "rollup";
 
 import { getHash } from "../utils";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): (...arguments_: any[]) => any => plugin.handler || plugin;
+type AnyFunction = (...arguments_: any[]) => any;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const unwrapCachedValue = (value: any) => {
-    if (value && typeof value === "object" && value.__packem_cache_wrapped === true) {
+type UnwrapHook<T> = T extends ObjectHook<infer H> ? H : T extends AnyFunction ? T : never;
+type HookReturn<T> = UnwrapHook<NonNullable<T>> extends AnyFunction ? Awaited<ReturnType<UnwrapHook<NonNullable<T>>>> : never;
+
+const PACKEM_CACHE_WRAPPED = "__packem_cache_wrapped" as const;
+const PACKEM_WATCH_FILES = "__packem_watch_files" as const;
+
+interface WrappedCacheValue {
+    data: unknown;
+    [PACKEM_CACHE_WRAPPED]: true;
+}
+
+interface WatchFilesCacheValue {
+    [PACKEM_WATCH_FILES]: string[];
+    result: unknown;
+}
+
+const getHandler = (plugin: ObjectHook<AnyFunction> | AnyFunction): AnyFunction => {
+    if (typeof plugin === "function") {
+        return plugin;
+    }
+
+    return (plugin as { handler: AnyFunction }).handler;
+};
+
+const isWrappedCacheValue = (value: unknown): value is WrappedCacheValue =>
+    value !== null && typeof value === "object" && (value as Partial<WrappedCacheValue>)[PACKEM_CACHE_WRAPPED] === true;
+
+const isWatchFilesCacheValue = (value: unknown): value is WatchFilesCacheValue =>
+    value !== null && typeof value === "object" && Array.isArray((value as Partial<WatchFilesCacheValue>)[PACKEM_WATCH_FILES]);
+
+const unwrapCachedValue = (value: unknown): unknown => {
+    if (isWrappedCacheValue(value)) {
         return value.data;
     }
 
@@ -68,15 +97,17 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return unwrapCachedValue(await cache.get(cacheKey, pluginPath));
             }
 
-            const result = await getHandler(plugin.load).call(this, id);
+            const result: unknown = await getHandler(plugin.load).call(this, id);
 
             // Store raw plugin results in a wrapped form to avoid type coercion issues
-            const toStore
-                = result && typeof result === "object" && "code" in (result as Record<string, unknown>) ? result : { __packem_cache_wrapped: true, data: result };
+            const toStore: unknown
+                = result && typeof result === "object" && "code" in (result as Record<string, unknown>)
+                    ? result
+                    : ({ data: result, [PACKEM_CACHE_WRAPPED]: true } satisfies WrappedCacheValue);
 
-            cache.set(cacheKey, toStore, pluginPath);
+            cache.set(cacheKey, toStore as Parameters<typeof cache.set>[1], pluginPath);
 
-            return result;
+            return result as HookReturn<Plugin["load"]>;
         },
 
         name: `cached(${plugin.name})`,
@@ -90,14 +121,14 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             const cacheKey = join("resolveId", getHash(id), importer ? getHash(importer) : "", getHash(JSON.stringify(options)));
 
             if (cache.has(cacheKey, pluginPath)) {
-                return unwrapCachedValue(await cache.get(cacheKey, pluginPath));
+                return unwrapCachedValue(await cache.get(cacheKey, pluginPath)) as HookReturn<Plugin["resolveId"]>;
             }
 
-            const result = await getHandler(plugin.resolveId).call(this, id, importer, options);
+            const result: unknown = await getHandler(plugin.resolveId).call(this, id, importer, options);
 
-            cache.set(cacheKey, result, pluginPath);
+            cache.set(cacheKey, result as Parameters<typeof cache.set>[1], pluginPath);
 
-            return result;
+            return result as HookReturn<Plugin["resolveId"]>;
         },
 
         async transform(code, id) {
@@ -109,29 +140,27 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             const cacheKey = join("transform", getHash(id), getHash(code));
 
             if (cache.has(cacheKey, pluginPath)) {
-                const cached = unwrapCachedValue(await cache.get(cacheKey, pluginPath));
+                const cached: unknown = unwrapCachedValue(await cache.get(cacheKey, pluginPath));
 
                 // Replay any addWatchFile calls that were captured during the original transform.
                 // This ensures rollup knows to invalidate this cached result when source
                 // dependencies (e.g. JSX/TSX files scanned by Tailwind) change.
-                if (cached !== null && typeof cached === "object" && Array.isArray((cached as { __packem_watch_files?: unknown }).__packem_watch_files)) {
-                    const entry = cached as { __packem_watch_files: string[]; result: unknown };
-
-                    for (const watchFile of entry.__packem_watch_files) {
+                if (isWatchFilesCacheValue(cached)) {
+                    for (const watchFile of cached[PACKEM_WATCH_FILES]) {
                         this.addWatchFile(watchFile);
                     }
 
-                    return unwrapCachedValue(entry.result);
+                    return unwrapCachedValue(cached.result) as HookReturn<Plugin["transform"]>;
                 }
 
-                return cached;
+                return cached as HookReturn<Plugin["transform"]>;
             }
 
             // Intercept addWatchFile calls so we can store them alongside the cached result.
             const watchFiles: string[] = [];
+            // eslint-disable-next-line @typescript-eslint/no-this-alias, unicorn/no-this-assignment -- need stable reference for the Proxy handler below.
             const pluginContext = this;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const contextWithWatcher = new Proxy(this as any, {
+            const contextWithWatcher = new Proxy(this, {
                 get(target, prop, receiver) {
                     if (prop === "addWatchFile") {
                         return (file: string) => {
@@ -140,21 +169,25 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                         };
                     }
 
-                    const value = Reflect.get(target, prop, receiver);
+                    const value: unknown = Reflect.get(target, prop, receiver);
 
-                    return typeof value === "function" ? value.bind(target) : value;
+                    return typeof value === "function" ? (value as AnyFunction).bind(target) : value;
                 },
             });
 
-            const result = await getHandler(plugin.transform).call(contextWithWatcher, code, id);
+            const result: unknown = await getHandler(plugin.transform).call(contextWithWatcher, code, id);
 
             if (watchFiles.length > 0) {
-                cache.set(cacheKey, { __packem_watch_files: watchFiles, result }, pluginPath);
+                cache.set(
+                    cacheKey,
+                    { [PACKEM_WATCH_FILES]: watchFiles, result } satisfies WatchFilesCacheValue,
+                    pluginPath,
+                );
             } else {
-                cache.set(cacheKey, result, pluginPath);
+                cache.set(cacheKey, result as Parameters<typeof cache.set>[1], pluginPath);
             }
 
-            return result;
+            return result as HookReturn<Plugin["transform"]>;
         },
     };
 

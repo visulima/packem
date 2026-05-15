@@ -22,15 +22,19 @@ const oxcTransformPlugin: TransformerFunction = ({ exclude, include, ...transfor
                 sourcemap: true,
             });
 
-            if (!result) {
-                return undefined;
-            }
+            const { code, errors, map } = result;
 
-            const { code, errors = [], map } = result;
+            if (errors.length > 0) {
+                const errorMessages = errors.map((error) => {
+                    if (typeof error === "string") {
+                        return error;
+                    }
 
-            if (errors && errors.length > 0) {
+                    return (error as { message?: string }).message ?? JSON.stringify(error);
+                });
+
                 return this.error({
-                    message: ["\ntransform errors:", ...errors].join("\n\n"),
+                    message: ["\ntransform errors:", ...errorMessages].join("\n\n"),
                     pluginCode: "ERR_TRANSFORM",
                 });
             }

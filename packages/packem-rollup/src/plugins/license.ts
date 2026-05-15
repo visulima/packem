@@ -22,7 +22,45 @@ const sortLicenses = (licenses: Set<string>) => {
         }
     });
 
-    return [...noParenthesis.toSorted(), ...withParenthesis.toSorted()];
+    const byLocale = (a: string, b: string): number => a.localeCompare(b);
+
+    return [...noParenthesis.toSorted(byLocale), ...withParenthesis.toSorted(byLocale)];
+};
+
+const collectAuthorNames = (author: unknown, maintainers: unknown[], contributors: unknown[]): string[] => {
+    const names = new Set<string>();
+
+    for (const person of [author, ...maintainers, ...contributors]) {
+        const personName = typeof person === "string"
+            ? person
+            : (person as { name?: string } | null | undefined)?.name;
+
+        if (personName) {
+            names.add(personName);
+        }
+    }
+
+    return [...names];
+};
+
+// eslint-disable-next-line func-style
+function prefixQuoteMarker(line: string): string {
+    return line ? `> ${line}` : ">";
+}
+
+const formatLicenseBody = (licenseText: string, marker: string, dtsMarker: string | undefined): string => {
+    const lines = licenseText
+        .trim()
+        .replaceAll(/\r\n|\r/g, "\n")
+        .replaceAll(`<!-- ${marker} -->`, "")
+        .replaceAll(dtsMarker ? `<!-- ${dtsMarker} -->` : "", "")
+        .replaceAll(`<!-- /${marker} -->`, "")
+        .replaceAll(dtsMarker ? `<!-- /${dtsMarker} -->` : "", "")
+        .trim()
+        .split("\n")
+        .map((line) => prefixQuoteMarker(line));
+
+    return lines.join("\n");
 };
 
 export interface LicenseOptions {
@@ -56,35 +94,22 @@ export const licensePlugin = ({
 
             const dependencyLicenseTexts = dependencies
                 .toSorted(({ name: nameA }, { name: nameB }) => {
-                    if ((nameA || 0) > (nameB || 0)) {
-                        return 1;
-                    }
+                    const a = nameA ?? "";
+                    const b = nameB ?? "";
 
-                    if ((nameB || 0) > (nameA || 0)) {
-                        return -1;
-                    }
-
-                    return 0;
+                    return a.localeCompare(b);
                 })
                 .map(({ author, contributors, license: dependencyLicense, licenseText, maintainers, name, repository }) => {
-                    let text = `## ${name}\n`;
+                    let text = `## ${name ?? ""}\n`;
 
                     if (dependencyLicense) {
                         text += `License: ${dependencyLicense}\n`;
                     }
 
-                    const names = new Set();
+                    const names = collectAuthorNames(author, maintainers, contributors);
 
-                    for (const person of [author, ...maintainers, ...contributors]) {
-                        const personName = typeof person === "string" ? person : person?.name;
-
-                        if (personName) {
-                            names.add(personName);
-                        }
-                    }
-
-                    if (names.size > 0) {
-                        text += `By: ${[...names].join(", ")}\n`;
+                    if (names.length > 0) {
+                        text += `By: ${names.join(", ")}\n`;
                     }
 
                     if (repository) {
@@ -92,23 +117,7 @@ export const licensePlugin = ({
                     }
 
                     if (licenseText) {
-                        text += `\n${licenseText
-                            .trim()
-                            .replaceAll(/\r\n|\r/g, "\n")
-                            .replaceAll(`<!-- ${marker} -->`, "")
-                            .replaceAll(dtsMarker ? `<!-- ${dtsMarker} -->` : "", "")
-                            .replaceAll(`<!-- /${marker} -->`, "")
-                            .replaceAll(dtsMarker ? `<!-- /${dtsMarker} -->` : "", "")
-                            .trim()
-                            .split("\n")
-                            .map((line) => {
-                                if (!line) {
-                                    return ">";
-                                }
-
-                                return `> ${line}`;
-                            })
-                            .join("\n")}\n`;
+                        text += `\n${formatLicenseBody(licenseText, marker, dtsMarker)}\n`;
                     }
 
                     if (dependencyLicense) {
@@ -131,7 +140,7 @@ export const licensePlugin = ({
             const licenseText = licenseTemplate(sortLicenses(licenses), dependencyLicenseTexts, packageName);
 
             try {
-                const existingLicenseText = readFileSync(licenseFilePath) as unknown as string;
+                const existingLicenseText = readFileSync(licenseFilePath);
                 const content = replaceContentWithinMarker(existingLicenseText, marker, licenseText);
 
                 if (!content) {

@@ -17,7 +17,7 @@ import { defaultMinifyOptions, defaultStrategy } from "./strategy.js";
 /**
  * Options for &lt;code>minifyHTMLLiterals()&lt;/code>.
  */
-export type Options = DefaultOptions | CustomOptions<unknown>;
+export type Options = DefaultOptions | CustomOptions;
 
 /**
  * Options for &lt;code>minifyHTMLLiterals()&lt;/code>, using default html-minifier
@@ -34,7 +34,8 @@ export interface DefaultOptions extends BaseOptions {
 /**
  * Options for &lt;code>minifyHTMLLiterals()&lt;/code>, using a custom strategy.
  */
-export interface CustomOptions<S extends Strategy | unknown> extends BaseOptions {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Strategy is generic over arbitrary minifier options
+export interface CustomOptions<S extends Strategy<any, any> = Strategy<any, any>> extends BaseOptions {
     /**
      * HTML minification options.
      */
@@ -183,9 +184,9 @@ export interface Result {
  * The default method to generate a SourceMap. It will generate the SourceMap
  * from the provided MagicString instance using "fileName.map" as the file and
  * "fileName" as the source.
- * @param ms the MagicString instance with code modifications
- * @param fileName the name of the source file
- * @returns a v3 SourceMap
+ * @param ms the MagicString instance carrying code overwrites/replacements
+ * @param fileName the name or path of the source file used for the map "file" + "source" entries
+ * @returns a v3 SourceMap describing the transformations
  */
 export const defaultGenerateSourceMap = (ms: MagicStringLike, fileName: string): SourceMap =>
     ms.generateMap({
@@ -202,7 +203,7 @@ export const defaultGenerateSourceMap = (ms: MagicStringLike, fileName: string):
  * @returns true if the template should be minified
  */
 export const defaultShouldMinify = (template: Template): boolean => {
-    const tag = template.tag && template.tag.toLowerCase();
+    const tag = template.tag?.toLowerCase();
 
     return !!tag && (tag.includes("html") || tag.includes("svg"));
 };
@@ -246,45 +247,28 @@ export async function minifyHTMLLiterals(source: string, options?: DefaultOption
 export async function minifyHTMLLiterals<S extends Strategy>(source: string, options?: CustomOptions<S>): Promise<Result | undefined>;
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export async function minifyHTMLLiterals(source: string, options: Options = {}): Promise<Result | undefined> {
-    // eslint-disable-next-line no-param-reassign
+    /* eslint-disable no-param-reassign -- options is a single config object explicitly populated with defaults */
     options.minifyOptions = {
         ...defaultMinifyOptions,
         ...options.minifyOptions,
     };
-
-    if (!options.MagicString) {
-        // eslint-disable-next-line no-param-reassign
-        options.MagicString = MagicString;
-    }
-
-    if (!options.parseLiterals) {
-        // eslint-disable-next-line no-param-reassign
-        options.parseLiterals = parseLiterals;
-    }
-
-    if (!options.shouldMinify) {
-        // eslint-disable-next-line no-param-reassign
-        options.shouldMinify = defaultShouldMinify;
-    }
-
-    if (!options.shouldMinifyCSS) {
-        // eslint-disable-next-line no-param-reassign
-        options.shouldMinifyCSS = defaultShouldMinifyCSS;
-    }
-
-    // eslint-disable-next-line no-param-reassign
+    options.MagicString ??= MagicString;
+    options.parseLiterals ??= parseLiterals;
+    options.shouldMinify ??= defaultShouldMinify;
+    options.shouldMinifyCSS ??= defaultShouldMinifyCSS;
     options.parseLiteralsOptions = {
         fileName: options.fileName,
         ...options.parseLiteralsOptions,
-    } as Partial<ParseLiteralsOptions>;
+    };
+    /* eslint-enable no-param-reassign */
 
     const templates = options.parseLiterals(source, options.parseLiteralsOptions);
-    const strategy = <Strategy>(<CustomOptions<unknown>>options).strategy || defaultStrategy;
+    const strategy = ((options as CustomOptions).strategy as Strategy | undefined) ?? defaultStrategy;
     const { shouldMinify, shouldMinifyCSS } = options;
     let validate: Validation | undefined;
 
     if (options.validate !== false) {
-        validate = options.validate || defaultValidation;
+        validate = options.validate ?? defaultValidation;
     }
 
     const ms = new options.MagicString(source);
@@ -304,21 +288,34 @@ export async function minifyHTMLLiterals(source: string, options: Options = {}):
             let min: string;
 
             if (minifyCSS) {
-                const minifyCSSOptions = ((options as DefaultOptions).minifyOptions || {}).minifyCSS;
+                const allMinifyOptions = options.minifyOptions as Record<string, unknown> | undefined;
+                const minifyCSSOptions = allMinifyOptions?.minifyCSS;
 
                 if (typeof minifyCSSOptions === "function") {
-                    const result = minifyCSSOptions(combined);
+                    const result = (minifyCSSOptions as (css: string) => string | Promise<string>)(combined);
 
+                    // eslint-disable-next-line no-await-in-loop -- sequential per-template minification by design
                     min = typeof result === "string" ? result : await result;
                 } else if (minifyCSSOptions === false) {
                     min = combined;
                 } else {
-                    const cssOptions = typeof minifyCSSOptions === "object" ? minifyCSSOptions : undefined;
+                    const cssOptions = typeof minifyCSSOptions === "object" && minifyCSSOptions !== null ? minifyCSSOptions : undefined;
+                    const minifyCSSFunction = strategy.minifyCSS as ((css: string, options?: unknown) => string | Promise<string>) | undefined;
 
-                    min = await strategy.minifyCSS!(combined, cssOptions);
+                    if (!minifyCSSFunction) {
+                        throw new Error("Strategy does not implement minifyCSS but minifyCSS was requested");
+                    }
+
+                    const cssResult = minifyCSSFunction(combined, cssOptions);
+
+                    // eslint-disable-next-line no-await-in-loop -- sequential per-template minification by design
+                    min = typeof cssResult === "string" ? cssResult : await cssResult;
                 }
             } else {
-                min = await strategy.minifyHTML(combined, options.minifyOptions);
+                const htmlResult = (strategy.minifyHTML as (html: string, options?: unknown) => string | Promise<string>)(combined, options.minifyOptions);
+
+                // eslint-disable-next-line no-await-in-loop -- sequential per-template minification by design
+                min = typeof htmlResult === "string" ? htmlResult : await htmlResult;
             }
 
             const minParts = strategy.splitHTMLByPlaceholder(min, placeholder);
@@ -345,7 +342,7 @@ export async function minifyHTMLLiterals(source: string, options: Options = {}):
     let map: SourceMap | undefined;
 
     if (options.generateSourceMap !== false) {
-        const generateSourceMap = options.generateSourceMap || defaultGenerateSourceMap;
+        const generateSourceMap = options.generateSourceMap ?? defaultGenerateSourceMap;
 
         map = generateSourceMap(ms, options.fileName ?? "");
     }

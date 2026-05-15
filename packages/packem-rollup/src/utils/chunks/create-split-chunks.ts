@@ -15,6 +15,8 @@ import type { GetManualChunk, GetModuleInfo } from "rollup";
 import getCustomModuleLayer from "./get-custom-module-layer";
 import getModuleLayer from "./get-module-layer";
 
+const SWC_HELPERS_RE = /[\\/]node_modules[\\/]@swc[\\/]helper/;
+
 const hashTo3Char = memoize((input: string): string => {
     let hash = 0;
 
@@ -110,7 +112,7 @@ const createSplitChunks = (
 
     // eslint-disable-next-line sonarjs/cognitive-complexity
     return function splitChunks(id, context) {
-        if (/[\\/]node_modules[\\/]@swc[\\/]helper/.test(id)) {
+        if (SWC_HELPERS_RE.test(id)) {
             return "cc"; // common chunk
         }
 
@@ -190,7 +192,7 @@ const createSplitChunks = (
 
                 const subModuleLayer = getModuleLayer(subModuleInfo.meta);
 
-                if (subModuleLayer === moduleLayer) {
+                if (moduleLayer && subModuleLayer === moduleLayer) {
                     if (!dependencyGraphMap.has(subId)) {
                         dependencyGraphMap.set(subId, new Set());
                     }
@@ -214,7 +216,7 @@ const createSplitChunks = (
 
                 const chunkName = basename(id, extname(id));
                 // Create a unique suffix based on all the layers that import this module
-                const layersSuffix = [...importerLayers].toSorted().join("-");
+                const layersSuffix = [...importerLayers].toSorted((a, b) => a.localeCompare(b)).join("-");
                 const chunkGroup = `${chunkName}-${hashTo3Char(layersSuffix)}`;
 
                 splitChunksGroupMap.set(id, chunkGroup);

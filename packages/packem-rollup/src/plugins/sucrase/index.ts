@@ -13,7 +13,7 @@ const sucraseTransformPlugin = ({ exclude, include, ...transformOptions }: Sucra
     return <Plugin>{
         name: "packem:sucrase",
 
-        async transform(sourcecode, id) {
+        transform(sourcecode, id) {
             if (!filter(id)) {
                 return undefined;
             }

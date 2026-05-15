@@ -10,12 +10,12 @@ import typescript from "./typescript.js";
 
 export interface ParseLiteralsOptions {
     fileName?: string;
-    strategy?: Partial<Strategy<unknown>>;
+    strategy?: Partial<Strategy>;
 }
 
 export const parseLiterals = (source: string, options: ParseLiteralsOptions = {}): Template[] => {
     const strategy = {
-        ...(<Strategy<unknown>>typescript),
+        ...(<Strategy>typescript),
         ...options.strategy,
     };
 
@@ -24,7 +24,7 @@ export const parseLiterals = (source: string, options: ParseLiteralsOptions = {}
 
     strategy.walkNodes(strategy.getRootNode(source, options.fileName), (node) => {
         if (strategy.isTaggedTemplate(node)) {
-            const template = strategy.getTaggedTemplateTemplate(node) as unknown;
+            const template = strategy.getTaggedTemplateTemplate(node);
 
             visitedTemplates.push(template);
             literals.push({

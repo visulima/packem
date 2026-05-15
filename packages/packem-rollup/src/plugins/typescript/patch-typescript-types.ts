@@ -20,26 +20,33 @@ const escapeRegex = (string_: string): string => string_.replaceAll(escapeRegexR
 
 const unique = <T>(array: T[]): T[] => [...new Set(array)];
 
-const cleanUnnecessaryComments = (code: string) =>
-    code.replaceAll(multilineCommentsRE, (m) => (licenseCommentsRE.test(m) ? "" : m)).replaceAll(consecutiveNewlinesRE, "\n\n");
+const FILE_EXTENSION_RE = /\.[^/.]+$/;
+
+// eslint-disable-next-line func-style
+function stripLicenseComment(comment: string): string {
+    return licenseCommentsRE.test(comment) ? "" : comment;
+}
+
+const cleanUnnecessaryComments = (code: string): string =>
+    code.replaceAll(multilineCommentsRE, stripLicenseComment).replaceAll(consecutiveNewlinesRE, "\n\n");
 
 const calledDtsFiles = new Map<string, boolean>();
 
 /**
- * Rollup deduplicate type names with a trailing `$1` or `$2`, which can be
- * confusing when showed in autocompletions. Try to replace with a better name
+ * Replaces deduplicated type names that rollup gives a trailing `$1`/`$2` suffix
+ * back to nicer identifiers via the `identifierReplacements` map, so they read
+ * sensibly in IDE autocompletions.
  */
 // eslint-disable-next-line func-style
-function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: RenderedChunk, { identifierReplacements }: PatchTypesOptions, logger: Console) {
+function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: RenderedChunk, { identifierReplacements }: PatchTypesOptions, logger: Console): string {
     const imports = findStaticImports(code);
+    let nextCode = code;
 
-    // eslint-disable-next-line guard-for-in
-    for (const moduleName in identifierReplacements) {
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-        const imp = imports.find((imp) => imp.specifier === moduleName && imp.imports.includes("{"));
+    for (const moduleName of Object.keys(identifierReplacements ?? {})) {
+        const matchingImport = imports.find((importDeclaration) => importDeclaration.specifier === moduleName && importDeclaration.imports.includes("{"));
 
         // Validate that `identifierReplacements` is not outdated if there's no match
-        if (!imp) {
+        if (!matchingImport) {
             this.warn(`${chunk.fileName} does not import "${moduleName}" for replacement`);
 
             process.exitCode = 1;
@@ -47,12 +54,11 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
             continue;
         }
 
-        const replacements = identifierReplacements[moduleName];
+        const replacements = identifierReplacements?.[moduleName] ?? {};
 
-        // eslint-disable-next-line guard-for-in
-        for (const id in replacements) {
+        for (const id of Object.keys(replacements)) {
             // Validate that `identifierReplacements` is not outdated if there's no match
-            if (!imp.imports.includes(id)) {
+            if (!matchingImport.imports.includes(id)) {
                 throw new Error(`${chunk.fileName} does not import "${id}" from "${moduleName}" for replacement`);
             }
 
@@ -63,21 +69,19 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
             // named import cannot be replaced with `Foo as Namespace.Foo`, so we
             // pre-emptively remove the whole named import
             if (betterId.includes(".")) {
-                // eslint-disable-next-line no-param-reassign
-                code = code.replace(new RegExp(String.raw`\b\w+\b as ${regexEscapedId},?\s?`), "");
+                nextCode = nextCode.replace(new RegExp(String.raw`\b\w+\b as ${regexEscapedId},?\s?`), "");
             }
 
-            // eslint-disable-next-line no-param-reassign
-            code = code.replaceAll(new RegExp(String.raw`\b${regexEscapedId}\b`, "g"), betterId);
+            nextCode = nextCode.replaceAll(new RegExp(String.raw`\b${regexEscapedId}\b`, "g"), betterId);
         }
     }
 
-    const unreplacedIds = unique(Array.from(code.matchAll(identifierWithTrailingDollarRE), (m) => m[0]));
+    const unreplacedIds = unique(Array.from(nextCode.matchAll(identifierWithTrailingDollarRE), (m) => m[0]));
 
     if (unreplacedIds.length > 0) {
         const unreplacedString = unreplacedIds.map((id) => `\n- ${id}`).join("");
 
-        const fileWithoutExtension = chunk.fileName.replace(/\.[^/.]+$/, "");
+        const fileWithoutExtension = chunk.fileName.replace(FILE_EXTENSION_RE, "");
 
         // Display the warning only once per file
         if (!calledDtsFiles.has(fileWithoutExtension)) {
@@ -90,24 +94,31 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
         calledDtsFiles.set(fileWithoutExtension, true);
     }
 
-    return code;
+    return nextCode;
+}
+
+interface NodeWithComments {
+    end: number;
+    leadingComments?: { start: number; type?: string; value?: string }[];
+    start: number;
 }
 
 /**
- * Remove `@internal` comments not handled by `compilerOptions.stripInternal`
- * Reference: https://github.com/vuejs/core/blob/main/rollup.dts.config.js
+ * Removes `@internal` comments and the parameters/declarations they annotate
+ * that `compilerOptions.stripInternal` leaves behind. See vuejs/core's rollup.dts.config.js for prior art.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const removeInternal = (s: MagicString, node: any): boolean => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (node.leadingComments?.some((c: any) => c.type === "CommentBlock" && c.value.includes("@internal"))) {
+const removeInternal = (s: MagicString, node: NodeWithComments): boolean => {
+    if (node.leadingComments?.some((comment) => comment.type === "CommentBlock" && comment.value?.includes("@internal"))) {
         // Examples:
         // function a(foo: string, /* @internal */ bar: number)
         //                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
         // strip trailing comma
-        const end = s.original[node.end] === "," ? (node.end as number) + 1 : node.end;
+        const end = s.original[node.end] === "," ? node.end + 1 : node.end;
+        const firstLeadingComment = node.leadingComments[0];
 
-        s.remove(node.leadingComments[0].start, end);
+        if (firstLeadingComment) {
+            s.remove(firstLeadingComment.start, end);
+        }
 
         return true;
     }
@@ -116,38 +127,36 @@ const removeInternal = (s: MagicString, node: any): boolean => {
 };
 
 /**
- * While we already enable `compilerOptions.stripInternal`, some internal comments
- * like internal parameters are still not stripped by TypeScript, so we run another
- * pass here.
+ * Runs a second pass after TypeScript's `compilerOptions.stripInternal` to
+ * scrub leftover `@internal` markers (e.g. on parameters) that TypeScript leaves intact.
  */
 // eslint-disable-next-line func-style
-function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedChunk) {
-    if (code.includes("@internal")) {
-        const s = new MagicString(code);
-        const ast = parse(code, {
-            plugins: ["typescript"],
-            sourceType: "module",
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        walk(ast as any, {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            enter(node: any) {
-                if (removeInternal(s, node)) {
-                    this.skip();
-                }
-            },
-        });
-
-        // eslint-disable-next-line no-param-reassign
-        code = s.toString();
-
-        if (code.includes("@internal")) {
-            throw new Error(`${chunk.fileName} has unhandled @internal declarations`);
-        }
+function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedChunk): string {
+    if (!code.includes("@internal")) {
+        return code;
     }
 
-    return code;
+    const s = new MagicString(code);
+    const ast = parse(code, {
+        plugins: ["typescript"],
+        sourceType: "module",
+    });
+
+    walk(ast as unknown as import("estree").Node, {
+        enter(node: import("estree").Node) {
+            if (removeInternal(s, node as unknown as NodeWithComments)) {
+                this.skip();
+            }
+        },
+    });
+
+    const nextCode = s.toString();
+
+    if (nextCode.includes("@internal")) {
+        throw new Error(`${chunk.fileName} has unhandled @internal declarations`);
+    }
+
+    return nextCode;
 }
 
 export type PatchTypesOptions = {
@@ -155,12 +164,12 @@ export type PatchTypesOptions = {
 };
 
 /**
- * Patch the types files before passing to dts plugin
+ * Patches the bundled types output before passing to the dts plugin.
  *
- * 1. Validate unallowed dependency imports
- * 2. Replace confusing type names
- * 3. Strip leftover internal types
- * 4. Clean unnecessary comments
+ * 1. Validate unallowed dependency imports.
+ * 2. Replace confusing type names.
+ * 3. Strip leftover internal types.
+ * 4. Clean unnecessary comments.
  */
 export const patchTypescriptTypes = (options: PatchTypesOptions, logger: Console): Plugin => {
     return {

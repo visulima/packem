@@ -6,18 +6,14 @@ import { EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { Plugin } from "rollup";
 
 const tsRE = /\.tsx?$/;
+const COMPILER_ANNOTATION_RE = /['"]use memo['"]/;
 
 /**
  * Helper function to find React Compiler plugin in Babel plugins array.
  * Used for React Compiler-specific optimizations like annotation mode filtering.
  */
-const getReactCompilerPlugin = (plugins: PluginItem[]): PluginItem | undefined => {
-    if (!plugins) {
-        return undefined;
-    }
-
-    return plugins.find((p: PluginItem) => p === "babel-plugin-react-compiler" || (Array.isArray(p) && p[0] === "babel-plugin-react-compiler"));
-};
+const getReactCompilerPlugin = (plugins: PluginItem[]): PluginItem | undefined =>
+    plugins.find((p: PluginItem) => p === "babel-plugin-react-compiler" || (Array.isArray(p) && p[0] === "babel-plugin-react-compiler"));
 
 /**
  * Filters React Compiler plugin based on annotation mode.
@@ -25,12 +21,11 @@ const getReactCompilerPlugin = (plugins: PluginItem[]): PluginItem | undefined =
  * @see https://react.dev/learn/react-compiler/incremental-adoption#annotation-mode-configuration
  */
 const filterReactCompilerByAnnotation = (plugins: PluginItem[], sourcecode: string): void => {
-    if (!plugins || !Array.isArray(plugins) || plugins.length === 0) {
+    if (plugins.length === 0) {
         return;
     }
 
     const reactCompilerPlugin = getReactCompilerPlugin(plugins);
-    const compilerAnnotationRE = /['"]use memo['"]/;
 
     if (!reactCompilerPlugin || !Array.isArray(reactCompilerPlugin)) {
         return;
@@ -38,7 +33,7 @@ const filterReactCompilerByAnnotation = (plugins: PluginItem[], sourcecode: stri
 
     const compilerOptions = reactCompilerPlugin[1] as { compilationMode?: string } | undefined;
 
-    if (compilerOptions?.compilationMode === "annotation" && !compilerAnnotationRE.test(sourcecode)) {
+    if (compilerOptions?.compilationMode === "annotation" && !COMPILER_ANNOTATION_RE.test(sourcecode)) {
         // Remove React Compiler plugin if annotation mode and no "use memo" directive
         const pluginIndex = plugins.indexOf(reactCompilerPlugin);
 
@@ -70,7 +65,7 @@ export const babelTransformPlugin = ({ exclude, filename, generatorOpts, include
             let plugins: PluginItem[] = [];
 
             if (transformOptions.plugins && Array.isArray(transformOptions.plugins)) {
-                plugins = [...(transformOptions.plugins as PluginItem[])];
+                plugins = [...transformOptions.plugins];
             }
 
             // Apply React Compiler-specific filtering (annotation mode)
@@ -114,20 +109,20 @@ export const babelTransformPlugin = ({ exclude, filename, generatorOpts, include
                 parserOpts: {
                     ...transformOptions.parserOpts,
                     allowAwaitOutsideFunction: true,
-                    plugins: uniqueParserPlugins.length > 0 ? (uniqueParserPlugins as NonNullable<TransformOptions["parserOpts"]>["plugins"]) : [],
+                    plugins: uniqueParserPlugins.length > 0 ? uniqueParserPlugins : [],
                     sourceType: "module",
                 },
                 plugins: plugins.length > 0 ? plugins : [],
                 sourceFileName: sourceFileName ?? id,
             });
 
-            if (!result || !result.code) {
+            if (!result?.code) {
                 return undefined;
             }
 
             return {
                 code: result.code,
-                map: result.map || undefined,
+                map: result.map ?? undefined,
             };
         },
     };

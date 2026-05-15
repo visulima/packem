@@ -1,6 +1,9 @@
 import MagicString from "magic-string";
 import type { NormalizedOutputOptions, Plugin, RenderedChunk, SourceMapInput } from "rollup";
 
+const EXPORTS_DEFAULT_ASSIGNMENT_RE = /(exports(?:\['default'\]|\.default)) = (.*);/i;
+const EXPORTS_DEFAULT_RE = /(?:module\.)?exports(?:\['default'\]|\.default)/i;
+
 export interface CJSInteropOptions {
     addDefaultProperty?: boolean;
 }
@@ -13,23 +16,22 @@ export const cjsInteropPlugin = ({
 }): Plugin => {
     return {
         name: "packem:cjs-interop",
-        renderChunk: async (
+        renderChunk: (
             code: string,
             chunk: RenderedChunk,
             options: NormalizedOutputOptions,
-        ): Promise<
+        ):
             | {
                 code: string;
                 map: SourceMapInput;
             }
-            | undefined
-        > => {
-            if (chunk.type !== "chunk" || !chunk.isEntry) {
+            | undefined => {
+            if (!chunk.isEntry) {
                 return undefined;
             }
 
             if (options.format === "cjs" && options.exports === "auto") {
-                const matches = /(exports(?:\['default'\]|\.default)) = (.*);/i.exec(code);
+                const matches = EXPORTS_DEFAULT_ASSIGNMENT_RE.exec(code);
 
                 if (matches === null || matches.length < 3) {
                     return undefined;
@@ -51,7 +53,7 @@ export const cjsInteropPlugin = ({
 
                 // @see https://github.com/Rich-Harris/magic-string/issues/208 why this is needed
                 // replace `exports.default = ...; or exports['default'] = ...;` with `module.exports = ...;`
-                newCode = newCode.replace(/(?:module\.)?exports(?:\['default'\]|\.default)/i, "module.exports");
+                newCode = newCode.replace(EXPORTS_DEFAULT_RE, "module.exports");
 
                 logger.debug({
                     message: `Applied CommonJS interop to entry chunk ${chunk.fileName}.`,

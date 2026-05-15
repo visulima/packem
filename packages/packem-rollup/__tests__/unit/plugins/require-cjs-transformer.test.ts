@@ -1,7 +1,26 @@
 import { init } from "cjs-module-lexer";
+import type { ObjectHook, Plugin, RenderedChunk } from "rollup";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import { requireCJSTransformerPlugin } from "../../../src/plugins/require-cjs-transformer";
+
+type RenderChunkHook = NonNullable<Plugin["renderChunk"]>;
+type RenderChunkHandler = RenderChunkHook extends ObjectHook<infer Handler> ? Handler : RenderChunkHook;
+type RenderChunkResult = { code: string; map?: unknown };
+
+const getRenderChunkHandler = (plugin: Plugin): RenderChunkHandler => {
+    const hook = plugin.renderChunk;
+
+    if (typeof hook === "function") {
+        return hook;
+    }
+
+    if (hook && typeof hook === "object" && "handler" in hook && typeof hook.handler === "function") {
+        return hook.handler;
+    }
+
+    throw new Error("plugin.renderChunk is not callable");
+};
 
 describe(requireCJSTransformerPlugin, async () => {
     await init();
@@ -9,7 +28,7 @@ describe(requireCJSTransformerPlugin, async () => {
     it("plugin exports correctly", () => {
         expect.assertions(3);
 
-        const plugin = requireCJSTransformerPlugin({}, { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() } as unknown as Console);
+        const plugin = requireCJSTransformerPlugin({}, { debug: vi.fn<() => void>(), error: vi.fn<() => void>(), info: vi.fn<() => void>(), warn: vi.fn<() => void>() } as unknown as Console);
 
         expect(plugin).toBeDefined();
         expect(plugin.name).toBe("packem:plugin-require-cjs");
@@ -20,10 +39,10 @@ describe(requireCJSTransformerPlugin, async () => {
         expect.assertions(4);
 
         const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, {
-            debug: vi.fn(),
-            error: vi.fn(),
-            info: vi.fn(),
-            warn: vi.fn(),
+            debug: vi.fn<() => void>(),
+            error: vi.fn<() => void>(),
+            info: vi.fn<() => void>(),
+            warn: vi.fn<() => void>(),
         } as unknown as Console);
 
         // Mock chunk with CJS import
@@ -34,20 +53,22 @@ export const test = 'hello';`;
 
         // Mock logger for testing
         const mockLogger = {
-            debug: vi.fn(),
+            debug: vi.fn<() => void>(),
         };
 
-        const result = await (typeof plugin.renderChunk === "function" ? plugin.renderChunk : (plugin.renderChunk as any)?.handler)?.call(
-            { debug: mockLogger.debug },
+        const result = await getRenderChunkHandler(plugin).call(
+            { debug: mockLogger.debug } as unknown as ThisParameterType<RenderChunkHandler>,
             code,
-            { fileName: "test.js" },
-            { format: "es" },
-        );
+            { fileName: "test.js" } as RenderedChunk,
+            { format: "es" } as Parameters<RenderChunkHandler>[2],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            {} as any,
+        ) as RenderChunkResult;
 
         // Should transform the code
         expect(result).toBeDefined();
 
-        expectTypeOf(result).toBeObject;
+        expectTypeOf(result).toBeObject();
 
         expect("code" in result).toBe(true);
         expect("map" in result).toBe(true);
@@ -85,10 +106,10 @@ export const test = 'hello';`;
         expect.assertions(5);
 
         const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, {
-            debug: vi.fn(),
-            error: vi.fn(),
-            info: vi.fn(),
-            warn: vi.fn(),
+            debug: vi.fn<() => void>(),
+            error: vi.fn<() => void>(),
+            info: vi.fn<() => void>(),
+            warn: vi.fn<() => void>(),
         } as unknown as Console);
 
         // Mock chunk with node:process import
@@ -98,20 +119,22 @@ console.log(process.version);`;
 
         // Mock logger for testing
         const mockLogger = {
-            debug: vi.fn(),
+            debug: vi.fn<() => void>(),
         };
 
-        const result = await (typeof plugin.renderChunk === "function" ? plugin.renderChunk : (plugin.renderChunk as any)?.handler)?.call(
-            { debug: mockLogger.debug },
+        const result = await getRenderChunkHandler(plugin).call(
+            { debug: mockLogger.debug } as unknown as ThisParameterType<RenderChunkHandler>,
             code,
-            { fileName: "test.js" },
-            { format: "es" },
-        );
+            { fileName: "test.js" } as RenderedChunk,
+            { format: "es" } as Parameters<RenderChunkHandler>[2],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            {} as any,
+        ) as RenderChunkResult;
 
         // Should transform the code
         expect(result).toBeDefined();
 
-        expectTypeOf(result).toBeObject;
+        expectTypeOf(result).toBeObject();
 
         expect("code" in result).toBe(true);
         expect("map" in result).toBe(true);

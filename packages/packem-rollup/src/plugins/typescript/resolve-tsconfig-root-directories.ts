@@ -37,9 +37,9 @@ const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | 
 };
 
 /**
- * This plugin resolves module paths using the rootDirs configuration from the tsconfig.json file.
+ * Resolves module paths using the `rootDirs` option from `tsconfig.json`.
  *
- * Consider the following example configuration:
+ * Consider the following example configuration.
  * @example
  * ```json
  * {

@@ -9,7 +9,7 @@ import ts from "typescript";
 
 import type { TemplatePart } from "./models.js";
 
-export interface TypescriptStrategy {
+interface TypescriptStrategy {
     getHeadTemplatePart: (node: ts.TemplateLiteral | ts.TemplateHead) => TemplatePart;
     getMiddleTailTemplatePart: (node: ts.TemplateMiddle | ts.TemplateTail) => TemplatePart;
     getRootNode: (source: string, fileName?: string) => ts.SourceFile;
@@ -24,8 +24,8 @@ export interface TypescriptStrategy {
 
 let currentRoot: ts.SourceFile | undefined;
 
-export default {
-    getHeadTemplatePart(node: ts.TemplateLiteral | ts.TemplateHead) {
+const typescriptStrategy: TypescriptStrategy = {
+    getHeadTemplatePart(node: ts.TemplateLiteral | ts.TemplateHead): TemplatePart {
         const fullText = node.getFullText(currentRoot);
         // ignore prefix spaces and comments
         const startOffset = fullText.indexOf("`") + 1;
@@ -37,7 +37,7 @@ export default {
             text: fullText.slice(startOffset, fullText.length + endOffset),
         };
     },
-    getMiddleTailTemplatePart(node: ts.TemplateMiddle | ts.TemplateTail) {
+    getMiddleTailTemplatePart(node: ts.TemplateMiddle | ts.TemplateTail): TemplatePart {
         // Use text, not fullText, to avoid prefix comments, which are part of the
         // expression.
         const text = node.getText(currentRoot);
@@ -63,26 +63,29 @@ export default {
     getTemplateParts(node: ts.TemplateLiteral): TemplatePart[] {
         if (ts.isNoSubstitutionTemplateLiteral(node)) {
             // "`string`"
-            return [this.getHeadTemplatePart(node)];
+            return [typescriptStrategy.getHeadTemplatePart(node)];
         }
 
         return [
             // "`head${" "}middle${" "}tail`"
-            this.getHeadTemplatePart(node.head),
-            ...node.templateSpans.map((templateSpan) => this.getMiddleTailTemplatePart(templateSpan.literal)),
+            typescriptStrategy.getHeadTemplatePart(node.head),
+            ...node.templateSpans.map((templateSpan) => typescriptStrategy.getMiddleTailTemplatePart(templateSpan.literal)),
         ];
     },
     isTaggedTemplate: ts.isTaggedTemplateExpression,
     isTemplate: ts.isTemplateLiteral,
-    walkChildNodes(node: ts.Node, visit: (node: ts.Node) => void) {
+    walkChildNodes(node: ts.Node, visit: (node: ts.Node) => void): void {
         visit(node);
         ts.forEachChild(node, (child) => {
-            this.walkChildNodes(child, visit);
+            typescriptStrategy.walkChildNodes(child, visit);
         });
     },
-    walkNodes(root: ts.SourceFile, visit: (node: ts.Node) => void) {
+    walkNodes(root: ts.SourceFile, visit: (node: ts.Node) => void): void {
         currentRoot = root;
-        this.walkChildNodes(root, visit);
+        typescriptStrategy.walkChildNodes(root, visit);
         currentRoot = undefined;
     },
-} as TypescriptStrategy;
+};
+
+export type { TypescriptStrategy };
+export default typescriptStrategy;

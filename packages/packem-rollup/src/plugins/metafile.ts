@@ -8,13 +8,13 @@ interface MetaInfo {
 
 const metafilePlugin = (): Plugin =>
     ({
-        async generateBundle(outputOptions: OutputOptions, outputBundle: OutputBundle) {
+        generateBundle(outputOptions: OutputOptions, outputBundle: OutputBundle) {
             const deps: MetaInfo[] = [];
 
             for (const id of this.getModuleIds()) {
                 const moduleInfo = this.getModuleInfo(id);
 
-                if (moduleInfo != undefined && !moduleInfo.isExternal) {
+                if (moduleInfo !== null && !moduleInfo.isExternal) {
                     for (const target of moduleInfo.importedIds) {
                         deps.push({
                             source: id,
@@ -31,7 +31,7 @@ const metafilePlugin = (): Plugin =>
             const outputBundleKeys = Object.keys(outputBundle);
 
             this.emitFile({
-                fileName: `metafile-${(outputBundleKeys[0] as string).replace(ENDING_REGEX, "")}-${outputOptions.format}.json`,
+                fileName: `metafile-${(outputBundleKeys[0] as string).replace(ENDING_REGEX, "")}-${outputOptions.format ?? "unknown"}.json`,
                 source: JSON.stringify(deps, undefined, 2),
                 type: "asset",
             });

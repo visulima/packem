@@ -10,13 +10,15 @@
 import { DEFAULT_EXTENSIONS } from "@visulima/packem-share/constants";
 import { basename } from "@visulima/path";
 
+const RUNTIME_LAYER_REGEX = /^(\w+)-runtime$/;
+
 const getCustomModuleLayer = (moduleId: string): string | undefined => {
     const segments = basename(moduleId).split(".");
 
     if (segments.length >= 2) {
         const [layerSegment, extension] = segments.slice(-2);
-        const baseName = segments[0];
-        const match = /^(\w+)-runtime$/.exec(layerSegment as string);
+        const baseName = segments[0] ?? "";
+        const match = RUNTIME_LAYER_REGEX.exec(layerSegment as string);
         const layer = match?.[1];
 
         if (DEFAULT_EXTENSIONS.includes(extension as string) && layer && layer.length > 0) {

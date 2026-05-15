@@ -43,9 +43,19 @@ interface DebarrelContext {
 const IS_SOURCE_EXT = /\.[mc]?tsx?(?:\?.*)?$/;
 
 // Consider TS/JS and their JSX variants, plus common index.* barrels
-const POSSIBLE_BARREL_SPECIFIER = /(?:\.(?:[tj]s|[tj]sx)|\/index\.(?:[tj]s|[tj]sx))(?:\?.*)?$/;
+const POSSIBLE_BARREL_SPECIFIER = /(?:\.[tj]sx?|\/index\.[tj]sx?)(?:\?.*)?$/;
 
 const IS_EXPORT_PREFIXED = /^\s*export/;
+
+const DEFAULT_IMPORT_RE = /^(?:import|export)\s+([\w$]+)/;
+// eslint-disable-next-line sonarjs/slow-regex -- pattern is bounded by `{` or `,` separators in import specifier lists; inputs are short.
+const LEADING_TRAILING_DEFAULT_RE = /([\w$]+)\s*,\s*\{|\}\s*,\s*([\w$]+)/;
+const IMPORT_NAMES_TOKENIZER_RE = /[{,]\s*(type\s+)?([\w$]+)(?:\s+as\s+([\w$]+))?/gi;
+const DEFAULT_RE_EXPORT_NAME_RE = /default\s+([a-zA-Z_$][\w$]*)(?:[;\n]|$)/;
+// eslint-disable-next-line sonarjs/slow-regex -- pattern is anchored at end of string and inputs are short import-clause slices.
+const TRAILING_AS_ALIAS_RE = /([\w$]+)\s*as\s*$/;
+const WILDCARD_EXPORT_RE = /^export\s+\*(?!\s+as)/;
+const AS_KEYWORD_RE = /\bas\b/;
 
 const EMPTY_PARSE_RESULT: SimpleParseResult = { exports: [], facade: false, imports: [] };
 
@@ -63,13 +73,25 @@ const isPossibleBarrelSpecifier = (id: string, options: DebarrelPluginOptions) =
     }
 
     if (options.possibleBarrelFiles) {
-        return options.possibleBarrelFiles.some((pattern) => id.match(pattern));
+        return options.possibleBarrelFiles.some((pattern) => {
+            if (typeof pattern === "string") {
+                return id.includes(pattern);
+            }
+
+            return pattern.test(id);
+        });
     }
 
     return false;
 };
 
-const getDeclarationKind = (specifiers: string) => (IS_EXPORT_PREFIXED.test(specifiers) ? "export" : "import");
+const getDeclarationKind = (specifiers: string): "export" | "import" => {
+    if (IS_EXPORT_PREFIXED.test(specifiers)) {
+        return "export";
+    }
+
+    return "import";
+};
 
 const { parseAsync } = rsModuleLexer;
 
@@ -124,12 +146,7 @@ const readFileCached = (context: DebarrelContext, id: string) => {
 };
 
 const getImportNames = (specifiers: string): ImportName[] => {
-    const defaultImportRegex = /^(?:import|export)\s+([\w$]+)/;
-
-    const leadingTrailingDefaultRegex = /([\w$]+)\s*,\s*\{|\}\s*,\s*([\w$]+)/;
-    const importNamesTokenizer = /[{,]\s*(type\s+)?([\w$]+)(?:\s+as\s+([\w$]+))?/gi;
-
-    importNamesTokenizer.lastIndex = 0;
+    IMPORT_NAMES_TOKENIZER_RE.lastIndex = 0;
 
     const names: ImportName[] = [];
 
@@ -138,34 +155,29 @@ const getImportNames = (specifiers: string): ImportName[] => {
     }
 
     if (!specifiers.includes("{")) {
-        const defaultMatch = specifiers.match(defaultImportRegex);
+        const defaultMatch = DEFAULT_IMPORT_RE.exec(specifiers);
 
         if (defaultMatch) {
-            names.push({ imported: "default", local: defaultMatch[1] as string });
+            names.push({ imported: "default", local: defaultMatch[1] });
         }
 
         return names;
     }
 
-    const defaultMatch = specifiers.match(leadingTrailingDefaultRegex);
+    const defaultMatch = LEADING_TRAILING_DEFAULT_RE.exec(specifiers);
 
     if (defaultMatch) {
-        names.push({ imported: "default", local: (defaultMatch[1] || defaultMatch[2]) as string });
+        names.push({ imported: "default", local: defaultMatch[1] ?? defaultMatch[2] });
     }
 
-    let token: RegExpExecArray | null;
+    let token: RegExpExecArray | null = IMPORT_NAMES_TOKENIZER_RE.exec(specifiers);
 
-    // eslint-disable-next-line no-cond-assign
-    while (token = importNamesTokenizer.exec(specifiers)) {
-        if (token[1]) {
-            continue; // types
+    while (token !== null) {
+        if (!token[1] && token[2]) {
+            names.push({ imported: token[2], local: token[3] });
         }
 
-        if (!token[2]) {
-            continue;
-        }
-
-        names.push({ imported: token[2] as string, local: token[3] as string | undefined });
+        token = IMPORT_NAMES_TOKENIZER_RE.exec(specifiers);
     }
 
     return names;
@@ -176,8 +188,8 @@ const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], co
 
     let imp = imports.find((index: ImportSpecifier) => index.ss < exp.s && index.se > exp.e && index.d === -1);
 
-    if (!imp || !imp.n) {
-        const ln = localExportName || code.slice(exp.s).match(/default\s+([a-zA-Z_$][\w$]*)(?:;|\n|$)/)?.[1];
+    if (!imp?.n) {
+        const ln = localExportName ?? DEFAULT_RE_EXPORT_NAME_RE.exec(code.slice(exp.s))?.[1];
 
         if (ln) {
             imp = imports.find((index: ImportSpecifier) => {
@@ -197,7 +209,7 @@ const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], co
         const slice = code.slice(imp.ss, exp.s);
 
         if (!slice.includes("*")) {
-            const ln = slice.match(/([\w$]+)\s*as\s*$/)?.[1];
+            const ln = TRAILING_AS_ALIAS_RE.exec(slice)?.[1];
 
             if (ln) {
                 localExportName = ln;
@@ -208,80 +220,93 @@ const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], co
     return { imp, localExportName } as { imp: ImportSpecifier | undefined; localExportName?: string };
 };
 
-const resolveThroughBarrel = async (
+const findAliasedImportName = (specifiers: string, exportName: string): string | undefined => {
+    if (getDeclarationKind(specifiers) !== "import" || !AS_KEYWORD_RE.test(specifiers)) {
+        return undefined;
+    }
+
+    // Ensure we only match full identifier aliases, not prefixes
+    const regex = new RegExp(String.raw`(\w+)\s+as\s+${exportName}(?!\w)`);
+
+    return regex.exec(specifiers)?.[0];
+};
+
+// Forward declaration to support mutual recursion between helpers and `resolveThroughBarrel`.
+let resolveThroughBarrel: (
     context: DebarrelContext,
     id: string,
     exportName: string,
     options: DebarrelPluginOptions,
     logger: Console,
+) => Promise<ResolvedSource>;
+
+const resolveExportThroughBarrel = async (
+    context: DebarrelContext,
+    id: string,
+    code: string,
+    exp: ExportSpecifier,
+    imports: ImportSpecifier[],
+    exportName: string,
+    options: DebarrelPluginOptions,
+    logger: Console,
 ): Promise<ResolvedSource> => {
     const { resolve } = context;
-    const code = await readFileCached(context, id);
-    const { exports, imports } = await parsePotentialBarrelFile(context, id, code, logger);
+    const matchingImport = findMatchingImport(exp, imports, code);
+    const { imp, localExportName } = matchingImport;
 
-    // Walk all explicit export specifiers
-    for await (const exp of exports) {
-        const exported = exp.n;
+    if (!imp?.n) {
+        return { exportName, id, resolved: true };
+    }
 
-        if (exported !== exportName) {
-            continue;
-        }
+    if (imp.d > -1) {
+        return { exportName, id, resolved: true };
+    }
 
-        const matchingImport = findMatchingImport(exp, imports, code);
-        const { imp, localExportName } = matchingImport;
+    const specifiers = code.slice(imp.ss, exp.s);
+    const aliasedImportName = findAliasedImportName(specifiers, exportName);
+    const resolved = await resolve(imp.n, id);
+    const resolvedId = resolved?.id;
 
-        if (!imp || !imp.n) {
-            return { exportName, id, resolved: true };
-        }
-
-        if (imp.d > -1) {
-            return { exportName, id, resolved: true };
-        }
-
-        let aliasedImportName: string | undefined;
-        const specifiers = code.slice(imp.ss, exp.s);
-
-        if (getDeclarationKind(specifiers) === "import" && /\bas\b/.test(specifiers)) {
-            // Ensure we only match full identifier aliases, not prefixes
-            const regex = new RegExp(String.raw`(\w+)\s+as\s+${exportName}(?!\w)`);
-
-            aliasedImportName = specifiers.match(regex)?.[0];
-        }
-
-        const resolved = await resolve(imp.n, id);
-        const resolvedId = resolved?.id;
-
-        if (!resolvedId) {
-            return {
-                aliasedImportName,
-                exportName: localExportName,
-                id,
-                resolved: false,
-            };
-        }
-
-        if (isPossibleBarrelSpecifier(resolvedId, options)) {
-            return resolveThroughBarrel(context, resolvedId, localExportName || exported, options, logger);
-        }
-
+    if (!resolvedId) {
         return {
             aliasedImportName,
-            exportName: localExportName || exportName,
-            id: resolvedId,
+            exportName: localExportName,
+            id,
             resolved: false,
         };
     }
 
-    // Attempt to resolve via wildcard re-exports
-    const wildcards = imports.filter((index) => /^export\s+\*(?!\s+as)/.test(code.slice(index.ss, index.s)));
+    if (isPossibleBarrelSpecifier(resolvedId, options)) {
+        return resolveThroughBarrel(context, resolvedId, localExportName ?? exp.n, options, logger);
+    }
+
+    return {
+        aliasedImportName,
+        exportName: localExportName ?? exportName,
+        id: resolvedId,
+        resolved: false,
+    };
+};
+
+const resolveWildcardReExports = async (
+    context: DebarrelContext,
+    id: string,
+    code: string,
+    imports: ImportSpecifier[],
+    exportName: string,
+    options: DebarrelPluginOptions,
+    logger: Console,
+): Promise<ResolvedSource | undefined> => {
+    const wildcards = imports.filter((index) => WILDCARD_EXPORT_RE.test(code.slice(index.ss, index.s)));
 
     if (wildcards.length === 1) {
         const first = wildcards[0];
         const name = first?.n;
-        const resolveId = name ? (await context.resolve(name, id))?.id : undefined;
+        const resolveResult = name ? await context.resolve(name, id) : undefined;
+        const resolveId = resolveResult?.id;
 
         if (!resolveId) {
-            return { exportName, id, resolved: false };
+            return undefined;
         }
 
         const inner = await resolveThroughBarrel(context, resolveId, exportName, options, logger);
@@ -292,8 +317,14 @@ const resolveThroughBarrel = async (
     } else if (wildcards.length > 1) {
         const returnValue = await Promise.all(
             wildcards.map(async (wc) => {
-                const module_ = wc.n;
-                const resolveId = module_ ? (await context.resolve(module_, id))?.id : undefined;
+                const moduleName = wc.n;
+
+                if (!moduleName) {
+                    return undefined;
+                }
+
+                const resolveResult = await context.resolve(moduleName, id);
+                const resolveId = resolveResult?.id;
 
                 if (!resolveId) {
                     return undefined;
@@ -306,16 +337,46 @@ const resolveThroughBarrel = async (
         const selected = returnValue.find((wc) => wc?.resolved);
 
         if (selected) {
-            return selected as ResolvedSource;
+            return selected;
         }
+    }
+
+    return undefined;
+};
+
+resolveThroughBarrel = async (
+    context: DebarrelContext,
+    id: string,
+    exportName: string,
+    options: DebarrelPluginOptions,
+    logger: Console,
+): Promise<ResolvedSource> => {
+    const code = await readFileCached(context, id);
+    const { exports, imports } = await parsePotentialBarrelFile(context, id, code, logger);
+
+    // Walk all explicit export specifiers
+    for (const exp of exports) {
+        if (exp.n !== exportName) {
+            continue;
+        }
+
+        // eslint-disable-next-line no-await-in-loop -- sequential per-export resolution is required because we return on the first match.
+        return await resolveExportThroughBarrel(context, id, code, exp, imports, exportName, options, logger);
+    }
+
+    // Attempt to resolve via wildcard re-exports
+    const wildcardResult = await resolveWildcardReExports(context, id, code, imports, exportName, options, logger);
+
+    if (wildcardResult) {
+        return wildcardResult;
     }
 
     return { exportName, id, resolved: false };
 };
 
-const getDeclarationClause = (resolvedSource: ResolvedSource, importName: ImportName, declarationKind: "import" | "export") => {
+const getDeclarationClause = (resolvedSource: ResolvedSource, importName: ImportName, declarationKind: "import" | "export"): string => {
     const { aliasedImportName, exportName } = resolvedSource;
-    const local = importName.local || importName.imported;
+    const local = importName.local ?? importName.imported;
 
     if (aliasedImportName) {
         return `{${aliasedImportName}}`;
@@ -325,9 +386,10 @@ const getDeclarationClause = (resolvedSource: ResolvedSource, importName: Import
         return local;
     }
 
-    const isLocallyAliased = exportName !== local;
+    const effectiveExport = exportName ?? local;
+    const isLocallyAliased = effectiveExport !== local;
 
-    return `{${isLocallyAliased ? `${exportName} as ${local}` : exportName}}`;
+    return `{${isLocallyAliased ? `${effectiveExport} as ${local}` : effectiveExport}}`;
 };
 
 const getDebarrelModifications = async (context: DebarrelContext, id: string, _code: string, options: DebarrelPluginOptions, logger: Console) => {
@@ -373,21 +435,12 @@ const getDebarrelModifications = async (context: DebarrelContext, id: string, _c
                 const replacements = await Promise.all(
                     importNames.map(async (importName) => {
                         const debarrelled = await resolveThroughBarrel(context, resolvedId, importName.imported, options, logger);
-
-                        if (!debarrelled) {
-                            return undefined;
-                        }
-
                         const clause = getDeclarationClause(debarrelled, importName, declarationKind);
                         const moduleSpecifier = JSON.stringify(debarrelled.id);
 
                         return `${declarationKind} ${clause} from ${moduleSpecifier}`;
                     }),
                 );
-
-                if (replacements.includes(undefined)) {
-                    return;
-                }
 
                 // Apply modifications using positions from original file
                 // Most transformations preserve import statements, so positions should match
@@ -420,7 +473,7 @@ const applyModifications = (id: string, code: string, modifications: Modificatio
 
     return {
         code: out.toString(),
-        map: sourceMap ? (out.generateMap({ file: id }) as any) : undefined,
+        map: sourceMap ? out.generateMap({ file: id }) : undefined,
     };
 };
 
@@ -461,9 +514,14 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
 
         // align sourcemap behavior with Rollup options
         options(inputOptions) {
-            const sm
-                = (inputOptions as any).output
-                    && (Array.isArray((inputOptions as any).output) ? (inputOptions as any).output[0]?.sourcemap : (inputOptions as any)?.output?.sourcemap);
+            const { output } = inputOptions as { output?: { sourcemap?: boolean } | { sourcemap?: boolean }[] };
+            let sm: boolean | undefined;
+
+            if (Array.isArray(output)) {
+                sm = output[0]?.sourcemap;
+            } else if (output) {
+                sm = output.sourcemap;
+            }
 
             if (sm === false) {
                 sourceMap = false;

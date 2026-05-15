@@ -24,22 +24,39 @@ export type ResolveExternalsPluginOptions = {
      */
     builtinsPrefix?: "add" | "ignore" | "strip";
 
-    /** Mark `dependencies` as external. @default true */
+    /**
+     * Mark `dependencies` as external.
+     * @default true
+     */
     deps?: boolean;
 
-    /** Mark `devDependencies` as external. @default false */
+    /**
+     * Mark `devDependencies` as external.
+     * @default false
+     */
     devDeps?: boolean;
 
     /**
-     * Force exclude these ids from the external list, regardless of other
-     * settings. @default []
+     * Patterns whose matching specifiers are forced to be bundled,
+     * overriding all other rules (deps/peer/built-ins/etc.).
+     *
+     * Strings are matched as exact specifiers; RegExp values are tested
+     * against the import id. Falsy entries are ignored for convenient
+     * conditional configuration.
+     * @default [] (no specifier is forcibly bundled)
      */
     exclude?: MaybeFalsy<RegExp | string>[];
 
-    /** Mark `optionalDependencies` as external. @default true */
+    /**
+     * Mark `optionalDependencies` as external.
+     * @default true
+     */
     optDeps?: boolean;
 
-    /** Mark `peerDependencies` as external. @default true */
+    /**
+     * Mark `peerDependencies` as external.
+     * @default true
+     */
     peerDeps?: boolean;
 };
 
@@ -60,11 +77,15 @@ export type ExternalsBuildOptions = {
     };
     rootDir: string;
     sourceDir?: string;
-    validation?: false | {
-        dependencies?: false | {
-            hoisted?: false | { exclude: string[] };
+    validation?:
+        | false
+        | {
+            dependencies?:
+                | false
+                | {
+                    hoisted?: false | { exclude: string[] };
+                };
         };
-    };
 };
 
 export type ExternalsPluginOptions = {
@@ -80,7 +101,7 @@ export type ExternalsPluginOptions = {
     dtsResolve?: boolean | (string | RegExp)[];
 
     /**
-     * Enables recommendation warnings for @types/X vs X dependency-placement
+     * Enables recommendation warnings for `@types/X` vs X dependency-placement
      * mismatches. Enabled for DTS builds.
      */
     forTypes?: boolean;

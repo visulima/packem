@@ -9,6 +9,7 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import type { Plugin } from "rollup";
 
+// eslint-disable-next-line import/no-namespace -- exposes the minifier as a namespace so consumers can reference both runtime fn & type
 import * as minify from "./lib/minify-html-literals.js";
 
 /**
@@ -53,14 +54,12 @@ export const minifyHTMLLiteralsPlugin = ({
 }: MinifyHTMLLiteralsOptions & {
     logger: Console;
 }): Plugin => {
-    if (!minifyHTMLLiterals) {
-        // eslint-disable-next-line no-param-reassign
-        minifyHTMLLiterals = minify.minifyHTMLLiterals;
-    }
+    // eslint-disable-next-line no-param-reassign
+    minifyHTMLLiterals ??= minify.minifyHTMLLiterals;
 
     const filter = createFilter(include, exclude);
 
-    const minifyOptions = <minify.DefaultOptions>options || {};
+    const minifyOptions = (options ?? {}) as minify.DefaultOptions;
 
     return {
         name: "packem:minify-html-literals",

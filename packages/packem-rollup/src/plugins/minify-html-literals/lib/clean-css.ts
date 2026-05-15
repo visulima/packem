@@ -6,11 +6,6 @@
  * Copyright (c) 2024 Google LLC
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type CleanCssOptions = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type CleanCssOptimizationsOptions = any;
-
 export interface OptimizationLevel {
     One: "1";
     Two: "2";
@@ -18,9 +13,11 @@ export interface OptimizationLevel {
 }
 
 export interface OptimizationLevelOptions {
-    [key: string]: Required<Omit<Exclude<CleanCssOptimizationsOptions, undefined>, "all">>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- clean-css types are intentionally permissive here
+    [key: string]: Required<Omit<Exclude<any, undefined>, "all">>;
 }
 
 export declare const OptimizationLevel: OptimizationLevel;
 
-export declare function optimizationLevelFrom(source: CleanCssOptions): OptimizationLevelOptions;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- clean-css types are intentionally permissive here
+export declare function optimizationLevelFrom(source: any): OptimizationLevelOptions;

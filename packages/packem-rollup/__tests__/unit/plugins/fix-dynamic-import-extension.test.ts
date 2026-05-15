@@ -20,7 +20,7 @@ describe(fixDynamicImportExtension, () => {
             code: string,
             chunk: RenderedChunk,
             options: NormalizedOutputOptions,
-        ) => { code: string; map: any } | undefined;
+        ) => { code: string; map: unknown } | undefined;
 
         it("should replace .ts with .mjs for es format", () => {
             expect.assertions(1);

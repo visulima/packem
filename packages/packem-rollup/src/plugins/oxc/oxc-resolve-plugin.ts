@@ -14,16 +14,13 @@ const packageJsonCache: FindPackageJsonCache = new Map();
 const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, logger: Console, tsconfigPath?: string): Plugin => {
     const { ignoreSideEffectsForRoot, ...userOptions } = options;
 
-    let resolver = cachedResolver;
+    cachedResolver ??= new ResolverFactory({
+        ...userOptions,
+        roots: [...userOptions.roots ?? [], rootDirectory],
+        tsconfig: tsconfigPath ? { configFile: tsconfigPath, references: "auto" } : undefined,
+    });
 
-    if (!resolver) {
-        // eslint-disable-next-line no-multi-assign
-        resolver = cachedResolver = new ResolverFactory({
-            ...userOptions,
-            roots: [...userOptions.roots ?? [], rootDirectory],
-            tsconfig: tsconfigPath ? { configFile: tsconfigPath, references: "auto" } : undefined,
-        });
-    }
+    const resolver = cachedResolver;
 
     return <Plugin>{
         name: "oxc-resolve",
@@ -80,10 +77,11 @@ const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, log
                             });
                         }
                     }
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                } catch (catchError: any) {
+                } catch (catchError: unknown) {
+                    const errorMessage = catchError instanceof Error ? catchError.message : String(catchError);
+
                     // eslint-disable-next-line no-console
-                    console.debug(catchError.message, {
+                    console.debug(errorMessage, {
                         context: [
                             {
                                 basedir: resolveDirectory,

@@ -36,6 +36,9 @@ const REGEX_PATTERNS = {
     require: /const\s+__cjs_require\s*=\s*(?:__cjs_)?createRequire\s*\([^)]*\);\s*/g,
 } as const;
 
+const DEFAULT_EXCLUDE = [/node_modules/, /\.d\.[cm]?ts$/];
+const DEFAULT_INCLUDE = [/\.[cm]?[jt]sx?$/];
+
 // Global state
 let cjsLexerInitialized = false;
 
@@ -56,7 +59,7 @@ const shouldTransformImport = async (
 
     const transformResult = await shouldTransform?.(source, cwd, resolveId);
 
-    return transformResult === undefined ? await isPureCJS(source, cwd, resolveId) : transformResult;
+    return transformResult ?? await isPureCJS(source, cwd, resolveId);
 };
 
 const generateRequireCode = (source: string, isBuiltin: boolean): { code: string; needsBuiltin: boolean; needsProcess: boolean; needsRequire: boolean } => {
@@ -129,9 +132,9 @@ const resolveOptions = (options: Options): OptionsResolved => {
 
     return {
         builtinNodeModules: !!options.builtinNodeModules,
-        cwd: options.cwd || process.cwd(),
-        exclude: options.exclude || [/node_modules/, /\.d\.[cm]?ts$/],
-        include: options.include || [/\.[cm]?[jt]sx?$/],
+        cwd: options.cwd ?? process.cwd(),
+        exclude: options.exclude ?? DEFAULT_EXCLUDE,
+        include: options.include ?? DEFAULT_INCLUDE,
         order: "order" in options ? options.order : "pre",
         shouldTransform: options.shouldTransform,
     };
@@ -156,6 +159,7 @@ export type TransformFunction = (
      * Rollup resolve function for better module resolution
      */
     rollupResolve: (id: string, importer?: string) => Promise<ResolvedId | null>,
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- void is intentionally allowed for hooks that may not return anything
 ) => Awaitable<boolean | undefined | void>;
 
 export interface Options {
@@ -171,7 +175,7 @@ export interface Options {
     cwd?: string;
     exclude?: FilterPattern;
     include?: FilterPattern;
-    order?: "pre" | "post" | undefined;
+    order?: "pre" | "post";
 
     /**
      * A function to determine whether a module should be transformed.
@@ -220,7 +224,7 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                 let needsProcess = false;
                 let needsBuiltin = false;
 
-                for await (const stmt of parsed.program.body) {
+                for (const stmt of parsed.program.body) {
                     if (stmt.type !== "ImportDeclaration" || stmt.importKind === "type") {
                         continue;
                     }
@@ -229,6 +233,7 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                     const isBuiltin = isBuiltinModule(source, builtinNodeModules);
                     const resolveId = this.resolve;
 
+                    // eslint-disable-next-line no-await-in-loop -- sequential per-import classification is required; results feed subsequent state updates
                     if (!await shouldTransformImport(source, isBuiltin, shouldTransform, cwd, resolveId)) {
                         continue;
                     }
@@ -275,7 +280,7 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                     const codes: string[] = [];
 
                     if (namespaceId) {
-                        defaultId ||= `_cjs_${namespaceId}_default`;
+                        defaultId ??= `_cjs_${namespaceId}_default`;
                     }
 
                     if (defaultId) {
@@ -283,11 +288,11 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                     }
 
                     if (namespaceId) {
-                        codes.push(`const ${namespaceId} = { ...${defaultId}, default: ${defaultId} };`);
+                        codes.push(`const ${namespaceId} = { ...${defaultId ?? ""}, default: ${defaultId ?? ""} };`);
                     }
 
                     if (mapping.length > 0) {
-                        const destructuring = `const {\n${mapping.map(([k, v]) => `  ${k === v ? v : `${k}: ${v}`}`).join(",\n")}\n} = ${defaultId || requireCode};`;
+                        const destructuring = `const {\n${mapping.map(([k, v]) => `  ${k === v ? v : `${k}: ${v}`}`).join(",\n")}\n} = ${defaultId ?? requireCode};`;
 
                         codes.push(destructuring);
                     }

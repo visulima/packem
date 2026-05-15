@@ -70,12 +70,15 @@ const findBestPatternMatch = <T>(values: ReadonlyArray<T>, getPattern: (value: T
 };
 
 /**
- * patternStrings contains both pattern strings (containing "*") and regular strings.
- * Return an exact match if possible, or a pattern match, or undefined.
+ * Returns an exact-match pattern string or the best matching `Pattern`.
+ *
+ * `patternStrings` contains both pattern strings (containing "*") and regular strings.
+ * Returns an exact match if possible, or a pattern match, or undefined.
  *
  * These are verified by verifyCompilerOptions to have 0 or 1 "*" characters.
  * @see https://github.com/microsoft/TypeScript/blob/main/src/compiler/program.ts#L4332-L4365
  */
+// eslint-disable-next-line sonarjs/function-return-type
 const matchPatternOrExact = (patternStrings: ReadonlyArray<string>, candidate: string): Pattern | string | undefined => {
     const patterns: Pattern[] = [];
 
@@ -98,8 +101,10 @@ const matchPatternOrExact = (patternStrings: ReadonlyArray<string>, candidate: s
 };
 
 /**
+ * Returns the substring of `candidate` matching the wildcard `*` in `pattern`.
+ *
  * Given that candidate matches pattern, returns the text matching the '*'.
- * E.g.: matchedText(tryParsePattern("foo*baz"), "foobarbaz") === "bar"
+ * E.g.: `matchedText(tryParsePattern("foo*baz"), "foobarbaz") === "bar"`.
  */
 // eslint-disable-next-line unicorn/prefer-string-slice
 const matchedText = (pattern: Pattern, candidate: string): string => candidate.substring(pattern.prefix.length, candidate.length - pattern.suffix.length);
@@ -116,7 +121,9 @@ const getTsconfigPaths = (
 } => {
     let resolvedBaseUrl: string = dirname(tsconfig.path);
 
+    // eslint-disable-next-line sonarjs/deprecation
     if (tsconfig.config.compilerOptions?.baseUrl) {
+        // eslint-disable-next-line sonarjs/deprecation
         resolvedBaseUrl = resolve(rootDirectory, tsconfig.config.compilerOptions.baseUrl);
     }
 
@@ -146,9 +153,11 @@ export type TsconfigPathsPluginOptions = {
 };
 
 /**
- * Handles tsconfig.json or jsconfig.js "paths" option for webpack
- * Largely based on how the TypeScript compiler handles it:
- * https://github.com/microsoft/TypeScript/blob/1a9c8197fffe3dace5f8dca6633d450a88cba66d/src/compiler/moduleNameResolver.ts#L1362
+ * Rollup plugin that resolves module ids using `tsconfig.json`/`jsconfig.json` "paths".
+ *
+ * Handles tsconfig.json or jsconfig.json "paths" option for rollup, largely based
+ * on how the TypeScript compiler handles it.
+ * @see https://github.com/microsoft/TypeScript/blob/1a9c8197fffe3dace5f8dca6633d450a88cba66d/src/compiler/moduleNameResolver.ts#L1362
  */
 export const resolveTsconfigPathsPlugin = (
     rootDirectory: string,
@@ -219,7 +228,7 @@ export const resolveTsconfigPathsPlugin = (
             const matchedStar = typeof matchedPattern === "string" ? undefined : matchedText(matchedPattern, id);
             const matchedPatternText = typeof matchedPattern === "string" ? matchedPattern : patternText(matchedPattern);
 
-            for await (const tsPath of paths[matchedPatternText] as string[]) {
+            for (const tsPath of paths[matchedPatternText] as string[]) {
                 const currentPath = matchedStar ? tsPath.replace("*", matchedStar) : tsPath;
 
                 // Ensure .d.ts is not matched
@@ -230,6 +239,8 @@ export const resolveTsconfigPathsPlugin = (
                 const candidate = join(resolvedBaseUrl, currentPath);
 
                 try {
+                    // Sequentially try each candidate path; return the first successful resolution.
+                    // eslint-disable-next-line no-await-in-loop
                     const resolved = await this.resolve(candidate, importer, { skipSelf: true, ...options });
 
                     if (resolved) {
@@ -238,7 +249,7 @@ export const resolveTsconfigPathsPlugin = (
                 } catch (error) {
                     logger.debug({
                         context: [error],
-                        message: `Failed to resolve ${candidate} from ${id as string}`,
+                        message: `Failed to resolve ${candidate} from ${id}`,
                         prefix: "plugin:resolve-tsconfig-paths",
                     });
                 }

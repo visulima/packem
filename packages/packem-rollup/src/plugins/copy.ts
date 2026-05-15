@@ -4,8 +4,18 @@ import { readFile } from "@visulima/fs";
 import { arrayify } from "@visulima/packem-share/utils";
 import { basename, dirname, join, normalize, relative } from "@visulima/path";
 import globParent from "glob-parent";
-import type { Plugin, PluginContext } from "rollup";
+import type { Plugin } from "rollup";
 import { glob } from "tinyglobby";
+
+type FileDesc = { copied: string[]; dest: string[]; timestamp: number; transform?: (content: Buffer, filename: string) => Buffer | string };
+
+type SingleTargetDesc = {
+    dest?: string;
+    exclude?: string[] | string;
+    src: string[] | string;
+};
+
+type MultipleTargetsDesc = SingleTargetDesc | SingleTargetDesc[] | string[] | string;
 
 export type CopyPluginOptions = {
     /**
@@ -21,16 +31,6 @@ export type CopyPluginOptions = {
      */
     flatten?: boolean;
     targets: MultipleTargetsDesc;
-};
-
-type FileDesc = { copied: string[]; dest: string[]; timestamp: number; transform?: (content: Buffer, filename: string) => Buffer | string };
-
-type MultipleTargetsDesc = SingleTargetDesc | SingleTargetDesc[] | string[] | string;
-
-type SingleTargetDesc = {
-    dest?: string;
-    exclude?: string[] | string;
-    src: string[] | string;
 };
 
 export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin => {
@@ -57,7 +57,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin 
 
                 return undefined;
             })
-            .filter(Boolean) as SingleTargetDesc[];
+            .filter(Boolean);
     } else if (typeof targets === "string") {
         targets = [{ src: targets }];
     }
@@ -66,16 +66,18 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin 
         async buildStart() {
             const results = await Promise.all(
                 (targets as SingleTargetDesc[])
-                    .flatMap((target) =>
-                        Array.isArray(target.src)
-                            ? target.src.map((itemSource) => {
-                                  return {
-                                      ...target,
-                                      src: itemSource,
-                                  };
-                              })
-                            : target,
-                    )
+                    .flatMap((target): SingleTargetDesc[] => {
+                        if (Array.isArray(target.src)) {
+                            return target.src.map((itemSource) => {
+                                return {
+                                    ...target,
+                                    src: itemSource,
+                                };
+                            });
+                        }
+
+                        return [target];
+                    })
                     .map(
                         async (target) =>
                             await glob(arrayify(target.src), { ignore: arrayify(target.exclude).filter(Boolean) }).then((result) => {
@@ -109,7 +111,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin 
                         fileDesc.dest.push(destination);
                     }
 
-                    (this as unknown as PluginContext).addWatchFile(file);
+                    this.addWatchFile(file);
                 }
             }
 
@@ -138,9 +140,9 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin 
                             fileDesc.copied = [];
                         }
 
-                        source = (await readFile(fileName, {
+                        source = await readFile(fileName, {
                             buffer: true,
-                        })) as unknown as Uint8Array;
+                        });
                     } catch (error: unknown) {
                         logger.error({
                             context: [error],
@@ -162,7 +164,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin 
                         const destinationFileName = join(destination, baseName);
 
                         try {
-                            (this as unknown as PluginContext).emitFile({
+                            this.emitFile({
                                 [config.exactFileNames ? "fileName" : "name"]: destinationFileName,
                                 source,
                                 type: "asset",

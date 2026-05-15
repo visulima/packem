@@ -1,9 +1,26 @@
-import type { NormalizedOutputOptions, PluginContext, RenderedChunk } from "rollup";
+import type { NormalizedOutputOptions, ObjectHook, Plugin, PluginContext, RenderedChunk } from "rollup";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import { fixDtsDefaultCjsExportsPlugin } from "../../../src/plugins/fix-dts-default-cjs-exports";
 
-const mockWarn = vi.fn();
+type RenderChunkHook = NonNullable<Plugin["renderChunk"]>;
+type RenderChunkHandler = RenderChunkHook extends ObjectHook<infer Handler> ? Handler : RenderChunkHook;
+
+const mockWarn = vi.fn<(message: string) => void>();
+
+const getRenderChunkHandler = (plugin: Plugin): RenderChunkHandler => {
+    const hook = plugin.renderChunk;
+
+    if (typeof hook === "function") {
+        return hook;
+    }
+
+    if (hook && typeof hook === "object" && "handler" in hook && typeof hook.handler === "function") {
+        return hook.handler;
+    }
+
+    throw new TypeError("plugin.renderChunk is not callable");
+};
 
 const getCode = (result: string | { code: string } | null | undefined): string | undefined => {
     if (typeof result === "string") {
@@ -27,7 +44,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
         expect(plugin).toBeInstanceOf(Object);
         expect(plugin.name).toBe("packem:fix-dts-default-cjs-exports-plugin");
 
-        expectTypeOf(plugin.renderChunk).toBeFunction();
+        expectTypeOf(getRenderChunkHandler(plugin)).toBeFunction();
     });
 
     describe("renderChunk", () => {
@@ -40,21 +57,16 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
 
         beforeEach(() => {
             const pluginInstance = fixDtsDefaultCjsExportsPlugin();
-            const rollupContext = { warn: mockWarn } as unknown as PluginContext;
+            const rollupContext = { warn: mockWarn } as unknown as ThisParameterType<RenderChunkHandler>;
+            const directRenderChunk = getRenderChunkHandler(pluginInstance);
 
-            const directRenderChunk = pluginInstance.renderChunk as unknown as (
-                this: PluginContext,
-                code: string,
-                chunk: RenderedChunk,
-                options: NormalizedOutputOptions,
-                meta: { chunks: Record<string, RenderedChunk> },
-            ) => string | { code: string; map?: unknown } | null | undefined;
-
-            if (typeof directRenderChunk !== "function") {
-                throw new TypeError("fixDtsDefaultCjsExportsPlugin.renderChunk is not a function");
-            }
-
-            renderChunk = (code, chunk, options, meta) => directRenderChunk.call(rollupContext, code, chunk as RenderedChunk, options, meta);
+            renderChunk = (code, chunk, options, meta) => directRenderChunk.call(
+                rollupContext,
+                code,
+                chunk as RenderedChunk,
+                options,
+                meta,
+            ) as string | { code: string; map?: unknown } | null | undefined;
         });
 
         afterEach(() => {
@@ -350,7 +362,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 type: "chunk",
             };
             const plugin = fixDtsDefaultCjsExportsPlugin();
-            const mockContext = { warn: vi.fn() } as unknown as PluginContext;
+            const mockContext = { warn: vi.fn<() => void>() } as unknown as PluginContext;
 
             const result
                 = typeof plugin.renderChunk === "function"
@@ -359,7 +371,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                         code,
                         chunkInfo as RenderedChunk,
                         {} as NormalizedOutputOptions,
-                        { chunks: {} } as { chunks: Record<string, RenderedChunk> },
+                        { chunks: {} },
                     )
                     : undefined;
 
@@ -378,7 +390,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 type: "chunk",
             };
             const plugin = fixDtsDefaultCjsExportsPlugin();
-            const mockContext = { warn: vi.fn() } as unknown as PluginContext;
+            const mockContext = { warn: vi.fn<() => void>() } as unknown as PluginContext;
 
             const result
                 = typeof plugin.renderChunk === "function"
@@ -387,7 +399,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                         code,
                         chunkInfo as RenderedChunk,
                         {} as NormalizedOutputOptions,
-                        { chunks: {} } as { chunks: Record<string, RenderedChunk> },
+                        { chunks: {} },
                     )
                     : undefined;
 
@@ -430,6 +442,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate AST node name in test description
         it("should handle TSModuleDeclaration and TSImportEqualsDeclaration processed by createCjsNamespace (L272-273, L280-281 coverage)", () => {
             expect.assertions(2);
 
@@ -521,6 +534,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate handler name in test description
         it("handleDefaultCJSExportAsDefault: should prepend import if no existing imports (L388-406)", () => {
             expect.assertions(2);
 
@@ -539,6 +553,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate handler name in test description
         it("handleDefaultCJSExportAsDefault: should append import if existing imports (L388-406)", () => {
             expect.assertions(2);
 
@@ -557,6 +572,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate handler name in test description
         it("handleDefaultCJSExportAsDefault: should create namespace if exportList has items (L393, L403)", () => {
             expect.assertions(2);
 
@@ -576,6 +592,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate handler name in test description
         it("handleNoSpecifierDefaultCJSExport: should create namespace for local default and named value export", () => {
             expect.assertions(2);
 
@@ -592,7 +609,7 @@ export { MyNamedImport as default, anotherValue };`;
             };
             const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const output = getCode(result)?.trim().replaceAll("\r\n", "\n");
-            // This test, despite its old name, currently tests handleNoSpecifierDefaultCJSExport
+            // This test, despite its old name, currently tests the no-specifier default CJS export handler
             // due to its input code `export { MyNamedImport as default, anotherValue };` (no 'from ...')
             const expected = `// @ts-ignore
 MyNamedImport;
@@ -609,6 +626,7 @@ export = MyNamedImport;`;
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate handler name in test description
         it("handleDefaultNamedCJSExport: should warn if import exists but does not provide alias", () => {
             expect.assertions(2);
 
@@ -627,6 +645,7 @@ export { MyNamedImport as default } from 'some-module';`;
             expect(mockWarn).toHaveBeenCalledExactlyOnceWith(`Cannot parse "MyNamedImport" named export from some-module import at test.d.ts!.`);
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate handler name in test description
         it("handleDefaultNamedCJSExport: re-export with alias and others, existing import provides alias", () => {
             expect.assertions(2);
 
@@ -662,6 +681,7 @@ export = N;`;
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate handler name in test description
         it("handleDefaultNamedCJSExport: re-export with alias and others, NO existing import for module", () => {
             expect.assertions(2);
 
@@ -693,6 +713,7 @@ export = N;`;
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate handler name in test description
         it("handleDefaultCJSExportAsDefault: existing import, no other exports in list", () => {
             expect.assertions(2);
 
@@ -714,6 +735,7 @@ export = ActualDefaultName;`;
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets -- legitimate handler name in test description
         it("handleDefaultCJSExportAsDefault: existing import, with other exports in list", () => {
             expect.assertions(2);
 

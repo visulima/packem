@@ -1,18 +1,24 @@
-import type { Pail } from "@visulima/pail";
 import { describe, expect, it, vi } from "vitest";
 
 import { minifyHTMLLiteralsPlugin } from "../../../src/plugins/minify-html-literals";
+
+type TransformResult = { code: string; map?: unknown } | undefined;
+type TransformFunction = (code: string, id: string) => Promise<TransformResult>;
+
+const HTML_JS_RE = /\.html\.js$/;
+
+const createMockLogger = (): Console => ({
+    debug: vi.fn<() => void>(),
+    error: vi.fn<() => void>(),
+    info: vi.fn<() => void>(),
+    warn: vi.fn<() => void>(),
+} as unknown as Console);
 
 describe(minifyHTMLLiteralsPlugin, () => {
     it("should return a plugin object", () => {
         expect.assertions(3);
 
-        const logger = {
-            debug: vi.fn(),
-            error: vi.fn(),
-            info: vi.fn(),
-            warn: vi.fn(),
-        } as unknown as Pail;
+        const logger = createMockLogger();
 
         const plugin = minifyHTMLLiteralsPlugin({ logger });
 
@@ -22,15 +28,10 @@ describe(minifyHTMLLiteralsPlugin, () => {
     });
 
     describe("transform", () => {
-        const logger = {
-            debug: vi.fn(),
-            error: vi.fn(),
-            info: vi.fn(),
-            warn: vi.fn(),
-        } as unknown as Pail;
+        const logger = createMockLogger();
 
         const plugin = minifyHTMLLiteralsPlugin({ logger });
-        const transform = plugin.transform as (code: string, id: string) => Promise<{ code: string; map?: any } | undefined>;
+        const transform = plugin.transform as unknown as TransformFunction;
 
         it("should minify HTML in tagged template literals", async () => {
             expect.assertions(2);
@@ -46,7 +47,7 @@ describe(minifyHTMLLiteralsPlugin, () => {
             const result = await transform(code, "test.js");
 
             expect(result).toBeDefined();
-            expect(result!.code).toContain("<div class=\"container\"><h1>Hello World</h1><p>This is a test</p></div>");
+            expect(result?.code).toContain("<div class=\"container\"><h1>Hello World</h1><p>This is a test</p></div>");
         });
 
         it("should minify CSS in tagged template literals", async () => {
@@ -64,17 +65,17 @@ describe(minifyHTMLLiteralsPlugin, () => {
             const result = await transform(code, "test.js");
 
             expect(result).toBeDefined();
-            expect(result!.code).toContain(".container{display:flex;justify-content:center}");
+            expect(result?.code).toContain(".container{display:flex;justify-content:center}");
         });
 
         it("should handle files that don't match the filter", async () => {
             expect.assertions(1);
 
             const pluginWithFilter = minifyHTMLLiteralsPlugin({
-                include: /\.html\.js$/,
+                include: HTML_JS_RE,
                 logger,
             });
-            const transformWithFilter = pluginWithFilter.transform as (code: string, id: string) => Promise<{ code: string; map?: any } | undefined>;
+            const transformWithFilter = pluginWithFilter.transform as unknown as TransformFunction;
 
             const code = "const template = html`<div>Hello</div>`;";
             const result = await transformWithFilter(code, "test.js");

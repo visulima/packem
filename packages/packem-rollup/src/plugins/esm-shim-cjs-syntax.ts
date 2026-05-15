@@ -8,7 +8,7 @@ import { findStaticImports } from "mlly";
 import type { Plugin } from "rollup";
 import { minVersion } from "semver";
 
-export const GLOBAL_REQUIRE_REGEX: RegExp = /(?:^|[^.\w'"`])require(\.resolve)?\(\s*([\w'"`])/;
+const GLOBAL_REQUIRE_REGEX: RegExp = /(?:^|[^.\w'"`])require(\.resolve)?\(\s*([\w'"`])/;
 
 // Shim __dirname, __filename and require
 const CJSToESM = (code: string, shim: (hasFilename: boolean, hasDirname: boolean, hasGlobalRequire: boolean) => string) => {
@@ -107,12 +107,12 @@ const generateCJSShimNode20_11 = (hasFilename: boolean, hasDirname: boolean, has
     return shim;
 };
 
-export interface EsmShimCjsSyntaxOptions {
+interface EsmShimCjsSyntaxOptions {
     exclude?: FilterPattern;
     include?: FilterPattern;
 }
 
-export const esmShimCjsSyntaxPlugin = (packageJson: PackageJson, options: EsmShimCjsSyntaxOptions): Plugin => {
+const esmShimCjsSyntaxPlugin = (packageJson: PackageJson, options: EsmShimCjsSyntaxOptions): Plugin => {
     const filter = createFilter(options.include, options.exclude);
 
     return {
@@ -136,3 +136,6 @@ export const esmShimCjsSyntaxPlugin = (packageJson: PackageJson, options: EsmShi
         },
     } satisfies Plugin;
 };
+
+export type { EsmShimCjsSyntaxOptions };
+export { esmShimCjsSyntaxPlugin, GLOBAL_REQUIRE_REGEX };

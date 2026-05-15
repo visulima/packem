@@ -2,7 +2,9 @@ import { copyFile } from "node:fs/promises";
 
 import { ensureDir, isAccessible } from "@visulima/fs";
 import { basename, dirname, extname, join, resolve } from "@visulima/path";
-import type { NormalizedOutputOptions, Plugin } from "rollup";
+import type { InputOptions, NormalizedOutputOptions, OutputOptions, Plugin } from "rollup";
+
+const NODE_EXT_RE = /\.node$/;
 
 // Counter-based virtual ID prefix — rolldown 1.0 treats `\0name:path`-style IDs
 // as relative paths and prepends cwd, breaking the round-trip. A counter avoids
@@ -62,7 +64,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
             // Deduplicate by source path — multiple imports of the same file share an outputName.
             const seenSources = new Set<string>();
-            const copies: Array<Promise<void>> = [];
+            const copies: Promise<void>[] = [];
 
             for (const { outputName, sourcePath } of virtualEntries.values()) {
                 if (seenSources.has(sourcePath)) {
@@ -88,10 +90,9 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
             // If distributionDirectory is not set yet, try to get it from this context
             if (!distributionDirectory) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const rollupContext = this as any;
+                const rollupContext = this as unknown as { meta?: { rollupVersion?: string } };
 
-                if (rollupContext && rollupContext.meta && rollupContext.meta.rollupVersion) {
+                if (rollupContext.meta?.rollupVersion) {
                     // We're in a rollup context, but output dir might not be available yet
                     // Return a placeholder that will be resolved later
                     return `export default require("./${nativesDirectory}/${outputName}");`;
@@ -110,15 +111,14 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
         options(options) {
             // Extract output directory from Rollup options
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const options_ = options as any;
+            const withOutput = options as InputOptions & { output?: OutputOptions | OutputOptions[] };
 
-            if (options_.output) {
-                const output = Array.isArray(options_.output) ? options_.output[0] : options_.output;
+            if (withOutput.output) {
+                const output = Array.isArray(withOutput.output) ? withOutput.output[0] : withOutput.output;
 
-                if (output.dir) {
+                if (output?.dir) {
                     distributionDirectory = output.dir;
-                } else if (output.file) {
+                } else if (output?.file) {
                     distributionDirectory = dirname(output.file);
                 }
             }
@@ -128,7 +128,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
         resolveId: {
             filter: {
-                id: /\.node$/,
+                id: NODE_EXT_RE,
             },
             async handler(source, importer) {
                 if (source.startsWith(PREFIX)) {
@@ -140,7 +140,6 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
                 // resolution produces a nonsense path. Mark it external so the
                 // require() / createRequire() call passes through to runtime.
                 if (importer?.startsWith(PREFIX)) {
-                    // eslint-disable-next-line unicorn/no-null
                     return { external: true, id: source };
                 }
 
@@ -164,17 +163,17 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
                 let suffix = 1;
 
                 // Handle name collisions by checking already staged output names.
-                const stagedOutputNames = new Set(Array.from(virtualEntries.values(), (e) => e.outputName));
+                const stagedOutputNames = new Set(Array.from(virtualEntries.values(), (entry) => entry.outputName));
 
                 while (stagedOutputNames.has(outputName)) {
                     const extension = extname(resolvedPathBasename);
                     const name = basename(resolvedPathBasename, extension);
 
-                    outputName = `${name}_${suffix}${extension}`;
+                    outputName = `${name}_${String(suffix)}${extension}`;
                     suffix += 1;
                 }
 
-                const virtualId = `${PREFIX}${counter}`;
+                const virtualId = `${PREFIX}${String(counter)}`;
 
                 counter += 1;
                 virtualEntries.set(virtualId, { outputName, sourcePath: resolvedPath });

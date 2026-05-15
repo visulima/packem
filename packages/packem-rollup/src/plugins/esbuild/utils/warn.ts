@@ -9,7 +9,9 @@ const warn = async (pluginContext: PluginContext, messages: Message[]): Promise<
             kind: "warning",
         });
 
-        warnings.forEach((warning) => pluginContext.warn(warning));
+        warnings.forEach((warning) => {
+            pluginContext.warn(warning);
+        });
     }
 };
 

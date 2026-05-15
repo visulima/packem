@@ -30,12 +30,12 @@ const VIRTUAL_PREFIX = "\0packem-import-attribute/";
 
 // Matches:  import <bindings>? from "path" with { type: "text"|"bytes" }
 // Bindings can include default, namespace, named, side-effect-only forms.
-const STATIC_IMPORT_WITH_ATTR = /(\bimport\b[\s\S]*?from\s*["'])([^"']+?)(["'])\s*with\s*\{\s*type\s*:\s*["'](text|bytes)["']\s*\}/g;
+const STATIC_IMPORT_WITH_ATTR = /(import[\s\S]+?from\s*["'])([^"']+)(["'])\s*with\s*\{\s*type\s*:\s*["'](text|bytes)["']\s*\}/g;
 
 // Matches:  import("path", { with: { type: "text"|"bytes" } })
-const DYNAMIC_IMPORT_WITH_ATTR = /(\bimport\s*\(\s*["'])([^"']+?)(["']\s*,\s*\{\s*with\s*:\s*\{\s*type\s*:\s*["'])(text|bytes)(["']\s*\}\s*\}\s*\))/g;
+const DYNAMIC_IMPORT_WITH_ATTR = /(\bimport\s*\(\s*["'])([^"']+)["']\s*,\s*\{\s*with\s*:\s*\{\s*type\s*:\s*["'](text|bytes)["']\s*\}\s*\}\s*\)/g;
 
-const SOURCE_FILE = /\.(?:[mc]?[jt]sx?|[mc]ts)$/;
+const SOURCE_FILE = /\.[mc]?[jt]sx?$/;
 
 interface AttributeEntry {
     importer: string;
@@ -43,12 +43,13 @@ interface AttributeEntry {
     type: "bytes" | "text";
 }
 
+// eslint-disable-next-line import/prefer-default-export -- public API surface stays named for plugin consumers
 export const importAttributesPlugin = (): Plugin => {
     const entries = new Map<string, AttributeEntry>();
     let counter = 0;
 
     const allocateId = (entry: AttributeEntry): string => {
-        const id = `${VIRTUAL_PREFIX}${counter}`;
+        const id = `${VIRTUAL_PREFIX}${String(counter)}`;
 
         counter += 1;
         entries.set(id, entry);
@@ -57,71 +58,9 @@ export const importAttributesPlugin = (): Plugin => {
     };
 
     return {
-        name: "packem:import-attributes",
-
         buildStart() {
             entries.clear();
             counter = 0;
-        },
-
-        transform(code, id) {
-            // Skip our own virtual modules and non-source files.
-            const baseId = id.split("?")[0] ?? id;
-
-            if (baseId.startsWith(VIRTUAL_PREFIX) || !SOURCE_FILE.test(baseId)) {
-                // eslint-disable-next-line unicorn/no-null
-                return null;
-            }
-
-            // Cheap pre-check before running the regex on every source file.
-            if (!code.includes("with") || (!code.includes("text") && !code.includes("bytes"))) {
-                // eslint-disable-next-line unicorn/no-null
-                return null;
-            }
-
-            let modified = false;
-
-            const rewritten = code
-                .replace(STATIC_IMPORT_WITH_ATTR, (_match, before: string, modulePath: string, quote: string, type: string) => {
-                    modified = true;
-
-                    const virtualId = allocateId({ importer: id, source: modulePath, type: type as "bytes" | "text" });
-
-                    return `${before}${virtualId}${quote}`;
-                })
-                .replace(DYNAMIC_IMPORT_WITH_ATTR, (_match, before: string, modulePath: string, _mid: string, type: string) => {
-                    modified = true;
-
-                    const virtualId = allocateId({ importer: id, source: modulePath, type: type as "bytes" | "text" });
-
-                    // Drop the attributes object entirely; the virtual ID encodes the type.
-                    return `${before}${virtualId}")`;
-                });
-
-            if (!modified) {
-                // eslint-disable-next-line unicorn/no-null
-                return null;
-            }
-
-            // eslint-disable-next-line unicorn/no-null
-            return { code: rewritten, map: null };
-        },
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        resolveId(source, _importer) {
-            if (!source.startsWith(VIRTUAL_PREFIX)) {
-                // eslint-disable-next-line unicorn/no-null
-                return null;
-            }
-
-            // Our virtual IDs are already absolute — return as-is so the bundler doesn't
-            // try to resolve them against the filesystem.
-            if (entries.has(source)) {
-                return source;
-            }
-
-            // eslint-disable-next-line unicorn/no-null
-            return null;
         },
 
         async load(id) {
@@ -153,6 +92,61 @@ export const importAttributesPlugin = (): Plugin => {
             const content = await readFile(filePath);
 
             return `export default new Uint8Array([${content.join(",")}])`;
+        },
+
+        name: "packem:import-attributes",
+
+        resolveId(source, _importer) {
+            if (!source.startsWith(VIRTUAL_PREFIX)) {
+                // eslint-disable-next-line unicorn/no-null
+                return null;
+            }
+
+            // Our virtual IDs are already absolute — return as-is so the bundler doesn't
+            // try to resolve them against the filesystem.
+            if (entries.has(source)) {
+                return source;
+            }
+
+            // eslint-disable-next-line unicorn/no-null
+            return null;
+        },
+
+        transform(code, id) {
+            // Skip our own virtual modules and non-source files.
+            const baseId = id.split("?")[0] ?? id;
+
+            if (baseId.startsWith(VIRTUAL_PREFIX) || !SOURCE_FILE.test(baseId)) {
+                // eslint-disable-next-line unicorn/no-null
+                return null;
+            }
+
+            // Cheap pre-check before running the regex on every source file.
+            if (!code.includes("with") || (!code.includes("text") && !code.includes("bytes"))) {
+                // eslint-disable-next-line unicorn/no-null
+                return null;
+            }
+
+            const rewritten = code
+                .replaceAll(STATIC_IMPORT_WITH_ATTR, (_match, before: string, modulePath: string, quote: string, type: string) => {
+                    const virtualId = allocateId({ importer: id, source: modulePath, type: type as "bytes" | "text" });
+
+                    return `${before}${virtualId}${quote}`;
+                })
+                .replaceAll(DYNAMIC_IMPORT_WITH_ATTR, (_match, before: string, modulePath: string, type: string) => {
+                    const virtualId = allocateId({ importer: id, source: modulePath, type: type as "bytes" | "text" });
+
+                    // Drop the attributes object entirely; the virtual ID encodes the type.
+                    return `${before}${virtualId}")`;
+                });
+
+            if (rewritten === code) {
+                // eslint-disable-next-line unicorn/no-null
+                return null;
+            }
+
+            // eslint-disable-next-line unicorn/no-null
+            return { code: rewritten, map: null };
         },
     };
 };

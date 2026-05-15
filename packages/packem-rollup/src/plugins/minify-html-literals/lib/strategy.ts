@@ -21,8 +21,10 @@ const OptimizationLevel = {
 
 type OptimizationLevelKey = (typeof OptimizationLevel)[keyof typeof OptimizationLevel];
 
-const optimizationLevelFrom = (level: CleanCSS.Options["level"]) => {
-    const defaultLevel = {
+type OptimizationLevels = Record<OptimizationLevelKey, Record<string, unknown>>;
+
+const optimizationLevelFrom = (level: CleanCSS.Options["level"]): OptimizationLevels => {
+    const defaultLevel: OptimizationLevels = {
         [OptimizationLevel.One]: {
             tidySelectors: false,
             transform: undefined,
@@ -47,26 +49,29 @@ const optimizationLevelFrom = (level: CleanCSS.Options["level"]) => {
         };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return level as any;
+    return level as unknown as OptimizationLevels;
 };
 
+// eslint-disable-next-line sonarjs/slow-regex -- bounded character class with no overlapping quantifiers; input is css from clean-css output, not user controlled
+const PSEUDO_CLASS_WITH_ARGS_RE = /(:[^()\s]+\(([^()]*)\))\s*\{/g;
+const WHITESPACE_RE = /\s/g;
+const HAS_WHITESPACE_RE = /\s/;
+
 const fixCleanCssTidySelectors = (original: string, result: string): string => {
-    const regex = /(:.+\((.*)\))\s*\{/g;
+    let next = result;
+    const matches = [...original.matchAll(PSEUDO_CLASS_WITH_ARGS_RE)];
 
-    let match: RegExpMatchArray | null;
-
-    while ((match = regex.exec(original)) !== null) {
+    for (const match of matches) {
         const pseudoClass = match[1] as string;
         const parameters = match[2] as string;
 
-        if (!pseudoClass || !parameters || !/\s/.test(parameters)) {
+        if (!pseudoClass || !parameters || !HAS_WHITESPACE_RE.test(parameters)) {
             continue;
         }
 
-        const parametersWithoutSpaces = parameters.replaceAll(/\s/g, "");
+        const parametersWithoutSpaces = parameters.replaceAll(WHITESPACE_RE, "");
         const resultPseudoClass = pseudoClass.replace(parameters, parametersWithoutSpaces);
-        const resultStartIndex = result.indexOf(resultPseudoClass);
+        const resultStartIndex = next.indexOf(resultPseudoClass);
 
         if (resultStartIndex === -1) {
             continue;
@@ -75,11 +80,10 @@ const fixCleanCssTidySelectors = (original: string, result: string): string => {
         const resultEndIndex = resultStartIndex + resultPseudoClass.length;
 
         // Restore the original pseudo class with spaces
-        // eslint-disable-next-line no-param-reassign
-        result = result.slice(0, Math.max(0, resultStartIndex)) + pseudoClass + result.slice(Math.max(0, resultEndIndex));
+        next = next.slice(0, Math.max(0, resultStartIndex)) + pseudoClass + next.slice(Math.max(0, resultEndIndex));
     }
 
-    return result;
+    return next;
 };
 
 /**
@@ -163,13 +167,16 @@ export const defaultMinifyOptions: HTMLOptions = {
 
 export const adjustMinifyCSSOptions = (options: CleanCSS.Options = {}): CleanCSS.Options => {
     const level = optimizationLevelFrom(options.level);
-    const originalTransform = typeof options.level === "object" && options.level[1] && options.level[1].transform;
+    const originalTransform: ((property: string, value: string) => string) | false
+        = typeof options.level === "object" && typeof options.level[1]?.transform === "function"
+            ? options.level[1].transform
+            : false;
 
-    level[OptimizationLevel.One].transform = (property: string, value: string) => {
+    level[OptimizationLevel.One].transform = (property: string, value: string): string => {
         if (value.startsWith("@TEMPLATE_EXPRESSION") && !value.endsWith(";")) {
             // The CSS minifier has removed the semicolon from the placeholder
             // and we need to add it back.
-            return (value = `${value};`);
+            return `${value};`;
         }
 
         return originalTransform ? originalTransform(property, value) : value;
@@ -177,7 +184,7 @@ export const adjustMinifyCSSOptions = (options: CleanCSS.Options = {}): CleanCSS
 
     return {
         ...options,
-        level,
+        level: level as unknown as CleanCSS.Options["level"],
     };
 };
 
@@ -205,14 +212,15 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
     },
     minifyCSS(css, options = {}) {
         const adjustedOptions = adjustMinifyCSSOptions(options);
-        const output = new CleanCSS(<OptionsOutput>adjustedOptions).minify(css);
+        const output = new CleanCSS(adjustedOptions as OptionsOutput).minify(css);
 
-        if (output.errors && output.errors.length > 0) {
+        if (output.errors.length > 0) {
             throw new Error(output.errors.join("\n\n"));
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if ((adjustedOptions.level as any)?.[OptimizationLevel.One]?.tidySelectors) {
+        const levels = adjustedOptions.level as OptimizationLevels | undefined;
+
+        if (levels?.[OptimizationLevel.One]?.tidySelectors) {
             output.styles = fixCleanCssTidySelectors(css, output.styles);
         }
 
@@ -242,10 +250,10 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
             // html-minifier does not support removing newlines inside <svg>
             // attributes. Support this, but be careful not to remove newlines from
             // supported areas (such as within <pre> and <textarea> tags).
-            const matches = [...result.matchAll(/<svg/g)].reverse();
+            const matches = [...result.matchAll(/<svg/g)].toReversed();
 
             for (const match of matches) {
-                const startTagIndex = match.index!;
+                const startTagIndex = match.index;
                 const closeTagIndex = result.indexOf("</svg", startTagIndex);
 
                 if (closeTagIndex === -1) {
@@ -254,7 +262,7 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
                 }
 
                 const start = result.slice(0, Math.max(0, startTagIndex));
-                let svg = result.substring(startTagIndex, closeTagIndex);
+                let svg = result.slice(startTagIndex, closeTagIndex);
                 const end = result.slice(Math.max(0, closeTagIndex));
 
                 svg = svg.replaceAll(/\r?\n/g, "");
@@ -262,8 +270,11 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
             }
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (adjustedMinifyCSSOptions && (adjustedMinifyCSSOptions.level as any)?.[OptimizationLevel.One]?.tidySelectors) {
+        const adjustedLevels = adjustedMinifyCSSOptions
+            ? (adjustedMinifyCSSOptions.level as OptimizationLevels | undefined)
+            : undefined;
+
+        if (adjustedLevels?.[OptimizationLevel.One]?.tidySelectors) {
             // Fix https://github.com/jakubpawlowicz/clean-css/issues/996
             result = fixCleanCssTidySelectors(html, result);
         }
@@ -277,7 +288,7 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
         if (placeholder.endsWith(";")) {
             const withoutSemicolon = placeholder.slice(0, Math.max(0, placeholder.length - 1));
 
-            for (let index = parts.length - 1; index >= 0; index--) {
+            for (let index = parts.length - 1; index >= 0; index -= 1) {
                 const part = parts[index];
 
                 if (part !== undefined) {

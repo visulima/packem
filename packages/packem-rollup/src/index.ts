@@ -5,13 +5,7 @@ export { default as fixDynamicImportExtension } from "./plugins/fix-dynamic-impo
 export { default as metafilePlugin } from "./plugins/metafile";
 export { pureNewExpressionPlugin } from "./plugins/pure-new-expression-plugin";
 export { default as resolveFileUrlPlugin } from "./plugins/resolve-file-url";
-export type {
-    ExtendedRollupNodeResolveOptions,
-    PackemRollupOptions,
-    RollupPlugins,
-    TransformerFn,
-    TransformerName,
-} from "./types";
+export type { ExtendedRollupNodeResolveOptions, PackemRollupOptions, RollupPlugins, TransformerFn, TransformerName } from "./types";
 export { default as createSplitChunks } from "./utils/chunks/create-split-chunks";
 export { default as getCustomModuleLayer } from "./utils/chunks/get-custom-module-layer";
 export { default as getModuleLayer } from "./utils/chunks/get-module-layer";

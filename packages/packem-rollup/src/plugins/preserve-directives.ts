@@ -115,17 +115,12 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
              * - shebang can only contain one line
              * - shebang must starts with # and !
              *
-             * Those assumptions are also made by acorn, babel and swc:
-             *
-             * - acorn: https://github.com/acornjs/acorn/blob/8da1fdd1918c9a9a5748501017262ce18bb2f2cc/acorn/src/state.js#L78
-             * - babel: https://github.com/babel/babel/blob/86fee43f499c76388cab495c8dcc4e821174d4e0/packages/babel-parser/src/tokenizer/index.ts#L574
-             * - swc: https://github.com/swc-project/swc/blob/7bf4ab39b0e49759d9f5c8d7f989b3ed010d81a7/crates/swc_ecma_parser/src/lexer/mod.rs#L204
+             * Those assumptions are also made by acorn, babel and swc; see their parser sources for confirmation.
              */
             if (code.startsWith("#") && code[1] === "!") {
                 let firstNewLineIndex = 0;
 
-                // eslint-disable-next-line @typescript-eslint/naming-convention,no-plusplus
-                for (let index = 2, length_ = code.length; index < length_; index++) {
+                for (let codeLength = code.length, index = 2; index < codeLength; index += 1) {
                     const charCode = code.codePointAt(index);
 
                     if (charCode === 10 || charCode === 13 || charCode === 0x20_28 || charCode === 0x20_29) {
@@ -153,7 +148,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
             let ast: Node | undefined;
 
             try {
-                ast = this.parse(magicString.toString(), { allowReturnOutsideFunction: true }) as Node;
+                ast = this.parse(magicString.toString(), { allowReturnOutsideFunction: true });
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
                 this.warn({
@@ -166,10 +161,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 return undefined;
             }
 
-            // Exit if the root of the AST is not a Program
-            if (ast.type !== "Program") {
-                return undefined;
-            }
+            // `ast.type` is typed as the literal "Program" by this.parse, so no runtime check is needed here.
 
             for (const node of ast.body.filter(Boolean)) {
                 // Only parse the top level directives, once reached to the first non statement literal node, stop parsing
@@ -180,8 +172,8 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 let directive: string | undefined;
 
                 /**
-                 * rollup and estree defines `directive` field on the `ExpressionStatement` node:
-                 * https://github.com/rollup/rollup/blob/fecf0cfe14a9d79bb0eff4ad475174ce72775ead/src/ast/nodes/ExpressionStatement.ts#L10
+                 * rollup and estree defines `directive` field on the `ExpressionStatement` node;
+                 * see rollup's ExpressionStatement.ts source.
                  */
                 if ("directive" in node) {
                     directive = node.directive;
@@ -194,13 +186,17 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 }
 
                 if (directive) {
-                    directives[id] ||= new Set<string>();
+                    const existing = directives[id];
 
-                    (directives[id] as Set<string>).add(directive);
+                    if (existing) {
+                        existing.add(directive);
+                    } else {
+                        directives[id] = new Set<string>([directive]);
+                    }
 
                     /**
-                     * rollup has extended acorn node with the `start` and the `end` field
-                     * https://github.com/rollup/rollup/blob/fecf0cfe14a9d79bb0eff4ad475174ce72775ead/src/ast/nodes/shared/Node.ts#L33
+                     * rollup has extended acorn node with the `start` and the `end` field;
+                     * see rollup's Node.ts source for the extended shape.
                      *
                      * However, typescript doesn't know that, so we add type guards for typescript
                      * to infer.

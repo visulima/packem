@@ -131,6 +131,7 @@ export type RollupPlugins = {
     type?: "build" | "dts";
 }[];
 
+// eslint-disable-next-line unicorn/prevent-abbreviations -- `TransformerFn` is part of the public API; renaming would be a breaking change.
 export type TransformerFn = ((config: EsbuildPluginConfig | InternalOXCTransformPluginConfig | SucrasePluginConfig | SwcPluginConfig) => Plugin) & {
     NAME?: TransformerName;
 };

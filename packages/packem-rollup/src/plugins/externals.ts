@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- Pail type from @visulima/pail alpha references a broken `./pail.d.ts` path; the underlying logger is functional at runtime */
 import fs from "node:fs";
 
 import { cyan } from "@visulima/colorize";
@@ -14,15 +15,20 @@ import type { ExternalsBuildOptions, ExternalsPluginOptions } from "./externals-
 
 type MaybeFalsy<T> = T | false | null | undefined;
 
+const REGEX_ESCAPE_RE = /[.*+?^${}()|[\]\\]/g;
+const MATCH_ALL_RE = /.*/;
+const RELATIVE_OR_NULL_RE = /^(?:\0|\.{1,2}\/)/;
+const NODE_PREFIX_RE = /^node:/;
+
 const getRegExps = (data: MaybeFalsy<RegExp | string>[], type: "exclude" | "include", logger: Pail): RegExp[] =>
     // eslint-disable-next-line unicorn/no-array-reduce
     data.reduce<RegExp[]>((result, entry, index) => {
         if (entry instanceof RegExp) {
             result.push(entry);
         } else if (typeof entry === "string" && entry.length > 0) {
-            result.push(new RegExp(`^${entry.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}$`));
+            result.push(new RegExp(`^${entry.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}$`));
         } else {
-            logger.warn(`Ignoring wrong entry type #${index} in '${type}' option: ${JSON.stringify(entry)}`);
+            logger.warn(`Ignoring wrong entry type #${String(index)} in '${type}' option: ${JSON.stringify(entry)}`);
         }
 
         return result;
@@ -56,7 +62,7 @@ const getAtTypesPackageName = (packageName: string): string => {
     if (packageName.startsWith("@")) {
         const [scope, name] = packageName.split("/");
 
-        return `${scope}/types/${name}`;
+        return `${scope ?? ""}/types/${name ?? ""}`;
     }
 
     return `${typesPrefix}${packageName}`;
@@ -67,7 +73,7 @@ const getOriginalPackageName = (typePackageName: string): string => {
         const parts = typePackageName.split("/");
 
         if (parts[1] === "types") {
-            return `@${parts[0]}/${parts.slice(2).join("/")}`;
+            return `@${parts[0] ?? ""}/${parts.slice(2).join("/")}`;
         }
     }
 
@@ -98,6 +104,7 @@ export type { ExternalsBuildOptions, ExternalsPluginOptions, ResolveExternalsPlu
  * handles cases that need plugin context — `this.resolve`/`this.error` for
  * devDeps, `#` imports, and node builtin prefix handling.
  */
+// eslint-disable-next-line sonarjs/cognitive-complexity -- orchestration function that wires all external-decision logic into a single Rollup plugin
 export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildContext<T>, options?: ExternalsPluginOptions): Plugin => {
     const cwd = fs.realpathSync.native(process.cwd());
     const { pkg } = context;
@@ -120,24 +127,24 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
         }
     }
 
-    const devDeps = new Set<string>(Object.keys(pkg.devDependencies || {}));
+    const devDeps = new Set<string>(Object.keys(pkg.devDependencies ?? {}));
 
-    const resolvedExternalsOptions = context.options?.rollup?.resolveExternals ?? {};
+    const resolvedExternalsOptions = context.options.rollup.resolveExternals ?? {};
 
     // User-configured externals (from `externals` option + classified deps) form
     // the include set; `resolveExternals.exclude` + DTS `resolve` form the exclude set.
-    const include = new Set(getRegExps([...context.options?.externals ?? []], "include", context.logger));
+    const include = new Set(getRegExps([...context.options.externals ?? []], "include", context.logger));
     const exclude = new Set(getRegExps([...resolvedExternalsOptions.exclude ?? []], "exclude", context.logger));
 
     // dtsResolve adds to `exclude` so classified-dep externalization doesn't re-externalize
     // packages whose types the DTS plugin wants to inline.
     if (options?.dtsResolve) {
         if (options.dtsResolve === true) {
-            exclude.add(/.*/);
+            exclude.add(MATCH_ALL_RE);
         } else {
             for (const pattern of options.dtsResolve) {
                 if (typeof pattern === "string") {
-                    exclude.add(new RegExp(`^${pattern.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}(?:/.+)?$`));
+                    exclude.add(new RegExp(`^${pattern.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}(?:/.+)?$`));
                 } else {
                     exclude.add(pattern);
                 }
@@ -156,7 +163,13 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
             return dtsResolve;
         }
 
-        return dtsResolve.some((pattern) => (typeof pattern === "string" ? id === pattern : pattern.test(id)));
+        return dtsResolve.some((pattern) => {
+            if (typeof pattern === "string") {
+                return id === pattern;
+            }
+
+            return pattern.test(id);
+        });
     };
 
     const classifiedDeps: Record<string, string | undefined> = {
@@ -171,9 +184,9 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
         include.add(new RegExp(`^(?:${classifiedNames.join("|")})(?:/.+)?$`));
     }
 
-    if (pkg?.peerDependenciesMeta) {
+    if (pkg.peerDependenciesMeta) {
         for (const [key, value] of Object.entries(pkg.peerDependenciesMeta)) {
-            if (value && typeof value === "object" && "optional" in value && value.optional) {
+            if (value && typeof value === "object" && "optional" in value) {
                 include.add(new RegExp(`^${key}(?:/.+)?$`));
             }
         }
@@ -185,14 +198,18 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     let tsconfigPathPatterns: RegExp[] = [];
 
     if (context.tsconfig) {
-        tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
-            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
-        );
+        tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) => {
+            if (key.endsWith("*")) {
+                return new RegExp(`^${key.replace("*", "(.*)")}$`);
+            }
+
+            return new RegExp(`^${key}$`);
+        });
     }
 
     const resolvedAliases = resolveAliases(pkg, context.options);
-    const sourceDirPattern = context.options?.sourceDir
-        ? new RegExp(String.raw`(?:^|/)${context.options.sourceDir.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}/`)
+    const sourceDirectoryPattern = context.options.sourceDir
+        ? new RegExp(String.raw`(?:^|/)${context.options.sourceDir.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}/`)
         : undefined;
 
     const warnedAtTypes = new Set<string>();
@@ -232,9 +249,9 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
 
                 // Extract the package name for tracking.
                 const parsedName
-                    = (resolvedId && isBareSpecifier(resolvedId) && parseNodeModulePath(resolvedId)?.name)
-                    || (isBareSpecifier(originalId) && parseNodeModulePath(originalId)?.name)
-                    || (isBareSpecifier(originalId) ? getPackageName(originalId) : "");
+                    = (resolvedId && isBareSpecifier(resolvedId) && parseNodeModulePath(resolvedId).name)
+                        ?? (isBareSpecifier(originalId) && parseNodeModulePath(originalId).name)
+                        ?? (isBareSpecifier(originalId) ? getPackageName(originalId) : "");
                 const packageName = parsedName && isBareSpecifier(parsedName) && isValidPackageName(parsedName) ? parsedName : "";
 
                 // Tracking runs up front (before any decision branch), so type-only
@@ -245,9 +262,9 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     const importerFromSource = !importer || !isFromNodeModules(importer, context.options.rootDir);
                     const declared
                         = Object.keys(pkg.dependencies ?? {}).includes(packageName)
-                        || Object.keys(pkg.devDependencies ?? {}).includes(packageName)
-                        || Object.keys(pkg.peerDependencies ?? {}).includes(packageName)
-                        || Object.keys(pkg.optionalDependencies ?? {}).includes(packageName);
+                            || Object.keys(pkg.devDependencies ?? {}).includes(packageName)
+                            || Object.keys(pkg.peerDependencies ?? {}).includes(packageName)
+                            || Object.keys(pkg.optionalDependencies ?? {}).includes(packageName);
 
                     if (
                         importerFromSource
@@ -261,22 +278,15 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     }
                 }
 
-                for (const candidate of [originalId, resolvedId].filter(Boolean) as string[]) {
+                for (const candidate of [originalId, resolvedId].filter(Boolean)) {
                     // Self-import: `pkg.name` exactly or `pkg.name/subpath`. A loose
                     // `startsWith(pkg.name)` match would incorrectly treat sibling workspace
                     // packages sharing the same scope+prefix (e.g. `@visulima/packem-rollup`
                     // for `@visulima/packem`) as self-imports and stop them from being marked
                     // external, causing rollup to load their dist files during the DTS build.
-                    const isSelfImport = pkg.name
-                        ? candidate === pkg.name || candidate.startsWith(`${pkg.name}/`)
-                        : false;
+                    const isSelfImport = pkg.name ? candidate === pkg.name || candidate.startsWith(`${pkg.name}/`) : false;
 
-                    if (
-                        /^(?:\0|\.{1,2}\/)/.test(candidate)
-                        || isAbsolute(candidate)
-                        || (sourceDirPattern?.test(candidate) ?? false)
-                        || isSelfImport
-                    ) {
+                    if (RELATIVE_OR_NULL_RE.test(candidate) || isAbsolute(candidate) || (sourceDirectoryPattern?.test(candidate) ?? false) || isSelfImport) {
                         cacheResolved.set(rawOriginalId, false);
 
                         return false;
@@ -343,6 +353,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
             filter: {
                 id: (id: string) => !id.startsWith("\0"),
             },
+            // eslint-disable-next-line sonarjs/cognitive-complexity -- resolveId handler covers many distinct external-decision branches that are clearer kept inline
             async handler(id: string, importer: string | undefined, resolveOptions): Promise<ResolveIdResult> {
                 if (resolveOptions.isEntry) {
                     return undefined;
@@ -367,7 +378,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                 }
 
                 if (isNodeBuiltin(id)) {
-                    const stripped = id.replace(/^node:/, "");
+                    const stripped = id.replace(NODE_PREFIX_RE, "");
                     let prefixId: string = stripped;
 
                     if (resolvedExternalsOptions.builtinsPrefix === "add" || !isNodeBuiltin(stripped)) {
@@ -375,7 +386,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     }
 
                     return {
-                        external: (resolvedExternalsOptions.builtins || isIncluded(id)) && !isExcluded(id),
+                        external: (resolvedExternalsOptions.builtins ?? isIncluded(id)) && !isExcluded(id),
                         id: resolvedExternalsOptions.builtinsPrefix === "ignore" ? id : prefixId,
                         moduleSideEffects: false,
                     };
@@ -453,7 +464,13 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     return undefined;
                 }
 
-                if (!devDeps.has(specifierPkg) && importer && !isFromNodeModules(importer, cwd) && !options?.skipUnlistedWarnings && !warnedUnlisted.has(specifierPkg)) {
+                if (
+                    !devDeps.has(specifierPkg)
+                    && importer
+                    && !isFromNodeModules(importer, cwd)
+                    && !options?.skipUnlistedWarnings
+                    && !warnedUnlisted.has(specifierPkg)
+                ) {
                     warnedUnlisted.add(specifierPkg);
                     context.logger.warn(
                         `"${specifierPkg}" imported by "${importer}" but not declared in package.json. Will be bundled to prevent failure at runtime.`,

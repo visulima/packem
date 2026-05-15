@@ -3,5 +3,5 @@ export { patchTypescriptTypes } from "./patch-typescript-types";
 export { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./patch-typescript-types";
 export type { TsconfigPathsPluginOptions } from "./resolve-tsconfig-paths-plugin";
 export { resolveTsconfigPathsPlugin } from "./resolve-tsconfig-paths-plugin";
-export { default as resolveTsconfigRootDirectoriesPlugin } from "./resolve-tsconfig-root-dirs";
+export { default as resolveTsconfigRootDirectoriesPlugin } from "./resolve-tsconfig-root-directories";
 export { default as resolveTypescriptMjsCtsPlugin } from "./resolve-typescript-mjs-cjs";

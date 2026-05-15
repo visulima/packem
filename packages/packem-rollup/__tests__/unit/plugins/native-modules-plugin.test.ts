@@ -1,7 +1,30 @@
+import type { ObjectHook, Plugin } from "rollup";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import type { NativeModulesOptions } from "../../../src/plugins/native-modules-plugin";
 import { nativeModulesPlugin } from "../../../src/plugins/native-modules-plugin";
+
+type HookFor<K extends keyof Plugin> = NonNullable<Plugin[K]>;
+type HandlerOf<H> = H extends ObjectHook<infer Handler> ? Handler : H;
+
+const getHandler = <K extends keyof Plugin>(plugin: Plugin, key: K): HandlerOf<HookFor<K>> => {
+    const hook = plugin[key];
+
+    if (typeof hook === "function") {
+        return hook;
+    }
+
+    if (hook && typeof hook === "object" && "handler" in hook && typeof hook.handler === "function") {
+        return hook.handler as HandlerOf<HookFor<K>>;
+    }
+
+    throw new TypeError(`plugin.${key} is not callable`);
+};
+
+const mockContext = {
+    error: () => {},
+    warn: () => {},
+};
 
 describe("nativeModules plugin", () => {
     const mockOptions: NativeModulesOptions = {
@@ -56,18 +79,11 @@ describe("nativeModules plugin", () => {
         expect.assertions(1);
 
         const plugin = nativeModulesPlugin(mockOptions);
+        const handler = getHandler(plugin, "resolveId");
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const resolveIdHook = plugin.resolveId as any;
-        const handler = typeof resolveIdHook === "function" ? resolveIdHook : resolveIdHook?.handler;
-        const result = await handler?.call(
-            {
-                error: () => {},
-                warn: () => {},
-            },
-            "test.js",
-            "/test/source/file.js",
-        );
+        type Context = ThisParameterType<typeof handler>;
+
+        const result = await handler.call(mockContext as unknown as Context, "test.js", "/test/source/file.js", { attributes: {}, isEntry: false });
 
         expect(result).toBeUndefined();
     });
@@ -76,18 +92,11 @@ describe("nativeModules plugin", () => {
         expect.assertions(1);
 
         const plugin = nativeModulesPlugin(mockOptions);
+        const handler = getHandler(plugin, "resolveId");
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const resolveIdHook = plugin.resolveId as any;
-        const handler = typeof resolveIdHook === "function" ? resolveIdHook : resolveIdHook?.handler;
-        const result = await handler?.call(
-            {
-                error: () => {},
-                warn: () => {},
-            },
-            "\0natives:test.node",
-            "/test/source/file.js",
-        );
+        type Context = ThisParameterType<typeof handler>;
+
+        const result = await handler.call(mockContext as unknown as Context, "\0natives:test.node", "/test/source/file.js", { attributes: {}, isEntry: false });
 
         expect(result).toBeUndefined();
     });
@@ -96,17 +105,11 @@ describe("nativeModules plugin", () => {
         expect.assertions(1);
 
         const plugin = nativeModulesPlugin(mockOptions);
+        const handler = getHandler(plugin, "load");
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const loadHook = plugin.load as any;
-        const handler = typeof loadHook === "function" ? loadHook : loadHook?.handler;
-        const result = handler?.call(
-            {
-                error: () => {},
-                warn: () => {},
-            },
-            "not-a-virtual-module",
-        );
+        type Context = ThisParameterType<typeof handler>;
+
+        const result = handler.call(mockContext as unknown as Context, "not-a-virtual-module");
 
         expect(result).toBeUndefined();
     });
@@ -115,17 +118,17 @@ describe("nativeModules plugin", () => {
         expect.assertions(1);
 
         const plugin = nativeModulesPlugin(mockOptions);
+        const handler = getHandler(plugin, "generateBundle");
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const generateBundleHook = plugin.generateBundle as any;
-        const handler = typeof generateBundleHook === "function" ? generateBundleHook : generateBundleHook?.handler;
+        type Context = ThisParameterType<typeof handler>;
+        type GenerateBundleArguments = Parameters<typeof handler>;
 
         // This should not throw an error even with empty modulesToCopy
         await expect(
-            handler?.call({
-                error: () => {},
-                warn: () => {},
-            }),
+            handler.call(
+                mockContext as unknown as Context,
+                ...([{}, {}, true] as unknown as GenerateBundleArguments),
+            ),
         ).resolves.toBeUndefined();
     });
 
@@ -133,21 +136,15 @@ describe("nativeModules plugin", () => {
         expect.assertions(1);
 
         const plugin = nativeModulesPlugin(mockOptions);
+        const handler = getHandler(plugin, "options");
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const optionsHook = plugin.options as any;
-        const handler = typeof optionsHook === "function" ? optionsHook : optionsHook?.handler;
-        const result = handler?.call(
-            {
-                error: () => {},
-                warn: () => {},
+        type Context = ThisParameterType<typeof handler>;
+
+        const result = handler.call(mockContext as unknown as Context, {
+            output: {
+                dir: "/test/output",
             },
-            {
-                output: {
-                    dir: "/test/output",
-                },
-            },
-        );
+        } as Parameters<typeof handler>[0]);
 
         expect(result).toStrictEqual({
             output: {

@@ -4,6 +4,8 @@ import { readFile } from "@visulima/fs";
 import { loadSourceMap } from "@visulima/source-map";
 import type { ExistingRawSourceMap, Plugin, PluginContext } from "rollup";
 
+const QUERY_SUFFIX_RE = /\?[^?]*$/;
+
 export interface SourcemapsPluginOptions {
     exclude?: FilterPattern;
     include?: FilterPattern;
@@ -28,7 +30,7 @@ export const sourcemapsPlugin = ({ exclude, include }: SourcemapsPluginOptions =
             } catch {
                 try {
                     // If reading fails, try again without a query suffix that some plugins use
-                    const cleanId = id.replace(/\?.*$/, "");
+                    const cleanId = id.replace(QUERY_SUFFIX_RE, "");
 
                     code = await readFile(cleanId, { buffer: false });
 

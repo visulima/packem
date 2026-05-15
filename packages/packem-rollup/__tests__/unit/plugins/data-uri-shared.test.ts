@@ -1,6 +1,9 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { dataUriPlugin } from "../../../src/plugins/data-uri";
+import dataUriPlugin from "../../../src/plugins/data-uri";
+
+const MIN_SVG_RE = /\.min\.svg$/;
+const SVG_RE = /\.svg$/;
 
 describe("dataUriPlugin with shared utilities", () => {
     it("should import and use shared SVG utilities successfully", () => {
@@ -26,8 +29,8 @@ describe("dataUriPlugin with shared utilities", () => {
         expect.assertions(2);
 
         const plugin = dataUriPlugin({
-            exclude: [/\.min\.svg$/],
-            include: [/\.svg$/],
+            exclude: [MIN_SVG_RE],
+            include: [SVG_RE],
             srcset: true,
         });
 

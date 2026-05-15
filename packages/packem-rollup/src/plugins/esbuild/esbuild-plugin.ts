@@ -18,17 +18,18 @@ import getRenderChunk from "./utils/get-render-chunk";
 import doOptimizeDeps from "./utils/optimize-deps";
 import warn from "./utils/warn";
 
+const SOURCE_FILE_TS_RE = /\.[cm]ts/;
+
 const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap, ...esbuildOptions }: EsbuildPluginConfig): RollupPlugin => {
     const loaders = DEFAULT_LOADERS;
 
     if (_loaders !== undefined) {
-        // eslint-disable-next-line prefer-const
-        for (let [key, value] of Object.entries(_loaders)) {
+        for (const [key, value] of Object.entries(_loaders)) {
             const newKey = key.startsWith(".") ? key : `.${key}`;
 
             if (typeof value === "string") {
                 loaders[newKey] = value;
-            } else if (!value) {
+            } else {
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete loaders[newKey];
             }
@@ -75,7 +76,7 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
             sourceMap,
         }),
 
-        async resolveId(id): Promise<string | undefined> {
+        resolveId(id): string | undefined {
             if (optimizeDepsResult?.optimized.has(id)) {
                 const m = optimizeDepsResult.optimized.get(id);
 
@@ -118,7 +119,7 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
                     format: (["base64", "binary", "dataurl", "text", "json"] satisfies Loader[] as Loader[]).includes(loader) ? "esm" : undefined,
                     loader,
                     // @see https://github.com/evanw/esbuild/issues/1932#issuecomment-1013380565
-                    sourcefile: id.replace(/\.[cm]ts/, ".ts"),
+                    sourcefile: id.replace(SOURCE_FILE_TS_RE, ".ts"),
                     sourcemap: sourceMap,
                     ...esbuildOptions,
                 });

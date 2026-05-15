@@ -200,12 +200,6 @@ const resolveImplicitExternalsPlugin = <T = unknown>(context: BuildContext<T>): 
                         }
                     }
 
-                    if (!pkgJson) {
-                        resolutionCache.set(cacheKey, undefined);
-
-                        return undefined;
-                    }
-
                     // If package has exports field, let Node.js handle resolution (even if subpath not defined)
                     if (pkgJson.exports) {
                         resolutionCache.set(cacheKey, undefined);

@@ -5,7 +5,7 @@ import { findPackageJson } from "@visulima/package/package-json";
 import { init, parse } from "cjs-module-lexer";
 import type { ResolvedId } from "rollup";
 
-const initted = false;
+let initted = false;
 
 /**
  * Determines if a module is a pure CommonJS module by checking various indicators.
@@ -22,6 +22,7 @@ export const isPureCJS = async (
 ): Promise<boolean> => {
     if (!initted) {
         await init();
+        initted = true;
     }
 
     // ignore Node.js built-in modules, as their performance is comparable

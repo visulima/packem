@@ -9,8 +9,16 @@
  */
 import type { CustomPluginOptions } from "rollup";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getModuleLayer = (moduleMeta: CustomPluginOptions): any =>
-    (moduleMeta.preserveDirectives || { directives: [] }).directives.map((d: string) => d.replace(/^use /, "")).find((d: string) => d !== "strict");
+const USE_PREFIX_REGEX = /^use /;
+
+interface PreserveDirectivesMeta {
+    directives: string[];
+}
+
+const getModuleLayer = (moduleMeta: CustomPluginOptions): string | undefined => {
+    const preserveDirectives = (moduleMeta.preserveDirectives as PreserveDirectivesMeta | undefined) ?? { directives: [] };
+
+    return preserveDirectives.directives.map((d: string) => d.replace(USE_PREFIX_REGEX, "")).find((d: string) => d !== "strict");
+};
 
 export default getModuleLayer;

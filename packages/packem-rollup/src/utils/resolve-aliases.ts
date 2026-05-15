@@ -6,7 +6,7 @@ import type { PackageJson } from "@visulima/package";
  * helper can live in `@visulima/packem-rollup` without depending on packem
  * core's `InternalBuildOptions`.
  */
-export type ResolveAliasesOptions = {
+type ResolveAliasesOptions = {
     alias?: Record<string, string>;
     rollup: {
         alias?: RollupAliasOptions | false;
@@ -37,4 +37,5 @@ const resolveAliases = (packageJson: PackageJson, options: ResolveAliasesOptions
     return aliases;
 };
 
+export type { ResolveAliasesOptions };
 export default resolveAliases;

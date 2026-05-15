@@ -1,3 +1,5 @@
+/* eslint-disable no-secrets/no-secrets */
+
 /**
  * Plugin to resolve JS extensions to TypeScript equivalents.
  *
@@ -25,7 +27,7 @@
  */
 import { isAbsolute } from "node:path";
 
-import type { Plugin } from "rollup";
+import type { Plugin, PluginContext, ResolvedId, ResolveIdResult } from "rollup";
 
 // Based on esbuild's rewrittenFileExtensions and TypeScript's tryAddingExtensions.
 // .jsx order follows TypeScript (prefers .tsx) over esbuild (prefers .ts).
@@ -44,71 +46,80 @@ const isBareSpecifier = (id: string): boolean => {
     return !(firstCharacter === "." || firstCharacter === "/" || firstCharacter === "#" || isAbsolute(id));
 };
 
-const resolveTypescriptMjsCts = (): Plugin => ({
-    name: "packem:resolve-typescript-mjs-cjs",
-    async resolveId(id, importer, options) {
-        if (!importer) {
-            return undefined;
+type ResolveOptions = Parameters<PluginContext["resolve"]>[2];
+
+const tryRewrites = async (
+    context: PluginContext,
+    rewrites: string[],
+    base: string,
+    importer: string,
+    resolveOptions: ResolveOptions,
+    swallowErrors: boolean,
+): Promise<ResolvedId | ResolveIdResult | null> => {
+    for (const tsExtension of rewrites) {
+        try {
+            // eslint-disable-next-line no-await-in-loop
+            const resolved = await context.resolve(base + tsExtension, importer, resolveOptions);
+
+            if (resolved) {
+                return resolved;
+            }
+        } catch (error) {
+            if (!swallowErrors) {
+                throw error;
+            }
+            // externalizeDependencies throws for unresolvable devDep
+            // bare specifiers — continue to try the next extension
         }
+    }
 
-        const match = jsExtensionRegex.exec(id);
+    return undefined;
+};
 
-        if (!match) {
-            return undefined;
-        }
-
-        const extension = match[0];
-        const rewrites = tsExtensions[extension];
-
-        if (!rewrites) {
-            return undefined;
-        }
-
-        const base = id.slice(0, -extension.length);
-        const resolveOptions = {
-            ...options,
-            skipSelf: true,
-        };
-
-        // For source code relative imports: try TS extensions in order
-        // In TypeScript convention, ./file.js means ./file.ts
-        if (!isBareSpecifier(id) && !importer.includes("/node_modules/")) {
-            for (const tsExtension of rewrites) {
-                // eslint-disable-next-line no-await-in-loop
-                const resolved = await this.resolve(base + tsExtension, importer, resolveOptions);
-
-                if (resolved) {
-                    return resolved;
-                }
+const resolveTypescriptMjsCts = (): Plugin => {
+    return {
+        name: "packem:resolve-typescript-mjs-cjs",
+        async resolveId(id, importer, options) {
+            if (!importer) {
+                return undefined;
             }
 
-            return undefined;
-        }
+            const match = jsExtensionRegex.exec(id);
 
-        // For bare specifiers and node_modules imports:
-        // try .js first, only use TS extensions if .js doesn't resolve
-        const jsResolved = await this.resolve(id, importer, resolveOptions);
-
-        if (jsResolved) {
-            return jsResolved;
-        }
-
-        for (const tsExtension of rewrites) {
-            try {
-                // eslint-disable-next-line no-await-in-loop
-                const resolved = await this.resolve(base + tsExtension, importer, resolveOptions);
-
-                if (resolved) {
-                    return resolved;
-                }
-            } catch {
-                // externalizeDependencies throws for unresolvable devDep
-                // bare specifiers — continue to try the next extension
+            if (!match) {
+                return undefined;
             }
-        }
 
-        return undefined;
-    },
-});
+            const extension = match[0];
+            const rewrites = tsExtensions[extension];
+
+            if (!rewrites) {
+                return undefined;
+            }
+
+            const base = id.slice(0, -extension.length);
+            const resolveOptions = {
+                ...options,
+                skipSelf: true,
+            };
+
+            // For source code relative imports: try TS extensions in order
+            // In TypeScript convention, ./file.js means ./file.ts
+            if (!isBareSpecifier(id) && !importer.includes("/node_modules/")) {
+                return tryRewrites(this, rewrites, base, importer, resolveOptions, false);
+            }
+
+            // For bare specifiers and node_modules imports:
+            // try .js first, only use TS extensions if .js doesn't resolve
+            const jsResolved = await this.resolve(id, importer, resolveOptions);
+
+            if (jsResolved) {
+                return jsResolved;
+            }
+
+            return tryRewrites(this, rewrites, base, importer, resolveOptions, true);
+        },
+    };
+};
 
 export default resolveTypescriptMjsCts;

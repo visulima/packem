@@ -28,7 +28,9 @@ const copy = async (source: string, destination: string): Promise<void> => {
         const write = createWriteStream(destination);
 
         write.on("error", reject);
-        write.on("finish", () => resolve(undefined));
+        write.on("finish", () => {
+            resolve(undefined);
+        });
 
         read.pipe(write);
     });
@@ -151,6 +153,9 @@ export const urlPlugin = ({
             let data: string;
 
             if ((limit && stats.size > limit) || limit === 0) {
+                // sha1 is intentional here: this hash is a CONTENT FINGERPRINT for cache busting,
+                // not a cryptographic signature; collisions on asset contents are not a security concern.
+                // eslint-disable-next-line sonarjs/hashing -- non-security content fingerprint
                 const hash = crypto.createHash("sha1").update(buffer).digest("hex").slice(0, 16);
                 const extension = extname(id);
                 const name = basename(id, extension);
@@ -168,7 +173,7 @@ export const urlPlugin = ({
             } else {
                 const mimetype = mime.getType(id);
 
-                if (mimetype === undefined) {
+                if (mimetype === null) {
                     throw new Error(`Could not determine mimetype for ${id}`);
                 }
 
