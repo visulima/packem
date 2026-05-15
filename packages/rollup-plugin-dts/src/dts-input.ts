@@ -1,6 +1,6 @@
 import type { Plugin } from "rollup";
 
-import { RE_DTS, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename";
+import { RE_DTS, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
 
 const createDtsInputPlugin = ({ sideEffects }: Pick<OptionsResolved, "sideEffects">): Plugin => {
@@ -8,20 +8,20 @@ const createDtsInputPlugin = ({ sideEffects }: Pick<OptionsResolved, "sideEffect
         name: "rollup-plugin-dts:dts-input",
 
         options:
-            sideEffects === false
-                ? (options) => {
+            sideEffects
+                ? undefined
+                : (options) => {
                     return {
                         treeshake:
                               options.treeshake === false
                                   ? false
                                   : {
-                                      ...typeof options.treeshake === "object" && options.treeshake !== null ? options.treeshake : {},
+                                      ...typeof options.treeshake === "object" ? options.treeshake : {},
                                       moduleSideEffects: false,
                                   },
                         ...options,
                     };
-                }
-                : undefined,
+                },
 
         outputOptions(options) {
             return {

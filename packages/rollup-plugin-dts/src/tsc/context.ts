@@ -31,10 +31,11 @@ export const createContext = (): TscContext => {
 };
 
 export const invalidateContextFile = (context: TscContext, file: string): void => {
-    file = resolve(file).replaceAll("\\", "/");
-    debug(`invalidating context file: ${file}`);
-    context.files.delete(file);
-    context.programs = context.programs.filter((program) => !program.getSourceFiles().some((sourceFile) => sourceFile.fileName === file));
+    const normalizedFile = resolve(file).replaceAll("\\", "/");
+
+    debug(`invalidating context file: ${normalizedFile}`);
+    context.files.delete(normalizedFile);
+    context.programs = context.programs.filter((program) => !program.getSourceFiles().some((sourceFile) => sourceFile.fileName === normalizedFile));
     context.projects.clear();
 };
 

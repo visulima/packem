@@ -9,6 +9,14 @@ import { getTsgoPathFromNodeModules } from "../src/tsgo.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const EXPORT_BLOCK_RE = /export\s*\{[^}]*\}/g;
+const MISSING_FILE_RE = /Could not resolve ['"]\.\/missing-file['"]/u;
+const STUB_LIB_IMPORT_RE = /import \* as _\$stub_lib from ['"]stub_lib['"]/u;
+const TYPE_TASK_WRAPPER_RE = /export\s*\{[^}]*type\s+TaskWrapper/u;
+const TYPE_TASK_RE = /export\s*\{[^}]*type\s+Task\b/u;
+const EXPORT_BRACE_RE = /export\s*\{/u;
+const TRIPLE_SLASH_NODE_RE = /\/\/\/ <reference types="node" \/>/g;
+
 it("basic", async () => {
     const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/basic.ts"), [dts()]);
 
@@ -50,7 +58,7 @@ it("input alias", async () => {
         },
         [dts({ emitDtsOnly: false })],
     );
-    const fileNames = chunks.map((chunk) => chunk.fileName).toSorted();
+    const fileNames = chunks.map((chunk) => chunk.fileName).toSorted((a, b) => a.localeCompare(b));
 
     // The JS output and DTS output should have the same structure
     expect(fileNames).toContain("output1.d.ts");
@@ -62,15 +70,15 @@ it("input alias", async () => {
 });
 
 it("isolated declaration error", async () => {
-    const error = await rolldownBuild(path.resolve(dirname, "fixtures/isolated-decl-error.ts"), [
+    const caughtError = await rolldownBuild(path.resolve(dirname, "fixtures/isolated-decl-error.ts"), [
         dts({
             emitDtsOnly: true,
             oxc: true,
         }),
-    ]).catch((error: any) => error);
+    ]).catch((error: unknown) => error);
 
-    expect(String(error)).toContain(`Function must have an explicit return type annotation with --isolatedDeclarations.`);
-    expect(String(error)).toContain(`export function fn() {`);
+    expect(String(caughtError)).toContain(`Function must have an explicit return type annotation with --isolatedDeclarations.`);
+    expect(String(caughtError)).toContain(`export function fn() {`);
 });
 
 it("paths", async () => {
@@ -97,7 +105,7 @@ it("tree-shaking", async () => {
                     if (id.startsWith("node:"))
                         return { external: true, id, moduleSideEffects: false };
 
-                    return null;
+                    return undefined;
                 },
             },
         ],
@@ -209,7 +217,7 @@ describe("dts input", () => {
             },
         );
 
-        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted();
+        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted((a, b) => a.localeCompare(b));
 
         expect(chunkNames).toContain("input1.d.mts");
         expect(chunkNames).toContain("input2.d.mts");
@@ -228,7 +236,7 @@ describe("dts input", () => {
             },
         );
 
-        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted();
+        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted((a, b) => a.localeCompare(b));
 
         expect(chunkNames).toContain("input1.d.ts");
         expect(chunkNames).toContain("input2.d.ts");
@@ -249,7 +257,7 @@ describe("entryFileNames", () => {
             },
         );
 
-        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted();
+        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted((a, b) => a.localeCompare(b));
 
         expect(chunkNames).toStrictEqual(["basic.d.mts", "basic.mjs"]);
     });
@@ -264,7 +272,7 @@ describe("entryFileNames", () => {
             },
         );
 
-        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted();
+        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted((a, b) => a.localeCompare(b));
 
         expect(chunkNames).toStrictEqual(["basic.cjs", "basic.d.cts"]);
     });
@@ -279,7 +287,7 @@ describe("entryFileNames", () => {
             },
         );
 
-        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted();
+        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted((a, b) => a.localeCompare(b));
 
         expect(chunkNames).toStrictEqual(["custom.d.mts", "custom.mjs"]);
     });
@@ -294,7 +302,7 @@ describe("entryFileNames", () => {
             },
         );
 
-        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted();
+        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted((a, b) => a.localeCompare(b));
 
         expect(chunkNames).toStrictEqual(["basic.d.invalid", "basic.invalid"]);
     });
@@ -324,7 +332,7 @@ describe("entryFileNames", () => {
             },
         );
 
-        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted();
+        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted((a, b) => a.localeCompare(b));
 
         expect(chunkNames).toContain("input1.d.mts");
         expect(chunkNames).toContain("input2.d.mts");
@@ -342,7 +350,7 @@ describe("entryFileNames", () => {
             },
         );
 
-        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted();
+        const chunkNames = chunks.map((chunk) => chunk.fileName).toSorted((a, b) => a.localeCompare(b));
 
         expect(chunkNames).toContain("input1.d.ts");
         expect(chunkNames).toContain("input2.d.ts");
@@ -417,9 +425,10 @@ it("declaration merging emits one export per bound name", async () => {
 
     // Each merged name appears in exactly one `export { ... }` specifier.
     const countExported = (name: string) => {
-        const exportBlocks = snapshot.match(/export\s*\{[^}]*\}/g) ?? [];
+        const exportBlocks = [...snapshot.matchAll(EXPORT_BLOCK_RE)].map((match) => match[0]);
+        const nameRegex = new RegExp(String.raw`\b${name}\b`, "g");
 
-        return exportBlocks.reduce((acc, block) => acc + (block.match(new RegExp(`\\b${name}\\b`, "g"))?.length ?? 0), 0);
+        return exportBlocks.reduce((accumulator, block) => accumulator + [...block.matchAll(nameRegex)].length, 0);
     };
 
     expect(countExported("visit")).toBe(1);
@@ -442,7 +451,7 @@ it("should error when file import cannot be found", async () => {
                 emitDtsOnly: true,
             }),
         ]),
-    ).rejects.toThrowError(/Could not resolve ['"]\.\/missing-file['"]/u);
+    ).rejects.toThrow(MISSING_FILE_RE);
 });
 
 it("banner", async () => {
@@ -549,7 +558,7 @@ it("infer false branch", async () => {
 });
 
 it("tsgo with custom path", async () => {
-    const tsgoPath = await getTsgoPathFromNodeModules();
+    const tsgoPath = getTsgoPathFromNodeModules();
     const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/basic.ts"), [
         dts({ tsconfig: path.resolve(dirname, "fixtures/basic.tsconfig.json"), tsgo: { path: tsgoPath } }),
     ]);
@@ -588,23 +597,25 @@ it("sub namespace", async () => {
 
 it("deterministic namespace import index", async () => {
     const cwd = path.resolve(dirname, "fixtures/import-type-multi");
-    const results: string[] = [];
+    const builds = await Promise.all(
+        Array.from({ length: 3 }, async () => {
+            const { snapshot } = await rolldownBuild(
+                ["a.d.ts", "b.d.ts", "c.d.ts"].map((f) => path.resolve(cwd, f)),
+                [dts({ dtsInput: true, emitDtsOnly: true, tsconfig: path.resolve(cwd, "tsconfig.json") })],
+            );
 
-    for (let i = 0; i < 3; i++) {
-        const { snapshot } = await rolldownBuild(
-            ["a.d.ts", "b.d.ts", "c.d.ts"].map((f) => path.resolve(cwd, f)),
-            [dts({ dtsInput: true, emitDtsOnly: true, tsconfig: path.resolve(cwd, "tsconfig.json") })],
-        );
+            return snapshot;
+        }),
+    );
 
-        results.push(snapshot);
-
+    for (const snapshot of builds) {
         expect(snapshot).toMatchSnapshot();
     }
 
-    expect(results[0]).toBe(results[1]);
-    expect(results[1]).toBe(results[2]);
-    expect(results[0]).toMatch(/import \* as _\$stub_lib from ['"]stub_lib['"]/u);
-    expect(results[0]).not.toContain("_$stub_lib0");
+    expect(builds[0]).toBe(builds[1]);
+    expect(builds[1]).toBe(builds[2]);
+    expect(builds[0]).toMatch(STUB_LIB_IMPORT_RE);
+    expect(builds[0]).not.toContain("_$stub_lib0");
 });
 
 it("decorators", async () => {
@@ -620,9 +631,9 @@ it("export * preserves type modifiers from re-exports", async () => {
 
     expect(snapshot).toMatchSnapshot();
     // TaskWrapper is a class but re-exported via `export { type TaskWrapper }` — must have type modifier
-    expect(snapshot).toMatch(/export\s*\{[^}]*type\s+TaskWrapper/u);
+    expect(snapshot).toMatch(TYPE_TASK_WRAPPER_RE);
     // Task is an interface re-exported via `export { type Task }` — must have type modifier
-    expect(snapshot).toMatch(/export\s*\{[^}]*type\s+Task\b/u);
+    expect(snapshot).toMatch(TYPE_TASK_RE);
 });
 
 // https://github.com/sxzz/rolldown-plugin-dts/issues/225
@@ -636,11 +647,11 @@ it("export * preserves type modifiers from re-exports (tsc)", async () => {
     ]);
 
     expect(snapshot).toMatchSnapshot();
-    expect(snapshot).toMatch(/export\s*\{[^}]*type\s+TaskWrapper/u);
-    expect(snapshot).toMatch(/export\s*\{[^}]*type\s+Task\b/u);
+    expect(snapshot).toMatch(TYPE_TASK_WRAPPER_RE);
+    expect(snapshot).toMatch(TYPE_TASK_RE);
 });
 
-it("JSDoc comments in types are preserved when tsc emits them", async () => {
+it("jSDoc comments in types are preserved when tsc emits them", async () => {
     const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/jsdoc-type-comments.ts"), [
         dts({
             compilerOptions: {
@@ -671,9 +682,10 @@ it("triple-slash directives are preserved and deduplicated in dtsInput mode", as
 
     expect(snapshot).toMatchSnapshot();
     // Directive should appear in the output
-    expect(snapshot).toContain('/// <reference types="node" />');
+    expect(snapshot).toContain("/// <reference types=\"node\" />");
+
     // Should be deduplicated — only one occurrence despite both input.d.ts and types-input.d.ts having it
-    const matches = snapshot.match(/\/\/\/ <reference types="node" \/>/g);
+    const matches = snapshot.match(TRIPLE_SLASH_NODE_RE);
 
     expect(matches).toHaveLength(1);
 });
@@ -688,18 +700,15 @@ it("module augmentation files preserve export {} to remain modules", async () =>
     expect(snapshot).toContain("ButtonPropsSizeOverrides");
     // The chunk containing the augmentation must have export {} or another export to be a module
     // Without it, TypeScript won't apply the module augmentation
-    expect(snapshot).toMatch(/export\s*\{/u);
+    expect(snapshot).toMatch(EXPORT_BRACE_RE);
 });
 
 it("module augmentation-only file preserves export {} as module marker", async () => {
-    const { snapshot } = await rolldownBuild(
-        path.resolve(dirname, "fixtures/module-augmentation-only.ts"),
-        [dts({ emitDtsOnly: true })],
-    );
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/module-augmentation-only.ts"), [dts({ emitDtsOnly: true })]);
 
     expect(snapshot).toMatchSnapshot();
     expect(snapshot).toContain("declare module");
     expect(snapshot).toContain("ButtonPropsSizeOverrides");
     // Must have export {} to be treated as a module by TypeScript
-    expect(snapshot).toMatch(/export\s*\{/u);
+    expect(snapshot).toMatch(EXPORT_BRACE_RE);
 });

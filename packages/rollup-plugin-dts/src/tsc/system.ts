@@ -17,6 +17,7 @@ export const createFsSystem = (files: Map<string, string>): ts.System => {
         },
 
         // Copied from
+        // eslint-disable-next-line no-secrets/no-secrets -- Source attribution URL is intentional
         // https://github.com/microsoft/TypeScript-Website/blob/b0e9a5c0/packages/typescript-vfs/src/index.ts#L532C1-L534C8
         directoryExists(directory) {
             if ([...files.keys()].some((path) => path.startsWith(directory))) {
@@ -43,6 +44,7 @@ export const createFsSystem = (files: Map<string, string>): ts.System => {
         },
 
         // Copied from
+        // eslint-disable-next-line no-secrets/no-secrets -- Source attribution URL is intentional
         // https://github.com/microsoft/TypeScript-Website/blob/b0e9a5c0/packages/typescript-vfs/src/index.ts#L571-L574
         resolvePath(path) {
             if (files.has(path)) {

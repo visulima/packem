@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return, sonarjs/cognitive-complexity, import/exports-last, @typescript-eslint/no-non-null-assertion, @typescript-eslint/prefer-nullish-coalescing, no-await-in-loop, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-dynamic-delete, unicorn/prevent-abbreviations, unicorn/no-await-expression-member, unicorn/no-null, no-underscore-dangle, @typescript-eslint/naming-convention, @typescript-eslint/restrict-template-expressions, no-plusplus, @stylistic/no-extra-parens, jsdoc/check-indentation, jsdoc/match-description, import/no-commonjs, prefer-const -- this file orchestrates the dts generation pipeline; rule-by-rule refactoring would obscure the control flow and many `any` usages stem from JSON.parse / rollup internal types */
 import type { ChildProcess } from "node:child_process";
 import { fork } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -6,14 +7,14 @@ import path from "node:path";
 
 import { parse } from "@babel/parser";
 import type { TSPropertySignature } from "@babel/types";
+import { createFilter } from "@rollup/pluginutils";
 import type { BirpcReturn } from "birpc";
 import { createDebug } from "obug";
 import { isolatedDeclarationSync, transformSync } from "oxc-transform";
-import { createFilter } from "@rollup/pluginutils";
 import type { Plugin, SourceMapInput } from "rollup";
 
 import {
-    filename_to_dts,
+    filenameToDts,
     RE_DTS,
     RE_DTS_MAP,
     RE_JS,
@@ -22,18 +23,18 @@ import {
     RE_TS,
     RE_VUE,
     replaceTemplateName,
-    resolveTemplateFn as resolveTemplateFunction,
+    resolveTemplateFunction,
 } from "./filename";
 import type { OptionsResolved } from "./options";
 import type { TscContext } from "./tsc/context";
 import { createContext, globalContext, invalidateContextFile } from "./tsc/context";
 import type { TscOptions, TscResult } from "./tsc/index";
-import type TscFunctions from "./tsc/worker";
+import type { TscFunctions } from "./tsc/worker";
 import { runTsgo } from "./tsgo";
 
 const debug = createDebug("rollup-plugin-dts:generate");
 
-const WORKER_URL = (import.meta as any).WORKER_URL ?? "./tsc/worker.js";
+const WORKER_URL: string = (import.meta as any).WORKER_URL ?? "./tsc/worker.js";
 
 export interface TsModule {
     /** `.ts` source code */
@@ -206,7 +207,7 @@ export const createGeneratePlugin = ({
                     if (RE_VUE.test(id))
                         throw new Error("tsgo does not support Vue files.");
 
-                    const dtsPath = path.resolve(tsgoDist!, path.relative(rootDir, filename_to_dts(id)));
+                    const dtsPath = path.resolve(tsgoDist!, path.relative(rootDir, filenameToDts(id)));
 
                     if (existsSync(dtsPath)) {
                         dtsCode = await readFile(dtsPath, "utf8");
@@ -368,13 +369,7 @@ export { __json_default_export as default }`;
                 // and misses `.tsx`, which is a legitimate React/JSX source extension that the
                 // inferred-entries pipeline maps to `.d.ts`.
                 const stripped = absoluteId.replace(RE_DTS, "");
-                const candidates = [
-                    absoluteId.replace(RE_DTS, ".$1ts"),
-                    `${stripped}.tsx`,
-                    `${stripped}.ts`,
-                    `${stripped}.mts`,
-                    `${stripped}.cts`,
-                ];
+                const candidates = [absoluteId.replace(RE_DTS, ".$1ts"), `${stripped}.tsx`, `${stripped}.ts`, `${stripped}.mts`, `${stripped}.cts`];
 
                 if (!dtsMap.has(absoluteId)) {
                     for (const tsId of candidates) {
@@ -440,7 +435,7 @@ export { __json_default_export as default }`;
                 if (shouldEmit) {
                     const module_ = this.getModuleInfo(id);
                     const isEntry = !!module_?.isEntry;
-                    const dtsId = filename_to_dts(id);
+                    const dtsId = filenameToDts(id);
 
                     dtsMap.set(dtsId, { code, id, isEntry });
                     debug("register dts source: %s", id);

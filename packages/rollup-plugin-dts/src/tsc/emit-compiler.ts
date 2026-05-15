@@ -24,56 +24,8 @@ const defaultCompilerOptions: ts.CompilerOptions = {
     target: 99 satisfies ts.ScriptTarget.ESNext,
 };
 
-const createOrGetTsModule = (options: TscOptions): TscModule => {
-    const { context = globalContext, entries, id } = options;
-    const program = context.programs.find((program) => {
-        const roots = program.getRootFileNames();
-
-        if (entries) {
-            return entries.every((entry) => roots.includes(entry));
-        }
-
-        return roots.includes(id);
-    });
-
-    if (program) {
-        const sourceFile = program.getSourceFile(id);
-
-        if (sourceFile) {
-            return { file: sourceFile, program };
-        }
-    }
-
-    debug(`create program for module: ${id}`);
-    const module = createTsProgram(options);
-
-    debug(`created program for module: ${id}`);
-
-    context.programs.push(module.program);
-
-    return module;
-};
-
-const createTsProgram = ({ context = globalContext, cwd, entries, id, tsconfig, tsconfigRaw, tsMacro, vue }: TscOptions): TscModule => {
-    const fsSystem = createFsSystem(context.files);
-    const baseDir = tsconfig ? dirname(tsconfig) : cwd;
-    const parsedConfig = ts.parseJsonConfigFileContent(tsconfigRaw, fsSystem, baseDir);
-
-    debug(`Creating program for root project: ${baseDir}`);
-
-    return createTsProgramFromParsedConfig({
-        baseDir,
-        entries,
-        fsSystem,
-        id,
-        parsedConfig,
-        tsMacro,
-        vue,
-    });
-};
-
 const createTsProgramFromParsedConfig = ({
-    baseDir,
+    baseDirectory,
     entries,
     fsSystem,
     id,
@@ -81,18 +33,19 @@ const createTsProgramFromParsedConfig = ({
     tsMacro,
     vue,
 }: Pick<TscOptions, "entries" | "vue" | "tsMacro" | "id"> & {
-    baseDir: string;
+    baseDirectory: string;
     fsSystem: ts.System;
     parsedConfig: ts.ParsedCommandLine;
 }): TscModule => {
     const compilerOptions: ts.CompilerOptions = {
         ...defaultCompilerOptions,
         ...parsedConfig.options,
-        $configRaw: parsedConfig.raw,
-        $rootDir: baseDir,
+        // @ts-expect-error TypeScript-only fields are not in ts.CompilerOptions typing
+        $configRaw: parsedConfig.raw as unknown,
+        $rootDir: baseDirectory,
     };
 
-    const rootNames = [...new Set([id, ...entries || parsedConfig.fileNames].map((f) => fsSystem.resolvePath(f)))];
+    const rootNames = [...new Set([id, ...entries ?? parsedConfig.fileNames].map((f) => fsSystem.resolvePath(f)))];
 
     const host = ts.createCompilerHost(compilerOptions, true);
 
@@ -134,6 +87,54 @@ const createTsProgramFromParsedConfig = ({
     };
 };
 
+const createTsProgram = ({ context = globalContext, cwd, entries, id, tsconfig, tsconfigRaw, tsMacro, vue }: TscOptions): TscModule => {
+    const fsSystem = createFsSystem(context.files);
+    const baseDirectory = tsconfig ? dirname(tsconfig) : cwd;
+    const parsedConfig = ts.parseJsonConfigFileContent(tsconfigRaw, fsSystem, baseDirectory);
+
+    debug(`Creating program for root project: ${baseDirectory}`);
+
+    return createTsProgramFromParsedConfig({
+        baseDirectory,
+        entries,
+        fsSystem,
+        id,
+        parsedConfig,
+        tsMacro,
+        vue,
+    });
+};
+
+const createOrGetTsModule = (options: TscOptions): TscModule => {
+    const { context = globalContext, entries, id } = options;
+    const existingProgram = context.programs.find((candidate) => {
+        const roots = candidate.getRootFileNames();
+
+        if (entries) {
+            return entries.every((entry) => roots.includes(entry));
+        }
+
+        return roots.includes(id);
+    });
+
+    if (existingProgram) {
+        const sourceFile = existingProgram.getSourceFile(id);
+
+        if (sourceFile) {
+            return { file: sourceFile, program: existingProgram };
+        }
+    }
+
+    debug(`create program for module: ${id}`);
+    const module = createTsProgram(options);
+
+    debug(`created program for module: ${id}`);
+
+    context.programs.push(module.program);
+
+    return module;
+};
+
 // Emit file using `tsc` mode (without `--build` flag).
 const tscEmitCompiler = (tscOptions: TscOptions): TscResult => {
     debug(`running tscEmitCompiler ${tscOptions.id}`);
@@ -150,7 +151,7 @@ const tscEmitCompiler = (tscOptions: TscOptions): TscResult => {
         (fileName, code) => {
             if (fileName.endsWith(".map")) {
                 debug(`emit dts sourcemap: ${fileName}`);
-                map = JSON.parse(code);
+                map = JSON.parse(code) as ExistingRawSourceMap;
                 setSourceMapRoot(map, fileName, tscOptions.id);
             } else {
                 debug(`emit dts: ${fileName}`);

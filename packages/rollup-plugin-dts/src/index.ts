@@ -9,8 +9,6 @@ import type { Options } from "./options";
 import { resolveOptions } from "./options";
 import createDtsResolvePlugin from "./resolver";
 
-export { default as createFakeJsPlugin } from "./fake-js";
-
 const debug = createDebug("rollup-plugin-dts:options");
 
 export const dts = (options: Options = {}): Plugin[] => {
@@ -36,6 +34,7 @@ export const dts = (options: Options = {}): Plugin[] => {
     return plugins;
 };
 
+export { default as createFakeJsPlugin } from "./fake-js";
 export { RE_CSS, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
 export { createGeneratePlugin } from "./generate";
 export { type FilterPattern, type Options, resolveOptions } from "./options";

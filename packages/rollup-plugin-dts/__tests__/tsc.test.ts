@@ -7,7 +7,7 @@ import { glob } from "tinyglobby";
 import { describe, expect, it } from "vitest";
 
 import { dts } from "../src/index.js";
-import { findSourceMapChunk } from "./utils.js";
+import findSourceMapChunk from "./utils.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -127,7 +127,7 @@ describe("tsc", () => {
         );
 
         const sourcemap = findSourceMapChunk(chunks, "index.d.ts.map");
-        const sources = sourcemap.sources || [];
+        const { sources } = sourcemap;
 
         // Cross-project source must always appear; entry re-export file may be omitted by newer TypeScript
         expect(sources).toEqual(expect.arrayContaining(["../../src/types.ts"]));
@@ -138,10 +138,10 @@ describe("tsc", () => {
         const root = path.resolve(dirname, "fixtures/composite-refs");
 
         // The outDir in tsconfig files.
-        const tempDir = path.resolve(root, "temp");
+        const temporaryDirectory = path.resolve(root, "temp");
 
         // Ensure .tsbuildinfo files do not exist before the test
-        await fs.rm(tempDir, { force: true, recursive: true });
+        await fs.rm(temporaryDirectory, { force: true, recursive: true });
 
         const { snapshot } = await rolldownBuild(
             [path.resolve(root, "dir1/input1.ts"), path.resolve(root, "dir2/input2.ts")],
@@ -159,7 +159,7 @@ describe("tsc", () => {
         // Ensure .tsbuildinfo files are not created after the test
         const tsBuildInfoFiles = await glob("**/*.tsbuildinfo", {
             absolute: false,
-            cwd: tempDir,
+            cwd: temporaryDirectory,
         });
 
         expect(tsBuildInfoFiles).toHaveLength(0);
@@ -169,10 +169,10 @@ describe("tsc", () => {
         const root = path.resolve(dirname, "fixtures/composite-refs-incremental");
 
         // The outDir in tsconfig files.
-        const tempDir = path.resolve(root, "temp");
+        const temporaryDirectory = path.resolve(root, "temp");
 
         // Ensure .tsbuildinfo files do not exist before the test
-        await fs.rm(tempDir, { force: true, recursive: true });
+        await fs.rm(temporaryDirectory, { force: true, recursive: true });
 
         const { snapshot } = await rolldownBuild(
             [path.resolve(root, "dir1/input1.ts"), path.resolve(root, "dir2/input2.ts")],
@@ -190,10 +190,10 @@ describe("tsc", () => {
         // Ensure .tsbuildinfo files are created after the test
         const tsBuildInfoFiles = await glob("**/*.tsbuildinfo", {
             absolute: false,
-            cwd: tempDir,
+            cwd: temporaryDirectory,
         });
 
-        expect(tsBuildInfoFiles.toSorted()).toMatchInlineSnapshot(`
+        expect(tsBuildInfoFiles.toSorted((a, b) => a.localeCompare(b))).toMatchInlineSnapshot(`
       [
         "dir1/tsconfig.1.tsbuildinfo",
         "dir2/tsconfig.2.tsbuildinfo",

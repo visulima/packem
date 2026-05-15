@@ -9,23 +9,25 @@ const createBannerPlugin = ({ banner, footer }: Pick<OptionsResolved, "banner" |
         name: "rollup-plugin-dts:banner",
         async renderChunk(code: string, chunk) {
             if (!RE_DTS.test(chunk.fileName)) {
-                return;
+                return undefined;
             }
 
             const s = new MagicString(code);
 
             if (banner) {
-                const code = await (typeof banner === "function" ? banner(chunk) : banner);
+                const bannerCode = await (typeof banner === "function" ? banner(chunk) : banner);
 
-                if (code)
-                    s.prepend(`${code}\n`);
+                if (bannerCode) {
+                    s.prepend(`${bannerCode}\n`);
+                }
             }
 
             if (footer) {
-                const code = await (typeof footer === "function" ? footer(chunk) : footer);
+                const footerCode = await (typeof footer === "function" ? footer(chunk) : footer);
 
-                if (code)
-                    s.append(`\n${code}`);
+                if (footerCode) {
+                    s.append(`\n${footerCode}`);
+                }
             }
 
             return {

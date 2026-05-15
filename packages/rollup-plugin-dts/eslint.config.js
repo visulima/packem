@@ -10,6 +10,9 @@ export default createConfig(
             "__fixtures__",
             "__docs__",
             "__tests__/fixtures/**",
+            "__tests__/rollup-plugin-dts/**",
+            "__tests__/__snapshots__/**",
+            "__tests__/temp/**",
             "vitest.config.ts",
             "packem.config.ts",
             ".secretlintrc.cjs",
@@ -28,6 +31,25 @@ export default createConfig(
         ignores: ["**/__tests__"],
         rules: {
             "unicorn/prefer-module": "off",
+        },
+    },
+    {
+        // The fixture-driven test files declare cases via testFixtures() from @sxzz/test-utils,
+        // which generates `it()` calls dynamically — the sonarjs rule cannot detect them.
+        files: ["__tests__/rollup-plugin-dts.test.ts", "__tests__/source-map.test.ts"],
+        rules: {
+            "sonarjs/no-empty-test-file": "off",
+        },
+    },
+    {
+        files: ["__tests__/source-map.test.ts"],
+        rules: {
+            "vitest/expect-expect": [
+                "warn",
+                {
+                    assertFunctionNames: ["expect", "validateSourceMap"],
+                },
+            ],
         },
     },
 );
