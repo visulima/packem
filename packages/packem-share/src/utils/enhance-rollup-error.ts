@@ -41,7 +41,7 @@ const enhanceRollupError = (error: RollupError): void => {
     let message = (error.plugin ? `[${error.plugin}] ` : "") + error.message;
 
     if (error.id) {
-        message += `\nfile: ${cyan(error.id + (error.loc ? `:${error.loc.line}:${error.loc.column}` : ""))}`;
+        message += `\nfile: ${cyan(error.id + (error.loc ? `:${String(error.loc.line)}:${String(error.loc.column)}` : ""))}`;
     }
 
     if (error.frame) {

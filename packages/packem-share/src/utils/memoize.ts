@@ -24,19 +24,23 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
 ): T => {
     const cache: Map<string, ReturnType<T>> = cacheArgument ?? new Map<string, ReturnType<T>>();
 
+    const resolveKey = (arguments_: Parameters<T>): string => {
+        if (cacheKey) {
+            return typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey;
+        }
+
+        return stringify({ args: arguments_ }) ?? JSON.stringify(arguments_);
+    };
+
     return ((...arguments_: Parameters<T>) => {
-        const key = cacheKey
-            ? typeof cacheKey === "function"
-                ? cacheKey(...arguments_)
-                : cacheKey
-            : stringify({ args: arguments_ }) ?? JSON.stringify(arguments_);
+        const key = resolveKey(arguments_);
         const existing = cache.get(key);
 
         if (existing !== undefined) {
             return existing;
         }
 
-        const result = function_(...arguments_);
+        const result = function_(...arguments_) as ReturnType<T>;
 
         cache.set(key, result);
 

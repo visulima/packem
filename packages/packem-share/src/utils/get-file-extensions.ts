@@ -24,7 +24,7 @@ const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildCont
 
     // Check if we're in a dual format scenario
     const isDualFormat = Boolean(emitCJS && emitESM);
-    const isSingleFormat = !isDualFormat && ((emitCJS && !emitESM) || (emitESM && !emitCJS));
+    const isSingleFormat = !isDualFormat && (Boolean(emitCJS && !emitESM) || Boolean(emitESM && !emitCJS));
 
     // Compatible mode requires CJS to be emitted AND node10Compatibility not explicitly false.
     // It indicates a dual-format-aware package that needs .mjs/.cjs and .d.mts/.d.cts extensions
@@ -47,7 +47,7 @@ const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildCont
  */
 export interface FileExtensionOptions {
     /** Declaration file generation mode */
-    declaration?: boolean | "compatible" | "node16" | undefined;
+    declaration?: boolean | "compatible" | "node16";
     /** Whether to emit CommonJS format */
     emitCJS?: boolean;
     /** Whether to emit ESM format */
