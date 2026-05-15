@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 
-import dataUriPlugin from "../../../src/plugins/data-uri";
+import { dataUriPlugin } from "../../../src/plugins/data-uri";
 
 const MIN_SVG_RE = /\.min\.svg$/;
 const SVG_RE = /\.svg$/;

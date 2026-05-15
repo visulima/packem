@@ -32,7 +32,7 @@ const DATA_URI_RE = /\?data-uri/;
  * - `./icon.svg?data-uri and srcset` - Tiny SVG with srcset compatibility.
  * - `./icon.svg?data-uri and encoding=css and srcset` - CSS encoding with srcset compatibility.
  */
-const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
+export const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
     const filter = createFilter(options.include ?? [DATA_URI_RE], options.exclude);
 
     return {
@@ -71,4 +71,3 @@ const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
 };
 
 export type { DataUriPluginOptions };
-export default dataUriPlugin;
