@@ -51,7 +51,7 @@ const expectMatchesInOrder = (text: string, patterns: RegExp[]): void => {
     for (const pattern of patterns) {
         const match = pattern.exec(cleaned.slice(lastIndex));
 
-        expect(match, `Expected pattern ${String(pattern)} to match in remaining text starting at index ${String(lastIndex)}`).toBe(true);
+        expect(match, `Expected pattern ${String(pattern)} to match in remaining text starting at index ${String(lastIndex)}`).not.toBeNull();
 
         lastIndex += (match?.index ?? 0) + (match?.[0]?.length ?? 0);
     }
