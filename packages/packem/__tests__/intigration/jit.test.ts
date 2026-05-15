@@ -69,6 +69,7 @@ describe("packem build --jit", () => {
 
 const jiti = createJiti(__filename, {
   "alias": {},
+  "debug": false,
   "interopDefault": true,
   "transformOptions": {
     "babel": {
@@ -99,6 +100,7 @@ export { default } from "${temporaryDirectoryPath}/src/index.d.cts";`);
 
 const jiti = createJiti(import.meta.url, {
   "alias": {},
+  "debug": false,
   "interopDefault": true,
   "transformOptions": {
     "babel": {
@@ -166,6 +168,7 @@ export { default } from "${temporaryDirectoryPath}/src/index.d.mts";`);
 
 const jiti = createJiti(__filename, {
   "alias": {},
+  "debug": false,
   "interopDefault": true,
   "transformOptions": {
     "babel": {
@@ -196,6 +199,7 @@ module.exports = jiti("${temporaryDirectoryPath}/src/index.ts")`);
 
 const jiti = createJiti(import.meta.url, {
   "alias": {},
+  "debug": false,
   "interopDefault": true,
   "transformOptions": {
     "babel": {
