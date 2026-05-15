@@ -22,7 +22,16 @@ export const TRANSFORMER_PACKAGE: Record<TransformerName, string> = {
 export const buildInstallHint = async (packages: string | string[], rootDirectory: string): Promise<string> => {
     const list = Array.isArray(packages) ? packages : [packages];
     const agent = await detectPackageManager(rootDirectory).catch(() => undefined);
-    const cmd = agent === "yarn" || agent === "bun" ? `${agent} add -D` : agent === "pnpm" ? "pnpm add -D" : "npm install -D";
+
+    let cmd: string;
+
+    if (agent === "yarn" || agent === "bun") {
+        cmd = `${agent} add -D`;
+    } else if (agent === "pnpm") {
+        cmd = "pnpm add -D";
+    } else {
+        cmd = "npm install -D";
+    }
 
     return `${cmd} ${list.join(" ")}`;
 };

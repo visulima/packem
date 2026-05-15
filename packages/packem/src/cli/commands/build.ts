@@ -11,8 +11,114 @@ import loadEnvFile from "../../config/utils/load-env-file";
 import loadPackemConfig from "../../config/utils/load-packem-config";
 import loadPreset from "../../config/utils/load-preset";
 import packem from "../../packem";
-import type { Environment, Mode } from "../../types";
+import type { BuildConfig, Environment, KillSignal, Mode, Runtime } from "../../types";
 import { createDefuWithHooksMerger } from "../../utils/create-defu-with-hooks-merger";
+
+/**
+ * Shape of the parsed CLI options consumed by the build command.
+ * Values originate from cerebro's argument parser and are narrowed here
+ * so the rest of the command can be fully type-checked.
+ */
+interface BuildCommandOptions {
+    analyze?: boolean;
+    bundler?: "rolldown" | "rollup";
+    cjsInterop?: boolean;
+    clean?: boolean;
+    config?: string;
+    debug?: boolean;
+    development?: boolean;
+    dir?: string;
+    dtsOnly?: boolean;
+    env?: { key: string; value: string }[];
+    envFile?: string;
+    envPrefix?: string;
+    exe?: boolean;
+    external?: string[];
+    jit?: boolean;
+    killSignal?: KillSignal;
+    license?: string;
+    metafile?: boolean;
+    minify?: boolean;
+    noExternal?: boolean;
+    onSuccess?: string;
+    production?: boolean;
+    runtime?: Runtime;
+    sourcemap?: boolean;
+    target?: string;
+    tsconfig?: string;
+    typedoc?: boolean;
+    unbundle?: boolean;
+    validation?: boolean;
+    watch?: boolean;
+}
+
+/** Resolves the build mode from the parsed CLI options. */
+const resolveMode = (options: BuildCommandOptions): Mode => {
+    if (options.watch) {
+        return "watch";
+    }
+
+    if (options.jit) {
+        return "jit";
+    }
+
+    return "build";
+};
+
+/**
+ * Splits `--env.KEY=value` entries into the NODE_ENV override and the
+ * remaining compile-time replacement variables.
+ */
+const parseCliEnvVariables = (options: BuildCommandOptions): { cliEnvVariables: Record<string, string>; nodeEnvironment: string | undefined } => {
+    let nodeEnvironment: string | undefined;
+    const cliEnvVariables: Record<string, string> = {};
+
+    if (options.env) {
+        for (const environment of options.env) {
+            if (environment.key === "NODE_ENV") {
+                nodeEnvironment = environment.value;
+            } else {
+                cliEnvVariables[`process.env.${environment.key}`] = JSON.stringify(environment.value);
+            }
+        }
+    }
+
+    return { cliEnvVariables, nodeEnvironment };
+};
+
+/** Derives NODE_ENV from the `--production`/`--development` flags when not set explicitly. */
+const resolveNodeEnvironment = (options: BuildCommandOptions, explicit: string | undefined): string | undefined => {
+    if (explicit !== undefined) {
+        return explicit;
+    }
+
+    if (options.production) {
+        return PRODUCTION_ENV;
+    }
+
+    if (options.development) {
+        return DEVELOPMENT_ENV;
+    }
+
+    return undefined;
+};
+
+/**
+ * Expands the repeatable `--external` option. Each value may itself be a
+ * comma-separated list, so every entry expands to a `string[]`. The runtime
+ * shape is preserved exactly; only the static type is made explicit.
+ */
+const collectExternals = (options: BuildCommandOptions): string[][] => {
+    const externals: string[][] = [];
+
+    if (options.external) {
+        for (const extension of options.external) {
+            externals.push(extension.split(","));
+        }
+    }
+
+    return externals;
+};
 
 /**
  * Creates and registers the build command with the CLI.
@@ -37,47 +143,17 @@ const createBuildCommand = (cli: Cli<Console>): void => {
         description: "Demonstrate options required",
 
         execute: async ({ logger, options: rawOptions }): Promise<void> => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const options = rawOptions as Record<string, any>;
-            let mode: Mode = "build";
-
-            if (options.watch) {
-                mode = "watch";
-            } else if (options.jit) {
-                mode = "jit";
-            }
-
-            let nodeEnvironment: string | undefined;
-            const cliEnvVariables: Record<string, string> = {};
+            const options = rawOptions as BuildCommandOptions;
+            const mode: Mode = resolveMode(options);
 
             // Process environment variables from CLI
-            if (options.env) {
-                for (const environment of options.env) {
-                    if (environment.key === "NODE_ENV") {
-                        nodeEnvironment = environment.value;
-                    } else {
-                        cliEnvVariables[`process.env.${environment.key}`] = JSON.stringify(environment.value);
-                    }
-                }
-            }
+            const { cliEnvVariables, nodeEnvironment: cliNodeEnvironment } = parseCliEnvVariables(options);
 
             // Determine NODE_ENV if not explicitly set
-            if (nodeEnvironment === undefined) {
-                if (options.production) {
-                    nodeEnvironment = PRODUCTION_ENV;
-                } else if (options.development) {
-                    nodeEnvironment = DEVELOPMENT_ENV;
-                }
-            }
-
-            const externals: string[] = [];
+            const nodeEnvironment = resolveNodeEnvironment(options, cliNodeEnvironment);
 
             // Process external dependencies
-            if (options.external) {
-                for (const extension of options.external) {
-                    externals.push(extension.split(","));
-                }
-            }
+            const externals = collectExternals(options);
 
             const rootPath = resolve(cwd(), options.dir ?? ".");
 
@@ -134,7 +210,7 @@ const createBuildCommand = (cli: Cli<Console>): void => {
                     dtsOnly: options.dtsOnly,
                     externals,
                     killSignal: options.killSignal,
-                    minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
+                    minify: options.minify ?? nodeEnvironment === PRODUCTION_ENV,
                     onSuccess: options.onSuccess,
                     rollup: {
                         esbuild: {
@@ -162,6 +238,7 @@ const createBuildCommand = (cli: Cli<Console>): void => {
                             : {},
                     },
                     runtime: options.runtime,
+                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- logical OR of three boolean flags: sourcemap is enabled when ANY of metafile/analyze/sourcemap is true; `??` would not short-circuit on `false`.
                     sourcemap: options.metafile || options.analyze || options.sourcemap,
                     unbundle: options.unbundle,
                     // validation will take the default values
@@ -181,8 +258,17 @@ const createBuildCommand = (cli: Cli<Console>): void => {
                     mergedConfig.validation = false;
                 }
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await packem(rootPath, mode, nodeEnvironment as Environment, logger, options.debug, mergedConfig as any, options.tsconfig ?? undefined);
+                await packem(
+                    rootPath,
+                    mode,
+                    nodeEnvironment as Environment,
+                    // cerebro injects a Pail logger at runtime; the toolbox types it
+                    // as the narrower `Console`, so widen it to what packem expects.
+                    logger as unknown as Parameters<typeof packem>[3],
+                    options.debug ?? false,
+                    mergedConfig as unknown as BuildConfig,
+                    options.tsconfig ?? undefined,
+                );
             } catch (error) {
                 logger.error(error);
 

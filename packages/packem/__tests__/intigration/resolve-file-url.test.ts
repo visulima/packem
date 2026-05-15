@@ -1,15 +1,19 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
+
+const SHARED_EFFECT_MJS_REGEX = /packem_shared\/effect-[\w-]+\.mjs/;
+const SHARED_EFFECT_CJS_REGEX = /packem_shared\/effect-[\w-]+\.cjs/;
+const EFFECT_WORD_REGEX = /\beffect\b/;
 
 describe("packem resolve-file-url", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory({
             prefix: "packem-resolve-file-url",
         });
@@ -54,12 +58,12 @@ export default log`,
         // splits it into `import X from './chunk.mjs'; export { X as effect };`.
         // Structural checks tolerate either form while still catching plugin
         // regressions (resolution + chunk emit + re-export wiring).
-        expect(mjsContent).toMatch(/packem_shared\/effect-[\w-]+\.mjs/);
-        expect(mjsContent).toMatch(/\beffect\b/);
+        expect(mjsContent).toMatch(SHARED_EFFECT_MJS_REGEX);
+        expect(mjsContent).toMatch(EFFECT_WORD_REGEX);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.cjs`);
 
-        expect(cjsContent).toMatch(/packem_shared\/effect-[\w-]+\.cjs/);
-        expect(cjsContent).toMatch(/\beffect\b/);
+        expect(cjsContent).toMatch(SHARED_EFFECT_CJS_REGEX);
+        expect(cjsContent).toMatch(EFFECT_WORD_REGEX);
     });
 });

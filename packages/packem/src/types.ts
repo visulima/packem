@@ -1,6 +1,7 @@
 import type { CheckPackageOptions } from "@arethetypeswrong/core";
 import type { PackemRollupOptions, TransformerFn, TransformerName } from "@visulima/packem-rollup";
 import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
+import type { ResolveExternalsPluginOptions } from "@visulima/packem-rollup/plugin/externals";
 import type { NativeModulesOptions } from "@visulima/packem-rollup/plugin/native-modules";
 import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
 import type { FileCache } from "@visulima/packem-share/utils";
@@ -11,7 +12,6 @@ import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
 import type { ExeOptions } from "./exe";
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
-import type { ResolveExternalsPluginOptions } from "@visulima/packem-rollup/plugin/externals";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -83,6 +83,10 @@ export type BuildEntry = {
     declaration?: boolean | "compatible" | "node16";
     /** Whether to generate .d.cts declaration file without triggering CJS JS build */
     declarationCjs?: boolean;
+
+    /** Whether to generate .d.mts declaration file without triggering ESM JS build */
+    declarationEsm?: boolean;
+
     /**
      * Set of declaration file extensions package.json's exports map references for
      * this entry (e.g. `{ "d.mts", "d.cts" }`). Derived by infer-entries from the
@@ -91,8 +95,6 @@ export type BuildEntry = {
      * `emitCJS`/`emitESM` + `declaration` flags when present.
      */
     declarationExtensions?: Set<"d.cts" | "d.mts" | "d.ts">;
-    /** Whether to generate .d.mts declaration file without triggering ESM JS build */
-    declarationEsm?: boolean;
     /** Build environment for this entry */
     environment?: Environment;
     /** Whether to generate ESM output for this entry */
@@ -147,11 +149,11 @@ export interface BuildOptions {
      * `false` will disable declaration generation.
      * `undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
      */
-    declaration?: boolean | "compatible" | "node16" | undefined;
+    declaration?: boolean | "compatible" | "node16";
 
     /**
      * Maximum number of DTS bundles to build in parallel. Each
-     * @visulima/rollup-plugin-dts instance keeps a TypeScript program in
+     * `@visulima/rollup-plugin-dts` instance keeps a TypeScript program in
      * memory, so this is capped low by default to avoid OOM on large monorepos.
      * @default 2
      */
@@ -205,14 +207,14 @@ export interface BuildOptions {
     /** Signal to use when killing child processes */
     killSignal?: KillSignal;
     /** Whether to minify the output */
-    minify?: boolean | undefined;
+    minify?: boolean;
     /** Name of the build */
     name: string;
     /** Node.js 10 compatibility options */
     node10Compatibility?: Node10CompatibilityOptions | false;
     /** Command to run or function to execute after successful build */
 
-    onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined | void>);
+    onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined>);
     /** Timeout for the onSuccess command in milliseconds */
     onSuccessTimeout?: number;
     /** Output directory for build artifacts */

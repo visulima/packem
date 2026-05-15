@@ -2,12 +2,12 @@ import { cpSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { ensureDir, isAccessibleSync, readFileSync, writeFile, writeJson } from "@visulima/fs";
-import type { UrlOptions } from "@visulima/packem-rollup";
+import type { UrlOptions } from "@visulima/packem-rollup/plugin/url";
 import { basename, join, resolve } from "@visulima/path";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { assertContainFiles, createPackageJson, createPackemConfig, execPackem } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "url");
@@ -15,7 +15,7 @@ const fixturePath = join(__dirname, "../..", "__fixtures__", "url");
 describe("url", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -23,7 +23,7 @@ describe("url", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    const build = async (type: string, options: Partial<UrlOptions>, generatedFiles: string[], useSnapshot?: boolean) => {
+    const build = async (type: string, options: Partial<UrlOptions>, generatedFiles: string[], useSnapshot = true) => {
         // copy fixtures to temporary directory
         cpSync(join(fixturePath, `${type}.js`), join(temporaryDirectoryPath, "src", `${type}.js`));
         cpSync(join(fixturePath, `${type}.${type}`), join(temporaryDirectoryPath, "src", `${type}.${type}`));
@@ -54,7 +54,7 @@ describe("url", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        if (useSnapshot !== false) {
+        if (useSnapshot) {
             const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
 
             expect(mjsContent).toMatchSnapshot("mjs");
@@ -205,12 +205,11 @@ describe("url", () => {
 
         const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
 
-        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs");
 
         const cjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.cjs`));
 
-        // eslint-disable-next-line no-secrets/no-secrets
-        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs");
     });
 
     it("should create a nested directory for the output, if required", async () => {
@@ -220,6 +219,7 @@ describe("url", () => {
             join(temporaryDirectoryPath, "/dist/png.cjs"),
             join(temporaryDirectoryPath, "/dist/png.mjs"),
 
+            // eslint-disable-next-line no-secrets/no-secrets -- deterministic content-hash filename of an emitted build artifact, not a credential
             join(temporaryDirectoryPath, "/dist/joker/6b71fbe07b498a82.png"),
         ]);
     });

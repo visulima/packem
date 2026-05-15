@@ -2,16 +2,20 @@ import { readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import type { BuildConfig } from "../../src/types";
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
+
+const CJS_GET_BUILTIN_MODULE_REGEX = /__cjs_getBuiltinModule\(['"]node:fs['"]\)/;
+const SHARED_PROCESS_UTILS_REGEX = /from '\.\/packem_shared\/process-utils-[^']+\.js'/;
 
 describe("packem require-cjs-transformer", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -114,7 +118,7 @@ export const testPath = (p: string) => {
                         builtinNodeModules: true,
                     },
                 },
-            },
+            } as unknown as BuildConfig,
         });
 
         const binProcess = await execPackem("build", [], {
@@ -241,7 +245,7 @@ export const test = () => {
                         builtinNodeModules: true,
                     },
                 },
-            },
+            } as unknown as BuildConfig,
         });
 
         const binProcess = await execPackem("build", [], {
@@ -403,13 +407,13 @@ export const mainIndex2 = () => ({
         expect(normalizedIndex).toContain("import { createRequire as __cjs_createRequire } from 'node:module'");
         expect(normalizedIndex).toContain("const __cjs_require = __cjs_createRequire(import.meta.url)");
         expect(normalizedIndex).toContain("__cjs_getBuiltinModule");
-        expect(normalizedIndex).toMatch(/__cjs_getBuiltinModule\(['"]node:fs['"]\)/);
-        expect(normalizedIndex).toMatch(/from '\.\/packem_shared\/process-utils-[^']+\.js'/);
+        expect(normalizedIndex).toMatch(CJS_GET_BUILTIN_MODULE_REGEX);
+        expect(normalizedIndex).toMatch(SHARED_PROCESS_UTILS_REGEX);
         expect(normalizedIndex).toContain("export { mainIndex }");
 
         const normalizedIndex2 = normalizeBundleOutput(index2MjsContent);
 
-        expect(normalizedIndex2).toMatch(/from '\.\/packem_shared\/process-utils-[^']+\.js'/);
+        expect(normalizedIndex2).toMatch(SHARED_PROCESS_UTILS_REGEX);
         expect(normalizedIndex2).toContain("export { mainIndex2 }");
 
         // Find the shared chunk file dynamically (filename contains hash)

@@ -1,12 +1,15 @@
-/* eslint-disable perfectionist/sort-objects */
 import type { BuildContext } from "@visulima/packem-share/types";
+import type { warn } from "@visulima/packem-share/utils";
+// eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
+import { temporaryDirectory } from "tempy";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { InternalBuildOptions } from "../../../../src/types";
 import validatePackageFields from "../../../../src/validator/package-json/validate-package-fields";
 
 const { mockedWarn } = vi.hoisted(() => {
     return {
-        mockedWarn: vi.fn(),
+        mockedWarn: vi.fn<typeof warn>(),
     };
 });
 
@@ -38,7 +41,7 @@ describe(validatePackageFields, () => {
             },
         };
 
-        validatePackageFields(context as unknown as BuildContext);
+        validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
         expect(mockedWarn).not.toHaveBeenCalledWith(context, "The 'files' field is missing in your package.json. Add the files to be included in the package.");
     });
@@ -54,7 +57,7 @@ describe(validatePackageFields, () => {
             },
         };
 
-        validatePackageFields(context as unknown as BuildContext);
+        validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
         expect(mockedWarn).toHaveBeenCalledTimes(2);
         expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -79,7 +82,7 @@ describe(validatePackageFields, () => {
             },
         };
 
-        validatePackageFields(context as unknown as BuildContext);
+        validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
         expect(mockedWarn).toHaveBeenCalledTimes(2);
         expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -96,14 +99,14 @@ describe(validatePackageFields, () => {
                 validation: { packageJson: { types: true } },
             },
             pkg: {
-                sideEffects: false,
                 files: ["dist"],
                 main: "dist/index.cjs",
                 name: "test",
+                sideEffects: false,
             },
         };
 
-        validatePackageFields(context as unknown as BuildContext);
+        validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
         expect(mockedWarn).toHaveBeenCalledTimes(2);
         expect(mockedWarn).toHaveBeenNthCalledWith(
@@ -127,12 +130,12 @@ describe(validatePackageFields, () => {
                 validation: { packageJson: { files: true } },
             },
             pkg: {
-                sideEffects: false,
                 files: [],
+                sideEffects: false,
             },
         };
 
-        validatePackageFields(context as unknown as BuildContext);
+        validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
         expect(mockedWarn).toHaveBeenCalledTimes(3);
         expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -153,32 +156,32 @@ describe(validatePackageFields, () => {
 
         const contextStringBin = {
             options: {
+                declaration: "compatible" as const,
                 emitCJS: true,
                 emitESM: true,
-                declaration: "compatible" as const,
                 validation: { packageJson: { bin: true } },
             },
             pkg: {
-                sideEffects: false,
                 bin: "bin/index.mjs",
+                sideEffects: false,
                 type: "commonjs",
             },
         };
         const contextObjectBin = {
             options: {
+                declaration: "compatible" as const,
                 emitCJS: true,
                 emitESM: true,
-                declaration: "compatible" as const,
                 validation: { packageJson: { bin: true } },
             },
             pkg: {
-                sideEffects: false,
                 bin: { cli1: "bin/cli1.mjs", cli2: "bin/cli2.cjs" },
+                sideEffects: false,
                 type: "commonjs",
             },
         };
 
-        validatePackageFields(contextStringBin as BuildContext);
+        validatePackageFields(contextStringBin as unknown as BuildContext<InternalBuildOptions>);
 
         expect(mockedWarn).toHaveBeenCalledTimes(6);
         expect(mockedWarn).toHaveBeenNthCalledWith(
@@ -210,7 +213,7 @@ describe(validatePackageFields, () => {
 
         vi.resetAllMocks();
 
-        validatePackageFields(contextObjectBin as unknown as BuildContext);
+        validatePackageFields(contextObjectBin as unknown as BuildContext<InternalBuildOptions>);
 
         expect(mockedWarn).toHaveBeenCalledTimes(6);
         expect(mockedWarn).toHaveBeenNthCalledWith(
@@ -251,7 +254,7 @@ describe(validatePackageFields, () => {
             },
         };
 
-        validatePackageFields(context as unknown as BuildContext);
+        validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
         expect(mockedWarn).toHaveBeenCalledTimes(2);
         expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -268,7 +271,6 @@ describe(validatePackageFields, () => {
         const context = {
             options: { declaration: true, outDir: "dist", validation: false },
             pkg: {
-                sideEffects: false,
                 exports: {
                     ".": {
                         default: "./dist/test.mjs",
@@ -277,11 +279,12 @@ describe(validatePackageFields, () => {
                 },
                 files: ["dist"],
                 name: "test",
+                sideEffects: false,
                 type: "module",
             },
         };
 
-        validatePackageFields(context as unknown as BuildContext);
+        validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
         expect(mockedWarn).not.toHaveBeenCalled();
     });
@@ -302,12 +305,12 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: "./dist/index.js",
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -318,12 +321,12 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
-                    sideEffects: false,
                     exports: "dist/index.js",
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledTimes(3);
             expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -341,12 +344,12 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
-                    sideEffects: false,
                     exports: "./../unsafe/path.js",
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledTimes(3);
             expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -368,12 +371,12 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
-                    sideEffects: false,
                     exports: "./dist/index.xyz",
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledTimes(3);
             expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -403,12 +406,12 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: "./dist/native.node",
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -427,12 +430,12 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: "./dist/component.jsx",
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -451,12 +454,12 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: "./dist/component.tsx",
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -476,12 +479,12 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: "./dist/icons/*",
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -501,18 +504,18 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
-                        "./icons/*": "./dist/icons/*",
                         "./assets/*.png": "./dist/assets/**/*.png",
-                        "./styles/*.css": "./dist/styles/*.css",
                         "./components/*.jsx": "./dist/components/**/*.jsx",
+                        "./icons/*": "./dist/icons/*",
+                        "./styles/*.css": "./dist/styles/*.css",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -532,15 +535,15 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./icons/*": "./src/icons/*",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             // Should not warn when no files are found (this is acceptable for glob patterns)
             expect(mockedWarn).not.toHaveBeenCalled();
@@ -552,22 +555,21 @@ describe(validatePackageFields, () => {
             // Create temporary test files
             const fs = await import("node:fs/promises");
             const path = await import("node:path");
-            const { temporaryDirectory } = await import("tempy");
 
-            const tempDir = temporaryDirectory();
-            const testDir = path.join(tempDir, "src", "icons");
+            const temporaryDirectoryPath = temporaryDirectory();
+            const testDirectory = path.join(temporaryDirectoryPath, "src", "icons");
 
-            await fs.mkdir(testDir, { recursive: true });
+            await fs.mkdir(testDirectory, { recursive: true });
 
             // Create test files with different extensions
-            await fs.writeFile(path.join(testDir, "icon1.svg"), "// valid svg");
-            await fs.writeFile(path.join(testDir, "icon2.png"), "// invalid png for icons");
-            await fs.writeFile(path.join(testDir, "icon3.js"), "// invalid js for icons");
-            await fs.writeFile(path.join(testDir, "icon4.ts"), "// invalid ts for icons");
+            await fs.writeFile(path.join(testDirectory, "icon1.svg"), "// valid svg");
+            await fs.writeFile(path.join(testDirectory, "icon2.png"), "// invalid png for icons");
+            await fs.writeFile(path.join(testDirectory, "icon3.js"), "// invalid js for icons");
+            await fs.writeFile(path.join(testDirectory, "icon4.ts"), "// invalid ts for icons");
 
             const context = {
                 options: {
-                    rootDir: tempDir,
+                    rootDir: temporaryDirectoryPath,
                     validation: {
                         packageJson: {
                             exports: true,
@@ -577,18 +579,18 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./icons/*": "./src/icons/*",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             // Clean up
-            await fs.rm(tempDir, { recursive: true, force: true });
+            await fs.rm(temporaryDirectoryPath, { force: true, recursive: true });
 
             // Should warn about files with invalid extensions
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
@@ -603,43 +605,42 @@ describe(validatePackageFields, () => {
             // Create temporary test files
             const fs = await import("node:fs/promises");
             const path = await import("node:path");
-            const { temporaryDirectory } = await import("tempy");
 
-            const tempDir = temporaryDirectory();
-            const testDir = path.join(tempDir, "src", "assets");
+            const temporaryDirectoryPath = temporaryDirectory();
+            const testDirectory = path.join(temporaryDirectoryPath, "src", "assets");
 
-            await fs.mkdir(testDir, { recursive: true });
+            await fs.mkdir(testDirectory, { recursive: true });
 
             // Create test files
-            await fs.writeFile(path.join(testDir, "asset1.png"), "// valid png");
-            await fs.writeFile(path.join(testDir, "asset2.jpg"), "// valid jpg");
-            await fs.writeFile(path.join(testDir, "asset3.txt"), "// invalid txt");
+            await fs.writeFile(path.join(testDirectory, "asset1.png"), "// valid png");
+            await fs.writeFile(path.join(testDirectory, "asset2.jpg"), "// valid jpg");
+            await fs.writeFile(path.join(testDirectory, "asset3.txt"), "// invalid txt");
 
             const context = {
                 options: {
-                    rootDir: tempDir,
+                    rootDir: temporaryDirectoryPath,
                     validation: {
                         packageJson: {
+                            allowedExportExtensions: [".png", ".jpg", ".jpeg"],
                             exports: true,
                             main: false,
                             name: false,
-                            allowedExportExtensions: [".png", ".jpg", ".jpeg"],
                         },
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./assets/*": "./src/assets/*",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             // Clean up
-            await fs.rm(tempDir, { recursive: true, force: true });
+            await fs.rm(temporaryDirectoryPath, { force: true, recursive: true });
 
             // Should warn about files with invalid extensions
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
@@ -662,15 +663,15 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         import: "./dist/index.mjs",
                         require: "./dist/index.cjs",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -689,15 +690,15 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./utils": "./dist/utils.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -708,12 +709,12 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
-                    sideEffects: false,
                     exports: {},
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledTimes(3);
             expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -731,15 +732,15 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         import: "./dist/index.mjs",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledTimes(3);
             expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -761,14 +762,14 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         "./utils": "./dist/utils.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledTimes(3);
             expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -786,14 +787,14 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".invalid": "./dist/invalid.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledTimes(4);
             expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -812,15 +813,15 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { rootDir: "/test/project", validation: { packageJson: { exports: true } } },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./*/*.js": "./dist/*/*.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledTimes(3);
             expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -846,15 +847,15 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         "custom-unknown": "./dist/custom.js",
                         default: "./dist/index.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
                 context,
@@ -876,15 +877,15 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         development: "./dist/dev.js",
                         production: "./dist/prod.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
                 context,
@@ -906,16 +907,16 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         // eslint-disable-next-line unicorn/no-null
                         "./internal": null,
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -934,12 +935,12 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: ["./dist/modern.js", "./dist/fallback.js"],
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -958,14 +959,14 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": [],
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
                 context,
@@ -987,14 +988,14 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": {},
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
                 context,
@@ -1016,14 +1017,14 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": 123,
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "Invalid exports value type at exports[\".\"]. Expected string, array, object, or null");
         });
@@ -1042,19 +1043,19 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
-                        "node-addons": "./dist/addons.js",
-                        node: "./dist/node.js",
-                        import: "./dist/esm.mjs",
-                        require: "./dist/cjs.cjs",
-                        "module-sync": "./dist/sync.js",
                         default: "./dist/default.js",
+                        import: "./dist/esm.mjs",
+                        "module-sync": "./dist/sync.js",
+                        node: "./dist/node.js",
+                        "node-addons": "./dist/addons.js",
+                        require: "./dist/cjs.cjs",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -1073,7 +1074,6 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         browser: "./dist/browser.js",
                         bun: "./dist/bun.js",
@@ -1087,10 +1087,11 @@ describe(validatePackageFields, () => {
                         types: "./dist/index.d.ts",
                         workerd: "./dist/workerd.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -1109,12 +1110,12 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: "invalid-path",
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -1133,20 +1134,20 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": {
+                            default: "./dist/default.js",
                             node: {
                                 import: "./dist/node.mjs",
                                 require: "./dist/node.cjs",
                             },
-                            default: "./dist/default.js",
                         },
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -1165,7 +1166,6 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         ".": {
                             import: "./dist/index.mjs",
@@ -1179,10 +1179,11 @@ describe(validatePackageFields, () => {
                             types: "./dist/utils.d.ts",
                         },
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -1195,23 +1196,23 @@ describe(validatePackageFields, () => {
                     validation: {
                         packageJson: {
                             exports: true,
+                            extraConditions: ["custom-bundler", "my-framework"],
                             main: false,
                             name: false,
-                            extraConditions: ["custom-bundler", "my-framework"],
                         },
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         "custom-bundler": "./dist/custom.js",
-                        "my-framework": "./dist/framework.js",
                         default: "./dist/index.js",
+                        "my-framework": "./dist/framework.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -1229,16 +1230,16 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
+                        default: "./dist/index.js",
                         "known-custom": "./dist/known.js",
                         "unknown-custom": "./dist/unknown.js",
-                        default: "./dist/index.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledTimes(3);
             expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -1262,22 +1263,22 @@ describe(validatePackageFields, () => {
                     validation: {
                         packageJson: {
                             exports: true,
+                            extraConditions: [],
                             main: false,
                             name: false,
-                            extraConditions: [],
                         },
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         import: "./dist/index.mjs",
                         require: "./dist/index.cjs",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).not.toHaveBeenCalled();
         });
@@ -1296,15 +1297,15 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
-                    sideEffects: false,
                     exports: {
                         "custom-condition": "./dist/custom.js",
                         default: "./dist/index.js",
                     },
+                    sideEffects: false,
                 },
             };
 
-            validatePackageFields(context as unknown as BuildContext);
+            validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
                 context,

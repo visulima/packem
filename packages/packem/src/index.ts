@@ -6,6 +6,24 @@ import internalPackem from "./packem";
 import type { BuildConfig, Environment, Mode } from "./types";
 
 /**
+ * Minimal structural logger contract. `@visulima/pail`'s shipped types
+ * re-export `Pail` from a non-existent `./pail.d.ts`, so `createPail`'s return
+ * value resolves to an error type. Modelling only the methods consumed
+ * downstream keeps the call site fully type-checked without that broken graph.
+ */
+type LoggerMessage = { message: string; prefix?: string };
+
+interface PackemLogger {
+    debug: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
+    error: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
+    info: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
+    raw: (message: string, ...arguments_: unknown[]) => void;
+    restoreAll: () => void;
+    warn: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
+    wrapAll: () => void;
+}
+
+/**
  * Configuration options for Packem bundler.
  * @interface PackemOptions
  * @augments {BuildConfig}
@@ -39,7 +57,7 @@ export interface PackemOptions extends BuildConfig {
 }
 
 /**
- * Runs the Packem bundler with the specified options
+ * Runs the Packem bundler with the specified options.
  * @param rootDirectory The root directory of the project to bundle
  * @param options Configuration options for the bundler
  * @returns Promise that resolves with the build result
@@ -61,7 +79,7 @@ export const packem = async (rootDirectory: string, options: PackemOptions = {})
         ...options,
     };
 
-    const pail = createPail({
+    const pailOptions: ConstructorOptions<string, string> = {
         reporters: [
             new SimpleReporter({
                 error: {
@@ -73,9 +91,15 @@ export const packem = async (rootDirectory: string, options: PackemOptions = {})
         ],
         scope: "packem",
         ...logger,
-    } as any);
+    };
 
-    await internalPackem(rootDirectory, mode, environment, pail, debug, inputConfig as BuildConfig, tsconfigPath);
+    // `createPail` expects `ServerConstructorOptions`, which `@visulima/pail` does
+    // not re-export from its package root (only `ConstructorOptions` is public).
+    // The two types are structurally compatible for the options we pass; the cast
+    // bridges the gap without naming an unexported type or using `any`.
+    const pail = createPail(pailOptions as unknown as Parameters<typeof createPail>[0]) as unknown as PackemLogger;
+
+    await internalPackem(rootDirectory, mode, environment, pail, debug, inputConfig, tsconfigPath);
 };
 
 export type { BuildEntry, BuildOptions, RollupBuildOptions } from "./types";

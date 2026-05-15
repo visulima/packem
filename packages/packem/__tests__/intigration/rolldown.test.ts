@@ -1,10 +1,10 @@
 import { rm } from "node:fs/promises";
 
 import { writeFile } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
 
 // The "missing rolldown" path is only exercised when neither '@rolldown/node' nor
 // 'rolldown' resolves from packem's own node_modules. Once rolldown is installed
@@ -12,16 +12,22 @@ import { createPackageJson, createPackemConfig, createTsConfig, execPackem, inst
 // error becomes unreachable, so skip rather than asserting an obsolete failure.
 const isRolldownInstalled = await (async (): Promise<boolean> => {
     try {
-        await import("@rolldown/node");
+        const rolldownNodeSpecifier = "@rolldown/node";
+
+        await import(rolldownNodeSpecifier);
 
         return true;
-    } catch { /* not installed */ }
+    } catch {
+        /* not installed */
+    }
 
     try {
         await import("rolldown");
 
         return true;
-    } catch { /* not installed */ }
+    } catch {
+        /* not installed */
+    }
 
     return false;
 })();
@@ -29,7 +35,7 @@ const isRolldownInstalled = await (async (): Promise<boolean> => {
 describe("bundler: rolldown", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory({ prefix: "packem-rolldown" });
     });
 
@@ -37,7 +43,7 @@ describe("bundler: rolldown", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it.skipIf(isRolldownInstalled)("should print a helpful error when rolldown is not installed", async () => {
+    it.runIf(!isRolldownInstalled)("should print a helpful error when rolldown is not installed", async () => {
         expect.assertions(2);
 
         await writeFile(`${temporaryDirectoryPath}/src/index.ts`, `export const foo = 1;`);
@@ -45,6 +51,9 @@ describe("bundler: rolldown", () => {
         await createTsConfig(temporaryDirectoryPath);
 
         await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             exports: {
                 ".": {
                     import: {
@@ -58,9 +67,6 @@ describe("bundler: rolldown", () => {
                 },
             },
             types: "./dist/index.d.ts",
-            devDependencies: {
-                typescript: "*",
-            },
         });
 
         await createPackemConfig(temporaryDirectoryPath, {
@@ -76,9 +82,9 @@ describe("bundler: rolldown", () => {
         });
 
         expect(binProcess.exitCode).toBe(1);
-        const combined = `${binProcess.stderr}\n${binProcess.stdout}`;
+
+        const combined = `${String(binProcess.stderr)}\n${String(binProcess.stdout)}`;
+
         expect(combined).toContain("Rolldown is not installed. Please install '@rolldown/node'");
     });
 });
-
-

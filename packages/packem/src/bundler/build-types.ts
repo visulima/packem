@@ -10,6 +10,17 @@ import { getRollupBuild } from "./get-rollup";
 
 const DTS_CACHE_KEY = "rollup-dts.json";
 
+/**
+ * Minimal structural logger contract. `@visulima/pail`'s shipped `Pail` type
+ * re-exports from a non-existent `./pail.d.ts`, so the structural alias below
+ * keeps the methods we call fully type-checked without the broken import.
+ */
+interface Logger {
+    info: (payload: { message: string; prefix: string }) => void;
+}
+
+const getLogger = (context: BuildContext<InternalBuildOptions>): Logger => context.logger as Logger;
+
 // Each DTS pass emits *all* chunks for *one* extension, but only some entries
 // actually want that extension. We can't tell rollup "skip this entry" from
 // inside entryFileNames — so we redirect unwanted entries to a synthetic path
@@ -19,26 +30,24 @@ const SKIP_CHUNK_PREFIX = "__packem_skip__/";
 
 type DtsExtension = "d.cts" | "d.mts" | "d.ts";
 
-/**
- * Compute the set of declaration extensions to emit for one entry.
- *
- * UNION of two sources:
- * - Global-flag-derived: `emitCJS` → `.d.cts`, `emitESM` → `.d.mts`, `compatible`
- *   → `.d.ts`. This is the legacy path: packages without an `exports` map (just
- *   top-level `main`/`module`/`types`) still expect all three files for a
- *   dual-format package, even though only one is explicitly referenced.
- * - `entry.declarationExtensions` (populated by infer-entries from package.json's
- *   exports map): exact extensions that specific conditions reference. This adds
- *   any extension the global logic would miss because of per-entry context
- *   narrowing — e.g. the ESM-only per-entry context for an environment-specific
- *   entry whose `types` is `.d.mts` would otherwise drop to `.d.ts` via
- *   `getDtsExtension`.
- *
- * The union preserves legacy "emit all for dual-format" behavior AND adds
- * extensions that package.json explicitly references, so exports-map-driven
- * packages (like colorize) get exactly what consumers resolve without breaking
- * tests whose fixtures rely on `main`/`module`/`types` alone.
- */
+// Compute the set of declaration extensions to emit for one entry.
+//
+// UNION of two sources:
+// - Global-flag-derived: `emitCJS` → `.d.cts`, `emitESM` → `.d.mts`, `compatible`
+//   → `.d.ts`. This is the legacy path: packages without an `exports` map (just
+//   top-level `main`/`module`/`types`) still expect all three files for a
+//   dual-format package, even though only one is explicitly referenced.
+// - `entry.declarationExtensions` (populated by infer-entries from package.json's
+//   exports map): exact extensions that specific conditions reference. This adds
+//   any extension the global logic would miss because of per-entry context
+//   narrowing — e.g. the ESM-only per-entry context for an environment-specific
+//   entry whose `types` is `.d.mts` would otherwise drop to `.d.ts` via
+//   `getDtsExtension`.
+//
+// The union preserves legacy "emit all for dual-format" behavior AND adds
+// extensions that package.json explicitly references, so exports-map-driven
+// packages (like colorize) get exactly what consumers resolve without breaking
+// tests whose fixtures rely on `main`/`module`/`types` alone.
 const resolveEntryExtensions = (entry: BuildEntry, context: BuildContext<InternalBuildOptions>): Set<DtsExtension> => {
     const result = new Set<DtsExtension>();
 
@@ -72,8 +81,7 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
 
     await context.hooks.callHook("rollup:dts:options", context, rollupTypeOptions);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (Object.keys(rollupTypeOptions.input as any).length === 0) {
+    if (Object.keys(rollupTypeOptions.input ?? {}).length === 0) {
         return;
     }
 
@@ -87,7 +95,7 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
 
         await context.hooks.callHook("rollup:dts:build", context, typesBuild);
 
-        context.logger.info({
+        getLogger(context).info({
             message: "Building declaration files...",
             prefix: "dts",
         });
@@ -108,13 +116,13 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
             }
         }
 
-        const outDir = resolve(context.options.rootDir, context.options.outDir);
+        const outputDirectory = resolve(context.options.rootDir, context.options.outDir);
 
         const filterSkipChunksPlugin: Plugin = {
             generateBundle(_options, bundle) {
                 for (const fileName of Object.keys(bundle)) {
                     if (fileName.startsWith(SKIP_CHUNK_PREFIX)) {
-                        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete, no-param-reassign -- rollup's generateBundle contract requires dropping unwanted chunks by mutating the passed `bundle` object in place; there is no return-value alternative.
                         delete bundle[fileName];
                     }
                 }
@@ -126,9 +134,9 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
             // eslint-disable-next-line no-await-in-loop
             await typesBuild.write({
                 chunkFileNames: (chunk) => getChunkFilename(chunk, extension),
-                dir: outDir,
+                dir: outputDirectory,
                 entryFileNames: (chunk) => {
-                    const entryName = chunk.name?.endsWith(".d") ? chunk.name.slice(0, -2) : chunk.name;
+                    const entryName = chunk.name.endsWith(".d") ? chunk.name.slice(0, -2) : chunk.name;
                     const entry = entryName ? entriesByName.get(entryName) : undefined;
 
                     if (entry) {

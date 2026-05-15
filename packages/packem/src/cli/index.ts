@@ -18,7 +18,9 @@ import createMigrateCommand from "./commands/migrate";
 try {
     // Use node.js 22 new API for better performance.
     // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
-    if (!require("node:module")?.enableCompileCache?.()) {
+    const nodeModule = require("node:module") as { enableCompileCache?: () => unknown };
+
+    if (!nodeModule.enableCompileCache?.()) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
         require("v8-compile-cache");
     }
@@ -30,7 +32,7 @@ try {
  * Creates and configures the main CLI instance for Packem.
  * Sets up logging, error reporting, and registers available commands.
  * @remarks
- * The CLI is built using the @visulima/cerebro framework and configured with
+ * The CLI is built using the `@visulima/cerebro` framework and configured with
  * a SimpleReporter for error handling and output formatting.
  * @example
  * ```typescript
@@ -40,6 +42,7 @@ try {
  * ```
  */
 const index = createCerebro("packem", {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- @visulima/pail's shipped d.ts re-exports from a non-existent ./pail.d.ts, so createPailLogger/SimpleReporter resolve to an error type; the runtime value is correct and cannot be fixed from here.
     logger: await createPailLogger({
         reporters: [
             new SimpleReporter({

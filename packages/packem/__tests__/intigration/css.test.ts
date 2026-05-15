@@ -1,14 +1,13 @@
 import type { Dirent } from "node:fs";
-import { cpSync, mkdirSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
 import { dirname, join } from "@visulima/path";
 import type { StyleOptions } from "@visulima/rollup-plugin-css";
-import type { LESSLoaderOptions } from "@visulima/rollup-plugin-css/less";
 import { inferModeOption, inferSourceMapOption } from "@visulima/rollup-plugin-css/utils";
 import type { OutputOptions } from "rollup";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { PackemConfigProperties } from "../helpers";
@@ -16,12 +15,16 @@ import { createPackageJson, createPackemConfig, execPackem, installPackage } fro
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "css");
 
+const CSS_DTS_SUFFIX_REGEX = /\.css\.d\.ts$/;
+
+const AUTO_MODULES_STYL_REGEX = /(?<!\.module\.)\.styl/;
+
 type BaseWriteData = {
     dependencies?: Record<string, string>;
     errorMessage?: string;
     files?: string[];
     input: string[] | string;
-    minimizer?: "cssnano" | "lightningcss" | undefined;
+    minimizer?: "cssnano" | "lightningcss";
     outDir?: string;
     outputOpts?: OutputOptions;
     packemPlugins?: PackemConfigProperties["plugins"];
@@ -60,8 +63,8 @@ interface WriteResult {
 describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
-        temporaryDirectoryPath = temporaryDirectory();
+    beforeEach(() => {
+        temporaryDirectoryPath = mkdtempSync(join(tmpdir(), "packem-css-"));
     });
 
     afterEach(async () => {
@@ -72,28 +75,38 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         const input = Array.isArray(data.input) ? data.input : [data.input];
 
         // copy fixtures to temporary directory
-        cpSync(join(fixturePath, dirname(input[0] as string)), temporaryDirectoryPath, { recursive: true });
+        cpSync(join(fixturePath, dirname(input[0])), temporaryDirectoryPath, { recursive: true });
 
         await installPackage(temporaryDirectoryPath, "minireset.css");
 
         const { loaders, ...otherOptions } = typeof data.styleOptions === "object" ? data.styleOptions : {};
 
-        await createPackemConfig(temporaryDirectoryPath, {
-            config: data.outputOpts
-                ? {
-                    rollup: {
-                        output: {
-                            ...data.outputOpts,
-                        },
+        // The config property resolves to a recursive deep-partial of the full build
+        // options type. Contextually checking the inline object literal against that
+        // mapped type makes tsc exceed its instantiation depth (TS2589). The shape the
+        // test actually exercises is just rollup.output, so we build it through a narrow
+        // local type that the config alias still accepts.
+        const rollupOutputConfig: { rollup: { output: OutputOptions } } | undefined = data.outputOpts
+            ? {
+                rollup: {
+                    output: {
+                        ...data.outputOpts,
                     },
-                }
-                : undefined,
-            cssLoader: loaders ?? ["postcss", "less", "stylus", "sass", "sourcemap"],
+                },
+            }
+            : undefined;
+
+        const packemConfigProperties: PackemConfigProperties = {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- the assertion is required: without it tsc exceeds its instantiation depth on the recursive deep-partial build config type and fails with TS2589; eslint's checker does not hit that depth so it misreports the cast as unnecessary.
+            config: rollupOutputConfig as PackemConfigProperties["config"],
+            cssLoader: (loaders as PackemConfigProperties["cssLoader"]) ?? ["postcss", "less", "stylus", "sass", "sourcemap"],
             cssOptions: typeof data.styleOptions === "string" ? data.styleOptions : otherOptions,
             minimizer: data.minimizer,
             plugins: data.packemPlugins,
             transformer: "esbuild",
-        });
+        };
+
+        await createPackemConfig(temporaryDirectoryPath, packemConfigProperties);
 
         await createPackageJson(temporaryDirectoryPath, {
             dependencies: data.dependencies ?? {},
@@ -126,22 +139,25 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         expect(binProcess.stdout).toSatisfy((content: string) => {
             const matches: string[] = [];
 
-            let match;
+            // A fresh /g instance is required here: the loop below mutates
+            // `lastIndex` to walk every match, so this regex is inherently
+            // stateful and must not be shared at module scope across calls.
             const regex = /: Unresolved URL.*/g;
+            let match: RegExpExecArray | null = regex.exec(content);
 
-            // eslint-disable-next-line no-cond-assign
-            while ((match = regex.exec(content)) !== null) {
+            while (match !== null) {
                 // This is necessary to avoid infinite loops with zero-width matches
                 if (match.index === regex.lastIndex) {
-                    // eslint-disable-next-line no-plusplus
-                    regex.lastIndex++;
+                    regex.lastIndex += 1;
                 }
 
-                match.forEach((m: string) => {
+                for (const m of match) {
                     if (!m.includes("./nonexistant")) {
                         matches.push(m);
                     }
-                });
+                }
+
+                match = regex.exec(content);
             }
 
             return matches.filter(Boolean).length === 0;
@@ -173,8 +189,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         const dts = sourceFiles
             .filter((dirent) => dirent.isFile())
             .map((dirent) => join(dirent.parentPath, dirent.name))
-            .filter((file) => /\.css\.d\.ts$/.test(file) && !file.includes(`${temporaryDirectoryPath}/dist/`))
-            .sort();
+            .filter((file) => CSS_DTS_SUFFIX_REGEX.test(file) && !file.includes(`${temporaryDirectoryPath}/dist/`))
+            .toSorted((a, b) => a.localeCompare(b));
 
         return {
             css(): string[] {
@@ -216,12 +232,58 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         };
     };
 
+    const expectFailure = async (data: WriteData): Promise<void> => {
+        const result = (await build(data)) as WriteFailResult;
+
+        expect(result.stderr).toContain(data.errorMessage);
+        expect(result.exitCode).toBe(1);
+    };
+
+    const assertCssSnapshots = (result: WriteResult, mode: ReturnType<typeof inferModeOption>): void => {
+        if (!mode.extract) {
+            return;
+        }
+
+        expect(result.isCss()).toBe(true);
+
+        for (const f of result.css()) {
+            expect(f).toMatchSnapshot("css");
+        }
+    };
+
+    const assertSourceMapSnapshots = (
+        result: WriteResult,
+        mode: ReturnType<typeof inferModeOption>,
+        sourceMap: ReturnType<typeof inferSourceMapOption>,
+    ): void => {
+        if (sourceMap && !sourceMap.inline) {
+            expect(result.isMap()).toBe(Boolean(mode.extract));
+
+            for (const f of result.map()) {
+                expect(f).toMatchSnapshot("map");
+            }
+
+            return;
+        }
+
+        expect(result.isMap()).toBe(false);
+    };
+
+    const assertDtsSnapshots = (result: WriteResult, optionDts: boolean | undefined): void => {
+        if (!optionDts) {
+            return;
+        }
+
+        expect(result.isDts()).toBe(true);
+
+        for (const f of result.dts()) {
+            expect(f).toMatchSnapshot("dts");
+        }
+    };
+
     const validate = async (data: WriteData): Promise<void> => {
         if (data.shouldFail) {
-            const result = (await build(data)) as WriteFailResult;
-
-            expect(result.stderr).toContain(data.errorMessage);
-            expect(result.exitCode).toBe(1);
+            await expectFailure(data);
 
             return;
         }
@@ -238,36 +300,12 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
 
         const mode = inferModeOption(optionMode ?? "inject");
 
-        if (mode.extract) {
-            expect(result.isCss()).toBe(true);
+        assertCssSnapshots(result, mode);
+        assertSourceMapSnapshots(result, mode, inferSourceMapOption(optionSourceMap));
 
-            for (const f of result.css()) {
-                expect(f).toMatchSnapshot("css");
-            }
-        }
+        const optionDts: boolean | undefined = typeof data.styleOptions === "object" ? data.styleOptions.dts : undefined;
 
-        const sourceMap = inferSourceMapOption(optionSourceMap);
-
-        if (sourceMap && !sourceMap.inline) {
-            expect(result.isMap()).toBe(Boolean(mode.extract));
-
-            for (const f of result.map()) {
-                expect(f).toMatchSnapshot("map");
-            }
-        } else {
-            expect(result.isMap()).toBe(false);
-        }
-
-        const optionDts: boolean | undefined
-            = typeof data.styleOptions === "object" ? (data.styleOptions as StyleOptions).dts : undefined;
-
-        if (optionDts) {
-            expect(result.isDts()).toBe(true);
-
-            for (const f of result.dts()) {
-                expect(f).toMatchSnapshot("dts");
-            }
-        }
+        assertDtsSnapshots(result, optionDts);
 
         for (const file of data.files ?? []) {
             expect(result.isFile(file)).toBe(true);
@@ -372,8 +410,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 errorMessage: "Incorrect mode provided, allowed modes are `inject`, `extract`, `emit` or `inline`",
                 input: "simple/index.js",
                 shouldFail: true,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                styleOptions: { mode: "mash" as any },
+                // Intentionally invalid mode to exercise the validation error path.
+                styleOptions: { mode: "mash" as unknown as StyleOptions["mode"] },
                 title: "mode-fail",
             },
             {
@@ -401,16 +439,15 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 errorMessage: "Unable to load PostCSS plugin `pulverizer`",
                 input: "simple/index.js",
                 shouldFail: true,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                styleOptions: { postcss: { plugins: ["pulverizer"] as any } },
+                styleOptions: { postcss: { plugins: ["pulverizer"] } },
                 title: "plugin-fail",
             },
             {
                 errorMessage: "plugins.filter(...) is not a function or its return value is not async iterable",
                 input: "simple/index.js",
                 shouldFail: true,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                styleOptions: { postcss: { plugins: "pulverizer" as any } },
+                // Intentionally invalid (string instead of array) to exercise the error path.
+                styleOptions: { postcss: { plugins: "pulverizer" as unknown as NonNullable<StyleOptions["postcss"]>["plugins"] } },
                 title: "plugin-type-fail",
             },
             {
@@ -515,16 +552,26 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 await installPackage(temporaryDirectoryPath, "sugarss");
             }
 
-            // eslint-disable-next-line vitest/no-conditional-in-test
-            if (data.styleOptions && (data.styleOptions as StyleOptions).alias) {
-                for (const [key, value] of Object.entries((data.styleOptions as StyleOptions).alias as Record<string, string>)) {
-                    // this is needed because of the temporary directory path, that is generated on every test run
+            const { styleOptions } = data;
+            const alias = typeof styleOptions === "object" ? styleOptions.alias : undefined;
 
-                    ((data.styleOptions as StyleOptions).alias as Record<string, string>)[key] = value.replace("__REPLACE__", temporaryDirectoryPath);
+            let resolvedData: WriteData = data;
+
+            // The temporary directory path is generated on every test run, so
+            // substitute the placeholder into a fresh copy rather than mutating
+            // the shared test-case data object.
+            // eslint-disable-next-line vitest/no-conditional-in-test -- per-case alias substitution depends on the test-case data; this is setup, not branched assertions.
+            if (alias) {
+                const resolvedAlias: Record<string, string> = {};
+
+                for (const [key, value] of Object.entries(alias)) {
+                    resolvedAlias[key] = value.replace("__REPLACE__", temporaryDirectoryPath);
                 }
+
+                resolvedData = { ...data, styleOptions: { ...(styleOptions as StyleOptions), alias: resolvedAlias } };
             }
 
-            await validate(data);
+            await validate(resolvedData);
         });
     });
 
@@ -664,7 +711,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "inline-modules-lightningcss",
             },
-        ] as WriteData[])("should minimize processed $title css with $minimizer", async ({ minimizer, title, ...data }: WriteData) => {
+        ] as WriteData[])("should minimize processed $title css with $minimizer", async ({ minimizer, title: _title, ...data }: WriteData) => {
             await validate({ ...data, minimizer });
         });
     });
@@ -686,7 +733,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 input: "simple/index.js",
 
                 styleOptions: {
-                    sourceMap: [true, { transform: (map) => (map.sources = ["virt"]) }],
+                    sourceMap: [true, { transform: (map) => Object.assign(map, { sources: ["virt"] }) }],
                 },
                 title: "transform",
             },
@@ -704,7 +751,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 input: "simple/index.js",
 
                 styleOptions: {
-                    sourceMap: ["inline", { transform: (m) => (m.sources = ["virt"]) }],
+                    sourceMap: ["inline", { transform: (m) => Object.assign(m, { sources: ["virt"] }) }],
                 },
                 title: "inline-transform",
             },
@@ -725,7 +772,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 input: "simple/index.js",
                 styleOptions: {
                     mode: "inline",
-                    sourceMap: [true, { transform: (map: any) => (map.sources = ["virt"]) }],
+                    sourceMap: [true, { transform: (map) => Object.assign(map, { sources: ["virt"] }) }],
                 },
                 title: "inline-transform",
             },
@@ -746,7 +793,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 input: "simple/index.js",
                 styleOptions: {
                     mode: "inline",
-                    sourceMap: ["inline", { transform: (m: any) => (m.sources = ["virt"]) }],
+                    sourceMap: ["inline", { transform: (m) => Object.assign(m, { sources: ["virt"] }) }],
                 },
                 title: "inline-inline-transform",
             },
@@ -770,7 +817,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "inline-modules-sourcemap",
             },
-        ] as WriteData[])("should generate sourcemap for processed $title css", async ({ title, ...data }: WriteData) => {
+        ] as WriteData[])("should generate sourcemap for processed $title css", async ({ title: _title, ...data }: WriteData) => {
             await validate(data);
         });
     });
@@ -823,7 +870,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
 
                 styleOptions: {
                     mode: "extract",
-                    sourceMap: [true, { transform: (map) => (map.sources = ["virt"]) }],
+                    sourceMap: [true, { transform: (map) => Object.assign(map, { sources: ["virt"] }) }],
                 },
                 title: "sourcemap-transform",
             },
@@ -837,7 +884,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
 
                 styleOptions: {
                     mode: "extract",
-                    sourceMap: ["inline", { transform: (map) => (map.sources = ["virt"]) }],
+                    sourceMap: ["inline", { transform: (map) => Object.assign(map, { sources: ["virt"] }) }],
                 },
                 title: "sourcemap-inline-transform",
             },
@@ -866,14 +913,14 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 styleOptions: { mode: "extract", sourceMap: true },
                 title: "asset-file-names",
             },
-        ] as WriteData[])("should generate sourcemap for processed $title css", async ({ title, ...data }: WriteData) => {
+        ] as WriteData[])("should generate sourcemap for processed $title css", async ({ title: _title, ...data }: WriteData) => {
             // eslint-disable-next-line vitest/no-conditional-in-test
             if (data.styleOptions && Array.isArray((data.styleOptions as StyleOptions).mode)) {
                 // eslint-disable-next-line no-param-reassign
                 (data.styleOptions as StyleOptions).mode = [
-                    ((data.styleOptions as StyleOptions).mode as string[])[0] as "extract",
-                    (((data.styleOptions as StyleOptions).mode as string[])[1] as string).replace("__REPLACE__", temporaryDirectoryPath),
-                ];
+                    ((data.styleOptions as StyleOptions).mode as string[])[0],
+                    ((data.styleOptions as StyleOptions).mode as string[])[1].replace("__REPLACE__", temporaryDirectoryPath),
+                ] as StyleOptions["mode"];
             }
 
             await validate(data);
@@ -893,16 +940,16 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             {
                 input: "simple/index.js",
                 styleOptions:
-                    // eslint-disable-next-line no-template-curly-in-string
+                    // eslint-disable-next-line no-template-curly-in-string, no-secrets/no-secrets -- this is a literal JS injector snippet written into the test packem config, not a credential; its high char entropy is incidental.
                     "mode: [\"inject\", (varname, id) => `console.log(${varname},${JSON.stringify(id.replace(\"__REPLACE__\", \"\"))})`],",
                 title: "function",
             },
-        ] as WriteData[])("should work with injected processed $title css", async ({ title, ...data }: WriteData) => {
+        ] as WriteData[])("should work with injected processed $title css", async ({ title: _title, ...data }: WriteData) => {
             // this is needed because of the temporary directory path, that is generated on every test run
             // eslint-disable-next-line vitest/no-conditional-in-test
             if (typeof data.styleOptions === "string") {
                 // eslint-disable-next-line no-param-reassign
-                data.styleOptions = (data.styleOptions as string).replace("__REPLACE__", temporaryDirectoryPath);
+                data.styleOptions = data.styleOptions.replace("__REPLACE__", temporaryDirectoryPath);
             }
 
             await validate(data);
@@ -980,7 +1027,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "inline-sourcemap-inline",
             },
-        ] as WriteData[])("should work with inline processed $title css", async ({ title, ...data }: WriteData) => {
+        ] as WriteData[])("should work with inline processed $title css", async ({ title: _title, ...data }: WriteData) => {
             await validate(data);
         });
     });
@@ -1063,7 +1110,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "sass - import",
             },
-        ] as WriteData[])("should work with sass/scss processed $title css", async ({ title, ...data }) => {
+        ] as WriteData[])("should work with sass/scss processed $title css", async ({ title: _title, ...data }) => {
             await validate(data);
         });
     });
@@ -1123,7 +1170,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "import-option",
             },
-        ] as WriteData[])("should work with stylus processed $title css", async ({ title, ...data }: WriteData) => {
+        ] as WriteData[])("should work with stylus processed $title css", async ({ title: _title, ...data }: WriteData) => {
             await validate(data);
         });
     });
@@ -1147,19 +1194,27 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "paths",
             },
-        ] as WriteData[])("should work with less processed $title css", async ({ title, ...data }: WriteData) => {
-            // eslint-disable-next-line vitest/no-conditional-in-test
-            if ((data.styleOptions as StyleOptions)?.less?.paths) {
-                for (let index = 0; index < (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[]).length; index++) {
-                    // this is needed because of the temporary directory path, that is generated on every test run
+        ] as WriteData[])("should work with less processed $title css", async ({ title: _title, ...data }: WriteData) => {
+            const styleOptions = typeof data.styleOptions === "object" ? data.styleOptions : undefined;
+            const lessOptions = styleOptions?.less;
+            const paths = lessOptions?.paths;
 
-                    ((((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string) = (
-                        (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string
-                    ).replace("__REPLACE__", temporaryDirectoryPath);
-                }
+            let resolvedData: WriteData = data;
+
+            // The temporary directory path is generated on every test run, so
+            // substitute the placeholder into a fresh copy rather than mutating
+            // the shared test-case data object.
+            // eslint-disable-next-line vitest/no-conditional-in-test -- per-case less path substitution depends on the test-case data; this is setup, not branched assertions.
+            if (paths) {
+                const resolvedPaths = paths.map((path) => path.replace("__REPLACE__", temporaryDirectoryPath));
+
+                resolvedData = {
+                    ...data,
+                    styleOptions: { ...(styleOptions as StyleOptions), less: { ...lessOptions, paths: resolvedPaths } },
+                };
             }
 
-            await validate(data);
+            await validate(resolvedData);
         });
     });
 
@@ -1182,7 +1237,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 input: "tailwind-oxide/index.js",
                 styleOptions: {
-                    loaders: ["tailwindcss"],
+                    loaders: ["tailwindcss"] as unknown as StyleOptions["loaders"],
                     mode: "extract",
                 },
                 title: "extract",
@@ -1282,7 +1337,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 input: "tailwind-oxide-cross-folder/index.js",
                 styleOptions: {
-                    loaders: ["tailwindcss"],
+                    loaders: ["tailwindcss"] as unknown as StyleOptions["loaders"],
                     mode: "extract",
                 },
                 title: "cross-folder-extract",
@@ -1311,16 +1366,16 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "cross-folder-extract-sourcemap-inline",
             },
-        ] as WriteData[])("should work with tailwind-oxide processed $title css", async (data: WriteData) => {
+        ] as unknown as WriteData[])("should work with tailwind-oxide processed $title css", async (data: WriteData) => {
             await installPackage(temporaryDirectoryPath, "tailwindcss");
 
             // eslint-disable-next-line vitest/no-conditional-in-test
-            if (data.styleOptions.mode === "emit") {
+            if (typeof data.styleOptions === "object" && data.styleOptions.mode === "emit") {
                 await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
             }
 
             // Use cross-folder validation for cross-folder tests
-            await ((data.title as string).includes("cross-folder") ? validateCrossFolder(data) : validate(data));
+            await (data.title?.includes("cross-folder") ? validateCrossFolder(data) : validate(data));
         });
     });
 
@@ -1336,7 +1391,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 input: "tailwind-oxide-cross-folder/index.js",
                 styleOptions: {
-                    loaders: ["tailwindcss"],
+                    loaders: ["tailwindcss"] as unknown as StyleOptions["loaders"],
                     mode: "extract",
                 },
             })) as WriteResult;
@@ -1394,7 +1449,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                     },
                     input: "tailwind-oxide-cross-folder/index.js",
                     styleOptions: {
-                        loaders: ["tailwindcss"],
+                        loaders: ["tailwindcss"] as unknown as StyleOptions["loaders"],
                         mode: "extract",
                     },
                 })) as WriteResult;
@@ -1657,7 +1712,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             },
             {
                 input: "auto-modules/index.js",
-                styleOptions: { autoModules: /(?<!\.module\.)\.styl/ },
+                styleOptions: { autoModules: AUTO_MODULES_STYL_REGEX },
                 title: "auto-modules-regexp",
             },
             {
@@ -1709,7 +1764,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "lightningcss-modules-named-exports",
             },
-        ] as WriteData[])("should work with processed modules $title css", async ({ title, ...data }: WriteData) => {
+        ] as WriteData[])("should work with processed modules $title css", async ({ title: _title, ...data }: WriteData) => {
             await validate(data);
         });
     });
@@ -1792,7 +1847,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "inline-multi-entry",
             },
-        ] as WriteData[])("should work with processed $title css", async ({ title, ...data }: WriteData) => {
+        ] as WriteData[])("should work with processed $title css", async ({ title: _title, ...data }: WriteData) => {
             await validate(data);
         });
     });
@@ -1873,8 +1928,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                     },
                 ],
 
-                sourceMap: [true, { transform: (map) => (map.sources = ["virt"]) }],
-                styleOptions: `mode: "emit", sourceMap: [true, { transform: (m) => (m.sources = ["virt"]) }]`,
+                sourceMap: [true, { transform: (map) => Object.assign(map, { sources: ["virt"] }) }],
+                styleOptions: `mode: "emit", sourceMap: [true, { transform: (m) => Object.assign(m, { sources: ["virt"] }) }]`,
                 title: "sourcemap-transform",
             },
             {
@@ -1910,7 +1965,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "meta",
             },
-        ] as WriteData[])("should work with emitted processed $title css", async ({ title, ...data }: WriteData) => {
+        ] as WriteData[])("should work with emitted processed $title css", async ({ title: _title, ...data }: WriteData) => {
             await installPackage(temporaryDirectoryPath, "lit");
 
             // eslint-disable-next-line vitest/no-conditional-in-test
@@ -1961,7 +2016,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             // Find emitted CSS file and assert content
             const distributionPath = join(temporaryDirectoryPath, "dist");
             const files = await readdir(distributionPath, { recursive: true, withFileTypes: true });
-            const cssFiles = files.filter((d) => d.isFile() && d.name.endsWith(".css")).map((d) => join(d.path, d.name));
+            const cssFiles = files.filter((d) => d.isFile() && d.name.endsWith(".css")).map((d) => join(d.parentPath, d.name));
 
             const initialCss = cssFiles.map((f) => readFileSync(f)).join("\n");
 
@@ -1978,7 +2033,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             expect(binProcess.exitCode).toBe(0);
 
             const files2 = await readdir(distributionPath, { recursive: true, withFileTypes: true });
-            const cssFiles2 = files2.filter((d) => d.isFile() && d.name.endsWith(".css")).map((d) => join(d.path, d.name));
+            const cssFiles2 = files2.filter((d) => d.isFile() && d.name.endsWith(".css")).map((d) => join(d.parentPath, d.name));
             const updatedCss = cssFiles2.map((f) => readFileSync(f)).join("\n");
 
             expect(updatedCss).toContain("color:blue");

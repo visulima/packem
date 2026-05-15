@@ -25,12 +25,14 @@ const ecosystemConfigs: Record<string, unknown> = {
 
 describe("packem ecosystem", () => {
     afterEach(async () => {
-        for await (const suite of ecosystemSuites) {
-            await rm(join(ecosystemPath, suite, "dist"), {
-                force: true,
-                recursive: true,
-            });
-        }
+        await Promise.all(
+            ecosystemSuites.map((suite) =>
+                rm(join(ecosystemPath, suite, "dist"), {
+                    force: true,
+                    recursive: true,
+                }),
+            ),
+        );
     });
 
     it.each(ecosystemSuites)("should work with provided '%s' ecosystem suite", async (suite) => {

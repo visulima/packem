@@ -38,7 +38,7 @@ export interface ReactPresetOptions {
  * React preset for Packem. Configures Babel with React presets and optionally React Compiler.
  * @description This preset configures Babel to run before your main transformer (esbuild/SWC/etc.).
  * Babel handles JSX transformation, while TypeScript is handled by the transformer via parser plugins.
- * This matches the approach used by @vitejs/plugin-react.
+ * This matches the approach used by `@vitejs/plugin-react`.
  * @example
  * ```typescript
  * // Basic usage
@@ -65,7 +65,7 @@ export interface ReactPresetOptions {
  * ```
  */
 export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig => {
-    const { compiler = false, plugins = [], presets = [] } = options;
+    const { compiler, plugins, presets } = options;
 
     const babelPlugins: BabelPluginConfig["plugins"] = [];
     const babelPresets: BabelPluginConfig["presets"] = [];
@@ -106,6 +106,7 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
                         babelConfig.presets[presetIndex] = [
                             preset[0],
                             {
+                                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- `typeof x === "object"` is also true for null, so the explicit null check is a real runtime guard; relaxed strictNullChecks hides the union from the type checker.
                                 ...typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {},
                                 development: context.environment === "development",
                             },

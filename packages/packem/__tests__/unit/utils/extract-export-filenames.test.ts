@@ -11,7 +11,7 @@ describe(extractExportFilenames, () => {
         const packageExports = undefined;
         const type = "esm";
 
-        const result = extractExportFilenames(packageExports, type, false);
+        const result = extractExportFilenames(packageExports, type, false, [], []);
 
         expect(result).toStrictEqual([]);
     });
@@ -22,7 +22,7 @@ describe(extractExportFilenames, () => {
         const packageExports = "index.js";
         const type = "esm";
 
-        const result = extractExportFilenames(packageExports, type, false);
+        const result = extractExportFilenames(packageExports, type, false, [], []);
 
         expect(result).toStrictEqual([{ file: "index.js", key: "exports", type: "esm" }]);
     });
@@ -36,7 +36,7 @@ describe(extractExportFilenames, () => {
         };
         const type = "esm";
 
-        const result = extractExportFilenames(packageExports, type, false);
+        const result = extractExportFilenames(packageExports, type, false, [], []);
 
         expect(result).toStrictEqual([
             {
@@ -63,7 +63,7 @@ describe(extractExportFilenames, () => {
         };
         const type = "cjs";
 
-        const result = extractExportFilenames(packageExports, type, false);
+        const result = extractExportFilenames(packageExports, type, false, [], []);
 
         expect(result).toStrictEqual([
             {
@@ -94,7 +94,7 @@ describe(extractExportFilenames, () => {
         };
         const type = "cjs";
 
-        const result = extractExportFilenames(packageExports, type, false);
+        const result = extractExportFilenames(packageExports, type, false, [], []);
 
         expect(result).toStrictEqual([
             {
@@ -129,7 +129,7 @@ describe(extractExportFilenames, () => {
         };
         const type = "cjs";
 
-        const result = extractExportFilenames(packageExports, type, false);
+        const result = extractExportFilenames(packageExports, type, false, [], []);
 
         expect(result).toStrictEqual([
             {
@@ -170,8 +170,8 @@ describe(extractExportFilenames, () => {
         const type = "esm";
 
         expect(() => {
-            extractExportFilenames(packageExports, type, false);
-        }).toThrowError("Exported file \"./src/index.cjs\" has an extension that does not match the package.json type \"module\".");
+            extractExportFilenames(packageExports, type, false, [], []);
+        }).toThrow("Exported file \"./src/index.cjs\" has an extension that does not match the package.json type \"module\".");
     });
 
     it.each([
@@ -758,7 +758,7 @@ describe(extractExportFilenames, () => {
         (type: "cjs" | "esm", packageExports: PackageJson["exports"], expectedResult: OutputDescriptor[]) => {
             expect.assertions(1);
 
-            const result = extractExportFilenames(packageExports, type, true);
+            const result = extractExportFilenames(packageExports, type, true, [], []);
 
             expect(result).toStrictEqual(expectedResult);
         },

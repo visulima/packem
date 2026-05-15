@@ -15,14 +15,18 @@ const loadPackemConfig = async (
 }> => {
     const packemConfigFilePath = await findPackemFile(rootDirectory, configPath);
 
-    let buildConfig = (await jiti.import(packemConfigFilePath, {
+    const imported = await jiti.import<BuildConfig | BuildConfigFunction>(packemConfigFilePath, {
         default: true,
         try: true,
-    }) || {}) as BuildConfig | BuildConfigFunction;
+    });
 
-    if (typeof buildConfig === "function") {
-        buildConfig = await buildConfig(environment, mode);
-    }
+    // `try: true` makes jiti return `undefined` when the config file is absent
+    // or fails to load; the project's relaxed `strictNullChecks` hides that
+    // `| undefined` from the type checker, so the fallback guard stays.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- runtime jiti `try: true` can yield undefined; relaxed strictNullChecks masks it.
+    const resolved: BuildConfig | BuildConfigFunction = imported ?? {};
+
+    const buildConfig: BuildConfig = typeof resolved === "function" ? await resolved(environment, mode) : resolved;
 
     return {
         config: buildConfig,

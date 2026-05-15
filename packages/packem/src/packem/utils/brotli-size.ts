@@ -14,7 +14,7 @@ const brotliSize = async (path: string): Promise<number> =>
         );
 
         pipe.on("error", reject);
-        pipe.on("data", (buf) => {
+        pipe.on("data", (buf: Buffer) => {
             size += buf.length;
         });
         pipe.on("end", () => {

@@ -47,8 +47,8 @@ export const extractExportFilenames: (
     packageExports: PackageJson["exports"],
     packageType: "cjs" | "esm",
     declaration: BuildOptions["declaration"],
-    conditions: string[] = [],
-    ignoreExportKeys: string[] = [],
+    conditions: string[],
+    ignoreExportKeys: string[],
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): OutputDescriptor[] => {
     if (!packageExports) {
@@ -85,7 +85,7 @@ export const extractExportFilenames: (
             const isIgnored = ignoreExportKeys.some((ignoredKey) => normalizedKey === ignoredKey || normalizedKey.startsWith(`${ignoredKey}/`));
 
             if (typeof packageExport === "string") {
-                let descriptor = {};
+                let descriptor: Record<string, string>;
 
                 if (Number.isInteger(+exportKey)) {
                     descriptor = { exportKey: "*" };
@@ -104,14 +104,14 @@ export const extractExportFilenames: (
                     key: "exports",
                     type: inferExportType(exportKey, conditions, packageType, packageExport),
                     ...isIgnored && { ignored: true },
-                } as OutputDescriptor);
-            } else if (typeof packageExport === "object" && packageExport !== undefined) {
+                });
+            } else if (typeof packageExport === "object" && packageExport !== null) {
                 for (const [condition, entryExport] of Object.entries(packageExport as Record<string, string[] | string | null>)) {
                     if (declaration === false && condition === "types") {
                         continue;
                     }
 
-                    const key: string = Number.isInteger(+exportKey) ? condition : (exportKey as string);
+                    const key: string = Number.isInteger(+exportKey) ? condition : exportKey;
 
                     if (typeof entryExport === "string") {
                         descriptors.push({
@@ -120,12 +120,12 @@ export const extractExportFilenames: (
                             key: "exports",
                             ...runtimeExportConventions.has(condition)
                                 ? {
-                                    subKey: condition as OutputDescriptor["subKey"],
+                                    subKey: condition,
                                 }
                                 : {},
                             type: inferExportType(condition, conditions, packageType, entryExport),
                             ...isIgnored && { ignored: true },
-                        } as OutputDescriptor);
+                        });
                     } else {
                         // For nested exports, we need to check if the parent export key should be ignored
                         const nestedKey = key.replace("./", "");
@@ -133,7 +133,7 @@ export const extractExportFilenames: (
                             = isIgnored || ignoreExportKeys.some((ignoredKey) => nestedKey === ignoredKey || nestedKey.startsWith(`${ignoredKey}/`));
 
                         const nestedResults = extractExportFilenames(
-                            { [key]: entryExport } as PackageJson["exports"],
+                            { [key]: entryExport },
                             packageType,
                             declaration,
                             [...conditions, condition],

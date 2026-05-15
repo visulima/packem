@@ -1,6 +1,6 @@
 import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
-import type { OutputOptions, RollupBuild, RollupCache } from "rollup";
+import type { OutputOptions, RollupBuild, RollupCache, RollupOptions } from "rollup";
 
 import { getRolldownBuild } from "../rolldown/get-rolldown";
 import { getRollupOptions } from "../rollup/get-rollup-options";
@@ -11,9 +11,9 @@ import { getRollupBuild } from "./get-rollup";
 const BUNDLE_CACHE_KEY = "rollup-build.json";
 const DEPENDENCIES_CACHE_KEY = "dependencies-cache.json";
 
-export type BundlerName = "rolldown" | "rollup";
+type BundlerName = "rolldown" | "rollup";
 
-export const resolveBundlerName = (bundler: BundlerName | undefined): BundlerName => bundler ?? "rollup";
+const resolveBundlerName = (bundler: BundlerName | undefined): BundlerName => bundler ?? "rollup";
 
 const ROLLDOWN_CSS_MODULE_TYPES = {
     ".css": "js",
@@ -29,8 +29,7 @@ const buildWithRollup = async (
     context: BuildContext<InternalBuildOptions>,
     fileCache: FileCache,
     subDirectory: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rollupOptions: any,
+    rollupOptions: RollupOptions,
 ): Promise<void> => {
     const hasCachedDependencies
         = context.options.validation
@@ -39,21 +38,32 @@ const buildWithRollup = async (
 
     const loadCache = !context.options.validation || context.options.validation.dependencies === false || hasCachedDependencies;
 
+    // Build the effective options without mutating the caller's object: only
+    // inject the persisted rollup cache when cache loading is enabled.
+    let effectiveOptions: RollupOptions = rollupOptions;
+
     if (loadCache) {
-        rollupOptions.cache = fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory);
+        effectiveOptions = {
+            ...rollupOptions,
+            cache: fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory),
+        };
 
         if (hasCachedDependencies) {
             const cachedDeps = fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
 
             if (cachedDeps) {
+                // The deserialized cache payload can be partial despite the typed
+                // shape, so the runtime guards are intentional.
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
                 cachedDeps.used?.forEach((dep) => context.usedDependencies.add(dep));
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
                 cachedDeps.hoisted?.forEach((dep) => context.hoistedDependencies.add(dep));
             }
         }
     }
 
     const rollup = await getRollupBuild();
-    const buildResult = await rollup(rollupOptions);
+    const buildResult = await rollup(effectiveOptions);
 
     try {
         if (loadCache) {
@@ -78,6 +88,7 @@ const buildWithRollup = async (
         for (const outputOptions of rollupOptions.output as OutputOptions[]) {
             // eslint-disable-next-line no-await-in-loop
             const { output } = await buildResult.write(outputOptions);
+
             collectBuildEntries(output, context, assets);
         }
 
@@ -91,8 +102,7 @@ const buildWithRolldown = async (
     context: BuildContext<InternalBuildOptions>,
     fileCache: FileCache,
     subDirectory: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rollupOptions: any,
+    rollupOptions: RollupOptions,
 ): Promise<void> => {
     // Rolldown owns its own incremental cache, so we don't shadow it with
     // BUNDLE_CACHE_KEY the way the rollup path does. The dependencies cache,
@@ -107,7 +117,11 @@ const buildWithRolldown = async (
         const cachedDeps = fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
 
         if (cachedDeps) {
+            // The deserialized cache payload can be partial despite the typed
+            // shape, so the runtime guards are intentional.
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
             cachedDeps.used?.forEach((dep) => context.usedDependencies.add(dep));
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
             cachedDeps.hoisted?.forEach((dep) => context.hoistedDependencies.add(dep));
         }
     }
@@ -123,7 +137,7 @@ const buildWithRolldown = async (
         ...rollupOptions,
         moduleTypes: {
             ...ROLLDOWN_CSS_MODULE_TYPES,
-            ...((rollupOptions as { moduleTypes?: Record<string, string> }).moduleTypes ?? {}),
+            ...(rollupOptions as { moduleTypes?: Record<string, string> }).moduleTypes,
         },
     } as unknown as Record<string, unknown>;
 
@@ -148,6 +162,7 @@ const buildWithRolldown = async (
         for (const outputOptions of rollupOptions.output as unknown as Record<string, unknown>[]) {
             // eslint-disable-next-line no-await-in-loop
             const { output } = await bundle.write(outputOptions);
+
             collectBuildEntries(output, context, assets);
         }
 
@@ -157,18 +172,12 @@ const buildWithRolldown = async (
     }
 };
 
-const build = async (
-    context: BuildContext<InternalBuildOptions>,
-    fileCache: FileCache,
-    subDirectory: string,
-    bundler: BundlerName,
-): Promise<void> => {
+const build = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string, bundler: BundlerName): Promise<void> => {
     const rollupOptions = await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (Object.keys(rollupOptions.input as any).length === 0) {
+    if (Object.keys(rollupOptions.input ?? {}).length === 0) {
         return;
     }
 
@@ -181,4 +190,6 @@ const build = async (
     await buildWithRollup(context, fileCache, subDirectory, rollupOptions);
 };
 
+export type { BundlerName };
+export { resolveBundlerName };
 export default build;

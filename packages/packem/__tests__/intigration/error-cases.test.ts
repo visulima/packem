@@ -1,16 +1,44 @@
-import { mkdirSync } from "node:fs";
+import { mkdirSync, mkdtempSync } from "node:fs";
 import { rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
+const IMPORT_TRACE_HEADER_REGEX = /Import trace:\n/;
+
+const TRACE_TS_BROKEN_PATTERNS: RegExp[] = [/broken\.ts/, IMPORT_TRACE_HEADER_REGEX, /src[/\\]index\.ts\n/, /↳[^\n]{0,500}src[/\\]broken\.ts/];
+
+const TRACE_TS_THREE_LEVEL_PATTERNS: RegExp[] = [
+    /broken\.ts/,
+    IMPORT_TRACE_HEADER_REGEX,
+    /src[/\\]index\.ts\n/,
+    /↳[^\n]{0,500}src[/\\]middle\.ts\n/,
+    /↳[^\n]{0,500}src[/\\]broken\.ts/,
+];
+
+const TRACE_JS_BROKEN_PATTERNS: RegExp[] = [/broken\.js/, IMPORT_TRACE_HEADER_REGEX, /src[/\\]index\.js\n/, /↳[^\n]{0,500}src[/\\]broken\.js/];
+
+const TRACE_DTS_BROKEN_PATTERNS: RegExp[] = [/does-not-exist/, IMPORT_TRACE_HEADER_REGEX, /src[/\\]index\.d\.ts\n/, /↳[^\n]{0,500}src[/\\]broken\.d\.ts/];
+
+const INDEX_TS_REGEX = /index\.ts/;
+
+const IMPORT_TRACE_LABEL_REGEX = /Import trace:/;
+
+// Matches ANSI SGR escape sequences (ESC [ <digits/semicolons> m). The ESC
+// byte (U+001B) is a literal control character, so the pattern must contain it
+// directly. `[\d;]+` is a non-backtracking equivalent of `\d+(?:;\d+)*` for
+// the realistic SGR parameter bytes emitted by terminal colorizers.
+// eslint-disable-next-line no-control-regex -- ANSI escape sequences begin with the U+001B control char; stripping them requires matching that char.
+const ANSI_ESCAPE_REGEX = /\u001B\[[\d;]+m/g;
+
 /**
  * Strips ANSI escape codes from text for reliable matching.
  */
-const stripAnsi = (text: string): string => text.replaceAll(/\u001B\[\d+(?:;\d+)*m/g, "");
+const stripAnsi = (text: string): string => text.replaceAll(ANSI_ESCAPE_REGEX, "");
 
 /**
  * Asserts that the given patterns appear in the text in the specified order.
@@ -21,11 +49,11 @@ const expectMatchesInOrder = (text: string, patterns: RegExp[]): void => {
     let lastIndex = 0;
 
     for (const pattern of patterns) {
-        const match = cleaned.slice(lastIndex).match(pattern);
+        const match = pattern.exec(cleaned.slice(lastIndex));
 
-        expect(match, `Expected pattern ${pattern} to match in remaining text starting at index ${lastIndex}`).toBeTruthy();
+        expect(match, `Expected pattern ${String(pattern)} to match in remaining text starting at index ${String(lastIndex)}`).toBe(true);
 
-        lastIndex += match!.index! + match![0].length;
+        lastIndex += (match?.index ?? 0) + (match?.[0]?.length ?? 0);
     }
 };
 
@@ -33,7 +61,7 @@ describe("packem error cases", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        temporaryDirectoryPath = temporaryDirectory();
+        temporaryDirectoryPath = mkdtempSync(join(tmpdir(), "packem-error-cases-"));
 
         await createPackemConfig(temporaryDirectoryPath);
     });
@@ -69,8 +97,18 @@ describe("packem error cases", () => {
         // < 20: "Unexpected end of JSON input in"
         // 20-21: "Expected property name or"
         // 22+: "Invalid package config" (ERR_INVALID_PACKAGE_CONFIG)
-        const expectedMessage
-            = NODE_JS_VERSION < 20 ? "Unexpected end of JSON input in" : NODE_JS_VERSION < 22 ? "Expected property name or" : "Invalid package config";
+        const expectedMessageByMajor = (major: number): string => {
+            if (major < 20) {
+                return "Unexpected end of JSON input in";
+            }
+
+            if (major < 22) {
+                return "Expected property name or";
+            }
+
+            return "Invalid package config";
+        };
+        const expectedMessage = expectedMessageByMajor(NODE_JS_VERSION);
 
         expect(binProcess.stderr).toContain(expectedMessage);
         expect(binProcess.exitCode).toBe(1);
@@ -240,12 +278,8 @@ describe("packem error cases", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expectMatchesInOrder(binProcess.stderr, [
-                /broken\.ts/,
-                /Import trace:\n/,
-                /src[/\\]index\.ts\n/,
-                /↳.*src[/\\]broken\.ts/,
-            ]);
+
+            expectMatchesInOrder(binProcess.stderr as string, TRACE_TS_BROKEN_PATTERNS);
         });
 
         it("should show import trace with 3 levels on build error", async () => {
@@ -270,13 +304,8 @@ describe("packem error cases", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expectMatchesInOrder(binProcess.stderr, [
-                /broken\.ts/,
-                /Import trace:\n/,
-                /src[/\\]index\.ts\n/,
-                /↳.*src[/\\]middle\.ts\n/,
-                /↳.*src[/\\]broken\.ts/,
-            ]);
+
+            expectMatchesInOrder(binProcess.stderr as string, TRACE_TS_THREE_LEVEL_PATTERNS);
         });
 
         it("should not show import trace when error is in entry point", async () => {
@@ -300,9 +329,9 @@ describe("packem error cases", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expect(binProcess.stderr).toMatch(/index\.ts/);
+            expect(binProcess.stderr).toMatch(INDEX_TS_REGEX);
             // Entry point errors should NOT show import trace (trace length = 1)
-            expect(binProcess.stderr).not.toMatch(/Import trace:/);
+            expect(binProcess.stderr).not.toMatch(IMPORT_TRACE_LABEL_REGEX);
         });
 
         it("should show import trace with plain js files", async () => {
@@ -323,12 +352,8 @@ describe("packem error cases", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expectMatchesInOrder(binProcess.stderr, [
-                /broken\.js/,
-                /Import trace:\n/,
-                /src[/\\]index\.js\n/,
-                /↳.*src[/\\]broken\.js/,
-            ]);
+
+            expectMatchesInOrder(binProcess.stderr as string, TRACE_JS_BROKEN_PATTERNS);
         });
 
         it("should show import trace on dts build error", async () => {
@@ -341,10 +366,7 @@ describe("packem error cases", () => {
             // broken.ts has a value export (JS build succeeds) AND a type-only re-export
             // from a non-existent module. Esbuild strips the type export for the JS build,
             // but tsc preserves it in the .d.ts — causing the DTS build to fail on resolution.
-            writeFileSync(
-                `${temporaryDirectoryPath}/src/broken.ts`,
-                `export const helper = 42;\nexport type { MissingType } from "./does-not-exist";`,
-            );
+            writeFileSync(`${temporaryDirectoryPath}/src/broken.ts`, `export const helper = 42;\nexport type { MissingType } from "./does-not-exist";`);
 
             await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
@@ -366,12 +388,8 @@ describe("packem error cases", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expectMatchesInOrder(binProcess.stderr, [
-                /does-not-exist/,
-                /Import trace:\n/,
-                /src[/\\]index\.d\.ts\n/,
-                /↳.*src[/\\]broken\.d\.ts/,
-            ]);
+
+            expectMatchesInOrder(binProcess.stderr as string, TRACE_DTS_BROKEN_PATTERNS);
         });
     });
 });

@@ -2,19 +2,104 @@ import { readdirSync } from "node:fs";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
 import { replaceContentWithinMarker } from "@visulima/packem-share";
-import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 import { Application } from "typedoc";
 
 import type { BuildEntry, TypeDocumentOptions } from "../../types";
 
-const generateReferenceDocumentation = async (options: TypeDocumentOptions, entries: BuildEntry[], outputDirectory: string, logger: Pail): Promise<void> => {
-    if (entries.length === 0) {
+/**
+ * Structured payload accepted by the Pail logger methods.
+ * @internal
+ */
+interface LoggerMessage {
+    context?: unknown[];
+    message: unknown;
+    prefix?: string;
+    suffix?: string;
+}
+
+/**
+ * Minimal, precisely-typed view of the `@visulima/pail` logger surface used here.
+ *
+ * The published `@visulima/pail` types re-export `Pail` from a non-existent
+ * `./pail.d.ts` (the real declaration is `./pail.server.d.ts`), so the upstream
+ * `Pail` type resolves to an unresolved/`any`-like type. Modelling only the
+ * methods we call keeps the call sites strictly typed without an `any` escape.
+ * @internal
+ */
+interface Logger {
+    error: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
+    warn: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
+}
+
+/**
+ * Inlines generated typedoc markdown into the project README between the
+ * configured marker comments. Extracted from the main flow to keep the
+ * orchestration function within the cognitive-complexity budget; behavior
+ * is unchanged.
+ * @internal
+ */
+const inlineMarkdownIntoReadme = (outputDirectory: string, entriesCount: number, marker: string, readmePath: string, logger: Logger): void => {
+    const markdownPathsList = readdirSync(outputDirectory, {
+        withFileTypes: true,
+    }).filter((item) => item.isFile());
+
+    let markdownContent = "";
+
+    for (const item of markdownPathsList) {
+        if (item.name === "README.md" && entriesCount > 1) {
+            continue;
+        }
+
+        markdownContent += readFileSync(join(outputDirectory, item.name))
+            // This is needed to not include the content in the wrong place
+            .replaceAll(`<!-- ${marker}`, `<!-- _REPLACE_${marker}`)
+            .replaceAll(`<!-- \${marker}`, `<!-- _REPLACE_\\${marker}`);
+    }
+
+    if (markdownContent === "") {
         return;
     }
 
-    const { format, jsonFileName, marker, output, plugin, readmePath, ...typedocOptions } = options;
+    const readmeContent = readFileSync(readmePath);
+    const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, `\n${markdownContent}`);
 
+    if (!updatedReadmeContent) {
+        logger.error({
+            message: `Could not find the typedoc marker: <!-- ${marker} --><!-- /${marker} --> in ${readmePath}`,
+            prefix: "typedoc",
+        });
+
+        return;
+    }
+
+    if (readmeContent === updatedReadmeContent) {
+        return;
+    }
+
+    writeFileSync(
+        readmePath,
+        updatedReadmeContent
+            .replaceAll(`<!-- _REPLACE_${marker}`, `<!-- ${marker}`)
+            .replaceAll(`<!-- _REPLACE_\\${marker}`, `<!-- \${marker}`),
+        {
+            overwrite: true,
+        },
+    );
+};
+
+/**
+ * Validates the format-specific typedoc options and emits warnings for
+ * options that are ignored by the active format. Extracted to keep the
+ * orchestration function within the cognitive-complexity budget.
+ * @internal
+ */
+const validateFormatOptions = (
+    format: TypeDocumentOptions["format"],
+    jsonFileName: string | undefined,
+    readmePath: string | undefined,
+    logger: Logger,
+): void => {
     if (format === "inline" && readmePath === undefined) {
         throw new Error("The `readmePath` option is required when using the `inline` format.");
     }
@@ -26,12 +111,12 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
         });
     }
 
-    if (format === "json") {
-        if (jsonFileName === undefined) {
-            throw new Error("The `jsonFileName` option is required when using the `json` format.");
-        } else if (!jsonFileName.endsWith(".json")) {
-            throw new Error("The `jsonFileName` option must end with `.json`.");
-        }
+    if (format === "json" && !jsonFileName?.endsWith(".json")) {
+        throw new Error(
+            jsonFileName === undefined
+                ? "The `jsonFileName` option is required when using the `json` format."
+                : "The `jsonFileName` option must end with `.json`.",
+        );
     }
 
     if (format !== "json" && typeof jsonFileName === "string") {
@@ -40,6 +125,20 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
             prefix: "typedoc",
         });
     }
+};
+
+const generateReferenceDocumentation = async (options: TypeDocumentOptions, entries: BuildEntry[], outputDirectory: string, logger: Logger): Promise<void> => {
+    if (entries.length === 0) {
+        return;
+    }
+
+    // `output` is a packem-only field and must NOT be forwarded into typedoc's
+    // bootstrap options, so it is destructured purely to exclude it from the
+    // `...typedocOptions` rest below.
+    // eslint-disable-next-line unused-imports/no-unused-vars -- intentional rest-exclusion of a non-typedoc option
+    const { format, jsonFileName, marker, output, plugin, readmePath, ...typedocOptions } = options;
+
+    validateFormatOptions(format, jsonFileName, readmePath, logger);
 
     const entryPoints = entries.map((entry) => entry.input);
 
@@ -91,6 +190,7 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
 
     if (project) {
         if (format === "json") {
+            // jsonFileName is guaranteed defined here by the `format === "json"` validation above.
             await app.generateJson(project, jsonFileName as string);
         } else if (format === "html") {
             await app.generateDocs(project, outputDirectory);
@@ -102,52 +202,8 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
                     throw new Error("The `marker` option is required when using the `inline` format.");
                 }
 
-                const markdownPathsList = readdirSync(outputDirectory, {
-                    withFileTypes: true,
-                }).filter((item) => item.isFile());
-
-                let markdownContent = "";
-
-                for (const item of markdownPathsList) {
-                    if (item.name === "README.md" && entries.length > 1) {
-                        continue;
-                    }
-
-                    markdownContent += (readFileSync(join(outputDirectory, item.name)) as unknown as string)
-                        // This is needed to not include the content in the wrong place
-                        .replaceAll(`<!-- ${marker}`, `<!-- _REPLACE_${marker}`)
-                        .replaceAll(`<!-- \${marker}`, `<!-- _REPLACE_\\${marker}`);
-                }
-
-                if (markdownContent !== "") {
-                    const readmeContent = readFileSync(readmePath as string) as unknown as string;
-                    const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, `\n${markdownContent}`);
-
-                    if (!updatedReadmeContent) {
-                        logger.error({
-                            message: `Could not find the typedoc marker: <!-- ${marker} --><!-- /${marker} --> in ${readmePath as string}`,
-                            prefix: "typedoc",
-                        });
-
-                        return;
-                    }
-
-                    if (readmeContent === updatedReadmeContent) {
-                        return;
-                    }
-
-                    if (updatedReadmeContent) {
-                        writeFileSync(
-                            readmePath as string,
-                            updatedReadmeContent
-                                .replaceAll(`<!-- _REPLACE_${marker}`, `<!-- ${marker}`)
-                                .replaceAll(`<!-- _REPLACE_\\${marker}`, `<!-- \${marker}`),
-                            {
-                                overwrite: true,
-                            },
-                        );
-                    }
-                }
+                // readmePath is guaranteed defined here by the `format === "inline"` validation above.
+                inlineMarkdownIntoReadme(outputDirectory, entries.length, marker, readmePath as string, logger);
             }
         }
     }

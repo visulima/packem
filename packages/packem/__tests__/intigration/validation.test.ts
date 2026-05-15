@@ -1,15 +1,18 @@
 import { rm } from "node:fs/promises";
 
 import { writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
+
+const FILE_SIZE_LIMIT_REGEX = /File size exceeds the limit: dist\/index\.mjs \(\d+ Bytes \/ 1\.00 Bytes\)/;
+const TOTAL_FILE_SIZE_LIMIT_REGEX = /Total file size exceeds the limit: \d+ Bytes \/ 1\.00 Bytes/;
 
 describe("packem validation", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -51,7 +54,7 @@ describe("packem validation", () => {
 
             expect(binProcess.exitCode).toBe(1);
             // Rolldown's region markers + interop bump emit size from 21B (rollup) to 57B.
-            expect(binProcess.stdout).toMatch(/File size exceeds the limit: dist\/index\.mjs \(\d+ Bytes \/ 1\.00 Bytes\)/);
+            expect(binProcess.stdout).toMatch(FILE_SIZE_LIMIT_REGEX);
         });
 
         it("should throw a warning if the size of the file extends the file limit and allowFail is enabled", async () => {
@@ -97,7 +100,7 @@ describe("packem validation", () => {
 
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
-            expect(binProcess.stdout).toMatch(/File size exceeds the limit: dist\/index\.mjs \(\d+ Bytes \/ 1\.00 Bytes\)/);
+            expect(binProcess.stdout).toMatch(FILE_SIZE_LIMIT_REGEX);
         });
 
         it("should throw a error if the size of the bundle extends the limit", async () => {
@@ -130,7 +133,7 @@ describe("packem validation", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expect(binProcess.stdout).toMatch(/Total file size exceeds the limit: \d+ Bytes \/ 1\.00 Bytes/);
+            expect(binProcess.stdout).toMatch(TOTAL_FILE_SIZE_LIMIT_REGEX);
         });
 
         it("should throw a warning if the size of the bundle extends the bundle limit and allowFail is enabled", async () => {
@@ -174,7 +177,7 @@ describe("packem validation", () => {
 
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
-            expect(binProcess.stdout).toMatch(/Total file size exceeds the limit: \d+ Bytes \/ 1\.00 Bytes/);
+            expect(binProcess.stdout).toMatch(TOTAL_FILE_SIZE_LIMIT_REGEX);
         });
     });
 
@@ -232,7 +235,7 @@ describe("packem validation", () => {
                 reject: false,
             });
 
-            expect(binProcess.stdout + binProcess.stderr).not.toContain("These dependencies are listed in package.json but not used");
+            expect((binProcess.stdout as string) + (binProcess.stderr as string)).not.toContain("These dependencies are listed in package.json but not used");
             expect(binProcess.exitCode).toBe(0);
         });
     });

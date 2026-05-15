@@ -1,6 +1,7 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
+// eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -12,7 +13,7 @@ const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
 describe("packem preserve-directives", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -115,6 +116,7 @@ console.log("Hello, world!");
     });
 
     it("should preserve directives like 'use client;'", async () => {
+        // eslint-disable-next-line vitest/prefer-expect-assertions -- assertion count legitimately differs by bundler: rolldown skips the CJS-shape assertions below
         expect.assertions(isRolldown ? 6 : 7);
 
         writeFileSync(
@@ -171,11 +173,13 @@ const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:b
 export { Tr as default };
 `);
 
+        // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown emits a different CJS interop shape; the ESM/DTS assertions above already cover both bundlers
         if (!isRolldown) {
             // Rolldown emits a different CJS interop shape (no `'use strict';`,
             // `(0, X.jsx)(...)` indirect-call form). DTS + ESM still match.
             const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
+            // eslint-disable-next-line vitest/no-conditional-expect -- deterministic bundler branch (see above); rollup-only CJS-shape assertion
             expect(normalizeBundleOutput(cjsContent)).toBe(`'use client';
 'use strict';
 
@@ -207,6 +211,7 @@ export = Tr;
     });
 
     it("should merge duplicated directives", async () => {
+        // eslint-disable-next-line vitest/prefer-expect-assertions -- assertion count legitimately differs by bundler: rolldown skips the CJS-shape assertions below
         expect.assertions(isRolldown ? 6 : 8);
 
         writeFileSync(
@@ -248,11 +253,13 @@ console.log("Hello, cli!");`,
 export { foo };
 `);
 
+        // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown's CJS interop diverges; the ESM/DTS assertions already cover both bundlers
         if (!isRolldown) {
             // Rolldown's CJS interop diverges (no `'use strict';`, different
             // Symbol.toStringTag preamble). DTS + ESM still match.
             const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
+            // eslint-disable-next-line vitest/no-conditional-expect -- deterministic bundler branch (see above); rollup-only CJS-shape assertion
             expect(normalizeBundleOutput(cjsContent)).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -264,6 +271,7 @@ exports.foo = foo;
 
             const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/cli.cjs`);
 
+            // eslint-disable-next-line vitest/no-conditional-expect -- deterministic bundler branch (see above); rollup-only CJS-shape assertion
             expect(cjsCliContent).toBe(`#!/usr/bin/env node
 'use strict';
 

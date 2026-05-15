@@ -19,7 +19,7 @@ export { template };
 "
 `;
 
-exports[`packem raw data > should generate js files with included raw content 1`] = `
+exports[`packem raw data > should generate js files with included raw content > mjs 1`] = `
 "
 const data = "const data = \\"thisismydata\\";\\nexport default data;";
 
@@ -27,7 +27,7 @@ export { data };
 "
 `;
 
-exports[`packem raw data > should generate js files with included raw content 2`] = `
+exports[`packem raw data > should generate js files with included raw content > cjs 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 
 const data = "const data = \\"thisismydata\\";\\nexport default data;";
@@ -36,7 +36,7 @@ exports.data = data;
 "
 `;
 
-exports[`packem raw data > should generate js files with included raw content when importing .js?raw 1`] = `
+exports[`packem raw data > should generate js files with included raw content when importing .js?raw > mjs 1`] = `
 "
 const data = "const message = \\"Hello from JS file\\";\\nconsole.log(message);\\nexport default message;";
 
@@ -44,7 +44,7 @@ export { data };
 "
 `;
 
-exports[`packem raw data > should generate js files with included raw content when importing .js?raw 2`] = `
+exports[`packem raw data > should generate js files with included raw content when importing .js?raw > cjs 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 
 const data = "const message = \\"Hello from JS file\\";\\nconsole.log(message);\\nexport default message;";
@@ -53,7 +53,7 @@ exports.data = data;
 "
 `;
 
-exports[`packem raw data > should generate js files with included raw content when the '?raw' query param is used 1`] = `
+exports[`packem raw data > should generate js files with included raw content when the '?raw' query param is used > mjs 1`] = `
 "
 const data = "thisismydata";
 
@@ -61,7 +61,7 @@ export { data };
 "
 `;
 
-exports[`packem raw data > should generate js files with included raw content when the '?raw' query param is used 2`] = `
+exports[`packem raw data > should generate js files with included raw content when the '?raw' query param is used > cjs 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 
 const data = "thisismydata";

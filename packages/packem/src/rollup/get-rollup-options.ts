@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { versions } from "node:process";
 
 import { cyan } from "@visulima/colorize";
-import type { AliasResolverObject } from "@visulima/packem-rollup";
+import type { AliasResolverObject, RollupReplaceOptions } from "@visulima/packem-rollup";
 import {
     alias as aliasPlugin,
     browserslistToEsbuild,
@@ -61,7 +61,7 @@ import { arrayify, memoizeByKey } from "@visulima/packem-share";
 import { getChunkFilename, getDtsExtension, getEntryFileNames, getOutputExtension, sortUserPlugins } from "@visulima/packem-share/utils";
 import { relative, resolve } from "@visulima/path";
 import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-plugin-css";
-import type { TsConfigResult } from "@visulima/tsconfig";
+import type { Options as DtsOptions } from "@visulima/rollup-plugin-dts";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import { importTrace } from "rollup-plugin-import-trace";
 import { minVersion } from "semver";
@@ -70,6 +70,54 @@ import type { InternalBuildOptions } from "../types";
 import cloneReplaceOptions from "../utils/clone-replace-options";
 import isDeclarationOnlyName from "../utils/is-declaration-only";
 
+/**
+ * Structural view of the Pail logger.
+ *
+ * `@visulima/pail`'s `dist/index.server.d.ts` re-exports `Pail` from a
+ * non-existent `./pail.d.ts` (the real file is `./pail.server.d.ts`), so the
+ * upstream `Pail` type used by `BuildContext.logger` resolves to an error type
+ * and every logger access trips `no-unsafe-*`. The runtime logger
+ * is `Console & ...` (Pail extends Console), and every consumer in this module
+ * either calls `debug`/`info`/`warn` or passes the logger to a plugin that
+ * types its parameter as `Console`. So narrow it to `Console` until the
+ * upstream re-export is fixed.
+ */
+type Logger = Console;
+
+const getLogger = (context: BuildContext<InternalBuildOptions>): Logger => {
+    const contextWithLogger: { logger: unknown } = context;
+
+    return contextWithLogger.logger as Logger;
+};
+
+const CIRCULAR_NODE_MODULES_REGEX = /Circular dependency:[\s\S]*node_modules/;
+const MTS_EXTENSION_REGEX = /\.mts$/;
+// eslint-disable-next-line sonarjs/single-character-alternation -- preserves the original Babel include pattern.
+const BABEL_DEFAULT_INCLUDE_REGEX = /\.(?:m|c)?(?:j|t)sx?$/;
+const PRESERVE_DIRECTIVE_REGEX = /^['|"](use (\w+))['|"]$/;
+const SCRIPT_OR_JSON_EXTENSION_REGEX = /\.(?:[cm]?jsx?|[cm]?tsx?|json)$/;
+
+const regExpOrStringToString = (pattern: RegExp | string): string => {
+    if (pattern instanceof RegExp) {
+        return pattern.source;
+    }
+
+    return pattern;
+};
+
+const computeDtsResolveKey = (dtsResolve: boolean | (string | RegExp)[]): string => {
+    if (typeof dtsResolve === "boolean") {
+        return String(dtsResolve);
+    }
+
+    const sources: string[] = [];
+
+    for (const pattern of dtsResolve) {
+        sources.push(regExpOrStringToString(pattern));
+    }
+
+    return sources.toSorted((a, b) => a.localeCompare(b)).join(",");
+};
 
 /**
  * Creates a chunkFileNames function that skips declaration-only entries.
@@ -112,6 +160,7 @@ const createEntryFileNames = (getExtension: (chunk: PreRenderedChunk) => string,
                 return undefined;
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- rollup types `name` as non-null but it can be absent at runtime; "[name]" is the rollup placeholder fallback
             return `${name ?? "[name]"}.${getExtension(chunkInfo)}`;
         };
     }
@@ -127,112 +176,221 @@ const createEntryFileNames = (getExtension: (chunk: PreRenderedChunk) => string,
     };
 };
 
+const resolveNodeTarget = (context: BuildContext<InternalBuildOptions>): string => {
+    const defaultTarget = `node${versions.node.split(".")[0]}`;
+
+    if (!context.pkg.engines?.node) {
+        return defaultTarget;
+    }
+
+    const minNodeVersion = minVersion(context.pkg.engines.node);
+
+    if (minNodeVersion) {
+        return `node${String(minNodeVersion.major)}`;
+    }
+
+    return defaultTarget;
+};
+
+const resolveTransformerTarget = (
+    context: BuildContext<InternalBuildOptions>,
+    currentTarget: string | string[] | undefined,
+    nodeTarget: string,
+): string[] => {
+    if (currentTarget) {
+        const targets = arrayify(currentTarget);
+
+        if (context.options.runtime === "node") {
+            return [...new Set([nodeTarget, ...targets])];
+        }
+
+        if (context.options.runtime === "browser") {
+            return [...new Set([...browserslistToEsbuild(context.options.browserTargets ?? []), ...targets])];
+        }
+
+        return targets;
+    }
+
+    return context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
+};
+
+const getEsbuildTransformerConfig = (context: BuildContext<InternalBuildOptions>, nodeTarget: string): EsbuildPluginConfig => {
+    if (!context.options.rollup.esbuild) {
+        throw new Error("No esbuild options found in your configuration.");
+    }
+
+    if (context.tsconfig?.config.compilerOptions?.target?.toLowerCase() === "es3") {
+        getLogger(context).warn(
+            [
+                "ES3 target is not supported by esbuild, so ES5 will be used instead..",
+                "Please set 'target' option in tsconfig to at least ES5 to disable this error",
+            ].join(" "),
+        );
+
+        context.tsconfig.config.compilerOptions.target = "es5";
+        context.options.rollup.esbuild.target = "es5";
+    }
+
+    // Add targets to esbuild target
+    context.options.rollup.esbuild.target = resolveTransformerTarget(context, context.options.rollup.esbuild.target, nodeTarget);
+
+    // keepNames is not needed when minify is disabled.
+    // Also transforming multiple times with keepNames enabled breaks tree-shaking.
+    if (!context.options.minify) {
+        context.options.rollup.esbuild.keepNames = false;
+
+        getLogger(context).debug("Disabling keepNames because minify is disabled");
+    }
+
+    if (context.tsconfig?.config.compilerOptions?.target === "es5") {
+        context.options.rollup.esbuild.keepNames = false;
+
+        getLogger(context).debug("Disabling keepNames because target is set to es5");
+    }
+
+    return {
+        logger: getLogger(context),
+        minify: context.options.minify,
+
+        /* eslint-disable no-secrets/no-secrets -- public reference URL in the attribution comment below, not a secret */
+        /*
+         * Smaller output for cache and marginal performance improvement:
+         * https://twitter.com/evanwallace/status/1396336348366180359?s=20
+         *
+         * minifyIdentifiers is disabled because debuggers don't use the
+         * `names` property from the source map
+         *
+         * minifySyntax is disabled because it does some tree-shaking
+         * eg. unused try-catch error variable
+         */
+        /* eslint-enable no-secrets/no-secrets -- re-enable after the attribution comment */
+        minifyWhitespace: context.options.minify,
+        sourceMap: context.options.sourcemap,
+        ...context.options.rollup.esbuild,
+    } satisfies EsbuildPluginConfig;
+};
+
+const getSwcTransformerConfig = (context: BuildContext<InternalBuildOptions>): SwcPluginConfig => {
+    if (!context.options.rollup.swc) {
+        throw new Error("No swc options found in your configuration.");
+    }
+
+    return {
+        minify: context.options.minify,
+        ...context.options.rollup.swc,
+        jsc: {
+            minify: {
+                compress: {
+                    directives: false,
+                    passes: 2,
+                },
+                format: {
+                    comments: "some",
+                },
+                mangle: {
+                    topLevel: true,
+                },
+                sourceMap: context.options.sourcemap,
+                toplevel: context.options.emitCJS ?? context.options.emitESM,
+            },
+            ...context.options.rollup.swc.jsc,
+        },
+        sourceMaps: context.options.sourcemap,
+    } satisfies SwcPluginConfig;
+};
+
+const getOxcTransformerConfig = (context: BuildContext<InternalBuildOptions>, nodeTarget: string): InternalOXCTransformPluginConfig => {
+    if (!context.options.rollup.oxc) {
+        throw new Error("No oxc options found in your configuration.");
+    }
+
+    const { jsx: oxcJsx } = context.options.rollup.oxc;
+
+    let resolvedOxcJsx: typeof oxcJsx;
+
+    if (typeof oxcJsx === "string") {
+        resolvedOxcJsx = oxcJsx;
+    } else if (oxcJsx) {
+        resolvedOxcJsx = {
+            ...oxcJsx,
+            // This is not needed in a library.
+            refresh: false,
+        };
+    } else {
+        resolvedOxcJsx = undefined;
+    }
+
+    context.options.rollup.oxc = {
+        ...context.options.rollup.oxc,
+        cwd: context.options.rootDir,
+        jsx: resolvedOxcJsx,
+        sourcemap: context.options.sourcemap,
+        typescript: context.tsconfig?.config
+            ? {
+                allowDeclareFields: true,
+                allowNamespaces: true,
+                declaration: undefined,
+                jsxPragma: context.tsconfig.config.compilerOptions?.jsxFactory,
+                jsxPragmaFrag: context.tsconfig.config.compilerOptions?.jsxFragmentFactory,
+                onlyRemoveTypeImports: true,
+                // Declaration generation is handled by @visulima/rollup-plugin-dts
+                rewriteImportExtensions: false,
+            }
+            : undefined,
+    } satisfies InternalOXCTransformPluginConfig;
+
+    // Add targets to oxc target
+    context.options.rollup.oxc.target = resolveTransformerTarget(context, context.options.rollup.oxc.target, nodeTarget);
+
+    return context.options.rollup.oxc satisfies InternalOXCTransformPluginConfig;
+};
+
+const resolveEsmEntryExtension = (context: BuildContext<InternalBuildOptions>, chunk: PreRenderedChunk, usePreserveModules: boolean): string => {
+    // In unbundle/preserveModules mode, use plain .js for all preserved
+    // module files. Each source file retains its own output, so format
+    // disambiguation via .mjs is not needed at the individual file level.
+    // NOTE: In unbundle mode, inferEntries is skipped so emitCJS may be
+    // undefined even when the package declares a .cjs main field; the
+    // unbundle check must come first to prevent misdetection as ESM-only.
+    if (usePreserveModules) {
+        return "js";
+    }
+
+    if (chunk.facadeModuleId?.endsWith(".mts")) {
+        const ctsPath = chunk.facadeModuleId.replace(MTS_EXTENSION_REGEX, ".cts");
+
+        if (existsSync(ctsPath)) {
+            return "mjs";
+        }
+    }
+
+    // For ESM-only sub-contexts in dual-format packages (where the overall
+    // package also emits CJS), use .mjs to disambiguate from CJS .js files.
+    // This handles environment-specific entries (browser/server/development)
+    // that are ESM-only but belong to a package that also has CJS output.
+    if (!context.options.emitCJS && context.options.emitESM) {
+        const pkgMain = (context.pkg as { main?: string }).main;
+
+        if (pkgMain?.endsWith(".cjs")) {
+            return "mjs";
+        }
+    }
+
+    return getOutputExtension(context, "esm");
+};
+
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
     context: BuildContext<InternalBuildOptions>,
 ): EsbuildPluginConfig | InternalOXCTransformPluginConfig | SucrasePluginConfig | SwcPluginConfig => {
-    let nodeTarget = `node${versions.node.split(".")[0]}`;
-
-    if (context.pkg.engines?.node) {
-        const minNodeVersion = minVersion(context.pkg.engines.node);
-
-        if (minNodeVersion) {
-            nodeTarget = `node${minNodeVersion.major}`;
-        }
-    }
+    const nodeTarget = resolveNodeTarget(context);
 
     if (name === "esbuild") {
-        if (!context.options.rollup.esbuild) {
-            throw new Error("No esbuild options found in your configuration.");
-        }
-
-        if (context.tsconfig?.config.compilerOptions?.target?.toLowerCase() === "es3") {
-            context.logger.warn(
-                [
-                    "ES3 target is not supported by esbuild, so ES5 will be used instead..",
-                    "Please set 'target' option in tsconfig to at least ES5 to disable this error",
-                ].join(" "),
-            );
-
-            context.tsconfig.config.compilerOptions.target = "es5";
-            context.options.rollup.esbuild.target = "es5";
-        }
-
-        // Add targets to esbuild target
-        if (context.options.rollup.esbuild.target) {
-            const targets = arrayify(context.options.rollup.esbuild.target);
-
-            if (context.options.runtime === "node") {
-                context.options.rollup.esbuild.target = [...new Set([nodeTarget, ...targets])];
-            } else if (context.options.runtime === "browser") {
-                context.options.rollup.esbuild.target = [...new Set([...browserslistToEsbuild(context.options.browserTargets ?? []), ...targets])];
-            }
-        } else {
-            context.options.rollup.esbuild.target
-                = context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
-        }
-
-        // keepNames is not needed when minify is disabled.
-        // Also transforming multiple times with keepNames enabled breaks tree-shaking.
-        if (!context.options.minify) {
-            context.options.rollup.esbuild.keepNames = false;
-
-            context.logger.debug("Disabling keepNames because minify is disabled");
-        }
-
-        if (context.tsconfig?.config.compilerOptions?.target === "es5") {
-            context.options.rollup.esbuild.keepNames = false;
-
-            context.logger.debug("Disabling keepNames because target is set to es5");
-        }
-
-        return {
-            logger: context.logger,
-            minify: context.options.minify,
-
-            /**
-             * Smaller output for cache and marginal performance improvement:
-             * https://twitter.com/evanwallace/status/1396336348366180359?s=20
-             *
-             * minifyIdentifiers is disabled because debuggers don't use the
-             * `names` property from the source map
-             *
-             * minifySyntax is disabled because it does some tree-shaking
-             * eg. unused try-catch error variable
-             */
-            minifyWhitespace: context.options.minify,
-            sourceMap: context.options.sourcemap,
-            ...context.options.rollup.esbuild,
-        } satisfies EsbuildPluginConfig;
+        return getEsbuildTransformerConfig(context, nodeTarget);
     }
 
     if (name === "swc") {
-        if (!context.options.rollup.swc) {
-            throw new Error("No swc options found in your configuration.");
-        }
-
-        return {
-            minify: context.options.minify,
-            ...context.options.rollup.swc,
-            jsc: {
-                minify: {
-                    compress: {
-                        directives: false,
-                        passes: 2,
-                    },
-                    format: {
-                        comments: "some",
-                    },
-                    mangle: {
-                        topLevel: true,
-                    },
-                    sourceMap: context.options.sourcemap,
-                    toplevel: context.options.emitCJS ?? context.options.emitESM,
-                },
-                ...context.options.rollup.swc.jsc,
-            },
-            sourceMaps: context.options.sourcemap,
-        } satisfies SwcPluginConfig;
+        return getSwcTransformerConfig(context);
     }
 
     if (name === "sucrase") {
@@ -244,66 +402,21 @@ const getTransformerConfig = (
     }
 
     if (name === "oxc") {
-        if (!context.options.rollup.oxc) {
-            throw new Error("No oxc options found in your configuration.");
-        }
-
-        context.options.rollup.oxc = {
-            ...context.options.rollup.oxc,
-            cwd: context.options.rootDir,
-            jsx:
-                typeof context.options.rollup.oxc.jsx === "string"
-                    ? context.options.rollup.oxc.jsx
-                    : context.options.rollup.oxc.jsx
-                        ? {
-                            ...context.options.rollup.oxc.jsx,
-                            // This is not needed in a library.
-                            refresh: false,
-                        }
-                        : undefined,
-            sourcemap: context.options.sourcemap,
-            typescript: context.tsconfig?.config
-                ? {
-                    allowDeclareFields: true,
-                    allowNamespaces: true,
-                    declaration: undefined,
-                    jsxPragma: context.tsconfig.config.compilerOptions?.jsxFactory,
-                    jsxPragmaFrag: context.tsconfig.config.compilerOptions?.jsxFragmentFactory,
-                    onlyRemoveTypeImports: true,
-                    // Declaration generation is handled by @visulima/rollup-plugin-dts
-                    rewriteImportExtensions: false,
-                }
-                : undefined,
-        } satisfies InternalOXCTransformPluginConfig;
-
-        // Add targets to oxc target
-        if (context.options.rollup.oxc.target) {
-            const targets = arrayify(context.options.rollup.oxc.target);
-
-            if (context.options.runtime === "node") {
-                context.options.rollup.oxc.target = [...new Set([nodeTarget, ...targets])];
-            } else if (context.options.runtime === "browser") {
-                context.options.rollup.oxc.target = [...new Set([...browserslistToEsbuild(context.options.browserTargets ?? []), ...targets])];
-            }
-        } else {
-            context.options.rollup.oxc.target = context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
-        }
-
-        return context.options.rollup.oxc satisfies InternalOXCTransformPluginConfig;
+        return getOxcTransformerConfig(context, nodeTarget);
     }
 
     throw new Error(`A Unknown transformer was provided`);
 };
 
 const createNodeResolver = (context: BuildContext<InternalBuildOptions>): Plugin | undefined => {
-    if (context.options.rollup.resolve && context.options.experimental?.oxcResolve !== true) {
+    if (context.options.rollup.resolve && !context.options.experimental?.oxcResolve) {
         return nodeResolvePlugin({
             ...context.options.rollup.resolve,
         });
     }
 
     if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
-        return oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
+        return oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, getLogger(context), context.tsconfig?.path);
     }
 
     return undefined;
@@ -311,7 +424,7 @@ const createNodeResolver = (context: BuildContext<InternalBuildOptions>): Plugin
 
 const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOptions>): boolean => {
     // If the circular dependency warning is from node_modules, ignore it
-    if (warning.code === "CIRCULAR_DEPENDENCY" && /Circular dependency:[\s\S]*node_modules/.test(warning.message)) {
+    if (warning.code === "CIRCULAR_DEPENDENCY" && CIRCULAR_NODE_MODULES_REGEX.test(warning.message)) {
         return true;
     }
 
@@ -319,14 +432,14 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOpt
     // @see https:// github.com/rollup/rollup/blob/5abe71bd5bae3423b4e2ee80207c871efde20253/cli/run/batchWarnings.ts#L236
     if (warning.code === "UNRESOLVED_IMPORT") {
         const error: Error & { id?: string } = new Error(
-            `Failed to resolve the module "${warning.exporter as string}" imported by "${cyan(relative(resolve(), warning.id as string))}"`
+            `Failed to resolve the module "${warning.exporter ?? ""}" imported by "${cyan(relative(resolve(), warning.id ?? ""))}"`
             + `\nIs the module installed? Note:`
             + `\n ↳ to inline a module into your bundle, install it to "devDependencies".`
             + `\n ↳ to depend on a module via import/require, install it to "dependencies".`,
         );
 
         // Preserve the file id so rollup-plugin-import-trace can build the import chain
-        error.id = warning.id as string;
+        error.id = warning.id;
 
         throw error;
     }
@@ -335,92 +448,105 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOpt
         return true;
     }
 
-    return warning.code === "MIXED_EXPORTS" && context.options.cjsInterop === true;
+    return warning.code === "MIXED_EXPORTS" && (context.options.cjsInterop ?? false);
 };
 
 const buildInputMap = (context: BuildContext<InternalBuildOptions>): Record<string, string> => {
     const input: Record<string, string> = {};
 
     for (const entry of context.options.entries) {
+        if (entry.name === undefined) {
+            continue;
+        }
+
+        const { name } = entry;
         const resolved = resolve(context.options.rootDir, entry.input);
 
-        if (input[entry.name] !== undefined && input[entry.name] !== resolved) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Record index type lies without noUncheckedIndexedAccess; input[name] is undefined at runtime for not-yet-seen names
+        if (input[name] !== undefined && input[name] !== resolved) {
             throw new Error(
-                `Duplicate rollup input name "${entry.name}" — one maps to "${input[entry.name]}", another to "${resolved}". Each entry must have a unique name.`,
+                `Duplicate rollup input name "${name}" — one maps to "${input[name]}", another to "${resolved}". Each entry must have a unique name.`,
             );
         }
 
-        input[entry.name] = resolved;
+        input[name] = resolved;
     }
 
     return input;
 };
 
-const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts"): RollupOptions =>
-    <RollupOptions>{
+const formatRollupLog = (log: RollupLog): string => {
+    if (log.stack) {
+        return `${log.message}\n${log.stack}`;
+    }
+
+    return log.message;
+};
+
+const throwIfUnresolvedImportIsError = (context: BuildContext<InternalBuildOptions>, level: string, log: RollupLog, format: string): void => {
+    // Handle unresolved import warnings from node-resolve plugin
+    if (!(level === "warn" && log.plugin === "node-resolve" && format.includes("Could not resolve import"))) {
+        return;
+    }
+
+    const unresolvedImportBehavior
+        = context.options.rollup.resolve && typeof context.options.rollup.resolve === "object"
+            ? context.options.rollup.resolve.unresolvedImportBehavior ?? "error"
+            : "error";
+
+    if (unresolvedImportBehavior === "error") {
+        const error: Error & { id?: string } = new Error(format);
+
+        // Preserve the file id so rollup-plugin-import-trace can build the import chain
+        if (log.id) {
+            error.id = log.id;
+        }
+
+        throw error;
+    }
+    // If "warn", fall through to the warn case below
+};
+
+const handleRollupLog = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts", level: "debug" | "info" | "warn", log: RollupLog): void => {
+    // DTS builds run in emitDtsOnly mode, so the JS chunk for every entry is empty
+    // by design. Suppress the EMPTY_BUNDLE warnings here — onwarn already filters them
+    // but onLog runs first and would otherwise log every empty entry.
+    if (type === "dts" && log.code === "EMPTY_BUNDLE") {
+        return;
+    }
+
+    const format = formatRollupLog(log);
+
+    throwIfUnresolvedImportIsError(context, level, log, format);
+
+    const prefix = type + (log.plugin ? `:plugin:${log.plugin}` : "");
+
+    // eslint-disable-next-line default-case
+    switch (level) {
+        case "info": {
+            getLogger(context).info({ message: format, prefix });
+
+            return;
+        }
+        case "warn": {
+            getLogger(context).warn({ message: format, prefix });
+
+            return;
+        }
+        case "debug": {
+            getLogger(context).debug({ message: format, prefix });
+        }
+    }
+};
+
+const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts"): RollupOptions => {
+    return {
         input: buildInputMap(context),
 
         logLevel: context.options.debug ? "debug" : "info",
 
         onLog: (level, log) => {
-            // DTS builds run in emitDtsOnly mode, so the JS chunk for every entry is empty
-            // by design. Suppress the EMPTY_BUNDLE warnings here — onwarn already filters them
-            // but onLog runs first and would otherwise log every empty entry.
-            if (type === "dts" && log.code === "EMPTY_BUNDLE") {
-                return;
-            }
-
-            let format = log.message;
-
-            if (log.stack) {
-                format = `${format}\n${log.stack}`;
-            }
-
-            // Handle unresolved import warnings from node-resolve plugin
-            if (level === "warn" && log.plugin === "node-resolve" && format.includes("Could not resolve import")) {
-                const unresolvedImportBehavior
-                    = context.options.rollup.resolve && typeof context.options.rollup.resolve === "object"
-                        ? context.options.rollup.resolve.unresolvedImportBehavior ?? "error"
-                        : "error";
-
-                if (unresolvedImportBehavior === "error") {
-                    const error: Error & { id?: string } = new Error(format);
-
-                    // Preserve the file id so rollup-plugin-import-trace can build the import chain
-                    if (log.id) {
-                        error.id = log.id;
-                    }
-
-                    throw error;
-                }
-                // If "warn", fall through to the warn case below
-            }
-
-            // eslint-disable-next-line default-case
-            switch (level) {
-                case "info": {
-                    context.logger.info({
-                        message: format,
-                        prefix: type + (log.plugin ? `:plugin:${log.plugin}` : ""),
-                    });
-
-                    return;
-                }
-                case "warn": {
-                    context.logger.warn({
-                        message: format,
-                        prefix: type + (log.plugin ? `:plugin:${log.plugin}` : ""),
-                    });
-
-                    return;
-                }
-                case "debug": {
-                    context.logger.debug({
-                        message: format,
-                        prefix: type + (log.plugin ? `:plugin:${log.plugin}` : ""),
-                    });
-                }
-            }
+            handleRollupLog(context, type, level, log);
         },
 
         onwarn(warning: RollupLog, rollupWarn) {
@@ -436,7 +562,7 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
         preserveEntrySignatures: "strict",
 
         treeshake: {
-            // preserve side-effect-only imports:
+        // preserve side-effect-only imports:
             moduleSideEffects: true,
             // use Rollup's most optimal tree-shaking: (drops unused getter reads)
             preset: "smallest",
@@ -444,8 +570,183 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
 
         watch: context.mode === "watch" ? context.options.rollup.watch : false,
     };
+};
 
-// eslint-disable-next-line import/exports-last
+const buildAliasPlugin = (
+    context: BuildContext<InternalBuildOptions>,
+    resolvedAliases: ReturnType<typeof resolveAliases>,
+    isRolldown: boolean,
+    nodeResolver: Plugin | undefined,
+): Plugin => {
+    const aliasOptions = {
+        ...context.options.rollup.alias,
+        entries: resolvedAliases,
+    } as Record<string, unknown>;
+
+    if (!isRolldown && nodeResolver) {
+        (aliasOptions as { customResolver: AliasResolverObject }).customResolver = nodeResolver as AliasResolverObject;
+    }
+
+    return aliasPlugin(aliasOptions);
+};
+
+const buildPurePlugins = (
+    context: BuildContext<InternalBuildOptions>,
+): { pureNewExpressionPluginInstance: Plugin | undefined; purePluginInstance: Plugin | undefined } => {
+    if (!context.options.rollup.pure) {
+        return { pureNewExpressionPluginInstance: undefined, purePluginInstance: undefined };
+    }
+
+    const purePluginInstance = purePlugin({
+        ...context.options.rollup.pure,
+        functions: [
+            // Common utility functions
+            "Object.defineProperty",
+            "Object.assign",
+            "Object.create",
+            "Object.freeze",
+            "Object.seal",
+            "Object.setPrototypeOf",
+            "Object.getOwnPropertyDescriptor",
+            "Object.getOwnPropertyDescriptors",
+            "Object.getPrototypeOf",
+            "Object.hasOwnProperty",
+            "Object.isExtensible",
+            "Object.isFrozen",
+            "Object.isSealed",
+
+            // Symbol functions - commonly used in libraries but safe to tree-shake when unused
+            "Symbol",
+            "Symbol.for",
+            "Symbol.keyFor",
+            "Symbol.iterator",
+            "Symbol.asyncIterator",
+            "Symbol.hasInstance",
+            "Symbol.isConcatSpreadable",
+            "Symbol.species",
+            "Symbol.toPrimitive",
+            "Symbol.toStringTag",
+
+            // Proxy constructor - safe when unused
+            "Proxy",
+
+            // Reflect methods - typically pure
+            "Reflect.apply",
+            "Reflect.construct",
+            "Reflect.defineProperty",
+            "Reflect.deleteProperty",
+            "Reflect.get",
+            "Reflect.getOwnPropertyDescriptor",
+            "Reflect.getPrototypeOf",
+            "Reflect.has",
+            "Reflect.isExtensible",
+            "Reflect.ownKeys",
+            "Reflect.preventExtensions",
+            "Reflect.set",
+            "Reflect.setPrototypeOf",
+
+            // WeakMap/WeakSet constructors - safe when unused
+            "WeakMap",
+            "WeakSet",
+            "WeakRef",
+
+            // Array methods that don't mutate
+            "Array.from",
+            "Array.of",
+            "Array.isArray",
+
+            // Number methods
+            "Number.isFinite",
+            "Number.isInteger",
+            "Number.isNaN",
+            "Number.isSafeInteger",
+            "Number.parseFloat",
+            "Number.parseInt",
+
+            // String methods
+            "String.fromCharCode",
+            "String.fromCodePoint",
+            "String.raw",
+
+            // Date constructor when used for static methods
+            "Date.now",
+            "Date.parse",
+            "Date.UTC",
+
+            // Math methods (all are pure)
+            "Math.abs",
+            "Math.acos",
+            "Math.acosh",
+            "Math.asin",
+            "Math.asinh",
+            "Math.atan",
+            "Math.atan2",
+            "Math.atanh",
+            "Math.cbrt",
+            "Math.ceil",
+            "Math.clz32",
+            "Math.cos",
+            "Math.cosh",
+            "Math.exp",
+            "Math.expm1",
+            "Math.floor",
+            "Math.fround",
+            "Math.hypot",
+            "Math.imul",
+            "Math.log",
+            "Math.log10",
+            "Math.log1p",
+            "Math.log2",
+            "Math.max",
+            "Math.min",
+            "Math.pow",
+            "Math.random",
+            "Math.round",
+            "Math.sign",
+            "Math.sin",
+            "Math.sinh",
+            "Math.sqrt",
+            "Math.tan",
+            "Math.tanh",
+            "Math.trunc",
+
+            // JSON methods
+            "JSON.parse",
+            "JSON.stringify",
+
+            // Common library patterns
+            "require.resolve",
+            "Buffer.from",
+            "Buffer.alloc",
+            "Buffer.allocUnsafe",
+            "Buffer.isBuffer",
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `functions` is typed as required but is optional at runtime (user config / preset may set `pure` without it); spreading undefined throws "is not iterable" at build time.
+            ...context.options.rollup.pure.functions ?? [],
+        ],
+        sourcemap: context.options.sourcemap,
+    });
+
+    // @ts-expect-error Hacking into the plugin ignoring types, we just fixed the order
+    purePluginInstance.transform.order = "pre";
+
+    // Companion plugin for annotating `new Constructor()` expressions (NewExpression nodes),
+    // which rollup-plugin-pure does not handle (it only covers CallExpression nodes).
+    const pureNewExpressionPluginInstance = pureNewExpressionPlugin({
+        constructors: [
+            "Proxy",
+            "WeakMap",
+            "WeakSet",
+            "WeakRef",
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `functions` is typed as required but is optional at runtime (user config / preset may set `pure` without it); the optional chain + `?? []` prevents a build-time crash.
+            ...((context.options.rollup.pure.functions?.filter((f: string | RegExp) => typeof f === "string" && !f.includes(".")) ?? []) as string[]),
+        ],
+        sourcemap: context.options.sourcemap,
+    });
+
+    return { pureNewExpressionPluginInstance, purePluginInstance };
+};
+
+// eslint-disable-next-line import/exports-last, sonarjs/cognitive-complexity -- the residual complexity is the deliberate, order-sensitive Rollup plugin/output array construction; HARD constraint forbids reordering or restructuring it, and pure pre-computation has already been extracted into helpers
 export const getRollupOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
     // When the bundler is rolldown, several rollup plugins are skipped because
@@ -461,174 +762,27 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
     const isRolldown = context.options.bundler === "rolldown";
     const nodeResolver = isRolldown ? undefined : createNodeResolver(context);
 
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean OR is intended: a falsy `unbundle` must still fall through to the preserveModules check
     const usePreserveModules = Boolean(context.options.unbundle || context.options.rollup.output?.preserveModules);
 
-    const chunking
-        = usePreserveModules
-            ? {
-                preserveModules: true,
-                preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
-            }
-            : {
-                manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries),
-                preserveModules: false,
-            };
+    const chunking = usePreserveModules
+        ? {
+            preserveModules: true,
+            preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
+        }
+        : {
+            manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries),
+            preserveModules: false,
+        };
 
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "build");
 
     // Add esm mark and interop helper if esm export is detected
     const useEsModuleMark = context.tsconfig?.config.compilerOptions?.esModuleInterop;
 
-    let purePluginInstance: Plugin | undefined;
-    let pureNewExpressionPluginInstance: Plugin | undefined;
+    const { pureNewExpressionPluginInstance, purePluginInstance } = buildPurePlugins(context);
 
-    if (context.options.rollup.pure) {
-        purePluginInstance = purePlugin({
-            ...context.options.rollup.pure,
-            functions: [
-                // Common utility functions
-                "Object.defineProperty",
-                "Object.assign",
-                "Object.create",
-                "Object.freeze",
-                "Object.seal",
-                "Object.setPrototypeOf",
-                "Object.getOwnPropertyDescriptor",
-                "Object.getOwnPropertyDescriptors",
-                "Object.getPrototypeOf",
-                "Object.hasOwnProperty",
-                "Object.isExtensible",
-                "Object.isFrozen",
-                "Object.isSealed",
-
-                // Symbol functions - commonly used in libraries but safe to tree-shake when unused
-                "Symbol",
-                "Symbol.for",
-                "Symbol.keyFor",
-                "Symbol.iterator",
-                "Symbol.asyncIterator",
-                "Symbol.hasInstance",
-                "Symbol.isConcatSpreadable",
-                "Symbol.species",
-                "Symbol.toPrimitive",
-                "Symbol.toStringTag",
-
-                // Proxy constructor - safe when unused
-                "Proxy",
-
-                // Reflect methods - typically pure
-                "Reflect.apply",
-                "Reflect.construct",
-                "Reflect.defineProperty",
-                "Reflect.deleteProperty",
-                "Reflect.get",
-                "Reflect.getOwnPropertyDescriptor",
-                "Reflect.getPrototypeOf",
-                "Reflect.has",
-                "Reflect.isExtensible",
-                "Reflect.ownKeys",
-                "Reflect.preventExtensions",
-                "Reflect.set",
-                "Reflect.setPrototypeOf",
-
-                // WeakMap/WeakSet constructors - safe when unused
-                "WeakMap",
-                "WeakSet",
-                "WeakRef",
-
-                // Array methods that don't mutate
-                "Array.from",
-                "Array.of",
-                "Array.isArray",
-
-                // Number methods
-                "Number.isFinite",
-                "Number.isInteger",
-                "Number.isNaN",
-                "Number.isSafeInteger",
-                "Number.parseFloat",
-                "Number.parseInt",
-
-                // String methods
-                "String.fromCharCode",
-                "String.fromCodePoint",
-                "String.raw",
-
-                // Date constructor when used for static methods
-                "Date.now",
-                "Date.parse",
-                "Date.UTC",
-
-                // Math methods (all are pure)
-                "Math.abs",
-                "Math.acos",
-                "Math.acosh",
-                "Math.asin",
-                "Math.asinh",
-                "Math.atan",
-                "Math.atan2",
-                "Math.atanh",
-                "Math.cbrt",
-                "Math.ceil",
-                "Math.clz32",
-                "Math.cos",
-                "Math.cosh",
-                "Math.exp",
-                "Math.expm1",
-                "Math.floor",
-                "Math.fround",
-                "Math.hypot",
-                "Math.imul",
-                "Math.log",
-                "Math.log10",
-                "Math.log1p",
-                "Math.log2",
-                "Math.max",
-                "Math.min",
-                "Math.pow",
-                "Math.random",
-                "Math.round",
-                "Math.sign",
-                "Math.sin",
-                "Math.sinh",
-                "Math.sqrt",
-                "Math.tan",
-                "Math.tanh",
-                "Math.trunc",
-
-                // JSON methods
-                "JSON.parse",
-                "JSON.stringify",
-
-                // Common library patterns
-                "require.resolve",
-                "Buffer.from",
-                "Buffer.alloc",
-                "Buffer.allocUnsafe",
-                "Buffer.isBuffer",
-                ...context.options.rollup.pure?.functions ?? [],
-            ],
-            sourcemap: context.options.sourcemap,
-        });
-
-        // @ts-expect-error Hacking into the plugin ignoring types, we just fixed the order
-        purePluginInstance.transform.order = "pre";
-
-        // Companion plugin for annotating `new Constructor()` expressions (NewExpression nodes),
-        // which rollup-plugin-pure does not handle (it only covers CallExpression nodes).
-        pureNewExpressionPluginInstance = pureNewExpressionPlugin({
-            constructors: [
-                "Proxy",
-                "WeakMap",
-                "WeakSet",
-                "WeakRef",
-                ...((context.options.rollup.pure?.functions?.filter((f: string | RegExp) => typeof f === "string" && !f.includes(".")) ?? []) as string[]),
-            ],
-            sourcemap: context.options.sourcemap,
-        });
-    }
-
-    return (<RollupOptions>{
+    return {
         ...baseRollupOptions(context, "build"),
 
         output: [
@@ -639,16 +793,10 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: createChunkFileNames(
-                    () => getOutputExtension(context, "cjs"),
-                    usePreserveModules,
-                ),
+                chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "cjs"), usePreserveModules),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: createEntryFileNames(
-                    (_chunk) => getOutputExtension(context, "cjs"),
-                    usePreserveModules,
-                ),
+                entryFileNames: createEntryFileNames((_chunk) => getOutputExtension(context, "cjs"), usePreserveModules),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -680,48 +828,10 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: createChunkFileNames(
-                    () => getOutputExtension(context, "esm"),
-                    usePreserveModules,
-                ),
+                chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "esm"), usePreserveModules),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: createEntryFileNames(
-                    (chunk) => {
-                        // In unbundle/preserveModules mode, use plain .js for all preserved
-                        // module files. Each source file retains its own output, so format
-                        // disambiguation via .mjs is not needed at the individual file level.
-                        // NOTE: In unbundle mode, inferEntries is skipped so emitCJS may be
-                        // undefined even when the package declares a .cjs main field; the
-                        // unbundle check must come first to prevent misdetection as ESM-only.
-                        if (usePreserveModules) {
-                            return "js";
-                        }
-
-                        if (chunk.facadeModuleId?.endsWith(".mts")) {
-                            const ctsPath = chunk.facadeModuleId.replace(/\.mts$/, ".cts");
-
-                            if (existsSync(ctsPath)) {
-                                return "mjs";
-                            }
-                        }
-
-                        // For ESM-only sub-contexts in dual-format packages (where the overall
-                        // package also emits CJS), use .mjs to disambiguate from CJS .js files.
-                        // This handles environment-specific entries (browser/server/development)
-                        // that are ESM-only but belong to a package that also has CJS output.
-                        if (!context.options.emitCJS && context.options.emitESM) {
-                            const pkgMain = (context.pkg as { main?: string }).main;
-
-                            if (pkgMain?.endsWith(".cjs")) {
-                                return "mjs";
-                            }
-                        }
-
-                        return getOutputExtension(context, "esm");
-                    },
-                    usePreserveModules,
-                ),
+                entryFileNames: createEntryFileNames((chunk) => resolveEsmEntryExtension(context, chunk, usePreserveModules), usePreserveModules),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -757,32 +867,23 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             externalsPlugin(context),
             resolveTypescriptMjsCtsPlugin(),
 
-            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
+            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, getLogger(context), context.tsconfig), fileCache),
             context.tsconfig
             && context.options.rollup.tsconfigPaths
             && cachingPlugin(
-                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger, context.options.rollup.tsconfigPaths),
+                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, getLogger(context), context.options.rollup.tsconfigPaths),
                 fileCache,
             ),
 
             resolveImplicitExternalsPlugin(context),
 
             context.options.rollup.replace
-            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap })),
+            // cloneReplaceOptions returns `any` by design (its RollupReplaceOptions index
+            // signature can't be safely spread without a cast — see the helper's doc); the
+            // produced object is structurally RollupReplaceOptions, so type it back here.
+            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap }) as RollupReplaceOptions),
 
-            context.options.rollup.alias
-            && (() => {
-                const aliasOptions = {
-                    ...context.options.rollup.alias,
-                    entries: resolvedAliases,
-                } as Record<string, unknown>;
-
-                if (!isRolldown && nodeResolver) {
-                    (aliasOptions as { customResolver: AliasResolverObject }).customResolver = nodeResolver as AliasResolverObject;
-                }
-
-                return aliasPlugin(aliasOptions as never);
-            })(),
+            context.options.rollup.alias && buildAliasPlugin(context, resolvedAliases, isRolldown, nodeResolver),
 
             ...prePlugins,
 
@@ -807,7 +908,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 ...context.options.rollup.json,
             }),
 
-            context.options.rollup.debarrel && debarrelPlugin(context.options.rollup.debarrel, context.logger),
+            context.options.rollup.debarrel && debarrelPlugin(context.options.rollup.debarrel, getLogger(context)),
 
             chunkSplitter(),
 
@@ -825,7 +926,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                         sourceMap: context.options.sourcemap,
                         ...context.options.rollup.css,
                     },
-                    context.options.browserTargets as string[],
+                    context.options.browserTargets ?? [],
                     context.options.rootDir,
                     context.options.sourceDir,
                     context.environment,
@@ -840,6 +941,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             context.options.rollup.css
             && context.options.rollup.css.loaders
             && context.options.rollup.css.loaders.length > 0
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean OR is intended: a falsy `declaration` must still fall through to the css.dts check
             && (context.options.declaration || context.options.rollup.css.dts)
             && cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir),
 
@@ -853,7 +955,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             && context.options.minify
             && minifyHTMLLiteralsPlugin({
                 ...context.options.rollup.minifyHTMLLiterals,
-                logger: context.logger,
+                logger: getLogger(context),
             }),
 
             context.options.rollup.requireCJS
@@ -864,7 +966,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                         ...context.options.rollup.requireCJS,
                         cwd: context.options.rootDir,
                     },
-                    context.logger,
+                    getLogger(context),
                 ),
                 fileCache,
             ),
@@ -872,11 +974,10 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             context.options.rollup.babel
             && cachingPlugin(
                 babelTransformPlugin({
-                    // eslint-disable-next-line sonarjs/single-character-alternation
-                    include: context.options.rollup.babel.include ?? /\.(?:m|c)?(?:j|t)sx?$/,
+                    include: context.options.rollup.babel.include ?? BABEL_DEFAULT_INCLUDE_REGEX,
                     ...context.options.rollup.babel,
                     root: context.options.rootDir,
-                    sourceMaps: context.options.rollup.babel.sourceMaps ?? context.options.sourcemap ?? false,
+                    sourceMaps: context.options.rollup.babel.sourceMaps ?? context.options.sourcemap,
                 }),
                 fileCache,
             ),
@@ -888,9 +989,9 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             context.options.rollup.preserveDirectives
             && preserveDirectivesPlugin({
-                directiveRegex: /^['|"](use (\w+))['|"]$/,
+                directiveRegex: PRESERVE_DIRECTIVE_REGEX,
                 ...context.options.rollup.preserveDirectives,
-                logger: context.logger,
+                logger: getLogger(context),
             }),
 
             context.options.rollup.shebang
@@ -898,7 +999,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 context.options.entries
                     .filter((entry) => entry.executable)
                     .map((entry) => entry.name)
-                    .filter(Boolean) as string[],
+                    .filter(Boolean),
                 context.options.rollup.shebang as ShebangOptions,
             ),
 
@@ -907,7 +1008,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             && context.options.emitCJS
             && cjsInteropPlugin({
                 ...context.options.rollup.cjsInterop,
-                logger: context.logger,
+                logger: getLogger(context),
             }),
 
             context.options.rollup.dynamicVars && fixDynamicImportExtension(),
@@ -937,7 +1038,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             && cachingPlugin(
                 jsxRemoveAttributes({
                     attributes: context.options.rollup.jsxRemoveAttributes.attributes,
-                    logger: context.logger,
+                    logger: getLogger(context),
                 }),
                 fileCache,
             ),
@@ -946,7 +1047,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             context.options.rollup.metafile && metafilePlugin(),
 
-            context.options.rollup.copy && copyPlugin(context.options.rollup.copy, context.logger),
+            context.options.rollup.copy && copyPlugin(context.options.rollup.copy, getLogger(context)),
 
             context.options.rollup.license
             && context.options.rollup.license.path
@@ -955,7 +1056,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 dtsMarker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
                 licenseFilePath: context.options.rollup.license.path,
                 licenseTemplate: context.options.rollup.license.dependenciesTemplate,
-                logger: context.logger,
+                logger: getLogger(context),
                 marker: context.options.rollup.license.dependenciesMarker ?? "DEPENDENCIES",
                 mode: "dependencies",
                 packageName: context.pkg.name,
@@ -975,10 +1076,10 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
         ].filter(Boolean),
 
         preserveEntrySignatures: "strict",
-    }) as RollupOptions;
+    };
 };
 
-/**
+/*
  * Compute the effective `resolve` list for the DTS build.
  *
  * Automatically includes:
@@ -993,38 +1094,24 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
  *   to chase transitive specifiers that aren't runtime deps of the package.
  *
  * The user can extend or override via `rollup.dts.resolve`:
- * - `false` → disable auto-resolution, keep all deps external in .d.ts
- * - `true`  → inline ALL node_modules types
- * - `(string | RegExp)[]` → merged with the auto-detected list
+ * - `false` -> disable auto-resolution, keep all deps external in .d.ts
+ * - `true`  -> inline ALL node_modules types
+ * - `(string | RegExp)[]` -> merged with the auto-detected list
  */
-const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean | (string | RegExp)[] => {
-    const userResolve = context.options.rollup.dts?.resolve;
-
-    // User explicitly disabled → respect it
-    if (userResolve === false) {
-        return false;
+const collectOptionalPeerDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
+    if (!context.pkg.peerDependenciesMeta) {
+        return;
     }
 
-    // User wants everything → no need to compute
-    if (userResolve === true) {
-        return true;
-    }
-
-    // Auto-detect packages whose types should be inlined
-    const autoResolve: string[] = [...Object.keys(context.pkg.optionalDependencies ?? {})];
-
-    // Include peer deps that are marked as optional in peerDependenciesMeta
-    // (only if they're actually listed in peerDependencies)
-    const peerDeps = context.pkg.peerDependencies ?? {};
-
-    if (context.pkg.peerDependenciesMeta) {
-        for (const [name, meta] of Object.entries(context.pkg.peerDependenciesMeta)) {
-            if (meta && typeof meta === "object" && "optional" in meta && meta.optional && name in peerDeps) {
-                autoResolve.push(name);
-            }
+    for (const [name, meta] of Object.entries(context.pkg.peerDependenciesMeta)) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- runtime guard for malformed package.json: peerDependenciesMeta values come from untyped parsed JSON
+        if (meta && typeof meta === "object" && "optional" in meta && meta.optional && name in peerDeps) {
+            autoResolve.push(name);
         }
     }
+};
 
+const collectBundledDevDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
     // Include devDeps the JS build bundled. usedDependencies is populated by the
     // externals plugin during the JS build (which runs before DTS), so we only
     // inline devDeps that actually appeared in the bundled JS — skipping the
@@ -1035,20 +1122,18 @@ const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean
     // externalizes peer deps (consumer provides the runtime), so the emitted
     // .d.ts must match and keep them external too. Optional peer deps are
     // still inlined above to cover the multi-framework case.
-    if (context.options.rollup.resolveExternals?.devDeps !== true) {
-        for (const name of Object.keys(context.pkg.devDependencies ?? {})) {
-            if (context.usedDependencies.has(name) && !(name in peerDeps)) {
-                autoResolve.push(name);
-            }
+    if (context.options.rollup.resolveExternals?.devDeps) {
+        return;
+    }
+
+    for (const name of Object.keys(context.pkg.devDependencies ?? {})) {
+        if (context.usedDependencies.has(name) && !(name in peerDeps)) {
+            autoResolve.push(name);
         }
     }
+};
 
-    if (autoResolve.length === 0 && !userResolve) {
-        return false;
-    }
-
-    // Merge and deduplicate auto-detected with user-provided patterns
-    const merged = [...autoResolve, ...(userResolve ?? [])];
+const dedupeResolvePatterns = (merged: (string | RegExp)[]): (string | RegExp)[] => {
     const seen = new Set<string>();
     const deduped: (string | RegExp)[] = [];
 
@@ -1066,15 +1151,47 @@ const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean
     return deduped;
 };
 
-const createDtsPlugin = async (
-    context: BuildContext<InternalBuildOptions>,
-    dtsResolve: boolean | (string | RegExp)[],
-): Promise<Plugin[]> => {
+// eslint-disable-next-line sonarjs/function-return-type -- the tri-state return is the deliberate dts-plugin `resolve` contract: false = disable, true = inline all, array = specific patterns
+const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean | (string | RegExp)[] => {
+    const userResolve = context.options.rollup.dts?.resolve;
+
+    // User explicitly disabled → respect it
+    if (userResolve === false) {
+        return false;
+    }
+
+    // User wants everything → no need to compute
+    if (userResolve === true) {
+        return true;
+    }
+
+    // Auto-detect packages whose types should be inlined
+    const autoResolve: string[] = Object.keys(context.pkg.optionalDependencies ?? {});
+
+    // Include peer deps that are marked as optional in peerDependenciesMeta
+    // (only if they're actually listed in peerDependencies)
+    const peerDeps = context.pkg.peerDependencies ?? {};
+
+    collectOptionalPeerDeps(context, peerDeps, autoResolve);
+    collectBundledDevDeps(context, peerDeps, autoResolve);
+
+    if (autoResolve.length === 0 && !userResolve) {
+        return false;
+    }
+
+    // Merge and deduplicate auto-detected with user-provided patterns
+    return dedupeResolvePatterns([...autoResolve, ...userResolve ?? []]);
+};
+
+const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsResolve: boolean | (string | RegExp)[]): Promise<Plugin[]> => {
     const { dts } = await import("@visulima/rollup-plugin-dts");
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userDtsOptions = (context.options.rollup.dts as any) ?? {};
+    const userDtsOptions: DtsOptions = context.options.rollup.dts ?? {};
 
+    // @visulima/rollup-plugin-dts bundles its own copy of rollup's type
+    // declarations, so its Plugin type is nominally distinct from this
+    // package's rollup@4 Plugin even though the shapes are identical.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- eslint's type service collapses the dts package's bundled rollup copy onto rollup@4, but `tsc --noEmit` fails with TS2322 without the `as unknown as Plugin[]` cast below.
     return dts({
         ...userDtsOptions,
         compilerOptions: {
@@ -1115,12 +1232,12 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
     // when `computeDtsResolve` runs. Without this, the first build's stale list is cached and
     // re-used for later builds, which breaks direct-bypass inlining for devDeps that only
     // showed up after the first build finished.
-    const resolveKey = typeof dtsResolve === "boolean" ? String(dtsResolve) : dtsResolve.map((p) => (p instanceof RegExp ? p.source : p)).sort().join(",");
-    const uniqueProcessId = `dts-plugin:${process.pid}${(context.tsconfig as TsConfigResult).path}:${resolveKey}` as string;
+    const resolveKey = computeDtsResolveKey(dtsResolve);
+    const uniqueProcessId = `dts-plugin:${String(process.pid)}${context.tsconfig?.path ?? ""}:${resolveKey}`;
 
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "dts");
 
-    return <RollupOptions>{
+    return {
         ...baseRollupOptions(context, "dts"),
 
         onwarn(warning, rollupWarn) {
@@ -1200,7 +1317,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             // through its transform hook, but load runs first and needs a stub for other ids.
             <Plugin>{
                 load(id) {
-                    if (!/\.(?:[cm]?jsx?|[cm]?tsx?|json)$/.test(id)) {
+                    if (!SCRIPT_OR_JSON_EXTENSION_REGEX.test(id)) {
                         return "";
                     }
 
@@ -1209,18 +1326,21 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
                 name: "packem:ignore-files",
             },
 
-            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
+            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, getLogger(context), context.tsconfig), fileCache),
             context.tsconfig
             && context.options.rollup.tsconfigPaths
             && cachingPlugin(
-                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger, context.options.rollup.tsconfigPaths),
+                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, getLogger(context), context.options.rollup.tsconfigPaths),
                 fileCache,
             ),
 
             resolveImplicitExternalsPlugin(context),
 
             context.options.rollup.replace
-            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap })),
+            // cloneReplaceOptions returns `any` by design (its RollupReplaceOptions index
+            // signature can't be safely spread without a cast — see the helper's doc); the
+            // produced object is structurally RollupReplaceOptions, so type it back here.
+            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap }) as RollupReplaceOptions),
 
             context.options.rollup.alias
             && aliasPlugin({
@@ -1244,10 +1364,10 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             && context.options.emitCJS
             && cjsInteropPlugin({
                 ...context.options.rollup.cjsInterop,
-                logger: context.logger,
+                logger: getLogger(context),
             }),
 
-            context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, context.logger), fileCache),
+            context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, getLogger(context)), fileCache),
 
             removeShebangPlugin(),
 
@@ -1259,7 +1379,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             && licensePlugin({
                 licenseFilePath: context.options.rollup.license.path,
                 licenseTemplate: context.options.rollup.license.dtsTemplate,
-                logger: context.logger,
+                logger: getLogger(context),
                 marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
                 mode: "types",
                 packageName: context.pkg.name,

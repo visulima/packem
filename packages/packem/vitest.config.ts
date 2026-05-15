@@ -4,8 +4,7 @@ import { getVitestConfig } from "../../tools/get-vitest-config";
 // `var x = ...` vs `const x = ...`, `//#region` markers, hoist order, etc.).
 // Suffix snapshot files with the active bundler so each backend owns its own
 // frozen baseline and the same test can match either bundler.
-const bundlerSnapshotSuffix
-    = process.env.PACKEM_TEST_BUNDLER === "rolldown" ? ".rolldown" : "";
+const bundlerSnapshotSuffix = process.env.PACKEM_TEST_BUNDLER === "rolldown" ? ".rolldown" : "";
 
 // https://vitejs.dev/config/
 export default getVitestConfig({

@@ -35,4 +35,13 @@ export default createConfig(
             "sonarjs/file-name-differ-from-class": "off",
         },
     },
+    {
+        // tsconfig*.json are JSONC by design (TypeScript natively supports
+        // comments here). The rationale comments documenting non-obvious
+        // compiler-option choices are intentional and worth keeping.
+        files: ["**/tsconfig.json", "**/tsconfig.*.json"],
+        rules: {
+            "jsonc/no-comments": "off",
+        },
+    },
 );

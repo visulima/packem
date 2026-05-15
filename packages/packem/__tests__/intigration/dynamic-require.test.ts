@@ -1,18 +1,18 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 import getFileNamesFromDirectory from "../helpers/get-file-names-from-directory";
+import temporaryDirectory from "../helpers/temporary-directory";
 
 const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
 
 describe("packem dynamic require", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -23,7 +23,7 @@ describe("packem dynamic require", () => {
     // Rolldown extracts the dynamically-required module into a shared chunk
     // (`packem_shared/chunk-*.cjs`) instead of inlining it, so the dist file
     // list contains a fifth entry. Rollup emits exactly the four entry files.
-    it.skipIf(isRolldown)("should handle dynamic require in esm", async () => {
+    it.runIf(!isRolldown)("should handle dynamic require in esm", async () => {
         expect.assertions(7);
 
         writeFileSync(

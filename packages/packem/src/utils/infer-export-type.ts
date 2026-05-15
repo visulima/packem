@@ -44,5 +44,5 @@ export const inferExportType = (condition: string, previousConditions: string[],
 
     const [newCondition, ...rest] = previousConditions;
 
-    return inferExportType(newCondition as string, rest, packageType, filename);
+    return inferExportType(newCondition, rest, packageType, filename);
 };

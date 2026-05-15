@@ -1,10 +1,10 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 describe("packem raw data", () => {
@@ -51,11 +51,11 @@ export const data = content;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs");
     });
 
     it("should generate js files with included raw content when the '?raw' query param is used", async () => {
@@ -89,11 +89,11 @@ export const data = content;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs");
     });
 
     it("should generate js files with included raw content when importing .js?raw", async () => {
@@ -135,11 +135,11 @@ export const data = jsContent;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs");
     });
 
     it("should generate js files with included raw HTML content", async () => {

@@ -10,13 +10,16 @@ import type { BuildConfig } from "../../src/types";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
+const ENV_BUNDLER = process.env.PACKEM_TEST_BUNDLER;
+const envBundler: PackemConfigProperties["bundler"] = ENV_BUNDLER === "rollup" || ENV_BUNDLER === "rolldown" ? ENV_BUNDLER : undefined;
+
 export type PackemConfigProperties = {
     bundler?: "rollup" | "rolldown";
-    config?: BuildConfig | string | undefined;
+    config?: BuildConfig | string;
     cssLoader?: ("less" | "lightningcss" | "postcss" | "sass" | "sourcemap" | "stylus" | "tailwindcss")[];
-    cssOptions?: StyleOptions | string | undefined;
+    cssOptions?: StyleOptions | string;
     experimental?: Record<string, boolean>;
-    minimizer?: "cssnano" | "lightningcss" | undefined;
+    minimizer?: "cssnano" | "lightningcss";
     plugins?: {
         code: string;
         from?: string;
@@ -29,21 +32,17 @@ export type PackemConfigProperties = {
     transformer?: "esbuild" | "oxc" | "sucrase" | "swc";
 };
 
-const ENV_BUNDLER = process.env.PACKEM_TEST_BUNDLER;
-const envBundler: PackemConfigProperties["bundler"]
-    = ENV_BUNDLER === "rollup" || ENV_BUNDLER === "rolldown" ? ENV_BUNDLER : undefined;
-
 export const createPackemConfig = async (
     fixturePath: string,
     {
         bundler = envBundler,
-        config = undefined,
+        config,
         cssLoader = [],
-        cssOptions = undefined,
+        cssOptions,
         experimental = {},
-        minimizer = undefined,
+        minimizer,
         plugins = [],
-        preset = undefined,
+        preset,
         runtime = "node",
         transformer = "esbuild",
     }: PackemConfigProperties = {},

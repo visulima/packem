@@ -9,17 +9,342 @@ import { join, resolve } from "@visulima/path";
 
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
 
+type CssMinifier = "cssnano" | "lightningcss" | undefined;
+
+interface InitOptions {
+    css?: boolean;
+    cssMinifier?: boolean;
+    dir?: string;
+    runtime?: string;
+    transformer?: string;
+    typescript?: boolean;
+}
+
+interface InitLogger {
+    info: (message: string) => void;
+}
+
+const normalizeCssLoaderName = (loader: string): string => {
+    if (loader === "sass-embedded" || loader === "node-sass") {
+        return "sass";
+    }
+
+    return loader;
+};
+
+const writeTsconfig = (rootDirectory: string, runInDom: boolean): void => {
+    /* eslint-disable perfectionist/sort-objects -- tsconfig key order is intentionally human-meaningful, not alphabetical. */
+    writeJsonSync(join(rootDirectory, "tsconfig.json"), {
+        compilerOptions: {
+            esModuleInterop: true,
+            skipLibCheck: true,
+            target: "es2022",
+            allowJs: true,
+            resolveJsonModule: true,
+            moduleDetection: "force",
+            isolatedModules: true,
+            verbatimModuleSyntax: true,
+            strict: true,
+            noUncheckedIndexedAccess: true,
+            noImplicitOverride: true,
+            module: "NodeNext",
+            outDir: "dist",
+            sourceMap: true,
+            declaration: true,
+            lib: runInDom ? ["es2022", "dom", "dom.iterable"] : ["es2022"],
+        },
+    });
+    /* eslint-enable perfectionist/sort-objects -- end tsconfig literal. */
+};
+
+const buildCssImports = (
+    cssEnabled: boolean,
+    cssLoaders: string[],
+    cssMinifier: CssMinifier,
+    cssMinifierEnabled: boolean,
+    useEsm: boolean,
+): string => {
+    let imports = "";
+
+    if (cssEnabled) {
+        for (const loader of cssLoaders) {
+            const name = normalizeCssLoaderName(loader);
+
+            imports += useEsm
+                ? `import ${name}Loader from "@visulima/packem/css/loader/${name.toLowerCase()}";\n`
+                : `const ${name}Loader = require("@visulima/packem/css/loader/${name.toLowerCase()}");\n`;
+        }
+    }
+
+    if (cssMinifierEnabled && cssMinifier) {
+        imports += useEsm
+            ? `import ${cssMinifier}Minifier from "@visulima/packem/css/minifier/${cssMinifier.toLowerCase()}";\n`
+            : `const ${cssMinifier}Minifier = require("@visulima/packem/css/minifier/${cssMinifier.toLowerCase()}");\n`;
+    }
+
+    return imports;
+};
+
+const buildCssConfigBlock = (cssEnabled: boolean, cssMinifier: CssMinifier, cssMinifierEnabled: boolean, cssLoaders: string[]): string => {
+    if (!cssEnabled && !cssMinifierEnabled) {
+        return "";
+    }
+
+    let block = ",\n    rollup: {\n        css: {";
+
+    if (cssEnabled) {
+        const stringCssLoaders = cssLoaders.map((loader) => `${normalizeCssLoaderName(loader)}Loader`).join(", ");
+
+        block += `\n            loaders: [${stringCssLoaders}],`;
+    }
+
+    if (cssMinifierEnabled && cssMinifier) {
+        block += `\n            minifier: ${cssMinifier}Minifier,`;
+    }
+
+    block += "\n        }\n    }";
+
+    return block;
+};
+
+const buildConfigTemplate = (
+    useEsm: boolean,
+    transformer: string,
+    runtime: string,
+    imports: string,
+    packemConfig: string,
+): string => {
+    if (useEsm) {
+        return `import { defineConfig } from "@visulima/packem/config";
+import transformer from "@visulima/packem/transformer/${transformer}";
+${imports}
+export default defineConfig({
+    runtime: "${runtime}",
+    transformer${packemConfig}
+});
+`;
+    }
+
+    return `const { defineConfig } = require("@visulima/packem/config");
+const transformer = require("@visulima/packem/transformer/${transformer}");
+${imports}
+module.exports = defineConfig({
+    runtime: ${runtime},
+    transformer${packemConfig}
+});
+`;
+};
+
+const collectPackageNames = (packageJson: { dependencies?: Record<string, unknown>; devDependencies?: Record<string, unknown> }): string[] => {
+    const packages: string[] = [];
+
+    if (packageJson.dependencies) {
+        packages.push(...Object.keys(packageJson.dependencies));
+    }
+
+    if (packageJson.devDependencies) {
+        packages.push(...Object.keys(packageJson.devDependencies));
+    }
+
+    return packages;
+};
+
+const setupTypescript = async (
+    typescriptOption: boolean | undefined,
+    hasTypescript: boolean,
+    packageJson: { dependencies?: Record<string, unknown>; devDependencies?: Record<string, unknown> },
+    packagesToInstall: string[],
+): Promise<boolean | undefined> => {
+    if (typescriptOption === undefined && !hasTypescript) {
+        const shouldInstall = (await confirm({
+            message: "Do you want to install TypeScript?",
+        })) as boolean;
+
+        if (shouldInstall) {
+            packagesToInstall.push("typescript@latest");
+        }
+
+        return shouldInstall;
+    }
+
+    const typescriptVersion = (packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown") as string;
+
+    log.message(`TypeScript version ${typescriptVersion} is already installed`);
+
+    return typescriptOption;
+};
+
+const resolveTransformer = async (transformerOption: string | undefined, packages: string[], packagesToInstall: string[]): Promise<string> => {
+    let transformer = transformerOption;
+
+    if (packages.includes("esbuild")) {
+        transformer = "esbuild";
+    } else if (packages.includes("@swc/core")) {
+        transformer = "swc";
+    } else if (packages.includes("sucrase")) {
+        transformer = "sucrase";
+    }
+
+    if (transformer !== undefined) {
+        log.message(`Transformer ${transformer} is already installed.`);
+
+        return transformer;
+    }
+
+    transformer = (await select({
+        message: "Pick a transformer",
+        options: [
+            { label: "esbuild", value: "esbuild" },
+            { label: "swc", value: "swc" },
+            { label: "Sucrase", value: "sucrase" },
+            { label: "OXC", value: "oxc" },
+        ],
+    })) as string;
+
+    if (transformer && transformer !== "oxc" && !packages.includes(transformer)) {
+        const shouldInstall = await confirm({
+            message: `Do you want to install ${transformer}?`,
+        });
+
+        if (shouldInstall) {
+            packagesToInstall.push(transformer === "swc" ? "@swc/core" : transformer);
+        }
+    }
+
+    return transformer;
+};
+
+const maybeGenerateTsconfig = async (rootDirectory: string): Promise<void> => {
+    if (isAccessibleSync(join(rootDirectory, "tsconfig.json"))) {
+        return;
+    }
+
+    const shouldGenerate = await confirm({
+        message: "Do you want to use generate a tsconfig.json?",
+    });
+    const runInDom = await confirm({
+        message: "Do you want to run your code in the DOM?",
+    });
+
+    if (shouldGenerate) {
+        const s = spinner();
+
+        s.start("Generating tsconfig.json");
+
+        writeTsconfig(rootDirectory, Boolean(runInDom));
+
+        s.stop("");
+    }
+};
+
+const resolveSassLoader = async (extraCssLoaders: string[]): Promise<string[]> => {
+    if (!extraCssLoaders.includes("sass")) {
+        return extraCssLoaders;
+    }
+
+    const sassLoader = (await select({
+        message: "Pick a sass loader",
+        options: [
+            {
+                hint: "recommended",
+                label: "Sass embedded",
+                value: "sass-embedded",
+            },
+            { label: "Sass", value: "sass" },
+            {
+                hint: "legacy",
+                label: "Node Sass",
+                value: "node-sass",
+            },
+        ],
+    })) as string;
+
+    if (sassLoader === "sass") {
+        return extraCssLoaders;
+    }
+
+    return [...extraCssLoaders.filter((loader) => loader !== "sass"), sassLoader];
+};
+
+const selectCssLoaders = async (packagesToInstall: string[]): Promise<string[]> => {
+    const cssLoaders: string[] = [];
+
+    const mainCssLoader = (await select({
+        message: "Pick a css loader",
+        options: [
+            { label: "PostCSS", value: "postcss" },
+            {
+                hint: "experimental",
+                label: "Lightning CSS",
+                value: "lightningcss",
+            },
+        ],
+    })) as string;
+
+    cssLoaders.push(mainCssLoader);
+
+    const extraCssLoaders = (await multiselect({
+        message: "Pick your loaders",
+        options: [
+            { label: "Sass", value: "sass" },
+            { label: "Stylus", value: "stylus" },
+            { label: "Less", value: "less" },
+        ],
+        required: false,
+    })) as string[];
+
+    const resolvedExtraLoaders = await resolveSassLoader(extraCssLoaders);
+
+    cssLoaders.push(...resolvedExtraLoaders);
+
+    const shouldInstall = await confirm({
+        message: `Do you want to install "${cssLoaders.join("\", \"")}"?`,
+    });
+
+    if (shouldInstall) {
+        for (const loader of cssLoaders) {
+            packagesToInstall.push(...cssLoaderDependencies[loader]);
+        }
+    }
+
+    cssLoaders.push("sourceMap");
+
+    return cssLoaders;
+};
+
+const selectCssMinifier = async (cssLoaders: string[], packagesToInstall: string[]): Promise<CssMinifier> => {
+    const cssMinifier = (await select({
+        message: "Pick a css minifier",
+        options: [
+            { label: "CSSNano", value: "cssnano" },
+            { label: "Lightning CSS", value: "lightningcss" },
+        ],
+    })) as "cssnano" | "lightningcss";
+
+    if (!cssLoaders.includes("lightningcss")) {
+        const shouldInstall = await confirm({
+            message: `Do you want to install "${cssMinifier}"?`,
+        });
+
+        if (shouldInstall) {
+            packagesToInstall.push(cssMinifier);
+        }
+    }
+
+    return cssMinifier;
+};
+
 const createInitCommand = (cli: Cli<Console>): void => {
     cli.addCommand({
         description: "Initialize packem configuration",
 
-        execute: async ({ logger, options: rawOptions }): Promise<void> => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const options = rawOptions as Record<string, any>;
+        execute: async ({ logger: rawLogger, options: rawOptions }): Promise<void> => {
+            const options = rawOptions as InitOptions;
+            const logger = rawLogger as InitLogger;
 
             intro("Welcome to packem setup");
 
-            if (isAccessibleSync(join(options.dir, "packem.config.ts"))) {
+            if (isAccessibleSync(join(options.dir ?? ".", "packem.config.ts"))) {
                 logger.info("Packem project already initialized, you can use `packem build` to build your project");
 
                 return;
@@ -35,296 +360,53 @@ const createInitCommand = (cli: Cli<Console>): void => {
             const packageJson = await parsePackageJson(packageJsonPath, {
                 resolveCatalogs: true,
             });
-            const packages: string[] = [];
-
-            if (packageJson.dependencies) {
-                packages.push(...Object.keys(packageJson.dependencies));
-            }
-
-            if (packageJson.devDependencies) {
-                packages.push(...Object.keys(packageJson.devDependencies));
-            }
+            const packages = collectPackageNames(packageJson);
 
             const hasTypescript = Boolean(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript);
 
             const packagesToInstall: string[] = [];
 
-            if (options.typescript === undefined && !hasTypescript) {
-                options.typescript = await confirm({
-                    message: "Do you want to install TypeScript?",
-                });
+            options.typescript = await setupTypescript(options.typescript, hasTypescript, packageJson, packagesToInstall);
 
-                if (options.typescript) {
-                    packagesToInstall.push("typescript@latest");
-                }
-            } else {
-                log.message(`TypeScript version ${packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript} is already installed`);
-            }
+            await maybeGenerateTsconfig(rootDirectory);
 
-            if (!isAccessibleSync(join(rootDirectory, "tsconfig.json"))) {
-                const shouldGenerate = await confirm({
-                    message: "Do you want to use generate a tsconfig.json?",
-                });
-                const runInDom = await confirm({
-                    message: "Do you want to run your code in the DOM?",
-                });
+            options.runtime ??= (await select({
+                message: "Pick a build runtime",
+                options: [
+                    { label: "Node", value: "node" },
+                    { label: "Browser", value: "browser" },
+                ],
+            })) as string;
 
-                if (shouldGenerate) {
-                    const s = spinner();
+            options.transformer = await resolveTransformer(options.transformer, packages, packagesToInstall);
 
-                    s.start("Generating tsconfig.json");
+            options.css ??= (await confirm({
+                initialValue: false,
+                message: "Do you want to use css in your project?",
+            })) as boolean;
 
-                    /* eslint-disable perfectionist/sort-objects */
-                    writeJsonSync(join(rootDirectory, "tsconfig.json"), {
-                        compilerOptions: {
-                            esModuleInterop: true,
-                            skipLibCheck: true,
-                            target: "es2022",
-                            allowJs: true,
-                            resolveJsonModule: true,
-                            moduleDetection: "force",
-                            isolatedModules: true,
-                            verbatimModuleSyntax: true,
-                            strict: true,
-                            noUncheckedIndexedAccess: true,
-                            noImplicitOverride: true,
-                            module: "NodeNext",
-                            outDir: "dist",
-                            sourceMap: true,
-                            declaration: true,
-                            lib: runInDom ? ["es2022", "dom", "dom.iterable"] : ["es2022"],
-                        },
-                    });
-                    s.stop("");
-                }
-            }
+            const cssLoaders: string[] = options.css ? await selectCssLoaders(packagesToInstall) : [];
 
-            if (options.runtime === undefined) {
-                options.runtime = await select({
-                    message: "Pick a build runtime",
-                    options: [
-                        { label: "Node", value: "node" },
-                        { label: "Browser", value: "browser" },
-                    ],
-                });
-            }
+            options.cssMinifier ??= (await confirm({
+                initialValue: false,
+                message: "Do you want to minify your css?",
+            })) as boolean;
 
-            if (packages.includes("esbuild")) {
-                options.transformer = "esbuild";
-            } else if (packages.includes("@swc/core")) {
-                options.transformer = "swc";
-            } else if (packages.includes("sucrase")) {
-                options.transformer = "sucrase";
-            }
+            const cssMinifier: CssMinifier = options.cssMinifier ? await selectCssMinifier(cssLoaders, packagesToInstall) : undefined;
 
-            if (options.transformer === undefined) {
-                options.transformer = await select({
-                    message: "Pick a transformer",
-                    options: [
-                        { label: "esbuild", value: "esbuild" },
-                        { label: "swc", value: "swc" },
-                        { label: "Sucrase", value: "sucrase" },
-                        { label: "OXC", value: "oxc" },
-                    ],
-                });
+            const cssEnabled = options.css ?? false;
+            const cssMinifierEnabled = options.cssMinifier ?? false;
+            const useEsm = hasTypescript || packageJson.type === "module";
 
-                if (options.transformer && options.transformer !== "oxc" && !packages.includes(options.transformer as string)) {
-                    const shouldInstall = await confirm({
-                        message: `Do you want to install ${options.transformer}?`,
-                    });
-
-                    if (shouldInstall) {
-                        packagesToInstall.push(options.transformer === "swc" ? "@swc/core" : options.transformer);
-                    }
-                }
-            } else {
-                log.message(`Transformer ${options.transformer} is already installed.`);
-            }
-
-            if (options.css === undefined) {
-                options.css = (await confirm({
-                    message: "Do you want to use css in your project?",
-                    initialValue: false,
-                })) as boolean;
-            }
-
-            const cssLoaders: (keyof typeof cssLoaderDependencies | "sourceMap")[] = [];
-
-            if (options.css) {
-                const mainCssLoader = (await select({
-                    message: "Pick a css loader",
-                    options: [
-                        { label: "PostCSS", value: "postcss" },
-                        {
-                            hint: "experimental",
-                            label: "Lightning CSS",
-                            value: "lightningcss",
-                        },
-                    ],
-                })) as keyof typeof cssLoaderDependencies;
-
-                cssLoaders.push(mainCssLoader);
-
-                let extraCssLoaders = (await multiselect({
-                    message: "Pick your loaders",
-                    options: [
-                        { label: "Sass", value: "sass" },
-                        { label: "Stylus", value: "stylus" },
-                        { label: "Less", value: "less" },
-                    ],
-                    required: false,
-                })) as (keyof typeof cssLoaderDependencies)[];
-
-                if (extraCssLoaders.includes("sass")) {
-                    const sassLoader = await select({
-                        message: "Pick a sass loader",
-                        options: [
-                            {
-                                label: "Sass embedded",
-                                value: "sass-embedded",
-                                hint: "recommended",
-                            },
-                            { label: "Sass", value: "sass" },
-                            {
-                                label: "Node Sass",
-                                value: "node-sass",
-                                hint: "legacy",
-                            },
-                        ],
-                    });
-
-                    if (sassLoader !== "sass") {
-                        extraCssLoaders = extraCssLoaders.filter((loader) => loader !== "sass");
-
-                        extraCssLoaders.push(sassLoader as keyof typeof cssLoaderDependencies);
-                    }
-                }
-
-                cssLoaders.push(...extraCssLoaders);
-
-                const shouldInstall = await confirm({
-                    message: `Do you want to install "${cssLoaders.join("\", \"")}"?`,
-                });
-
-                if (shouldInstall) {
-                    for (const loader of cssLoaders) {
-                        packagesToInstall.push(...(cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]));
-                    }
-                }
-
-                cssLoaders.push("sourceMap");
-            }
-
-            if (options.cssMinifier === undefined) {
-                options.cssMinifier = (await confirm({
-                    message: "Do you want to minify your css?",
-                    initialValue: false,
-                })) as boolean;
-            }
-
-            let cssMinifier: "cssnano" | "lightningcss" | undefined;
-
-            if (options.cssMinifier) {
-                cssMinifier = (await select({
-                    message: "Pick a css minifier",
-                    options: [
-                        { label: "CSSNano", value: "cssnano" },
-                        { label: "Lightning CSS", value: "lightningcss" },
-                    ],
-                })) as "cssnano" | "lightningcss";
-
-                if (!cssLoaders.includes("lightningcss")) {
-                    const shouldInstall = await confirm({
-                        message: `Do you want to install "${cssMinifier}"?`,
-                    });
-
-                    if (shouldInstall) {
-                        packagesToInstall.push(cssMinifier);
-                    }
-                }
-            }
-
-            let template = "";
-            let packemConfig = "";
-
-            if (options.css || options.cssMinifier) {
-                packemConfig += ",\n    rollup: {\n        css: {";
-            }
-
-            if (options.css) {
-                const stringCssLoaders = cssLoaders
-                    .map((loader) => {
-                        if (loader === "sass-embedded" || loader === "node-sass") {
-                            // eslint-disable-next-line no-param-reassign
-                            loader = "sass";
-                        }
-
-                        return `${loader}Loader`;
-                    })
-                    .join(", ");
-
-                packemConfig += `\n            loaders: [${stringCssLoaders}],`;
-            }
-
-            if (options.cssMinifier && cssMinifier) {
-                packemConfig += `\n            minifier: ${cssMinifier}Minifier,`;
-            }
-
-            if (options.css || options.cssMinifier) {
-                packemConfig += "\n        }\n    }";
-            }
-
-            if (hasTypescript || packageJson.type === "module") {
-                let imports = "";
-
-                if (options.css) {
-                    for (let loader of cssLoaders) {
-                        if (loader === "sass-embedded" || loader === "node-sass") {
-                            loader = "sass";
-                        }
-
-                        imports += `import ${loader as string}Loader from "@visulima/packem/css/loader/${loader.toLowerCase() as string}";\n`;
-                    }
-                }
-
-                if (options.cssMinifier && cssMinifier) {
-                    imports += `import ${cssMinifier as string}Minifier from "@visulima/packem/css/minifier/${cssMinifier.toLowerCase() as string}";\n`;
-                }
-
-                template = `import { defineConfig } from "@visulima/packem/config";
-import transformer from "@visulima/packem/transformer/${options.transformer as string}";
-${imports}
-export default defineConfig({
-    runtime: "${options.runtime as string}",
-    transformer${packemConfig}
-});
-`;
-            } else {
-                let imports = "";
-
-                if (options.css) {
-                    for (let loader of cssLoaders) {
-                        if (loader === "sass-embedded" || loader === "node-sass") {
-                            loader = "sass";
-                        }
-
-                        imports += `const ${loader as string}Loader = require("@visulima/packem/css/loader/${loader.toLowerCase() as string}");\n`;
-                    }
-                }
-
-                if (options.cssMinifier && cssMinifier) {
-                    imports += `const ${cssMinifier as string}Minifier = require("@visulima/packem/css/minifier/${cssMinifier.toLowerCase() as string}");\n`;
-                }
-
-                template = `const { defineConfig } = require("@visulima/packem/config");
-const transformer = require("@visulima/packem/transformer/${options.transformer as string}");
-${imports}
-module.exports = defineConfig({
-    runtime: ${options.runtime as string},
-    transformer${packemConfig}
-});
-`;
-            }
+            const packemConfig = buildCssConfigBlock(cssEnabled, cssMinifier, cssMinifierEnabled, cssLoaders);
+            const imports = buildCssImports(cssEnabled, cssLoaders, cssMinifier, cssMinifierEnabled, useEsm);
+            const template = buildConfigTemplate(
+                useEsm,
+                options.transformer ?? "",
+                options.runtime ?? "",
+                imports,
+                packemConfig,
+            );
 
             const s = spinner();
 

@@ -28,7 +28,7 @@ describe(overwriteWithPublishConfig, () => {
             version: "1.0.0",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_, undefined);
+        const result = overwriteWithPublishConfig(package_);
 
         expect(result.bin).toStrictEqual(package_.publishConfig?.bin);
         expect(result.type).toStrictEqual(package_.publishConfig?.type);
@@ -61,7 +61,7 @@ describe(overwriteWithPublishConfig, () => {
             version: "1.0.0",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(package_);
 
         expect(result).toStrictEqual(package_);
     });
@@ -74,7 +74,7 @@ describe(overwriteWithPublishConfig, () => {
             version: "1.0.0",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(package_);
 
         expect(result).toStrictEqual(package_);
     });
@@ -88,7 +88,7 @@ describe(overwriteWithPublishConfig, () => {
             version: "1.0.0",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(package_);
 
         expect(result).toStrictEqual(package_);
     });
@@ -109,7 +109,7 @@ describe(overwriteWithPublishConfig, () => {
             version: "1.0.0",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(package_);
 
         expect(result).toStrictEqual(package_);
     });
@@ -137,7 +137,7 @@ describe(overwriteWithPublishConfig, () => {
             version: "",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(package_);
 
         expect(result).toStrictEqual(package_);
     });

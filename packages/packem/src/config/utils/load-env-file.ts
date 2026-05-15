@@ -3,6 +3,48 @@ import { parseEnv } from "node:util";
 
 import { resolve } from "@visulima/path";
 
+const ENV_LINE_REGEX = /^([^#:=]+)=(.*)$/;
+
+/**
+ * Manually parses .env file content and extracts environment variables.
+ * @param content Raw text read from the .env file, parsed line by line.
+ * @param prefix Only keys starting with this string are kept (empty keeps all).
+ * @returns Record of environment variables with keys formatted as "process.env.KEY"
+ */
+const loadEnvFileManually = (content: string, prefix: string = "PACKEM_"): Record<string, string> => {
+    const envVariables: Record<string, string> = {};
+
+    // Parse .env file line by line
+    for (const line of content.split("\n")) {
+        const trimmedLine = line.trim();
+
+        // Skip empty lines and comments
+        if (!trimmedLine || trimmedLine.startsWith("#")) {
+            continue;
+        }
+
+        // Parse KEY=VALUE format
+        const match = ENV_LINE_REGEX.exec(trimmedLine);
+
+        if (match?.[1]) {
+            const key = match[1].trim();
+            let value = match[2].trim();
+
+            // Remove quotes if present
+            if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) {
+                value = value.slice(1, -1);
+            }
+
+            // Filter by prefix if provided
+            if (!prefix || key.startsWith(prefix)) {
+                envVariables[`process.env.${key}`] = JSON.stringify(value);
+            }
+        }
+    }
+
+    return envVariables;
+};
+
 /**
  * Loads environment variables from a .env file with optional prefix filtering.
  * Uses Node.js built-in `util.parseEnv` to parse the file content without modifying `process.env`.
@@ -24,7 +66,7 @@ const loadEnvFile = async (envFilePath: string, rootDirectory: string, prefix: s
     }
 
     const { readFile } = await import("node:fs/promises");
-    const content = await readFile(resolvedPath, "utf-8");
+    const content = await readFile(resolvedPath, "utf8");
     const envVariables: Record<string, string> = {};
 
     // Use Node.js built-in util.parseEnv if available (Node.js >= 20.12.0)
@@ -46,46 +88,6 @@ const loadEnvFile = async (envFilePath: string, rootDirectory: string, prefix: s
     } else {
         // Fallback to manual parsing for older Node.js versions
         return loadEnvFileManually(content, prefix);
-    }
-
-    return envVariables;
-};
-
-/**
- * Manually parses .env file content and extracts environment variables.
- * @param content The content of the .env file
- * @param prefix Optional prefix to filter environment variables
- * @returns Record of environment variables with keys formatted as "process.env.KEY"
- */
-const loadEnvFileManually = (content: string, prefix: string = "PACKEM_"): Record<string, string> => {
-    const envVariables: Record<string, string> = {};
-
-    // Parse .env file line by line
-    for (const line of content.split("\n")) {
-        const trimmedLine = line.trim();
-
-        // Skip empty lines and comments
-        if (!trimmedLine || trimmedLine.startsWith("#")) {
-            continue;
-        }
-
-        // Parse KEY=VALUE format
-        const match = trimmedLine.match(/^([^=:#]+)=(.*)$/);
-
-        if (match && match[1] && match[2] !== undefined) {
-            const key = match[1].trim();
-            let value = match[2].trim();
-
-            // Remove quotes if present
-            if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) {
-                value = value.slice(1, -1);
-            }
-
-            // Filter by prefix if provided
-            if (!prefix || key.startsWith(prefix)) {
-                envVariables[`process.env.${key}`] = JSON.stringify(value);
-            }
-        }
     }
 
     return envVariables;

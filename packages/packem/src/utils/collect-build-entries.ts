@@ -36,10 +36,12 @@ export const collectBuildEntries = (
             chunks: (entry.imports ?? []).filter((id) => outputChunks.some((c) => c.fileName === id)),
             dynamicImports: entry.dynamicImports ?? [],
             exports: entry.exports ?? [],
-            modules: Object.entries(entry.modules ?? {}).map(([id, module_]) => ({
-                bytes: module_.renderedLength,
-                id,
-            })),
+            modules: Object.entries(entry.modules ?? {}).map(([id, module_]) => {
+                return {
+                    bytes: module_.renderedLength,
+                    id,
+                };
+            }),
             path: entry.fileName,
             size: {
                 bytes: Buffer.byteLength(entry.code ?? "", "utf8"),

@@ -6,8 +6,29 @@ import type { InternalBuildOptions } from "../../types";
 import createOrUpdateKeyStorage from "../../utils/create-or-update-key-storage";
 import generateReferenceDocumentation from "./generate-reference-documentation";
 
+/**
+ * Minimal structural logger contract. `@visulima/pail`'s shipped `Pail` type
+ * re-exports from a non-existent `./pail.d.ts`, so the structural alias below
+ * keeps the methods we call fully type-checked without the broken import.
+ */
+interface LogPayload {
+    message: string;
+    prefix: string;
+}
+
+interface Logger {
+    debug: (payload: LogPayload | string, ...arguments_: unknown[]) => void;
+    error: (payload: LogPayload | string, ...arguments_: unknown[]) => void;
+    info: (payload: LogPayload) => void;
+    raw: (message: string) => void;
+    warn: (payload: LogPayload | string, ...arguments_: unknown[]) => void;
+}
+
+const getLogger = (context: BuildContext<InternalBuildOptions>): Logger => context.logger as Logger;
+
 const builder = async (context: BuildContext<InternalBuildOptions>, cachePath: string | undefined, _: never, logged: boolean): Promise<void> => {
     if (context.options.typedoc && context.options.typedoc.format !== undefined) {
+        const logger = getLogger(context);
         let typedocVersion = "unknown";
 
         if (context.pkg.dependencies?.typedoc) {
@@ -17,14 +38,14 @@ const builder = async (context: BuildContext<InternalBuildOptions>, cachePath: s
         }
 
         if (cachePath) {
-            createOrUpdateKeyStorage("typedoc", cachePath as string, context.logger, true);
+            createOrUpdateKeyStorage("typedoc", cachePath, logger, true);
         }
 
         if (logged) {
-            context.logger.raw("\n");
+            logger.raw("\n");
         }
 
-        context.logger.info({
+        logger.info({
             message: `Using ${cyan("typedoc")} ${typedocVersion} to generate reference documentation`,
             prefix: "typedoc",
         });
@@ -41,7 +62,7 @@ const builder = async (context: BuildContext<InternalBuildOptions>, cachePath: s
             outputDirectory = join(outputDirectory, "api-docs");
         }
 
-        await generateReferenceDocumentation(context.options.typedoc, context.options.entries, outputDirectory, context.logger);
+        await generateReferenceDocumentation(context.options.typedoc, context.options.entries, outputDirectory, logger);
 
         await context.hooks.callHook("typedoc:done", context);
     }

@@ -1,6 +1,7 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFile } from "@visulima/fs";
+// eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -10,7 +11,7 @@ import { normalizeBundleOutput } from "../helpers/testing-utils";
 describe("packem node exports", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -52,11 +53,11 @@ describe("packem node exports", () => {
 
             const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-            expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+            expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs output");
 
             const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-            expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
+            expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs output");
 
             const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
@@ -230,11 +231,11 @@ export { test2, test3, test4, test5, test as default };`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs output");
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
@@ -283,11 +284,11 @@ export = test;
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.cjs`);
 
-        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs output");
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.cts`);
 
@@ -520,19 +521,19 @@ export class Child extends Parent {
 
         const mjsPackageContent = readFileSync(`${temporaryDirectoryPath}/dist/package.mjs`);
 
-        expect(normalizeBundleOutput(mjsPackageContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(mjsPackageContent)).toMatchSnapshot("package.mjs output");
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("index.mjs output");
 
         const cjsPackageContent = readFileSync(`${temporaryDirectoryPath}/dist/package.cjs`);
 
-        expect(normalizeBundleOutput(cjsPackageContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(cjsPackageContent)).toMatchSnapshot("package.cjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("index.cjs output");
     });
 
     it("should only find the correct export file, if files with the same name exist but with different extension", async () => {

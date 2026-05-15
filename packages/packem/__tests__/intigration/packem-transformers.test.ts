@@ -1,10 +1,10 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
 
 // The byte-exact assertions below capture rollup-specific CJS emit:
 //   - `'use strict';` directive prologue
@@ -24,7 +24,7 @@ import { createPackageJson, createPackemConfig, createTsConfig, execPackem, inst
 describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem-transformers", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -112,9 +112,13 @@ export { index as default };
             transformer: transformer as "esbuild" | "oxc" | "sucrase" | "swc",
         });
 
-        expect(readFileSync(`${temporaryDirectoryPath}/packem.config.ts`)).toContain(
-            transformer === "swc" ? "swc/swc-plugin" : transformer === "oxc" ? `${transformer}/oxc-transformer` : `${transformer}/index`,
-        );
+        const expectedTransformerImports: Record<string, string> = {
+            oxc: `${transformer}/oxc-transformer`,
+            swc: "swc/swc-plugin",
+        };
+        const expectedTransformerImport = expectedTransformerImports[transformer] ?? `${transformer}/index`;
+
+        expect(readFileSync(`${temporaryDirectoryPath}/packem.config.ts`)).toContain(expectedTransformerImport);
 
         const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,

@@ -1,9 +1,9 @@
 import type { RollupBuild, RollupOptions, RollupWatcher } from "rollup";
 
-export type RollupBuildFactory = (options: RollupOptions) => Promise<RollupBuild>;
-export type RollupWatchFactory = (options: RollupOptions | RollupOptions[]) => RollupWatcher;
+type RollupBuildFactory = (options: RollupOptions) => Promise<RollupBuild>;
+type RollupWatchFactory = (options: RollupOptions | RollupOptions[]) => RollupWatcher;
 
-const tryImport = async <T>(load: () => Promise<unknown>, pick: (mod: unknown) => T | undefined): Promise<T | undefined> => {
+const tryImport = async <T>(load: () => Promise<unknown>, pick: (module_: unknown) => T | undefined): Promise<T | undefined> => {
     try {
         return pick(await load());
     } catch {
@@ -11,31 +11,41 @@ const tryImport = async <T>(load: () => Promise<unknown>, pick: (mod: unknown) =
     }
 };
 
-const NOT_INSTALLED_MESSAGE
-    = "Rollup is not installed. Please install 'rollup' to use bundler: 'rollup' or DTS generation with the rollup driver.";
+const NOT_INSTALLED_MESSAGE = "Rollup is not installed. Please install 'rollup' to use bundler: 'rollup' or DTS generation with the rollup driver.";
 
 export const getRollupBuild = async (): Promise<RollupBuildFactory> => {
     // @ts-ignore optional peer dependency
-    const fn = await tryImport(() => import("rollup"), (m) => (m as { rollup?: RollupBuildFactory }).rollup);
+    const factory = await tryImport(
+        () => import("rollup"),
+        (m) => (m as { rollup?: RollupBuildFactory }).rollup,
+    );
 
-    if (!fn) {
+    if (!factory) {
         throw new Error(NOT_INSTALLED_MESSAGE);
     }
 
-    return fn;
+    return factory;
 };
 
 export const getRollupWatch = async (): Promise<RollupWatchFactory> => {
     // @ts-ignore optional peer dependency
-    const fn = await tryImport(() => import("rollup"), (m) => (m as { watch?: RollupWatchFactory }).watch);
+    const factory = await tryImport(
+        () => import("rollup"),
+        (m) => (m as { watch?: RollupWatchFactory }).watch,
+    );
 
-    if (!fn) {
+    if (!factory) {
         throw new Error(NOT_INSTALLED_MESSAGE);
     }
 
-    return fn;
+    return factory;
 };
 
 export const getRollupVersion = async (): Promise<string | undefined> =>
     // @ts-ignore optional peer dependency
-    tryImport(() => import("rollup"), (m) => (m as { VERSION?: string }).VERSION);
+    tryImport(
+        () => import("rollup"),
+        (m) => (m as { VERSION?: string }).VERSION,
+    );
+
+export type { RollupBuildFactory, RollupWatchFactory };

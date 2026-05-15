@@ -15,7 +15,7 @@ const validateEngines = (context: BuildContext<InternalBuildOptions>): void => {
     const { pkg } = context;
 
     // Skip validation if engines validation is disabled
-    if (validation.packageJson?.engines === false) {
+    if (!validation.packageJson?.engines) {
         return;
     }
 

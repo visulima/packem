@@ -138,14 +138,7 @@ export { test as default, test2 };
 "
 `;
 
-exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop 1`] = `
-"const test = () => "this should be in final bundle";
-
-export { test as default };
-"
-`;
-
-exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop 2`] = `
+exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop > cjs output 1`] = `
 "'use strict';
 
 const test = () => "this should be in final bundle";
@@ -154,20 +147,30 @@ module.exports = test;
 "
 `;
 
-exports[`packem node exports > should generate correct chunks names, when chunk per export is generated 1`] = `
-"const packageA = () => "This is a named export";
-const d = "This is a default export";
+exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop > mjs output 1`] = `
+"const test = () => "this should be in final bundle";
 
-export { d as default, packageA };
+export { test as default };
 "
 `;
 
-exports[`packem node exports > should generate correct chunks names, when chunk per export is generated 2`] = `
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > index.cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const _package = require('./package.cjs');
+
+exports.packageA = _package.packageA;
+"
+`;
+
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > index.mjs output 1`] = `
 "export { packageA } from './package.mjs';
 "
 `;
 
-exports[`packem node exports > should generate correct chunks names, when chunk per export is generated 3`] = `
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > package.cjs output 1`] = `
 "'use strict';
 
 Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
@@ -180,14 +183,11 @@ exports.packageA = packageA;
 "
 `;
 
-exports[`packem node exports > should generate correct chunks names, when chunk per export is generated 4`] = `
-"'use strict';
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > package.mjs output 1`] = `
+"const packageA = () => "This is a named export";
+const d = "This is a default export";
 
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const _package = require('./package.cjs');
-
-exports.packageA = _package.packageA;
+export { d as default, packageA };
 "
 `;
 
@@ -409,14 +409,7 @@ exports[`packem node exports > should output 'class' with 'extends correctly whe
 "
 `;
 
-exports[`packem node exports > should output 'default export' correctly 1`] = `
-"const test = "this should be in final bundle";
-
-export { test as default };
-"
-`;
-
-exports[`packem node exports > should output 'default export' correctly 2`] = `
+exports[`packem node exports > should output 'default export' correctly > cjs output 1`] = `
 "'use strict';
 
 const test = "this should be in final bundle";
@@ -425,18 +418,25 @@ module.exports = test;
 "
 `;
 
-exports[`packem node exports > should output 'default export' for nested folder correctly 1`] = `
+exports[`packem node exports > should output 'default export' correctly > mjs output 1`] = `
 "const test = "this should be in final bundle";
 
 export { test as default };
 "
 `;
 
-exports[`packem node exports > should output 'default export' for nested folder correctly 2`] = `
+exports[`packem node exports > should output 'default export' for nested folder correctly > cjs output 1`] = `
 "'use strict';
 
 const test = "this should be in final bundle";
 
 module.exports = test;
+"
+`;
+
+exports[`packem node exports > should output 'default export' for nested folder correctly > mjs output 1`] = `
+"const test = "this should be in final bundle";
+
+export { test as default };
 "
 `;

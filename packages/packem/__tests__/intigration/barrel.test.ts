@@ -2,15 +2,15 @@ import { rm } from "node:fs/promises";
 import { join } from "node:path";
 
 import { readFileSync, writeFile, writeJson } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
 
 describe("barrel", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 

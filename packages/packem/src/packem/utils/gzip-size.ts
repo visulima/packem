@@ -8,7 +8,7 @@ const gzipSize = async (path: string): Promise<number> =>
         const pipe = createReadStream(path).pipe(createGzip({ level: 9 }));
 
         pipe.on("error", reject);
-        pipe.on("data", (buf) => {
+        pipe.on("data", (buf: Buffer) => {
             size += buf.length;
         });
         pipe.on("end", () => {

@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
+// eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -11,7 +12,7 @@ import { normalizeBundleOutput } from "../helpers/testing-utils";
 describe("packem cli", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -99,45 +100,48 @@ export { a };
     });
 
     // Rolldown inlines `process.env.NODE_ENV` natively even when the env-replace plugin is disabled.
-    it.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("should not replace the NODE_ENV by default if no development or production option was given", async () => {
-        expect.assertions(7);
+    it.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")(
+        "should not replace the NODE_ENV by default if no development or production option was given",
+        async () => {
+            expect.assertions(7);
 
-        await installPackage(temporaryDirectoryPath, "typescript");
-        await installPackage(temporaryDirectoryPath, "@types/node");
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await installPackage(temporaryDirectoryPath, "@types/node");
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = process.env.NODE_ENV;`);
+            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = process.env.NODE_ENV;`);
 
-        await createTsConfig(temporaryDirectoryPath);
-        await createPackageJson(temporaryDirectoryPath, {
-            devDependencies: {
-                typescript: "*",
-            },
-            module: "dist/index.js",
-            type: "module",
-            types: "dist/index.d.ts",
-        });
-        await createPackemConfig(temporaryDirectoryPath);
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                module: "dist/index.js",
+                type: "module",
+                types: "dist/index.d.ts",
+            });
+            await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackem("build", ["--no-environment"], {
-            cwd: temporaryDirectoryPath,
-            env: {},
-        });
+            const binProcess = await execPackem("build", ["--no-environment"], {
+                cwd: temporaryDirectoryPath,
+                env: {},
+            });
 
-        expect(binProcess.stderr).toBe("");
-        expect(binProcess.exitCode).toBe(0);
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
 
-        expect(binProcess.stdout).toContain("Preparing build for");
-        expect(binProcess.stdout).not.toContain("development");
-        expect(binProcess.stdout).not.toContain("environment with");
-        expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
+            expect(binProcess.stdout).toContain("Preparing build for");
+            expect(binProcess.stdout).not.toContain("development");
+            expect(binProcess.stdout).not.toContain("environment with");
+            expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+            const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(normalizeBundleOutput(mtsContent)).toBe(`const a = process.env.NODE_ENV;
+            expect(normalizeBundleOutput(mtsContent)).toBe(`const a = process.env.NODE_ENV;
 
 export { a };
 `);
-    });
+        },
+    );
 
     // Rolldown's production minifier emits its module-helper preamble (Object.defineProperty,
     // __esm, __commonJS, etc.) that rollup+terser strip. The byte-exact assertion is rollup-specific.
@@ -186,11 +190,13 @@ export { a };
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
+            // eslint-disable-next-line no-secrets/no-secrets -- test fixture source: non-secret env-var names, not credentials
             `export const apiUrl = process.env.PACKEM_API_URL;
 export const version = process.env.PACKEM_VERSION;
 export const ignored = process.env.OTHER_VAR;`,
         );
 
+        // eslint-disable-next-line no-secrets/no-secrets -- test fixture .env: example URL and version, not credentials
         writeFileSync(`${temporaryDirectoryPath}/.env`, "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\nOTHER_VAR=should-be-ignored\n");
 
         await createTsConfig(temporaryDirectoryPath);
@@ -227,10 +233,12 @@ export const ignored = process.env.OTHER_VAR;`,
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
+            // eslint-disable-next-line no-secrets/no-secrets -- test fixture source: non-secret env-var names, not credentials
             `export const apiUrl = process.env.PACKEM_API_URL;
 export const version = process.env.PACKEM_VERSION;`,
         );
 
+        // eslint-disable-next-line no-secrets/no-secrets -- test fixture .env: example URL and version, not credentials
         writeFileSync(`${temporaryDirectoryPath}/.env`, "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\n");
 
         await createTsConfig(temporaryDirectoryPath);
@@ -271,10 +279,12 @@ export const version = process.env.PACKEM_VERSION;`,
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
+            // eslint-disable-next-line no-secrets/no-secrets -- test fixture source: non-secret env-var names, not credentials
             `export const apiUrl = process.env.PACKEM_API_URL;
 export const version = process.env.PACKEM_VERSION;`,
         );
 
+        // eslint-disable-next-line no-secrets/no-secrets -- test fixture .env: example URL and version, not credentials
         writeFileSync(`${temporaryDirectoryPath}/.env`, "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\n");
 
         await createTsConfig(temporaryDirectoryPath);
@@ -302,14 +312,12 @@ export const version = process.env.PACKEM_VERSION;`,
         expect(mtsContent).toContain("const version = \"2.0.0\""); // CLI override
     });
 
-    it("should handle non-existent .env file gracefully", async () => {
-        // On Node.js v20+, --env-file is a Node.js CLI option that fails with exit 9
-        // when the file doesn't exist, before the script even runs.
-        // On Node.js < 20, packem handles missing env files gracefully (exit 0).
-        const NODE_VERSION = Number(process.versions.node.split(".")[0]);
+    // On Node.js v20+, --env-file is a Node.js CLI option that fails with exit 9
+    // when the file doesn't exist, before the script even runs.
+    // On Node.js < 20, packem handles missing env files gracefully (exit 0).
+    const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
 
-        expect.assertions(NODE_VERSION >= 20 ? 2 : 3);
-
+    const setupMissingEnvFileFixture = async (): Promise<void> => {
         await installPackage(temporaryDirectoryPath, "typescript");
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
@@ -324,6 +332,12 @@ export const version = process.env.PACKEM_VERSION;`,
             types: "dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
+    };
+
+    it.runIf(NODE_MAJOR_VERSION >= 20)("should fail for non-existent .env file on Node.js v20+", async () => {
+        expect.assertions(2);
+
+        await setupMissingEnvFileFixture();
 
         const binProcess = await execPackem("build", ["--env-file", ".env.nonexistent"], {
             cwd: temporaryDirectoryPath,
@@ -331,21 +345,31 @@ export const version = process.env.PACKEM_VERSION;`,
             reject: false,
         });
 
-        if (NODE_VERSION >= 20) {
-            // Node.js v20+ processes --env-file before the script runs and fails for missing files
-            expect(binProcess.exitCode).toBe(9);
-            expect(binProcess.stderr).toContain(".env.nonexistent");
-        } else {
-            expect(binProcess.stderr).toBe("");
-            expect(binProcess.exitCode).toBe(0);
+        // Node.js v20+ processes --env-file before the script runs and fails for missing files
+        expect(binProcess.exitCode).toBe(9);
+        expect(binProcess.stderr).toContain(".env.nonexistent");
+    });
 
-            const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+    it.runIf(NODE_MAJOR_VERSION < 20)("should handle non-existent .env file gracefully on Node.js < 20", async () => {
+        expect.assertions(3);
 
-            expect(normalizeBundleOutput(mtsContent)).toBe(`const a = 1;
+        await setupMissingEnvFileFixture();
+
+        const binProcess = await execPackem("build", ["--env-file", ".env.nonexistent"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+            reject: false,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+
+        expect(normalizeBundleOutput(mtsContent)).toBe(`const a = 1;
 
 export { a };
 `);
-        }
     });
 
     it("should enable minify when --production option is used", async () => {

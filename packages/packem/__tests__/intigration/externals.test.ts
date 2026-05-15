@@ -3,12 +3,19 @@ import { mkdir, rm } from "node:fs/promises";
 
 import { readFile, writeFile, writeJson } from "@visulima/fs";
 import { join } from "@visulima/path";
+// eslint-disable-next-line e18e/ban-dependencies -- execa is core test-runner infra for spawning built output; tinyexec migration tracked separately
 import { execaNode } from "execa";
+// eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
+
+const DECLARE_TRANSFORM_REGEX = /declare const transform/u;
+const IMPORT_DEP_FILE_REGEX = /import ['"]dep\/file\.js['"]/;
+const IMPORT_POSTGRAPHILE_PLUGINS_REGEX = /import.*['"]postgraphile\/plugins['"]/;
+const FROM_DETECT_INDENT_REGEX = /from ["']detect-indent["']/;
 
 describe("packem externals", () => {
     let temporaryDirectoryPath: string;
@@ -271,7 +278,7 @@ export const transform = svgrTransform;
         expect(dMtsContent).toContain("transform");
 
         // DTS should contain resolved type signatures, not just a re-export
-        expect(dMtsContent).toMatch(/declare const transform/u);
+        expect(dMtsContent).toMatch(DECLARE_TRANSFORM_REGEX);
 
         const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
@@ -319,7 +326,7 @@ export const foo = "bar";
         const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         // Should import from .js, not .ts
-        expect(content).toMatch(/import ['"]dep\/file\.js['"]/);
+        expect(content).toMatch(IMPORT_DEP_FILE_REGEX);
         expect(content).not.toMatch("file.ts");
     });
 
@@ -336,7 +343,7 @@ console.log(foo);
 `,
         );
         await mkdir(`${temporaryDirectoryPath}/node_modules/external-pkg`, { recursive: true });
-        await writeFileSync(`${temporaryDirectoryPath}/node_modules/external-pkg/file-without-ext.js`, "export const foo = 'bar';");
+        writeFileSync(`${temporaryDirectoryPath}/node_modules/external-pkg/file-without-ext.js`, "export const foo = 'bar';");
         await writeJson(`${temporaryDirectoryPath}/node_modules/external-pkg/package.json`, {
             name: "external-pkg",
             type: "module",
@@ -382,7 +389,7 @@ console.log(foo);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await mkdir(`${temporaryDirectoryPath}/node_modules/pkg-with-exports`, { recursive: true });
-        await writeFileSync(`${temporaryDirectoryPath}/node_modules/pkg-with-exports/file.js`, "export const foo = 'bar';");
+        writeFileSync(`${temporaryDirectoryPath}/node_modules/pkg-with-exports/file.js`, "export const foo = 'bar';");
         await writeJson(`${temporaryDirectoryPath}/node_modules/pkg-with-exports/package.json`, {
             exports: {
                 import: "./index.js",
@@ -431,7 +438,7 @@ console.log(foo);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await mkdir(`${temporaryDirectoryPath}/node_modules/pkg-with-subpaths`, { recursive: true });
-        await writeFileSync(`${temporaryDirectoryPath}/node_modules/pkg-with-subpaths/utils.js`, "export const foo = 'bar';");
+        writeFileSync(`${temporaryDirectoryPath}/node_modules/pkg-with-subpaths/utils.js`, "export const foo = 'bar';");
         await writeJson(`${temporaryDirectoryPath}/node_modules/pkg-with-subpaths/package.json`, {
             exports: {
                 ".": "./index.js",
@@ -480,7 +487,7 @@ console.log(foo);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await mkdir(`${temporaryDirectoryPath}/node_modules/pkg-with-subpaths`, { recursive: true });
-        await writeFileSync(`${temporaryDirectoryPath}/node_modules/pkg-with-subpaths/other.js`, "export const foo = 'bar';");
+        writeFileSync(`${temporaryDirectoryPath}/node_modules/pkg-with-subpaths/other.js`, "export const foo = 'bar';");
         await writeJson(`${temporaryDirectoryPath}/node_modules/pkg-with-subpaths/package.json`, {
             exports: {
                 ".": "./index.js",
@@ -530,7 +537,7 @@ console.log(foo);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await mkdir(`${temporaryDirectoryPath}/node_modules/external-pkg`, { recursive: true });
-        await writeFileSync(`${temporaryDirectoryPath}/node_modules/external-pkg/lib.min.js`, "export default 'minified';");
+        writeFileSync(`${temporaryDirectoryPath}/node_modules/external-pkg/lib.min.js`, "export default 'minified';");
         await writeJson(`${temporaryDirectoryPath}/node_modules/external-pkg/package.json`, {
             name: "external-pkg",
             type: "module",
@@ -583,7 +590,7 @@ console.log(lib);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await mkdir(`${temporaryDirectoryPath}/node_modules/external-pkg/utils`, { recursive: true });
-        await writeFileSync(`${temporaryDirectoryPath}/node_modules/external-pkg/utils/index.js`, "export default 'utils';");
+        writeFileSync(`${temporaryDirectoryPath}/node_modules/external-pkg/utils/index.js`, "export default 'utils';");
         await writeJson(`${temporaryDirectoryPath}/node_modules/external-pkg/package.json`, {
             name: "external-pkg",
             type: "module",
@@ -669,7 +676,7 @@ console.log(TagsFilePlugin);
 
         // postgraphile has an exports field, so the plugin should not rewrite the import
         // even though ./plugins is not in the exports map
-        expect(content).toMatch(/import.*['"]postgraphile\/plugins['"]/);
+        expect(content).toMatch(IMPORT_POSTGRAPHILE_PLUGINS_REGEX);
     });
 
     it("should inline types from peer dependencies when rollup.dts.resolve is configured", async () => {
@@ -733,21 +740,21 @@ export const indent = dIndent;
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).not.toContain("from 'detect-indent'");
-        expect(dMtsContent).not.toContain('from "detect-indent"');
+        expect(dMtsContent).not.toContain("from \"detect-indent\"");
         expect(dMtsContent).toContain("indent");
 
         // CJS DTS output should NOT have an import from detect-indent (types are inlined)
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).not.toContain("from 'detect-indent'");
-        expect(dCtsContent).not.toContain('from "detect-indent"');
+        expect(dCtsContent).not.toContain("from \"detect-indent\"");
         expect(dCtsContent).toContain("indent");
 
         // Default DTS output should NOT have an import from detect-indent (types are inlined)
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dTsContent).not.toContain("from 'detect-indent'");
-        expect(dTsContent).not.toContain('from "detect-indent"');
+        expect(dTsContent).not.toContain("from \"detect-indent\"");
     });
 
     it("should externalize a declared peerDep even when tsconfig `paths` has a catch-all `*` entry", async () => {
@@ -764,10 +771,7 @@ export const indent = dIndent;
         // over `paths` catch-alls.
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "detect-indent");
-        await writeFile(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            "import detectIndent from \"detect-indent\";\nexport default detectIndent;\n",
-        );
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import detectIndent from \"detect-indent\";\nexport default detectIndent;\n");
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "^4.4.3",
@@ -788,8 +792,8 @@ export const indent = dIndent;
             compilerOptions: {
                 moduleResolution: "bundler",
                 paths: {
-                    "@/*": ["./src/*"],
                     "*": ["./*"],
+                    "@/*": ["./src/*"],
                 },
             },
         });
@@ -803,7 +807,7 @@ export const indent = dIndent;
         const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Peer dep stays external — the catch-all path must not clobber the peerDep classification.
-        expect(mjsContent).toMatch(/from ["']detect-indent["']/);
+        expect(mjsContent).toMatch(FROM_DETECT_INDENT_REGEX);
         // And it wasn't silently bundled via the "implicit external" warn path either.
         expect(binProcess.stdout).not.toContain("Inlined implicit external");
     });

@@ -17,6 +17,7 @@ const runWithConcurrency = async <T>(tasks: (() => Promise<T>)[], limit: number)
             currentIndex += 1;
             const task = tasks[index];
 
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- tasks may be a sparse array at runtime; the element type hides possible holes.
             if (task) {
                 // eslint-disable-next-line no-await-in-loop
                 results[index] = await task();

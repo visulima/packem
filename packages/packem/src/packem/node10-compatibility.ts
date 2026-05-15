@@ -6,6 +6,24 @@ import { coerce, valid } from "semver";
 
 import type { InternalBuildOptions } from "../types";
 
+interface LoggerMessage {
+    message: unknown;
+    prefix?: string;
+}
+
+/**
+ * Minimal, precisely-typed view of the `@visulima/pail` logger surface used here.
+ *
+ * `BuildContext["logger"]` is typed `Pail`, which the published `@visulima/pail`
+ * types re-export from a non-existent `./pail.d.ts`, so it resolves to an
+ * unresolved/`any`-like type. Modelling only the methods we call keeps the call
+ * sites strictly typed without an `any` escape.
+ * @internal
+ */
+interface Logger {
+    info: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
+}
+
 /**
  * Makes all string arrays unique in a nested object structure.
  * @param object The nested object containing string arrays
@@ -35,14 +53,16 @@ const uniqueNestedValues = (object: Partial<Record<string, Partial<Record<string
 export type { Node10CompatibilityOptions } from "./node10-compatibility-options";
 
 export const node10Compatibility = async (
-    logger: BuildContext<InternalBuildOptions>["logger"],
+    rawLogger: BuildContext<InternalBuildOptions>["logger"],
     entries: BuildContext<InternalBuildOptions>["options"]["entries"],
     outDirectory: string,
     rootDirectory: string,
     mode: "console" | "file",
     typeScriptVersion: string,
 ): Promise<void> => {
-    if (typeScriptVersion !== "*" && valid(coerce(typeScriptVersion)) === undefined) {
+    const logger = rawLogger as unknown as Logger;
+
+    if (typeScriptVersion !== "*" && valid(coerce(typeScriptVersion)) === null) {
         throw new Error("Invalid typeScriptVersion option. It must be a valid semver range.");
     }
 
@@ -54,12 +74,14 @@ export const node10Compatibility = async (
     const typesVersions: Record<string, string[]> = {};
 
     for (const entry of entries) {
-        for (const exportKey of entry.exportKey as Set<string>) {
-            if (exportKey.includes("/*")) {
-                typesVersions[exportKey as string] = [`./${join(outDirectory, dirname(entry.name as string), "*.d.ts")}`];
-            } else {
-                typesVersions[exportKey as string] = [...typesVersions[exportKey as string] ?? [], `./${join(outDirectory, `${entry.name as string}.d.ts`)}`];
-            }
+        if (entry.exportKey === undefined || entry.name === undefined) {
+            continue;
+        }
+
+        const { name } = entry;
+
+        for (const exportKey of entry.exportKey) {
+            typesVersions[exportKey] = exportKey.includes("/*") ? [`./${join(outDirectory, dirname(name), "*.d.ts")}`] : [...typesVersions[exportKey] ?? [], `./${join(outDirectory, `${name}.d.ts`)}`];
         }
     }
 

@@ -2,21 +2,26 @@ import { createRequire } from "node:module";
 
 import { installPackage } from "@antfu/install-pkg";
 import { confirm, isCancel, spinner } from "@clack/prompts";
-import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 
 import { getRolldownBuild } from "../rolldown/get-rolldown";
 import type { BundlerName } from "./build";
 import { getRollupBuild } from "./get-rollup";
-import { buildInstallHint, TRANSFORMER_PACKAGE, type TransformerName } from "./installer";
+import type { TransformerName } from "./installer";
+import { buildInstallHint, TRANSFORMER_PACKAGE } from "./installer";
+
+/**
+ * Minimal structural logger contract. `@visulima/pail`'s shipped `Pail` type
+ * re-exports from a non-existent `./pail.d.ts`, so the structural alias below
+ * keeps the methods we call fully type-checked without the broken import.
+ */
+interface Logger {
+    error: (message: string, ...arguments_: unknown[]) => void;
+}
 
 const isBundlerAvailable = async (bundler: BundlerName): Promise<boolean> => {
     try {
-        if (bundler === "rolldown") {
-            await getRolldownBuild();
-        } else {
-            await getRollupBuild();
-        }
+        await (bundler === "rolldown" ? getRolldownBuild() : getRollupBuild());
 
         return true;
     } catch {
@@ -44,10 +49,10 @@ const promptAndInstall = async (
     packageName: string,
     promptMessage: string,
     rootDirectory: string,
-    logger: Pail,
+    logger: Logger,
     verifyInstalled: () => Promise<boolean>,
 ): Promise<void> => {
-    const isInteractive = Boolean(process.stdout.isTTY) && !process.env.CI;
+    const isInteractive = process.stdout.isTTY && !process.env.CI;
 
     if (!isInteractive) {
         const hint = await buildInstallHint(packageName, rootDirectory);
@@ -77,7 +82,7 @@ const promptAndInstall = async (
         throw error;
     }
 
-    if (!(await verifyInstalled())) {
+    if (!await verifyInstalled()) {
         logger.error(`Installed ${packageName} but it still cannot be loaded. Try restarting packem.`);
 
         throw new Error(`${packageName} was installed but is not loadable in the current process. Re-run packem to pick it up.`);
@@ -89,26 +94,21 @@ const promptAndInstall = async (
  * the user to install it via the local package manager. In CI / non-TTY, throw
  * with an actionable error so the failure mode is loud, not silent.
  */
-export const ensureBundlerInstalled = async (bundler: BundlerName, rootDirectory: string, logger: Pail): Promise<void> => {
+export const ensureBundlerInstalled = async (bundler: BundlerName, rootDirectory: string, logger: Logger): Promise<void> => {
     if (await isBundlerAvailable(bundler)) {
         return;
     }
 
-    await promptAndInstall(
-        bundler,
-        `${bundler} is required as the bundler but is not installed. Install it now?`,
-        rootDirectory,
-        logger,
-        () => isBundlerAvailable(bundler),
-    );
+    await promptAndInstall(bundler, `${bundler} is required as the bundler but is not installed. Install it now?`, rootDirectory, logger, () =>
+        isBundlerAvailable(bundler));
 };
 
 /**
  * Ensure the runtime package for the chosen transformer is installed. The
  * transformer plugin itself ships with packem; only its underlying engine
- * (esbuild, @swc/core, oxc-transform, sucrase) is the install target.
+ * (esbuild, `@swc/core`, oxc-transform, sucrase) is the install target.
  */
-export const ensureTransformerInstalled = async (transformer: TransformerName, rootDirectory: string, logger: Pail): Promise<void> => {
+export const ensureTransformerInstalled = async (transformer: TransformerName, rootDirectory: string, logger: Logger): Promise<void> => {
     const packageName = TRANSFORMER_PACKAGE[transformer];
 
     if (isModuleAvailable(packageName, rootDirectory)) {

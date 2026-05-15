@@ -56,17 +56,13 @@ const validateSea = (input: ExeBuildInput): void => {
     }
 
     if (!satisfies(process.version, ">=25.7.0")) {
-        throw new Error(
-            `Node.js ${process.version} does not support \`exe\` option. Please upgrade to Node.js 25.7.0 or later.`,
-        );
+        throw new Error(`Node.js ${process.version} does not support \`exe\` option. Please upgrade to Node.js 25.7.0 or later.`);
     }
 
     if (options.entries.length > 1) {
         const entryList = options.entries.map((entry) => `- ${entry.input}`).join("\n");
 
-        throw new Error(
-            `The \`exe\` feature only supports a single entry point. Found ${String(options.entries.length)} entries:\n${entryList}`,
-        );
+        throw new Error(`The \`exe\` feature only supports a single entry point. Found ${String(options.entries.length)} entries:\n${entryList}`);
     }
 
     if (options.declaration) {
@@ -78,10 +74,7 @@ const validateSea = (input: ExeBuildInput): void => {
     logger.info("`exe` option is experimental and may change in future releases.");
 };
 
-const pickMainFormat = (
-    fileName: string,
-    packageType: string | undefined,
-): "commonjs" | "module" => {
+const pickMainFormat = (fileName: string, packageType: string | undefined): "commonjs" | "module" => {
     if (fileName.endsWith(".cjs")) {
         return "commonjs";
     }
@@ -95,13 +88,7 @@ const pickMainFormat = (
 
 const HOST_TARGET_PLATFORM: string = processPlatform === "win32" ? "win" : processPlatform;
 
-const resolveOutputFileName = (
-    exe: ExeOptions,
-    chunk: ExeChunk,
-    bundledFile: string,
-    targetPlatform: string,
-    suffix?: string,
-): string => {
+const resolveOutputFileName = (exe: ExeOptions, chunk: ExeChunk, bundledFile: string, targetPlatform: string, suffix?: string): string => {
     let baseName: string;
 
     if (exe.fileName) {
@@ -180,9 +167,10 @@ const buildSingleExe = async (
                 throwOnError: true,
             });
         } catch {
-            const signHint = processPlatform === "darwin"
-                ? `You can sign it manually using:\n  codesign --sign - "${outputPath}"`
-                : `Automatic code signing is not supported on ${processPlatform}.`;
+            const signHint
+                = processPlatform === "darwin"
+                    ? `You can sign it manually using:\n  codesign --sign - "${outputPath}"`
+                    : `Automatic code signing is not supported on ${processPlatform}.`;
 
             logger.warn(`Failed to code-sign the executable. ${signHint}`);
         }
@@ -197,9 +185,7 @@ const buildSingleExe = async (
 
     const durationMs = Math.round(performance.now() - started);
 
-    logger.success(
-        `Built executable: ${red(relative(options.rootDir, outputPath))} ${gray(`(${String(durationMs)}ms)`)}`,
-    );
+    logger.success(`Built executable: ${red(relative(options.rootDir, outputPath))} ${gray(`(${String(durationMs)}ms)`)}`);
 };
 
 const buildExe = async (context: unknown): Promise<void> => {
@@ -215,9 +201,7 @@ const buildExe = async (context: unknown): Promise<void> => {
 
     validateSea(input);
 
-    const entryChunks = buildEntries.filter(
-        (entry): entry is ExeChunk => entry.type === "entry" && !DTS_REGEX.test(entry.path),
-    );
+    const entryChunks = buildEntries.filter((entry): entry is ExeChunk => entry.type === "entry" && !DTS_REGEX.test(entry.path));
 
     if (entryChunks.length === 0) {
         throw new Error("The `exe` feature requires a built entry, but no entry chunks were found.");
@@ -226,9 +210,7 @@ const buildExe = async (context: unknown): Promise<void> => {
     if (entryChunks.length > 1) {
         const chunkList = entryChunks.map((entry) => `- ${entry.path}`).join("\n");
 
-        throw new Error(
-            `The \`exe\` feature only supports single-chunk outputs. Found ${String(entryChunks.length)} chunks:\n${chunkList}`,
-        );
+        throw new Error(`The \`exe\` feature only supports single-chunk outputs. Found ${String(entryChunks.length)} chunks:\n${chunkList}`);
     }
 
     const chunk: ExeChunk = entryChunks[0];
@@ -239,16 +221,13 @@ const buildExe = async (context: unknown): Promise<void> => {
     const { targets } = exe;
 
     if (targets !== undefined && targets.length > 0) {
-        // `seaConfig` is declared optional on `ExeOptions`; with `strictNullChecks: false`
-        // ESLint strips the `| undefined`, which makes the required guard look redundant.
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (exe.seaConfig?.executable) {
             logger.warn("`seaConfig.executable` is ignored when `targets` is specified.");
         }
 
         for (const target of targets) {
             // eslint-disable-next-line no-await-in-loop
-            const nodeBinaryPath = await resolveNodeBinary(target, logger as never);
+            const nodeBinaryPath = await resolveNodeBinary(target, logger);
             const suffix = getTargetSuffix(target);
             const outputFile = resolveOutputFileName(exe, chunk, bundledFile, target.platform, suffix);
 

@@ -42,7 +42,7 @@ const mergeUserBabelOptions = (
     if (userBabelOptions.plugins) {
         const userPluginsArray = Array.isArray(userBabelOptions.plugins) ? userBabelOptions.plugins : [];
 
-        mergedPlugins = [...basePlugins || [], ...userPluginsArray];
+        mergedPlugins = [...basePlugins ?? [], ...userPluginsArray];
     }
 
     // Merge user presets
@@ -51,7 +51,7 @@ const mergeUserBabelOptions = (
     if (userBabelOptions.presets) {
         const userPresetsArray = Array.isArray(userBabelOptions.presets) ? userBabelOptions.presets : [];
 
-        mergedPresets = [...basePresets || [], ...userPresetsArray];
+        mergedPresets = [...basePresets ?? [], ...userPresetsArray];
     }
 
     return {
@@ -172,7 +172,7 @@ export interface SolidPresetOptions {
  */
 
 export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig => {
-    const { babel: userBabelOptions, plugins = [], presets = [], solidOptions = {} } = options;
+    const { babel: userBabelOptions, plugins, presets, solidOptions } = options;
 
     const babelPlugins: BabelPluginConfig["plugins"] = [];
     const babelPresets: BabelPluginConfig["presets"] = [];
@@ -184,8 +184,7 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
 
     const solidPreset: [string, Record<string, unknown>] = ["babel-preset-solid", solidPresetOptions];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    babelPresets.push(solidPreset as any);
+    babelPresets.push(solidPreset);
 
     // Merge user-provided plugins and presets
     const finalPlugins = [...babelPlugins, ...Array.isArray(plugins) ? plugins : []];
@@ -222,6 +221,11 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                 const { runtime } = context.options;
                 const isServer = runtime === "node";
 
+                // `replace` may be `false` (explicitly disabled) in addition to
+                // `undefined`. `??=` only treats null/undefined as absent, so replacing
+                // these checks with `??=` would skip the `false` case and change runtime
+                // behavior. The falsy checks below intentionally cover both.
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- `??=` would not reassign when `replace`/`values` is `false`, changing behavior.
                 if (!context.options.rollup.replace) {
                     context.options.rollup.replace = {
                         preventAssignment: true,
@@ -229,6 +233,7 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                     };
                 }
 
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- see note above; preserves the original falsy guard semantics.
                 if (!context.options.rollup.replace.values) {
                     context.options.rollup.replace.values = {};
                 }

@@ -1,7 +1,7 @@
 import { isAccessible } from "@visulima/fs";
 import { join } from "@visulima/path";
 
-export const PACKEM_CONFIG_FILES = [
+const PACKEM_CONFIG_FILES = [
     "packem.config.js",
     "packem.config.mjs",
     "packem.config.cjs",
@@ -32,7 +32,7 @@ const findPackemFile = async (rootDirectory: string, configPath = ""): Promise<s
     return packemConfigFilePath;
 };
 
-export const hasPackemConfig = async (rootDirectory: string): Promise<boolean> => {
+const hasPackemConfig = async (rootDirectory: string): Promise<boolean> => {
     for (const file of PACKEM_CONFIG_FILES) {
         // eslint-disable-next-line no-await-in-loop
         if (await isAccessible(join(rootDirectory, file))) {
@@ -43,4 +43,5 @@ export const hasPackemConfig = async (rootDirectory: string): Promise<boolean> =
     return false;
 };
 
+export { hasPackemConfig, PACKEM_CONFIG_FILES };
 export default findPackemFile;

@@ -1,16 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found 1`] = `
-"const __dirname = import.meta.dirname; // -- packem CommonJS __dirname shim --
-function getDirname() {
-  return __dirname;
-}
-
-export { getDirname };
-"
-`;
-
-exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found 2`] = `
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > dirname.cjs output 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -23,17 +13,17 @@ exports.getDirname = getDirname;
 "
 `;
 
-exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found 3`] = `
-"const __filename = import.meta.filename; // -- packem CommonJS __filename shim --
-function getFilename() {
-  return __filename;
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > dirname.mjs output 1`] = `
+"const __dirname = import.meta.dirname; // -- packem CommonJS __dirname shim --
+function getDirname() {
+  return __dirname;
 }
 
-export { getFilename };
+export { getDirname };
 "
 `;
 
-exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found 4`] = `
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > filename.cjs output 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -46,21 +36,17 @@ exports.getFilename = getFilename;
 "
 `;
 
-exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found 5`] = `
-"import require$$0 from 'node:fs';
-
-function getRequireModule() {
-  return require$$0;
-}
-function esmImport() {
-  return import.meta.url;
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > filename.mjs output 1`] = `
+"const __filename = import.meta.filename; // -- packem CommonJS __filename shim --
+function getFilename() {
+  return __filename;
 }
 
-export { esmImport, getRequireModule };
+export { getFilename };
 "
 `;
 
-exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found 6`] = `
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > require.cjs output 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -84,7 +70,52 @@ exports.getRequireModule = getRequireModule;
 "
 `;
 
-exports[`packem shims > should include esm shim, if dirname, filename or require are found 1`] = `
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > require.mjs output 1`] = `
+"import require$$0 from 'node:fs';
+
+function getRequireModule() {
+  return require$$0;
+}
+function esmImport() {
+  return import.meta.url;
+}
+
+export { esmImport, getRequireModule };
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > custom-require.cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const a = 1;
+
+exports.a = a;
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > custom-require.mjs output 1`] = `
+"const a = 1;
+
+export { a };
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > dirname.cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+function getDirname() {
+  return __dirname;
+}
+
+exports.getDirname = getDirname;
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > dirname.mjs output 1`] = `
 "import __cjs_url__ from 'node:url'; // -- packem CommonJS __filename shim --
 import __cjs_path__ from 'node:path'; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
@@ -97,31 +128,7 @@ export { getDirname };
 "
 `;
 
-exports[`packem shims > should include esm shim, if dirname, filename or require are found 2`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function getDirname() {
-  return __dirname;
-}
-
-exports.getDirname = getDirname;
-"
-`;
-
-exports[`packem shims > should include esm shim, if dirname, filename or require are found 3`] = `
-"import __cjs_url__ from 'node:url'; // -- packem CommonJS __filename shim --
-const __filename = __cjs_url__.fileURLToPath(import.meta.url);
-function getFilename() {
-  return __filename;
-}
-
-export { getFilename };
-"
-`;
-
-exports[`packem shims > should include esm shim, if dirname, filename or require are found 4`] = `
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > filename.cjs output 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -134,21 +141,18 @@ exports.getFilename = getFilename;
 "
 `;
 
-exports[`packem shims > should include esm shim, if dirname, filename or require are found 5`] = `
-"import require$$0 from 'node:fs';
-
-function getRequireModule() {
-  return require$$0;
-}
-function esmImport() {
-  return import.meta.url;
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > filename.mjs output 1`] = `
+"import __cjs_url__ from 'node:url'; // -- packem CommonJS __filename shim --
+const __filename = __cjs_url__.fileURLToPath(import.meta.url);
+function getFilename() {
+  return __filename;
 }
 
-export { esmImport, getRequireModule };
+export { getFilename };
 "
 `;
 
-exports[`packem shims > should include esm shim, if dirname, filename or require are found 6`] = `
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > require.cjs output 1`] = `
 "'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -172,21 +176,17 @@ exports.getRequireModule = getRequireModule;
 "
 `;
 
-exports[`packem shims > should include esm shim, if dirname, filename or require are found 7`] = `
-"const a = 1;
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > require.mjs output 1`] = `
+"import require$$0 from 'node:fs';
 
-export { a };
-"
-`;
+function getRequireModule() {
+  return require$$0;
+}
+function esmImport() {
+  return import.meta.url;
+}
 
-exports[`packem shims > should include esm shim, if dirname, filename or require are found 8`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const a = 1;
-
-exports.a = a;
+export { esmImport, getRequireModule };
 "
 `;
 
