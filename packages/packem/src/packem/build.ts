@@ -3,7 +3,6 @@ import { stat } from "node:fs/promises";
 import { bold, cyan, gray, green } from "@visulima/colorize";
 import { walk } from "@visulima/fs";
 import { formatBytes } from "@visulima/humanizer";
-import type { RollupReplaceOptions } from "@visulima/packem-rollup";
 import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry, Environment, Runtime } from "@visulima/packem-share/types";
 import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/utils";
@@ -13,7 +12,7 @@ import bundlerBuild, { resolveBundlerName } from "../bundler/build";
 import bundlerBuildTypes from "../bundler/build-types";
 import { buildExe } from "../exe";
 import runWithConcurrency from "../lib/concurrency";
-import type { BuildEntry, InternalBuildOptions } from "../types";
+import type { BuildEntry, InternalBuildOptions, RollupBuildOptions } from "../types";
 import cloneReplaceOptions from "../utils/clone-replace-options";
 import isDeclarationOnlyName from "../utils/is-declaration-only";
 import brotliSize from "./utils/brotli-size";
@@ -180,12 +179,7 @@ const buildDeclarationTypesLine = (
  * unchanged.
  * @internal
  */
-const buildEntryLine = (
-    entry: SizeEntry,
-    context: BuildContext<InternalBuildOptions>,
-    rPath: (p: string) => string,
-    foundDtsEntries: string[],
-): string => {
+const buildEntryLine = (entry: SizeEntry, context: BuildContext<InternalBuildOptions>, rPath: (p: string) => string, foundDtsEntries: string[]): string => {
     let totalBytes = entry.size?.bytes ?? 0;
     let chunkBytes = 0;
 
@@ -561,16 +555,29 @@ const prepareRollupConfig = async (
                 // The replace options can be mutated by the `rollup:options`
                 // hook above, so reference it through its real declared type
                 // (the inline-literal inference over-narrows `.values` to `{}`).
-                const replaceOptions = environmentRuntimeContext.options.rollup.replace as RollupReplaceOptions | false;
-                const baseReplaceOptions = context.options.rollup.replace as RollupReplaceOptions | false;
+                // Annotate with the *declared* option type rather than letting
+                // TS infer the over-narrowed literal from the `values: {}` seed
+                // at construction. The `rollup:options` hook (called above) and
+                // presets can reassign/clear `.replace` and `.values` at runtime,
+                // so `.values` is genuinely optional here despite the seed.
+                const replaceOptions: RollupBuildOptions["replace"] = environmentRuntimeContext.options.rollup.replace;
+                const baseReplaceOptions: RollupBuildOptions["replace"] = context.options.rollup.replace;
 
                 const defaultReplaceValues = replaceOptions ? createReplaceValues(environment, runtime) : {};
 
                 if (replaceOptions) {
                     replaceOptions.values ??= {};
 
-                    // Use the ORIGINAL context's user-provided values (not the reset ones in environmentRuntimeContext)
-                    const userValues = baseReplaceOptions ? { ...baseReplaceOptions.values } : {};
+                    // Use the ORIGINAL context's user-provided values (not the
+                    // reset ones in environmentRuntimeContext). Route through
+                    // `cloneReplaceOptions` rather than spreading `.values`
+                    // directly: `RollupReplaceOptions`'s `[str: string]` index
+                    // signature widens `.values` to `string | RegExp | fn | …`,
+                    // so a raw spread trips no-misused-spread/no-unsafe. The
+                    // helper is the single sanctioned spot that owns that cast.
+                    const userValues: Record<string, string> = baseReplaceOptions
+                        ? (cloneReplaceOptions(baseReplaceOptions) as { values: Record<string, string> }).values
+                        : {};
 
                     // Merge values: default values first, then user-provided values override them
                     Object.assign(replaceOptions.values, defaultReplaceValues, userValues);

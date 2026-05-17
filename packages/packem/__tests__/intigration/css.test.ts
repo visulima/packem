@@ -443,7 +443,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 title: "plugin-fail",
             },
             {
-                errorMessage: "plugins.filter(...) is not a function or its return value is not async iterable",
+                errorMessage: "plugins.filter is not a function or its return value is not iterable",
                 input: "simple/index.js",
                 shouldFail: true,
                 // Intentionally invalid (string instead of array) to exercise the error path.

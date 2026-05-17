@@ -192,11 +192,7 @@ const resolveNodeTarget = (context: BuildContext<InternalBuildOptions>): string 
     return defaultTarget;
 };
 
-const resolveTransformerTarget = (
-    context: BuildContext<InternalBuildOptions>,
-    currentTarget: string | string[] | undefined,
-    nodeTarget: string,
-): string[] => {
+const resolveTransformerTarget = (context: BuildContext<InternalBuildOptions>, currentTarget: string | string[] | undefined, nodeTarget: string): string[] => {
     if (currentTarget) {
         const targets = arrayify(currentTarget);
 
@@ -562,7 +558,7 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
         preserveEntrySignatures: "strict",
 
         treeshake: {
-        // preserve side-effect-only imports:
+            // preserve side-effect-only imports:
             moduleSideEffects: true,
             // use Rollup's most optimal tree-shaking: (drops unused getter reads)
             preset: "smallest",
@@ -720,7 +716,12 @@ const buildPurePlugins = (
             "Buffer.alloc",
             "Buffer.allocUnsafe",
             "Buffer.isBuffer",
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `functions` is typed as required but is optional at runtime (user config / preset may set `pure` without it); spreading undefined throws "is not iterable" at build time.
+
+            // `PureAnnotationsOptions.functions` is declared required `(string|RegExp)[]`,
+            // but packem's default `pure: {}` (see generateOptions) supplies no
+            // `functions` key, so this is `undefined` at runtime for the common
+            // (unconfigured) case — the type lies, the `?? []` is load-bearing.
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- default `pure: {}` has no `functions` prop; value is genuinely undefined at runtime despite the required type
             ...context.options.rollup.pure.functions ?? [],
         ],
         sourcemap: context.options.sourcemap,
@@ -737,7 +738,11 @@ const buildPurePlugins = (
             "WeakMap",
             "WeakSet",
             "WeakRef",
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `functions` is typed as required but is optional at runtime (user config / preset may set `pure` without it); the optional chain + `?? []` prevents a build-time crash.
+
+            // Same as above: default `pure: {}` makes `.functions` undefined at
+            // runtime despite the required declared type, so both the optional
+            // chain and the `?? []` fallback are load-bearing here.
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- default `pure: {}` has no `functions` prop; value is genuinely undefined at runtime despite the required type
             ...((context.options.rollup.pure.functions?.filter((f: string | RegExp) => typeof f === "string" && !f.includes(".")) ?? []) as string[]),
         ],
         sourcemap: context.options.sourcemap,
@@ -746,7 +751,13 @@ const buildPurePlugins = (
     return { pureNewExpressionPluginInstance, purePluginInstance };
 };
 
-// eslint-disable-next-line import/exports-last, sonarjs/cognitive-complexity -- the residual complexity is the deliberate, order-sensitive Rollup plugin/output array construction; HARD constraint forbids reordering or restructuring it, and pure pre-computation has already been extracted into helpers
+// getRollupOptions currently performs no await (its only one was a spurious
+// await of the synchronous rollupCssPlugin, since removed), but it is kept as
+// an async function returning a promise on purpose: it is the symmetric
+// counterpart of the genuinely-async getRollupDtsOptions, and both are
+// consumed via await in bundler/build.ts and rollup/watch.ts. Demoting only
+// one of the pair to sync would split that shared call contract.
+// eslint-disable-next-line import/exports-last, sonarjs/cognitive-complexity, @typescript-eslint/require-await -- residual complexity is the deliberate order-sensitive Rollup plugin/output array construction (HARD constraint forbids reordering it); the async signature is an intentional API-contract symmetry with getRollupDtsOptions, not accidental
 export const getRollupOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
     // When the bundler is rolldown, several rollup plugins are skipped because
@@ -920,7 +931,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             && context.options.rollup.css.loaders
             && context.options.rollup.css.loaders.length > 0
             && cachingPlugin(
-                await rollupCssPlugin(
+                rollupCssPlugin(
                     {
                         dts: Boolean(context.options.declaration),
                         sourceMap: context.options.sourcemap,
@@ -1049,8 +1060,12 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             context.options.rollup.copy && copyPlugin(context.options.rollup.copy, getLogger(context)),
 
-            context.options.rollup.license
-            && context.options.rollup.license.path
+            // `license` is `LicenseOptions | false`; optional chaining does not
+            // exclude `false`, so the later `.dtsMarker`/`.path`/… accesses
+            // would be reads off `false` (error-typed). Narrow off `false` up
+            // front so the whole `&&` chain sees `LicenseOptions`.
+            context.options.rollup.license !== false
+            && context.options.rollup.license?.path
             && typeof context.options.rollup.license.dependenciesTemplate === "function"
             && licensePlugin({
                 dtsMarker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
@@ -1188,10 +1203,6 @@ const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsR
 
     const userDtsOptions: DtsOptions = context.options.rollup.dts ?? {};
 
-    // @visulima/rollup-plugin-dts bundles its own copy of rollup's type
-    // declarations, so its Plugin type is nominally distinct from this
-    // package's rollup@4 Plugin even though the shapes are identical.
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- eslint's type service collapses the dts package's bundled rollup copy onto rollup@4, but `tsc --noEmit` fails with TS2322 without the `as unknown as Plugin[]` cast below.
     return dts({
         ...userDtsOptions,
         compilerOptions: {
@@ -1211,7 +1222,7 @@ const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsR
         // This overrides any userDtsOptions.resolve from the spread above.
         resolve: dtsResolve,
         tsconfig: context.tsconfig?.path,
-    }) as unknown as Plugin[];
+    });
 };
 
 // Avoid create multiple dts plugins instance and parsing the same tsconfig multi times,
@@ -1373,8 +1384,11 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
 
             ...postPlugins,
 
-            context.options.rollup.license
-            && context.options.rollup.license.path
+            // See the dependencies-license block above: `license` is
+            // `LicenseOptions | false`, so narrow off `false` before the
+            // optional chain to keep the property reads well-typed.
+            context.options.rollup.license !== false
+            && context.options.rollup.license?.path
             && typeof context.options.rollup.license.dtsTemplate === "function"
             && licensePlugin({
                 licenseFilePath: context.options.rollup.license.path,

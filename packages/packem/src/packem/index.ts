@@ -615,7 +615,11 @@ const generateOptions = (
 
     validateAliasEntries(options.alias);
 
-    if (options.rollup.alias && options.rollup.alias.entries) {
+    // `options.rollup.alias` is `RollupAliasOptions | false`; optional chaining
+    // only short-circuits on null/undefined, so `alias === false` would fall
+    // through to a `false.entries` access (an error type). Narrow off `false`
+    // explicitly before reading `.entries`.
+    if (options.rollup.alias !== false && options.rollup.alias?.entries) {
         validateAliasEntries(options.rollup.alias.entries);
     }
 
@@ -1030,14 +1034,7 @@ const packem = async (
                     typeScriptVersion = context.options.node10Compatibility.typeScriptVersion ?? "*";
                 }
 
-                await node10Compatibility(
-                    logger,
-                    context.options.entries,
-                    context.options.outDir,
-                    context.options.rootDir,
-                    outputMode,
-                    typeScriptVersion,
-                );
+                await node10Compatibility(logger, context.options.entries, context.options.outDir, context.options.rootDir, outputMode, typeScriptVersion);
             }
 
             await context.hooks.callHook("validate:before", context);
