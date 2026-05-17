@@ -324,18 +324,18 @@ export { png_default as default };
 "
 `;
 
-exports[`url > should use publicPath with file that has empty dirname > mjs 1`] = `
-"
-var png_default = "/batman/6b71fbe07b498a82.png";
-
-export { png_default as default };
-"
-`;
-
 exports[`url > should use publicPath with file that has empty dirname > cjs 1`] = `
 "
 var png_default = "/batman/6b71fbe07b498a82.png";
 
 module.exports = png_default;
+"
+`;
+
+exports[`url > should use publicPath with file that has empty dirname > mjs 1`] = `
+"
+var png_default = "/batman/6b71fbe07b498a82.png";
+
+export { png_default as default };
 "
 `;

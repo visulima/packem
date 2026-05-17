@@ -54,10 +54,7 @@ describe("native modules", () => {
         });
 
         // Create source files
-        await writeFile(
-            join(temporaryDirectoryPath, "src", "index.js"),
-            SINGLE_NATIVE_SOURCE,
-        );
+        await writeFile(join(temporaryDirectoryPath, "src", "index.js"), SINGLE_NATIVE_SOURCE);
 
         // Create dummy .node file
         await writeFile(join(temporaryDirectoryPath, "src", "native.node"), Buffer.from("dummy native module"));
@@ -98,10 +95,7 @@ describe("native modules", () => {
         await createPackemConfig(temporaryDirectoryPath);
 
         // Create source files
-        await writeFile(
-            join(temporaryDirectoryPath, "src", "index.js"),
-            SINGLE_NATIVE_SOURCE,
-        );
+        await writeFile(join(temporaryDirectoryPath, "src", "index.js"), SINGLE_NATIVE_SOURCE);
 
         // Create dummy .node file
         await writeFile(join(temporaryDirectoryPath, "src", "native.node"), Buffer.from("dummy native module"));
@@ -149,10 +143,7 @@ describe("native modules", () => {
         });
 
         // Create source files
-        await writeFile(
-            join(temporaryDirectoryPath, "src", "index.js"),
-            SINGLE_NATIVE_SOURCE,
-        );
+        await writeFile(join(temporaryDirectoryPath, "src", "index.js"), SINGLE_NATIVE_SOURCE);
 
         // Create dummy .node file
         await writeFile(join(temporaryDirectoryPath, "src", "native.node"), Buffer.from("dummy native module"));
@@ -189,10 +180,7 @@ describe("native modules", () => {
         await createPackemConfig(temporaryDirectoryPath);
 
         // Create source files with same base name
-        await writeFile(
-            join(temporaryDirectoryPath, "src", "index.js"),
-            COLLISION_NATIVE_SOURCE,
-        );
+        await writeFile(join(temporaryDirectoryPath, "src", "index.js"), COLLISION_NATIVE_SOURCE);
 
         // Create dummy .node files with same name
         await writeFile(join(temporaryDirectoryPath, "src", "addon.node"), Buffer.from("native module 1"));

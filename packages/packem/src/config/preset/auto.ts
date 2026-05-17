@@ -29,7 +29,6 @@ interface AutoPresetLogger {
 
 const autoPreset: BuildConfig = {
     hooks: {
-
         "build:prepare": async function (context: BuildContext<InternalBuildOptions>) {
             // For unbundle mode, always create entries for all source files
             if (context.options.unbundle) {

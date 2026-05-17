@@ -152,11 +152,7 @@ const logInputs = (context: BuildContext<InternalBuildOptions>, rollupOptions: {
 
 type WatchOptions = WatcherOptions | false | undefined;
 
-const buildMergedWatchOptions = (
-    context: BuildContext<InternalBuildOptions>,
-    currentWatch: WatcherOptions,
-    userWatch: WatcherOptions,
-): WatcherOptions => {
+const buildMergedWatchOptions = (context: BuildContext<InternalBuildOptions>, currentWatch: WatcherOptions, userWatch: WatcherOptions): WatcherOptions => {
     const baseInclude: (string | RegExp)[] = [
         join(context.options.sourceDir, "**", "*"),
         "package.json",

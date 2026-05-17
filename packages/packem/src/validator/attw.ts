@@ -223,7 +223,15 @@ interface ProblemMessageDeps {
 }
 
 const buildProblemMessage = (analysis: Analysis, ignoreResolutions: string[], deps: ProblemMessageDeps): string => {
-    const { allResolutionKinds, filterProblems, getResolutionOption, groupProblemsByKind, problemAffectsEntrypoint, problemAffectsResolutionKind, problemKindInfo } = deps;
+    const {
+        allResolutionKinds,
+        filterProblems,
+        getResolutionOption,
+        groupProblemsByKind,
+        problemAffectsEntrypoint,
+        problemAffectsResolutionKind,
+        problemKindInfo,
+    } = deps;
 
     const requiredResolutions = allResolutionKinds.filter((kind) => !ignoreResolutions.includes(kind));
     const ignoredResolutions = allResolutionKinds.filter((kind) => ignoreResolutions.includes(kind));

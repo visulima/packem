@@ -79,9 +79,7 @@ const inlineMarkdownIntoReadme = (outputDirectory: string, entriesCount: number,
 
     writeFileSync(
         readmePath,
-        updatedReadmeContent
-            .replaceAll(`<!-- _REPLACE_${marker}`, `<!-- ${marker}`)
-            .replaceAll(`<!-- _REPLACE_\\${marker}`, `<!-- \${marker}`),
+        updatedReadmeContent.replaceAll(`<!-- _REPLACE_${marker}`, `<!-- ${marker}`).replaceAll(`<!-- _REPLACE_\\${marker}`, `<!-- \${marker}`),
         {
             overwrite: true,
         },

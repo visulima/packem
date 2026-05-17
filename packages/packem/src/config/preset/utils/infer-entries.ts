@@ -48,8 +48,7 @@ const OUTPUT_SLUG_STRIP_REGEXP = /(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+)$/;
  * across many branches/hooks, so it is read through the full declared union
  * type here instead of relying on flow narrowing of the shared option object.
  */
-const allowsCompatibleDeclarationUpgrade = (declaration: InternalBuildOptions["declaration"]): boolean =>
-    declaration === undefined || declaration === "node16";
+const allowsCompatibleDeclarationUpgrade = (declaration: InternalBuildOptions["declaration"]): boolean => declaration === undefined || declaration === "node16";
 
 /**
  * Minimal structural view of the {@link BuildContext}'s `logger` (a `Pail`
@@ -390,11 +389,7 @@ const createOrUpdateEntry = (
     const aliasName = fileWithoutExtension.replace(new RegExp(`^(./)?${outDirectoryPrefix}/`), "");
 
     // Check if input file matches the alias (if not, we need fileAlias)
-    const inputBase
-        = input
-            .replace(extensionPattern, "")
-            .split("/")
-            .pop() ?? "";
+    const inputBase = input.replace(extensionPattern, "").split("/").pop() ?? "";
     const aliasBase = aliasName.split("/").pop() ?? "";
     const needsFileAlias = !input.includes(aliasName) && inputBase !== aliasBase;
 
@@ -408,15 +403,16 @@ const createOrUpdateEntry = (
     );
 
     if (entry === undefined) {
-        entry = entries[
-            entries.push({
-                environment: entryEnvironment,
-                exportKey: new Set([output.exportKey].filter(Boolean)),
-                fileAlias: needsFileAlias ? aliasName : undefined,
-                input,
-                runtime,
-            }) - 1
-        ];
+        entry
+            = entries[
+                entries.push({
+                    environment: entryEnvironment,
+                    exportKey: new Set([output.exportKey].filter(Boolean)),
+                    fileAlias: needsFileAlias ? aliasName : undefined,
+                    input,
+                    runtime,
+                }) - 1
+            ];
     } else if (entry.exportKey && output.exportKey) {
         entry.exportKey.add(output.exportKey);
     }

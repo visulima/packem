@@ -57,13 +57,7 @@ const writeTsconfig = (rootDirectory: string, runInDom: boolean): void => {
     /* eslint-enable perfectionist/sort-objects -- end tsconfig literal. */
 };
 
-const buildCssImports = (
-    cssEnabled: boolean,
-    cssLoaders: string[],
-    cssMinifier: CssMinifier,
-    cssMinifierEnabled: boolean,
-    useEsm: boolean,
-): string => {
+const buildCssImports = (cssEnabled: boolean, cssLoaders: string[], cssMinifier: CssMinifier, cssMinifierEnabled: boolean, useEsm: boolean): string => {
     let imports = "";
 
     if (cssEnabled) {
@@ -107,13 +101,7 @@ const buildCssConfigBlock = (cssEnabled: boolean, cssMinifier: CssMinifier, cssM
     return block;
 };
 
-const buildConfigTemplate = (
-    useEsm: boolean,
-    transformer: string,
-    runtime: string,
-    imports: string,
-    packemConfig: string,
-): string => {
+const buildConfigTemplate = (useEsm: boolean, transformer: string, runtime: string, imports: string, packemConfig: string): string => {
     if (useEsm) {
         return `import { defineConfig } from "@visulima/packem/config";
 import transformer from "@visulima/packem/transformer/${transformer}";
@@ -400,13 +388,7 @@ const createInitCommand = (cli: Cli<Console>): void => {
 
             const packemConfig = buildCssConfigBlock(cssEnabled, cssMinifier, cssMinifierEnabled, cssLoaders);
             const imports = buildCssImports(cssEnabled, cssLoaders, cssMinifier, cssMinifierEnabled, useEsm);
-            const template = buildConfigTemplate(
-                useEsm,
-                options.transformer ?? "",
-                options.runtime ?? "",
-                imports,
-                packemConfig,
-            );
+            const template = buildConfigTemplate(useEsm, options.transformer ?? "", options.runtime ?? "", imports, packemConfig);
 
             const s = spinner();
 

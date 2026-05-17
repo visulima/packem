@@ -170,8 +170,7 @@ const hasNodeLikeExportKey = (exportKey: Set<string>): boolean => {
     return false;
 };
 
-const fileAliasIndicatesNode = (fileAlias: string): boolean =>
-    fileAlias.includes(".server") || fileAlias.includes(".node") || fileAlias.includes(".workerd");
+const fileAliasIndicatesNode = (fileAlias: string): boolean => fileAlias.includes(".server") || fileAlias.includes(".node") || fileAlias.includes(".workerd");
 
 /**
  * Resolves the runtime for a single entry from its export keys and file

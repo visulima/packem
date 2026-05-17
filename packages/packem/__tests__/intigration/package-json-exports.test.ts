@@ -39,8 +39,7 @@ const REACT_NATIVE_LITERAL_REGEX = /"react-native"/;
 
 const API_LITERAL_REGEX = /"api:"/;
 
-const SIZE_REPORT_INDEX_REACT_SERVER_REGEX
-    = /dist\/index\.react-server\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/;
+const SIZE_REPORT_INDEX_REACT_SERVER_REGEX = /dist\/index\.react-server\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/;
 
 const SIZE_REPORT_FOO_REGEX = /dist\/foo\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/;
 

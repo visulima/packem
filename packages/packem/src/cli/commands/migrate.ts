@@ -109,9 +109,7 @@ const migrateScript = (key: string, value: string, logger: CommandLogger): strin
         if (next.includes(oldCmd)) {
             logger.info(`Migrating \`${key}\` script from ${oldCmd} to packem`);
             changed = true;
-            next = next
-                .replaceAll(new RegExp(String.raw`\b${oldCmd}\b`, "g"), "packem")
-                .replaceAll(new RegExp(String.raw`\b${oldCmd}-node\b`, "g"), "packem");
+            next = next.replaceAll(new RegExp(String.raw`\b${oldCmd}\b`, "g"), "packem").replaceAll(new RegExp(String.raw`\b${oldCmd}-node\b`, "g"), "packem");
         }
     }
 
@@ -156,10 +154,7 @@ const migrateScripts = (scripts: Record<string, string>, logger: CommandLogger):
  * @param logger Logger instance for output
  * @returns The updated package.json and whether anything changed
  */
-const migrateDependencies = (
-    parsedPkg: MigratablePackageJson,
-    logger: CommandLogger,
-): { found: boolean; pkg: MigratablePackageJson } => {
+const migrateDependencies = (parsedPkg: MigratablePackageJson, logger: CommandLogger): { found: boolean; pkg: MigratablePackageJson } => {
     const result: MigratablePackageJson = { ...parsedPkg };
     let found = false;
 

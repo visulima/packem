@@ -1542,9 +1542,7 @@ exports.AppContext = AppContext.AppContext;
 exports.index = index;
 `);
 
-            const cjsChunk1Content = await readFile(
-                `${temporaryDirectoryPath}/dist/${cjsMatches[0].replace("require('./", "").replace("');", "")}`,
-            );
+            const cjsChunk1Content = await readFile(`${temporaryDirectoryPath}/dist/${cjsMatches[0].replace("require('./", "").replace("');", "")}`);
 
             expect(cjsChunk1Content).toBe(`'use strict';
 
@@ -1557,9 +1555,7 @@ function sharedApi() {
 exports.sharedApi = sharedApi;
 `);
 
-            const cjsChunk2Content = await readFile(
-                `${temporaryDirectoryPath}/dist/${cjsMatches[1].replace("require('./", "").replace("');", "")}`,
-            );
+            const cjsChunk2Content = await readFile(`${temporaryDirectoryPath}/dist/${cjsMatches[1].replace("require('./", "").replace("');", "")}`);
 
             expect(cjsChunk2Content).toBe(`'use client';
 'use strict';
