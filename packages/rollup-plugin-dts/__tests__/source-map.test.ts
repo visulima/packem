@@ -23,10 +23,7 @@ const validateSourceMap = (sourcemap: string): void => {
     expect(consumer.names).toStrictEqual([]);
     expect(consumer.file).toBe("index.d.ts");
     expect(consumer.sourcesContent ?? []).toHaveLength(0);
-    expect(consumer.sources).toStrictEqual([
-        expect.stringContaining("fixtures/source-map/mod.ts"),
-        expect.stringContaining("fixtures/source-map/index.ts"),
-    ]);
+    expect(consumer.sources).toStrictEqual([expect.stringContaining("fixtures/source-map/mod.ts"), expect.stringContaining("fixtures/source-map/index.ts")]);
 
     const mappings: unknown[] = [];
 
@@ -43,6 +40,8 @@ describe("source-map", () => {
     });
 
     it("oxc", async () => {
+        expect.hasAssertions();
+
         const directory = path.join(temporaryDirectory, "source-map-oxc");
         const bundle = await rollup({
             input,
@@ -64,6 +63,8 @@ describe("source-map", () => {
     });
 
     it("tsc", async () => {
+        expect.hasAssertions();
+
         const directory = path.join(temporaryDirectory, "source-map-tsc");
         const bundle = await rollup({
             input,
@@ -85,6 +86,8 @@ describe("source-map", () => {
     });
 
     it("tsgo", async () => {
+        expect.hasAssertions();
+
         const directory = path.join(temporaryDirectory, "source-map-tsgo");
         const bundle = await rollup({
             input,
@@ -106,6 +109,8 @@ describe("source-map", () => {
     });
 
     it("disable dts source map only", async () => {
+        expect.assertions(4);
+
         const { chunks } = await rolldownBuild(input, [dts({ sourcemap: false })], {}, { sourcemap: true });
         const fileNames = chunks.map((chunk) => chunk.fileName);
 
