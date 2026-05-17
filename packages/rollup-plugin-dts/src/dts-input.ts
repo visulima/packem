@@ -7,21 +7,20 @@ const createDtsInputPlugin = ({ sideEffects }: Pick<OptionsResolved, "sideEffect
     return {
         name: "rollup-plugin-dts:dts-input",
 
-        options:
-            sideEffects
-                ? undefined
-                : (options) => {
-                    return {
-                        treeshake:
-                              options.treeshake === false
-                                  ? false
-                                  : {
-                                      ...typeof options.treeshake === "object" ? options.treeshake : {},
-                                      moduleSideEffects: false,
-                                  },
-                        ...options,
-                    };
-                },
+        options: sideEffects
+            ? undefined
+            : (options) => {
+                return {
+                    treeshake:
+                          options.treeshake === false
+                              ? false
+                              : {
+                                  ...typeof options.treeshake === "object" ? options.treeshake : {},
+                                  moduleSideEffects: false,
+                              },
+                    ...options,
+                };
+            },
 
         outputOptions(options) {
             return {

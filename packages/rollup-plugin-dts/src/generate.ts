@@ -13,18 +13,7 @@ import { createDebug } from "obug";
 import { isolatedDeclarationSync, transformSync } from "oxc-transform";
 import type { Plugin, SourceMapInput } from "rollup";
 
-import {
-    filenameToDts,
-    RE_DTS,
-    RE_DTS_MAP,
-    RE_JS,
-    RE_JSON,
-    RE_NODE_MODULES,
-    RE_TS,
-    RE_VUE,
-    replaceTemplateName,
-    resolveTemplateFunction,
-} from "./filename";
+import { filenameToDts, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
 import type { TscContext } from "./tsc/context";
 import { createContext, globalContext, invalidateContextFile } from "./tsc/context";
@@ -232,7 +221,7 @@ export const createGeneratePlugin = ({
                         // Include codeframe in message so it appears in String(error)
                         return this.error({
                             frame: error?.codeframe || undefined,
-                            message: error?.codeframe ? `${error.message}\n${error.codeframe}` : error?.message ?? "Unknown error",
+                            message: error?.codeframe ? `${error.message}\n${error.codeframe}` : (error?.message ?? "Unknown error"),
                         });
                     }
 

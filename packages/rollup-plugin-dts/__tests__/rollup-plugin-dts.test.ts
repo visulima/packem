@@ -16,17 +16,18 @@ const TRAILING_SEMICOLON_RE = /;$/gm;
 
 const isUpdateEnabled = process.env.npm_lifecycle_script?.includes("-u") ?? process.env.npm_lifecycle_script?.includes("--update") ?? false;
 
-const cleanupCode = (text: string): string => `${text
-    .replaceAll(REGION_COMMENT_RE, "")
-    .replaceAll("//#endregion", "")
-    .replaceAll(FROM_DOUBLE_QUOTE_RE, "from '$1'")
-    // Normalize: the legacy rollup-plugin-dts emits `export type` while the new plugin emits `export`
-    .replaceAll("export type", "export")
-    .split("\n")
-    .filter((line) => line.trim() !== "")
-    .join("\n")
-    .replaceAll(TRAILING_SEMICOLON_RE, "")
-    .trim()}\n`;
+const cleanupCode = (text: string): string =>
+    `${text
+        .replaceAll(REGION_COMMENT_RE, "")
+        .replaceAll("//#endregion", "")
+        .replaceAll(FROM_DOUBLE_QUOTE_RE, "from '$1'")
+        // Normalize: the legacy rollup-plugin-dts emits `export type` while the new plugin emits `export`
+        .replaceAll("export type", "export")
+        .split("\n")
+        .filter((line) => line.trim() !== "")
+        .join("\n")
+        .replaceAll(TRAILING_SEMICOLON_RE, "")
+        .trim()}\n`;
 
 const buildSnapshots = async (entries: string[]): Promise<[string, string]> => {
     const [rolldownSnap, rollupSnap] = await Promise.all([

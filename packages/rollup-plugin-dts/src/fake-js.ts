@@ -9,15 +9,7 @@ import t from "@babel/types";
 import { isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST } from "ast-kit";
 import type { Plugin, RenderedChunk, TransformPluginContext, TransformResult } from "rollup";
 
-import {
-    filenameDtsTo,
-    filenameJsToDts,
-    filenameToDts,
-    RE_DTS,
-    RE_DTS_MAP,
-    replaceTemplateName,
-    resolveTemplateFunction,
-} from "./filename";
+import { filenameDtsTo, filenameJsToDts, filenameToDts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
 
 // input:
@@ -288,10 +280,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 // (e.g. `declare module './foo'` — StringLiteral). `declare global { }`
                 // and `declare module Foo { }` already have valid Identifier ids and
                 // must keep their names so renderChunk emits the correct keyword.
-                binding
-                    = sideEffect && (binding as t.Node).type !== "Identifier"
-                        ? t.identifier(`_${getIdentifierIndex(identifierMap, "")}`)
-                        : binding;
+                binding = sideEffect && (binding as t.Node).type !== "Identifier" ? t.identifier(`_${getIdentifierIndex(identifierMap, "")}`) : binding;
                 bindings.push(binding as t.Identifier);
             } else {
                 const binding = t.identifier("export_default");
@@ -658,9 +647,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         const hasExport = program.body.some(
             (node) => node.type === "ExportNamedDeclaration" || node.type === "ExportDefaultDeclaration" || node.type === "ExportAllDeclaration",
         );
-        const hasModuleAugmentation = program.body.some(
-            (node) => node.type === "TSModuleDeclaration" && node.id.type === "StringLiteral",
-        );
+        const hasModuleAugmentation = program.body.some((node) => node.type === "TSModuleDeclaration" && node.id.type === "StringLiteral");
 
         if (!hasExport && hasModuleAugmentation) {
             program.body.push({
@@ -1141,12 +1128,14 @@ const patchTsNamespace = (nodes: t.Statement[]) => {
                     {
                         declaration: null,
                         source: null,
-                        specifiers: exports.properties.filter((property) => property.type === "ObjectProperty").map((property) => {
-                            const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
-                            const exported = property.key as t.Identifier;
+                        specifiers: exports.properties
+                            .filter((property) => property.type === "ObjectProperty")
+                            .map((property) => {
+                                const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
+                                const exported = property.key as t.Identifier;
 
-                            return t.exportSpecifier(local, exported);
-                        }),
+                                return t.exportSpecifier(local, exported);
+                            }),
                         type: "ExportNamedDeclaration",
                     },
                 ],
