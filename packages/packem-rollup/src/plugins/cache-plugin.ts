@@ -178,11 +178,7 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             const result: unknown = await getHandler(plugin.transform).call(contextWithWatcher, code, id);
 
             if (watchFiles.length > 0) {
-                cache.set(
-                    cacheKey,
-                    { [PACKEM_WATCH_FILES]: watchFiles, result } satisfies WatchFilesCacheValue,
-                    pluginPath,
-                );
+                cache.set(cacheKey, { [PACKEM_WATCH_FILES]: watchFiles, result } satisfies WatchFilesCacheValue, pluginPath);
             } else {
                 cache.set(cacheKey, result as Parameters<typeof cache.set>[1], pluginPath);
             }

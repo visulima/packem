@@ -124,12 +124,7 @@ describe("nativeModules plugin", () => {
         type GenerateBundleArguments = Parameters<typeof handler>;
 
         // This should not throw an error even with empty modulesToCopy
-        await expect(
-            handler.call(
-                mockContext as unknown as Context,
-                ...([{}, {}, true] as unknown as GenerateBundleArguments),
-            ),
-        ).resolves.toBeUndefined();
+        await expect(handler.call(mockContext as unknown as Context, ...([{}, {}, true] as unknown as GenerateBundleArguments))).resolves.toBeUndefined();
     });
 
     it("should extract output directory from Rollup options", () => {
@@ -140,11 +135,14 @@ describe("nativeModules plugin", () => {
 
         type Context = ThisParameterType<typeof handler>;
 
-        const result = handler.call(mockContext as unknown as Context, {
-            output: {
-                dir: "/test/output",
-            },
-        } as Parameters<typeof handler>[0]);
+        const result = handler.call(
+            mockContext as unknown as Context,
+            {
+                output: {
+                    dir: "/test/output",
+                },
+            } as Parameters<typeof handler>[0],
+        );
 
         expect(result).toStrictEqual({
             output: {

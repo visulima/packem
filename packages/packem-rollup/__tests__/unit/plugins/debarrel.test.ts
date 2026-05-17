@@ -24,26 +24,36 @@ const getTransformHandler = (plugin: Plugin): TransformHandler => {
 };
 
 // Mock fs module
-vi.mock(import("node:fs/promises"), () => ({
-    default: {
-        readFile: vi.fn<(path: string, encoding?: string) => Promise<string>>(),
-    },
-}) as unknown as typeof import("node:fs/promises"));
+vi.mock(
+    import("node:fs/promises"),
+    () =>
+        ({
+            default: {
+                readFile: vi.fn<(path: string, encoding?: string) => Promise<string>>(),
+            },
+        }) as unknown as typeof import("node:fs/promises"),
+);
 
 // Mock rs-module-lexer to avoid memory issues in tests
-vi.mock(import("rs-module-lexer"), () => ({
-    parseAsync: vi.fn<() => Promise<{ output: { exports: unknown[]; facade: boolean; filename: string; hasModuleSyntax: boolean; imports: unknown[] }[] }>>().mockResolvedValue({
-        output: [
-            {
-                exports: [],
-                facade: false,
-                filename: "",
-                hasModuleSyntax: true,
-                imports: [],
-            },
-        ],
-    }),
-}) as unknown as typeof import("rs-module-lexer"));
+vi.mock(
+    import("rs-module-lexer"),
+    () =>
+        ({
+            parseAsync: vi
+                .fn<() => Promise<{ output: { exports: unknown[]; facade: boolean; filename: string; hasModuleSyntax: boolean; imports: unknown[] }[] }>>()
+                .mockResolvedValue({
+                    output: [
+                        {
+                            exports: [],
+                            facade: false,
+                            filename: "",
+                            hasModuleSyntax: true,
+                            imports: [],
+                        },
+                    ],
+                }),
+        }) as unknown as typeof import("rs-module-lexer"),
+);
 
 describe(debarrelPlugin, () => {
     const mockLogger = {

@@ -31,9 +31,7 @@ const collectAuthorNames = (author: unknown, maintainers: unknown[], contributor
     const names = new Set<string>();
 
     for (const person of [author, ...maintainers, ...contributors]) {
-        const personName = typeof person === "string"
-            ? person
-            : (person as { name?: string } | null | undefined)?.name;
+        const personName = typeof person === "string" ? person : (person as { name?: string } | null | undefined)?.name;
 
         if (personName) {
             names.add(personName);

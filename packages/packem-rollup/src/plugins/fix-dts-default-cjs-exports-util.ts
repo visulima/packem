@@ -681,7 +681,7 @@ const fixDtsDefaultCJSExports = (
                     = defaultImport // An import for the module existed
                         && parsedExports.defaultExport.specifier // It was a re-export
                         && defaultAlias !== "default" // It was a named alias to default
-                        && (defaultImport.namedImports?.[defaultAlias] !== defaultAlias); // And the specific alias wasn't found in the import
+                        && defaultImport.namedImports?.[defaultAlias] !== defaultAlias; // And the specific alias wasn't found in the import
 
                 if (resultString === undefined && wasSpecificNamedExportWarning) {
                     // Do nothing here. resultString is already undefined, and we want to propagate that.
@@ -722,13 +722,15 @@ const fixDtsDefaultCJSExports = (
             && lastStatement.specifiers.every((s) => s.exportKind === "type")
         ) {
             isPureTypeExportBlock = true;
-            typeExportNames = lastStatement.specifiers.map((s) => {
-                if (s.local.type === "Identifier") {
-                    return s.local.name;
-                }
+            typeExportNames = lastStatement.specifiers
+                .map((s) => {
+                    if (s.local.type === "Identifier") {
+                        return s.local.name;
+                    }
 
-                return "";
-            }).filter(Boolean);
+                    return "";
+                })
+                .filter(Boolean);
         }
     }
 

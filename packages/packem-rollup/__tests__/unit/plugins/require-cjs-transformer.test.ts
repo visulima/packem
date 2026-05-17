@@ -28,7 +28,12 @@ describe(requireCJSTransformerPlugin, async () => {
     it("plugin exports correctly", () => {
         expect.assertions(3);
 
-        const plugin = requireCJSTransformerPlugin({}, { debug: vi.fn<() => void>(), error: vi.fn<() => void>(), info: vi.fn<() => void>(), warn: vi.fn<() => void>() } as unknown as Console);
+        const plugin = requireCJSTransformerPlugin({}, {
+            debug: vi.fn<() => void>(),
+            error: vi.fn<() => void>(),
+            info: vi.fn<() => void>(),
+            warn: vi.fn<() => void>(),
+        } as unknown as Console);
 
         expect(plugin).toBeDefined();
         expect(plugin.name).toBe("packem:plugin-require-cjs");
@@ -56,14 +61,14 @@ export const test = 'hello';`;
             debug: vi.fn<() => void>(),
         };
 
-        const result = await getRenderChunkHandler(plugin).call(
+        const result = (await getRenderChunkHandler(plugin).call(
             { debug: mockLogger.debug } as unknown as ThisParameterType<RenderChunkHandler>,
             code,
             { fileName: "test.js" } as RenderedChunk,
             { format: "es" } as Parameters<RenderChunkHandler>[2],
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             {} as any,
-        ) as RenderChunkResult;
+        )) as RenderChunkResult;
 
         // Should transform the code
         expect(result).toBeDefined();
@@ -122,14 +127,14 @@ console.log(process.version);`;
             debug: vi.fn<() => void>(),
         };
 
-        const result = await getRenderChunkHandler(plugin).call(
+        const result = (await getRenderChunkHandler(plugin).call(
             { debug: mockLogger.debug } as unknown as ThisParameterType<RenderChunkHandler>,
             code,
             { fileName: "test.js" } as RenderedChunk,
             { format: "es" } as Parameters<RenderChunkHandler>[2],
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             {} as any,
-        ) as RenderChunkResult;
+        )) as RenderChunkResult;
 
         // Should transform the code
         expect(result).toBeDefined();

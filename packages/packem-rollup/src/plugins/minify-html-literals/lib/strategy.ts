@@ -168,9 +168,7 @@ export const defaultMinifyOptions: HTMLOptions = {
 export const adjustMinifyCSSOptions = (options: CleanCSS.Options = {}): CleanCSS.Options => {
     const level = optimizationLevelFrom(options.level);
     const originalTransform: ((property: string, value: string) => string) | false
-        = typeof options.level === "object" && typeof options.level[1]?.transform === "function"
-            ? options.level[1].transform
-            : false;
+        = typeof options.level === "object" && typeof options.level[1]?.transform === "function" ? options.level[1].transform : false;
 
     level[OptimizationLevel.One].transform = (property: string, value: string): string => {
         if (value.startsWith("@TEMPLATE_EXPRESSION") && !value.endsWith(";")) {
@@ -270,9 +268,7 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
             }
         }
 
-        const adjustedLevels = adjustedMinifyCSSOptions
-            ? (adjustedMinifyCSSOptions.level as OptimizationLevels | undefined)
-            : undefined;
+        const adjustedLevels = adjustedMinifyCSSOptions ? (adjustedMinifyCSSOptions.level as OptimizationLevels | undefined) : undefined;
 
         if (adjustedLevels?.[OptimizationLevel.One]?.tidySelectors) {
             // Fix https://github.com/jakubpawlowicz/clean-css/issues/996

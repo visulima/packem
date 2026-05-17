@@ -7,12 +7,13 @@ type TransformFunction = (code: string, id: string) => Promise<TransformResult>;
 
 const HTML_JS_RE = /\.html\.js$/;
 
-const createMockLogger = (): Console => ({
-    debug: vi.fn<() => void>(),
-    error: vi.fn<() => void>(),
-    info: vi.fn<() => void>(),
-    warn: vi.fn<() => void>(),
-} as unknown as Console);
+const createMockLogger = (): Console =>
+    ({
+        debug: vi.fn<() => void>(),
+        error: vi.fn<() => void>(),
+        info: vi.fn<() => void>(),
+        warn: vi.fn<() => void>(),
+    }) as unknown as Console;
 
 describe(minifyHTMLLiteralsPlugin, () => {
     it("should return a plugin object", () => {

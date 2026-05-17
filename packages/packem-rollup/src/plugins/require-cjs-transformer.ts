@@ -159,7 +159,7 @@ export type TransformFunction = (
      * Rollup resolve function for better module resolution
      */
     rollupResolve: (id: string, importer?: string) => Promise<ResolvedId | null>,
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- void is intentionally allowed for hooks that may not return anything
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- void is intentionally allowed for hooks that may not return anything
 ) => Awaitable<boolean | undefined | void>;
 
 export interface Options {

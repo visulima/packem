@@ -27,8 +27,7 @@ function stripLicenseComment(comment: string): string {
     return licenseCommentsRE.test(comment) ? "" : comment;
 }
 
-const cleanUnnecessaryComments = (code: string): string =>
-    code.replaceAll(multilineCommentsRE, stripLicenseComment).replaceAll(consecutiveNewlinesRE, "\n\n");
+const cleanUnnecessaryComments = (code: string): string => code.replaceAll(multilineCommentsRE, stripLicenseComment).replaceAll(consecutiveNewlinesRE, "\n\n");
 
 const calledDtsFiles = new Map<string, boolean>();
 
@@ -38,7 +37,13 @@ const calledDtsFiles = new Map<string, boolean>();
  * sensibly in IDE autocompletions.
  */
 // eslint-disable-next-line func-style
-function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: RenderedChunk, { identifierReplacements }: PatchTypesOptions, logger: Console): string {
+function replaceConfusingTypeNames(
+    this: PluginContext,
+    code: string,
+    chunk: RenderedChunk,
+    { identifierReplacements }: PatchTypesOptions,
+    logger: Console,
+): string {
     const imports = findStaticImports(code);
     let nextCode = code;
 

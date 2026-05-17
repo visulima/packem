@@ -60,13 +60,12 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const rollupContext = { warn: mockWarn } as unknown as ThisParameterType<RenderChunkHandler>;
             const directRenderChunk = getRenderChunkHandler(pluginInstance);
 
-            renderChunk = (code, chunk, options, meta) => directRenderChunk.call(
-                rollupContext,
-                code,
-                chunk as RenderedChunk,
-                options,
-                meta,
-            ) as string | { code: string; map?: unknown } | null | undefined;
+            renderChunk = (code, chunk, options, meta) =>
+                directRenderChunk.call(rollupContext, code, chunk as RenderedChunk, options, meta) as
+                | string
+                | { code: string; map?: unknown }
+                | null
+                | undefined;
         });
 
         afterEach(() => {
@@ -366,13 +365,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
 
             const result
                 = typeof plugin.renderChunk === "function"
-                    ? plugin.renderChunk.call(
-                        mockContext,
-                        code,
-                        chunkInfo as RenderedChunk,
-                        {} as NormalizedOutputOptions,
-                        { chunks: {} },
-                    )
+                    ? plugin.renderChunk.call(mockContext, code, chunkInfo as RenderedChunk, {} as NormalizedOutputOptions, { chunks: {} })
                     : undefined;
 
             expect(result).toBeUndefined();
@@ -394,13 +387,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
 
             const result
                 = typeof plugin.renderChunk === "function"
-                    ? plugin.renderChunk.call(
-                        mockContext,
-                        code,
-                        chunkInfo as RenderedChunk,
-                        {} as NormalizedOutputOptions,
-                        { chunks: {} },
-                    )
+                    ? plugin.renderChunk.call(mockContext, code, chunkInfo as RenderedChunk, {} as NormalizedOutputOptions, { chunks: {} })
                     : undefined;
 
             expect(result).toBeUndefined();
