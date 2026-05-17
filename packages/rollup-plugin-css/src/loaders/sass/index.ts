@@ -65,14 +65,16 @@ const loader: Loader<SassLoaderOptions> = {
             resultMap = normalizeSourceMap(resultMap);
         }
 
-        result.loadedUrls.filter((loadedUrl) => loadedUrl.protocol === "file:").forEach((includedFile) => {
-            const normalizedIncludedFile = fileURLToPath(includedFile);
+        result.loadedUrls
+            .filter((loadedUrl) => loadedUrl.protocol === "file:")
+            .forEach((includedFile) => {
+                const normalizedIncludedFile = fileURLToPath(includedFile);
 
-            // Custom `importer` can return only `contents` so includedFile will be relative
-            if (isAbsolute(normalizedIncludedFile)) {
-                this.deps.add(normalizedIncludedFile);
-            }
-        });
+                // Custom `importer` can return only `contents` so includedFile will be relative
+                if (isAbsolute(normalizedIncludedFile)) {
+                    this.deps.add(normalizedIncludedFile);
+                }
+            });
 
         return {
             code: Buffer.from(result.css).toString(),

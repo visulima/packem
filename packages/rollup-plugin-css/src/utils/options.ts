@@ -259,7 +259,12 @@ export const ensurePCSSPlugins = async (plugins: PostCSSOptions["plugins"], cwd:
 
         if (options) {
             // eslint-disable-next-line no-await-in-loop
-            const factory = await ensurePCSSOption<(pluginOptions: unknown) => ResultPlugin>(plug as string | ((pluginOptions: unknown) => ResultPlugin), "plugin", cwd, logger);
+            const factory = await ensurePCSSOption<(pluginOptions: unknown) => ResultPlugin>(
+                plug as string | ((pluginOptions: unknown) => ResultPlugin),
+                "plugin",
+                cwd,
+                logger,
+            );
 
             ps.push(factory(options));
         } else {

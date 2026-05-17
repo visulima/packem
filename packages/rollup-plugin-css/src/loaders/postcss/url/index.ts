@@ -175,9 +175,7 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
                     const publicPathSuffix = typeof options.publicPath === "string" && !TRAILING_SLASH_REGEXP.test(options.publicPath) ? "/" : "";
                     const resolvedPublicPath
-                        = typeof options.publicPath === "string"
-                            ? options.publicPath + publicPathSuffix + basename(to)
-                            : `${defaultPublicPath}${basename(to)}`;
+                        = typeof options.publicPath === "string" ? options.publicPath + publicPathSuffix + basename(to) : `${defaultPublicPath}${basename(to)}`;
 
                     node.type = "string";
                     node.value = typeof options.publicPath === "function" ? options.publicPath(node.value, resolvedPublicPath, file) : resolvedPublicPath;

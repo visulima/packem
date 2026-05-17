@@ -28,8 +28,6 @@ describe("loader", () => {
             },
         });
 
-        await expect(
-            loaders.process({ code: "" }, { id: "file.less" } as unknown as LoaderContext),
-        ).resolves.toStrictEqual({ code: "" });
+        await expect(loaders.process({ code: "" }, { id: "file.less" } as unknown as LoaderContext)).resolves.toStrictEqual({ code: "" });
     });
 });

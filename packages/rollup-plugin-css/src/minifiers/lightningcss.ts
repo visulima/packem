@@ -44,11 +44,7 @@ const lightningcssMinifier: Minifier<NonNullable<InternalStyleOptions["lightning
      * @param options LightningCSS-specific transformation options.
      * @returns Promise resolving to optimized CSS data.
      */
-    handler(
-        data: ExtractedData,
-        sourceMap: LoaderContext["sourceMap"],
-        options: NonNullable<InternalStyleOptions["lightningcss"]>,
-    ): Promise<ExtractedData> {
+    handler(data: ExtractedData, sourceMap: LoaderContext["sourceMap"], options: NonNullable<InternalStyleOptions["lightningcss"]>): Promise<ExtractedData> {
         // Transform CSS using LightningCSS with minification enabled
         const result = transform({
             ...options,

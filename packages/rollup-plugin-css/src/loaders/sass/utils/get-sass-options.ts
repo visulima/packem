@@ -16,7 +16,6 @@ const getSassOptions = async (
     options: SassLoaderOptions,
     content: string,
     useSourceMap: boolean,
-
 ): Promise<SassLoaderOptions> => {
     const { warnRuleAsWarning, ...otherOptions } = options;
     let data = content;
@@ -108,14 +107,16 @@ const getSassOptions = async (
     };
 
     (sassOptions as StringOptions<"async">).loadPaths = [
-        ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map(
-            (includePath) => normalizeIncludePath(includePath),
+        ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map((includePath) =>
+            normalizeIncludePath(includePath),
         ),
         ...process.env.SASS_PATH ? process.env.SASS_PATH.split(separator) : [],
     ];
 
     if ((sassOptions as StringOptions<"async">).importers) {
-        (sassOptions as StringOptions<"async">).importers = Array.isArray((sassOptions as StringOptions<"async">).importers) ? [...((sassOptions as StringOptions<"async">).importers as Importer[])] : (sassOptions as StringOptions<"async">).importers;
+        (sassOptions as StringOptions<"async">).importers = Array.isArray((sassOptions as StringOptions<"async">).importers)
+            ? [...((sassOptions as StringOptions<"async">).importers as Importer[])]
+            : (sassOptions as StringOptions<"async">).importers;
     } else {
         (sassOptions as StringOptions<"async">).importers = [];
     }
