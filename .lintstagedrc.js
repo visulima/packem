@@ -14,7 +14,11 @@ const groupByPackage = (files) => {
     const groups = new Map();
 
     for (const file of files) {
-        const match = file.match(/^(.*\/packages\/[^/]+)\//);
+        // Lazy match so the FIRST `packages/<pkg>` segment wins. A greedy `.*`
+        // would pick the innermost one — e.g. a fixture's nested fake package
+        // (`__fixtures__/.../packages/packi`) — and `pnpm --dir` would fail with
+        // ERR_PNPM_RECURSIVE_EXEC_NO_PACKAGE since it is not a workspace member.
+        const match = file.match(/^(.*?\/packages\/[^/]+)\//);
         const packageDirectory = match ? match[1] : process.cwd();
 
         if (!groups.has(packageDirectory)) {
@@ -27,8 +31,13 @@ const groupByPackage = (files) => {
     return groups;
 };
 
+// Fixture trees hold `.ts`/`.js` data files (and fake nested package.json /
+// tsconfig setups) that are inputs to tests, not tests themselves. Running
+// `vitest related` on them is meaningless and trips on the fake packages.
+const isFixtureFile = (file) => /\/__fixtures__\/|\/__tests__\/fixtures\//.test(file);
+
 const testCommand = (files) =>
-    [...groupByPackage(files)].map(
+    [...groupByPackage(files.filter((file) => !isFixtureFile(file)))].map(
         ([packageDirectory, relativeFiles]) =>
             `pnpm --dir ${JSON.stringify(packageDirectory)} exec vitest related --run ${relativeFiles
                 .map((relativeFile) => JSON.stringify(relativeFile))
