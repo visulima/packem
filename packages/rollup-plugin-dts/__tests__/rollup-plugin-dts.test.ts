@@ -96,7 +96,7 @@ const handleDiff = async (diff: string, diffPath: string, knownDiffPath: string)
 };
 
 await testFixtures(
-    "tests/rollup-plugin-dts/**/{index,main-a}.d.ts",
+    "__tests__/__fixtures__/rollup-plugin-dts/**/{index,main-a}.d.ts",
     async (_arguments, id) => {
         const dirname = path.dirname(id);
 
