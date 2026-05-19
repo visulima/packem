@@ -81,7 +81,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@main"
+              uses: "anolilab/workflows/step/setup@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
@@ -97,10 +97,14 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              run: "pnpm run build:affected:packages --files=${{ steps.files.outputs.all_changed_files }}"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
+              run: "pnpm run build:affected:packages --files=\"$ALL_CHANGED_FILES\""
 
             - name: "lint eslint"
-              run: "pnpm run lint:affected:eslint --files=${{ steps.files.outputs.all_changed_files }}"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
+              run: "pnpm run lint:affected:eslint --files=\"$ALL_CHANGED_FILES\""
 
             - name: "Prepare nx cache"
               shell: "bash"
@@ -134,7 +138,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@main"
+              uses: "anolilab/workflows/step/setup@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
@@ -151,10 +155,14 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              run: "pnpm run build:affected:packages --files=${{ steps.files.outputs.all_changed_files }}"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
+              run: "pnpm run build:affected:packages --files=\"$ALL_CHANGED_FILES\""
 
             - name: "lint attw"
-              run: "pnpm run lint:affected:attw --files=${{ steps.files.outputs.all_changed_files }}"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
+              run: "pnpm run lint:affected:attw --files=\"$ALL_CHANGED_FILES\""
 
             - name: "Prepare nx cache"
               shell: "bash"
@@ -188,7 +196,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@main"
+              uses: "anolilab/workflows/step/setup@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
@@ -204,10 +212,14 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              run: "pnpm run build:affected:packages --files=${{ steps.files.outputs.all_changed_files }}"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
+              run: "pnpm run build:affected:packages --files=\"$ALL_CHANGED_FILES\""
 
             - name: "lint package.json"
-              run: "pnpm run lint:affected:package-json --files=${{ steps.files.outputs.all_changed_files }}"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
+              run: "pnpm run lint:affected:package-json --files=\"$ALL_CHANGED_FILES\""
 
             - name: "Prepare nx cache"
               shell: "bash"
@@ -241,7 +253,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@main"
+              uses: "anolilab/workflows/step/setup@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
@@ -257,10 +269,14 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              run: "pnpm run build:affected:packages --files=${{ steps.files.outputs.all_changed_files }}"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
+              run: "pnpm run build:affected:packages --files=\"$ALL_CHANGED_FILES\""
 
             - name: "lint typescript files"
-              run: "pnpm run lint:affected:types --files=${{ steps.files.outputs.all_changed_files }}"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
+              run: "pnpm run lint:affected:types --files=\"$ALL_CHANGED_FILES\""
 
             - name: "Prepare nx cache"
               shell: "bash"

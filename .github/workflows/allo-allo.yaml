@@ -13,7 +13,7 @@ on: # yamllint disable-line rule:truthy
 
 jobs:
     allo-allo:
-        uses: "anolilab/workflows/.github/workflows/allo-allo.yml@main"
+        uses: "anolilab/workflows/.github/workflows/allo-allo.yml@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1
         with:
             target-repo: "visulima/packem"
             onboarding-lead: "prisis"

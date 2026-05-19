@@ -11,6 +11,6 @@ on: # yamllint disable-line rule:truthy
 
 jobs:
     stale-issues:
-        uses: "anolilab/workflows/.github/workflows/semantic-pull-request.yml@main"
+        uses: "anolilab/workflows/.github/workflows/semantic-pull-request.yml@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1
         with:
             target-repo: "visulima/packem"

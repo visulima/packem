@@ -93,7 +93,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@main"
+              uses: "anolilab/workflows/step/setup@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1
               with:
                   node-version: "${{ matrix.node_version }}"
                   install-packages: "false"
@@ -124,19 +124,23 @@ jobs:
 
             - name: "Build"
               shell: "bash"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               run: |
-                  files="${{ steps.files.outputs.all_changed_files }}";
-                  pnpm run build:affected:packages --files=${files//\\/\/}
+                  files="${ALL_CHANGED_FILES}";
+                  pnpm run build:affected:packages --files="${files//\\/\/}"
 
             - name: "Run tests"
               shell: "bash"
+              env:
+                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               run: |
-                  files="${{ steps.files.outputs.all_changed_files }}";
+                  files="${ALL_CHANGED_FILES}";
 
-                  if [[ ${{ matrix.os }} == "ubuntu-latest" && ${{ matrix.node_version }} == 22 ]]; then
-                      pnpm run test:affected:coverage --files=${files//\\/\/}
+                  if [[ "${{ matrix.os }}" == "ubuntu-latest" && "${{ matrix.node_version }}" == 22 ]]; then
+                      pnpm run test:affected:coverage --files="${files//\\/\/}"
                   else
-                      pnpm run test:affected --files=${files//\\/\/}
+                      pnpm run test:affected --files="${files//\\/\/}"
                   fi
 
             - name: "Prepare nx cache"
@@ -145,7 +149,7 @@ jobs:
 
             - name: "Upload code coverage to codecov"
               if: "matrix.os == 'ubuntu-latest' && matrix.node_version == 22"
-              uses: "anolilab/workflows/step/codecov@main"
+              uses: "anolilab/workflows/step/codecov@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1
               with:
                   run-lint: "needs.files-changed.outputs.codecov == 'true'"
                   codecov-token: "${{ secrets.CODECOV_TOKEN }}"
