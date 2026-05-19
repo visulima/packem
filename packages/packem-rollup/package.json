@@ -221,7 +221,7 @@
         "@types/is-glob": "catalog:types",
         "@types/node": "catalog:types",
         "@types/semver": "catalog:types",
-        "@visulima/packem": "workspace:*",
+        "@visulima/packem": "catalog:visulima",
         "@visulima/pail": "catalog:visulima",
         "@visulima/tsconfig": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",

@@ -144,7 +144,7 @@
         "@types/stylus": "catalog:types",
         "@types/uglifycss": "catalog:types",
         "@visulima/css-style-inject": "workspace:*",
-        "@visulima/packem": "workspace:*",
+        "@visulima/packem": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",

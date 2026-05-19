@@ -96,7 +96,7 @@
         "@types/debug": "catalog:types",
         "@types/node": "catalog:types",
         "@typescript/native-preview": "catalog:types",
-        "@visulima/packem": "workspace:*",
+        "@visulima/packem": "catalog:visulima",
         "@volar/typescript": "catalog:tsc",
         "@vue/language-core": "catalog:frontend",
         "conventional-changelog-conventionalcommits": "catalog:dev",
