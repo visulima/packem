@@ -50,89 +50,6 @@ export { fn, foo, something };
 "
 `;
 
-exports[`banner 1`] = `
-"// minimal.d.ts
-/* My Banner */
-declare function foo(): void;
-export { foo };
-/* My Footer minimal.d.ts */
-"
-`;
-
-exports[`basic 1`] = `
-"// basic.d.ts
-declare const foo: number;
-type SomeType<T> = T;
-type FooType = string;
-interface Interface {}
-declare function fn(argument0: SomeType<FooType>, opt: Interface): void;
-declare enum Enum {
-  A = 0,
-  B = 1,
-  C = 2,
-}
-declare class Cls {
-  foo: string;
-  fn(e: Enum): void;
-}
-export { Cls, Enum, fn, foo };
-
-// basic.js
-const foo = 42;
-function fn(argument0, opt) {}
-let Enum = /* @__PURE__ */ function(Enum) {
-	Enum[Enum["A"] = 0] = "A";
-	Enum[Enum["B"] = 1] = "B";
-	Enum[Enum["C"] = 2] = "C";
-	return Enum;
-}({});
-class Cls {
-	foo;
-	fn(e) {}
-}
-
-export { Cls, Enum, fn, foo };
-"
-`;
-
-exports[`cjs exports 1`] = `
-"// cjs-exports.js
-'use strict';
-
-var cjsExports = 42;
-
-module.exports = cjsExports;
-"
-`;
-
-exports[`cjs exports 2`] = `
-"// cjs-exports.d.ts
-declare const _default: 42;
-export = _default;
-"
-`;
-
-exports[`codeSplitting 1`] = `
-"// entry.d.ts
-import { t as shared1 } from "./shared1-chunk-DkzKviwR.js";
-
-//#region __tests__/fixtures/manual-chunk/shared2.d.ts
-declare const shared2 = "shared2";
-//#endregion
-export { shared1, shared2 };
-// shared1-chunk-DkzKviwR.d.ts
-//#region __tests__/fixtures/manual-chunk/shared1.d.ts
-declare const shared1 = "shared1";
-//#endregion
-export { shared1 as t };"
-`;
-
-exports[`css.ts files 1`] = `
-"// index.d.ts
-export * from './file.css';
-"
-`;
-
 exports[`declaration merging emits one export per bound name 1`] = `
 "// declaration-merging.d.ts
 declare function visit(node: unknown, visitor: (n: unknown) => void): void;
@@ -154,72 +71,6 @@ declare namespace Box {
   const empty: Box<null>;
 }
 export { Box, ZodError, visit };
-"
-`;
-
-exports[`declare module 1`] = `
-"// declare-module.d.ts
-declare module "virtual" {
-  const _default: string;
-  export default _default;
-}
-export {};
-"
-`;
-
-exports[`declare relative module 1`] = `
-"// main-bar.d.ts
-interface FooBar {
-  foobar: string;
-}
-declare module "./main-bar.js" {
-  interface FooBar {
-    foobar2: string;
-  }
-}
-declare module "./main-bar.js" {
-  interface Bar {
-    bar2: string;
-  }
-}
-interface FooBaz {
-  foobaz: string;
-}
-declare module "./main-foo.js" {
-  interface Foo {
-    foo2: string;
-  }
-}
-interface Bar {
-  bar: string;
-}
-export { Bar, FooBar, FooBaz };
-
-// main-baz/index.d.ts
-declare module "../main-foo.js" {
-  interface Foo {
-    baz: string;
-  }
-}
-interface Baz {
-  baz: string;
-}
-export { Baz };
-
-// main-foo.d.ts
-interface Foo {
-  foo: string;
-}
-export { Foo };
-"
-`;
-
-exports[`decorators 1`] = `
-"// decorator.d.ts
-declare class Product {
-  accessor price: number;
-}
-export { Product };
 "
 `;
 
@@ -322,20 +173,6 @@ interface User {
   name: string;
 }
 export { User as U };
-"
-`;
-
-exports[`dts input > input array 1`] = `
-"// dts-input.d.ts
-declare class Foo {}
-export { Foo };
-"
-`;
-
-exports[`dts input > input object 1`] = `
-"// index.d.ts
-declare class Foo {}
-export { Foo };
 "
 `;
 
@@ -1044,78 +881,6 @@ export { type Task, type TaskWrapper };
 "
 `;
 
-exports[`function overloads 1`] = `
-"// function-overloads.d.ts
-interface Config {
-  name: string;
-  version: number;
-}
-declare function useConfig(): Config;
-declare function useConfig<T>(selector: (config: Config) => T): T;
-export { useConfig };
-"
-`;
-
-exports[`infer false branch 1`] = `
-"// index.d.ts
-type U$1 = 'mod';
-type U = 'local';
-type Test<T> = T extends Array<infer U> ? (T extends Array<infer U2> ? U2 : U) : U;
-export { Test, type U$1 as U };
-"
-`;
-
-exports[`infer type parameter 1`] = `
-"// infer-type-param.d.ts
-type Mapped<T> = T extends Record<string, infer U> ? U : never;
-type Fn1<U = unknown> = () => Mapped<U>;
-type Fn2<V = unknown> = () => Mapped<V>;
-export { Fn1, Fn2 };
-"
-`;
-
-exports[`input alias 1`] = `
-"// output1.d.ts
-import { Input2 } from "./output2/index.js";
-interface Input1 extends Input2 {
-  input1: string;
-}
-declare const input1: Input1;
-export { Input1, input1 };
-
-// output1.js
-import { input2 } from './output2/index.js';
-
-const input1 = {
-	...input2,
-	input1: "input1"
-};
-
-export { input1 };
-
-// output2/index.d.ts
-interface Shared {
-  shared: string;
-}
-declare const shared: Shared;
-interface Input2 extends Shared {
-  input2: string;
-}
-declare const input2: Input2;
-export { Input2, input2 };
-
-// output2/index.js
-const shared = { shared: "shared" };
-
-const input2 = {
-	...shared,
-	input2: "input2"
-};
-
-export { input2 };
-"
-`;
-
 exports[`jSDoc comments in types are preserved when tsc emits them 1`] = `
 "// jsdoc-type-comments.d.ts
 declare const foo = "foo";
@@ -1144,18 +909,6 @@ export { fn, foo, something };
 "
 `;
 
-exports[`manualChunks 1`] = `
-"// entry.d.ts
-export { s as shared1 } from "./shared1-chunk-BbYo8D0c.js";
-declare const shared2 = "shared2";
-export { shared2 };
-
-// shared1-chunk-BbYo8D0c.d.ts
-declare const shared1 = "shared1";
-export { shared1 as s };
-"
-`;
-
 exports[`module augmentation files preserve export {} to remain modules 1`] = `
 "// index.d.ts
 declare module '@mui/material/Button' {
@@ -1179,23 +932,6 @@ export {};
 "
 `;
 
-exports[`paths 1`] = `
-"// index.d.ts
-declare const foo = 42;
-export { foo };
-"
-`;
-
-exports[`re-export from lib > both 1`] = `
-"// a.d.ts
-export * from 'stub-lib';
-
-// b.d.ts
-import "./a.js";
-export { type LibType } from 'stub-lib';
-"
-`;
-
 exports[`re-export from lib > onlyA 1`] = `
 "// a.d.ts
 export * from 'stub-lib';
@@ -1216,49 +952,11 @@ export { foo };
 "
 `;
 
-exports[`resolve dts 1`] = `
-"// index.d.ts
-type Foo = string;
-export { Foo };
-
-// index.js
-
-"
-`;
-
 exports[`scss imports are externalized 1`] = `
 "// index.d.ts
 import './styles.scss';
 declare const foo: number;
 export { foo };
-"
-`;
-
-exports[`side effects 1`] = `
-"// index.d.ts
-import "./mod.js";
-
-// mod.d.ts
-declare global {
-  let sideEffectExecuted: boolean;
-}
-"
-`;
-
-exports[`sub namespace 1`] = `
-"// sub-namespace.d.ts
-declare namespace Foo.Bar {}
-export { Foo };
-"
-`;
-
-exports[`tree-shaking 1`] = `
-"// index.d.ts
-type A = string;
-export { type A };
-
-// index.js
-
 "
 `;
 
@@ -1278,68 +976,5 @@ declare function readConfig(path: string): Buffer;
 declare function resolve(p: string): string;
 declare function getVersion(): string;
 export { getVersion, readConfig, resolve };
-"
-`;
-
-exports[`tsgo with custom path 1`] = `
-"// basic.d.ts
-declare const foo: number;
-type SomeType<T> = T;
-type FooType = string;
-interface Interface {}
-declare function fn(argument0: SomeType<FooType>, opt: Interface): void;
-declare enum Enum {
-  A = 0,
-  B = 1,
-  C = 2,
-}
-declare class Cls {
-  foo: string;
-  fn(e: Enum): void;
-}
-export { Cls, Enum, fn, foo };
-
-// basic.js
-const foo = 42;
-function fn(argument0, opt) {}
-let Enum = /* @__PURE__ */ function(Enum) {
-	Enum[Enum["A"] = 0] = "A";
-	Enum[Enum["B"] = 1] = "B";
-	Enum[Enum["C"] = 2] = "C";
-	return Enum;
-}({});
-class Cls {
-	foo;
-	fn(e) {}
-}
-
-export { Cls, Enum, fn, foo };
-"
-`;
-
-exports[`tsx 1`] = `
-"// tsx.d.ts
-import { JSX } from 'solid-js';
-declare function createComponent(): JSX.HTMLAttributes<HTMLElement>;
-export { createComponent };
-
-// tsx.js
-import { jsx } from 'react/jsx-runtime';
-
-function createComponent() {
-	return /* @__PURE__ */ jsx("div", {});
-}
-
-export { createComponent };
-"
-`;
-
-exports[`type-only export 1`] = `
-"// index.d.ts
-declare const all = 42;
-declare class A {}
-declare class B {}
-declare const ns$1 = 42;
-export { A as RuntimeA, type A as TypeA, type B as TypeB, type A as TypeC, all, type namespace_d as ns };
 "
 `;
