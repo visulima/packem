@@ -1044,12 +1044,12 @@ describe(validatePackageFields, () => {
                 },
                 pkg: {
                     exports: {
-                        default: "./dist/default.js",
-                        import: "./dist/esm.mjs",
-                        "module-sync": "./dist/sync.js",
-                        node: "./dist/node.js",
                         "node-addons": "./dist/addons.js",
+                        node: "./dist/node.js",
+                        import: "./dist/esm.mjs",
                         require: "./dist/cjs.cjs",
+                        "module-sync": "./dist/sync.js",
+                        default: "./dist/default.js",
                     },
                     sideEffects: false,
                 },
@@ -1136,11 +1136,11 @@ describe(validatePackageFields, () => {
                 pkg: {
                     exports: {
                         ".": {
-                            default: "./dist/default.js",
                             node: {
                                 import: "./dist/node.mjs",
                                 require: "./dist/node.cjs",
                             },
+                            default: "./dist/default.js",
                         },
                     },
                     sideEffects: false,

@@ -18,7 +18,7 @@ import type { InternalBuildOptions, ValidationOptions } from "../../types";
 const validateExports = (context: BuildContext<InternalBuildOptions>, exports: unknown): void => {
     const validation = context.options.validation as ValidationOptions;
 
-    if (!validation.packageJson?.exports) {
+    if (validation.packageJson?.exports === false) {
         return;
     }
 
@@ -53,7 +53,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
     ]);
 
     // Add extra conditions from validation options
-    const extraConditions = validation.packageJson.extraConditions ?? [];
+    const extraConditions = validation.packageJson?.extraConditions ?? [];
     const EXTRA_CONDITIONS = new Set(extraConditions);
 
     const ALL_CONDITIONS = new Set([...COMMUNITY_CONDITIONS, ...EXTRA_CONDITIONS, ...STANDARD_CONDITIONS]);
@@ -304,13 +304,13 @@ interface FieldValidationContext {
 }
 
 const validateNameAndFiles = ({ context, pkg, validation }: FieldValidationContext): void => {
-    if (pkg.name === undefined && validation.packageJson?.name) {
+    if (pkg.name === undefined && validation.packageJson?.name !== false) {
         warn(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     }
 
     // Omitting the field will make it default to ["*"], which means it will include all files.
     // @see {@link https://docs.npmjs.com/cli/v11/configuring-npm/package-json#files}
-    if (validation.packageJson?.files && Array.isArray(pkg.files) && !pkg.files.includes("*")) {
+    if (validation.packageJson?.files !== false && Array.isArray(pkg.files) && !pkg.files.includes("*")) {
         if (pkg.files.length === 0) {
             warn(context, "The 'files' field in your package.json is empty. Please specify the files to be included in the package.");
         } else if (!pkg.files.some((file) => file.includes(context.options.outDir))) {
@@ -323,7 +323,7 @@ const validateNameAndFiles = ({ context, pkg, validation }: FieldValidationConte
 };
 
 const validateCjsModuleFields = ({ cjsJSExtension, context, esmJSExtension, pkg, validation }: FieldValidationContext): void => {
-    if (validation.packageJson?.main) {
+    if (validation.packageJson?.main !== false) {
         if (pkg.main === undefined) {
             warn(context, "The 'main' field is missing in your package.json. This field should point to your main entry file.");
         }
@@ -333,7 +333,7 @@ const validateCjsModuleFields = ({ cjsJSExtension, context, esmJSExtension, pkg,
         }
     }
 
-    if (validation.packageJson?.module) {
+    if (validation.packageJson?.module !== false) {
         if (pkg.module === undefined && context.options.emitESM) {
             warn(context, "The 'module' field is missing in your package.json, but you are emitting ES modules.");
         }
@@ -352,11 +352,11 @@ const validateCjsModuleFields = ({ cjsJSExtension, context, esmJSExtension, pkg,
 };
 
 const validateEsmCjsEmitFields = ({ cjsJSExtension, context, pkg, validation }: FieldValidationContext): void => {
-    if (validation.packageJson?.main && pkg.main === undefined) {
+    if (validation.packageJson?.main !== false && pkg.main === undefined) {
         warn(context, "The 'main' field is missing in your package.json. This field is needed when emitting CommonJS modules.");
     }
 
-    if (validation.packageJson?.module) {
+    if (validation.packageJson?.module !== false) {
         if (pkg.module === undefined) {
             warn(context, "The 'module' field is missing in your package.json. This field is necessary when emitting ES modules.");
         }
@@ -373,7 +373,7 @@ const validateEsmCjsEmitFields = ({ cjsJSExtension, context, pkg, validation }: 
         }
     }
 
-    if (validation.packageJson?.exports && pkg.exports === undefined) {
+    if (validation.packageJson?.exports !== false && pkg.exports === undefined) {
         warn(context, "The 'exports' field is missing in your package.json. This field is required for defining explicit exports.");
     }
 };
@@ -382,7 +382,7 @@ const validateEsmModuleFields = (fieldContext: FieldValidationContext): void => 
     const { context, pkg, validation } = fieldContext;
 
     if (pkg.exports === undefined && !context.options.emitCJS) {
-        if (validation.packageJson?.exports) {
+        if (validation.packageJson?.exports !== false) {
             warn(context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
         }
     } else if (context.options.emitCJS) {
@@ -391,7 +391,7 @@ const validateEsmModuleFields = (fieldContext: FieldValidationContext): void => 
 };
 
 const validateBinExtensionFields = ({ cjsJSExtension, context, esmJSExtension, pkg, validation }: FieldValidationContext, isCjs: boolean): void => {
-    if (!validation.packageJson?.bin) {
+    if (validation.packageJson?.bin === false) {
         return;
     }
 
@@ -426,14 +426,14 @@ const validateDeclarationFields = ({ cjsJSExtension, context, pkg, validation }:
         showWarning = Boolean(pkg.main?.endsWith(`.${cjsJSExtension}`));
     }
 
-    if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation.packageJson?.types) {
+    if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation.packageJson?.types !== false) {
         warn(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
     }
 
     if (
         (context.options.declaration === true || context.options.declaration === "compatible")
         && showWarning
-        && validation.packageJson?.typesVersions
+        && validation.packageJson?.typesVersions !== false
         && (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
     ) {
         warn(
@@ -475,7 +475,7 @@ const validatePackageFields = (context: BuildContext<InternalBuildOptions>): voi
     validateBinExtensionFields(fieldContext, isCjs);
     validateDeclarationFields(fieldContext);
 
-    if (validation.packageJson?.sideEffects && pkg.sideEffects === undefined) {
+    if (validation.packageJson?.sideEffects !== false && pkg.sideEffects === undefined) {
         warn(context, "The 'sideEffects' field is missing in your package.json. Consider adding this field to your package.json.");
     }
 };
