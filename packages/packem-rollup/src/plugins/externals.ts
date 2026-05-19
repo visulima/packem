@@ -248,10 +248,16 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                 }
 
                 // Extract the package name for tracking.
-                const parsedName
-                    = (resolvedId && isBareSpecifier(resolvedId) && parseNodeModulePath(resolvedId).name)
-                        ?? (isBareSpecifier(originalId) && parseNodeModulePath(originalId).name)
-                        ?? (isBareSpecifier(originalId) ? getPackageName(originalId) : "");
+                let parsedName = "";
+
+                if (resolvedId && isBareSpecifier(resolvedId)) {
+                    parsedName = parseNodeModulePath(resolvedId).name ?? "";
+                }
+
+                if (!parsedName && isBareSpecifier(originalId)) {
+                    parsedName = parseNodeModulePath(originalId).name ?? getPackageName(originalId);
+                }
+
                 const packageName = parsedName && isBareSpecifier(parsedName) && isValidPackageName(parsedName) ? parsedName : "";
 
                 // Tracking runs up front (before any decision branch), so type-only
