@@ -7,6 +7,7 @@ export default defineConfig({
     runtime: "node",
     rollup: {
         dts: {
+            oxc: true,
             // Keep all node_modules types external in the emitted .d.ts. Several optional
             // peer deps (e.g. @babel/core) ship .d.ts files that depend on global ambient
             // types or use TS-only syntax our fake-js transform doesn't handle, so
