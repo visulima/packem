@@ -1,5 +1,5 @@
 {
-    "name": "ignore-export-keys-example",
+    "name": "examples_packem_ignore_export_keys",
     "version": "1.0.0",
     "private": true,
     "type": "module",
