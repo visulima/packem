@@ -7,6 +7,14 @@ packages:
   - "packages/packem/__fixtures__/ecosystem/**"
   - "packages/**"
   - "examples/**"
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  esbuild: true
+  nodehun: true
+  nx: true
+  rs-module-lexer: true
+  unrs-resolver: true
 auditConfig:
   ignoreGhsas:
     - GHSA-9vqf-7f2p-gf9v
@@ -51,7 +59,6 @@ catalogs:
     "@anolilab/semantic-release-preset": 13.4.10
     commitizen: ^4.3.1
     semantic-release: 25.0.3
-    taze: 19.11.0
   dev:
     "@arethetypeswrong/cli": ^0.18.2
     "@babel/core": 7.29.0
@@ -357,7 +364,7 @@ peerDependencyRules:
 
   allowedVersions:
     # vite 8 not yet in rollup-plugin-import-trace's peer range
-    
+
     # @anolilab/* configs pin exact prettier/secretlint/textlint; widen to current catalog
     "@anolilab/commitlint-config>@commitlint/cli": "^21.0.0"
     "@anolilab/eslint-config>@eslint/css": "^1.0.0"
