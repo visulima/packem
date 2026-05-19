@@ -48,7 +48,20 @@ describe("externals-plugin", () => {
         buildOptions,
         logger = mockedLogger,
         options,
-        packageJson,
+        packageJson = {
+            dependencies: {
+                "test-dep": "*",
+            },
+            devDependencies: {
+                "test-dev-dep": "*",
+            },
+            optionalDependencies: {
+                "test-opt-dep": "*",
+            },
+            peerDependencies: {
+                "test-peer-dep": "*",
+            },
+        },
         tsconfig,
     }: {
         buildOptions?: Partial<InternalBuildOptions>;
