@@ -2,9 +2,11 @@
     "name": "@visulima/packem-plugins",
     "version": "1.0.0-alpha.0",
     "private": true,
-    "description": "Internal: bundler-agnostic custom plugins shared by @visulima/packem-rollup and @visulima/packem-rolldown. Not published — consumers inline this package at build time via workspace devDependency.",
+    "description": "Packem bundler-agnostic custom plugins for @visulima/packem to share rollup and rolldown plugins.",
     "keywords": [
         "visulima",
+        "rolldown",
+        "rollup",
         "packem-plugins"
     ],
     "homepage": "https://github.com/visulima/packem/tree/main/packages/packem-plugins",
@@ -196,6 +198,18 @@
         "semantic-release": "catalog:cli",
         "typescript": "catalog:tsc",
         "vitest": "catalog:test"
+    },
+    "peerDependencies": {
+        "rolldown": "catalog:build",
+        "rollup": "catalog:build"
+    },
+    "peerDependenciesMeta": {
+        "rolldown": {
+            "optional": true
+        },
+        "rollup": {
+            "optional": true
+        }
     },
     "engines": {
         "node": "^22.14.0 || >= 24.10.0"
