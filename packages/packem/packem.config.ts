@@ -29,6 +29,8 @@ export default defineConfig({
     rollup: {
         dts: {
             oxc: true,
+            // disabled till visulima is fixed
+            resolve: false,
         },
         license: {
             path: "./LICENSE.md",
