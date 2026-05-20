@@ -3,9 +3,10 @@ import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEnt
 import type { OutputOptions, RollupBuild, RollupCache, RollupOptions } from "rollup";
 
 import { getRolldownBuild } from "../rolldown/get-rolldown";
-import { getRollupOptions } from "../rollup/get-rollup-options";
+import { getRolldownOptions } from "../rolldown/get-rolldown-options";
 import type { InternalBuildOptions } from "../types";
 import { collectBuildEntries } from "../utils/collect-build-entries";
+import { getRollupOptions } from "./get-build-options";
 import { getRollupBuild } from "./get-rollup";
 
 const BUNDLE_CACHE_KEY = "rollup-build.json";
@@ -173,7 +174,11 @@ const buildWithRolldown = async (
 };
 
 const build = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string, bundler: BundlerName): Promise<void> => {
-    const rollupOptions = await getRollupOptions(context, fileCache);
+    const isRolldown = bundler === "rolldown";
+
+    // Pick the backend-specialised builder so the rolldown path never even
+    // constructs the rollup-only ecosystem plugins / transformer adapter.
+    const rollupOptions = isRolldown ? await getRolldownOptions(context, fileCache) : await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
 
@@ -181,7 +186,7 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
         return;
     }
 
-    if (bundler === "rolldown") {
+    if (isRolldown) {
         await buildWithRolldown(context, fileCache, subDirectory, rollupOptions);
 
         return;

@@ -1,0 +1,9 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "moduleResolution": "bundler",
+        "skipLibCheck": true
+    },
+    "include": ["src/**/*", "*.d.ts", "__tests__/**/*"]
+}

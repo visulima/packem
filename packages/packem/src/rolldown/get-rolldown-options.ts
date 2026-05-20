@@ -1,0 +1,54 @@
+import type { FileCache } from "@visulima/packem-share";
+import type { BuildContext } from "@visulima/packem-share/types";
+import type { RollupOptions } from "rollup";
+
+import { createJsBuildOptions } from "../bundler/get-build-options";
+import { getOxcTransformerConfig, resolveNodeTarget } from "../rollup/get-rollup-options";
+import type { InternalBuildOptions } from "../types";
+
+/**
+ * Rolldown bundles an oxc-based transform natively, so the rolldown builder
+ * does NOT run packem's transformer adapter plugin (the esbuild/swc/sucrase/
+ * oxc rollup plugin). Instead it feeds rolldown's `transform` input option the
+ * same oxc-shaped config the oxc adapter would have produced: TS/JSX still get
+ * compiled, but by rolldown's built-in pipeline rather than an extra plugin
+ * pass over every module.
+ *
+ * `define` is intentionally not carried here: packem's shared `replace` plugin
+ * already runs under rolldown and owns global replacement, so emitting it again
+ * via `transform.define` would double-apply.
+ *
+ * When oxc options are disabled (`rollup.oxc: false`) there is nothing to
+ * forward — rolldown falls back to its own tsconfig-driven transform defaults.
+ */
+const getRolldownTransformOptions = (context: BuildContext<InternalBuildOptions>): Record<string, unknown> => {
+    if (!context.options.rollup.oxc) {
+        return {};
+    }
+
+    const oxc = getOxcTransformerConfig(context, resolveNodeTarget(context));
+
+    return {
+        jsx: oxc.jsx,
+        target: oxc.target,
+        typescript: oxc.typescript,
+    };
+};
+
+/**
+ * Build the rolldown variant of the JS-build options. Starts from the shared
+ * base (`createJsBuildOptions(..., "rolldown")`) — which already skips the
+ * rollup-only ecosystem plugins and the transformer adapter — and layers
+ * rolldown's native `transform` input option on top.
+ *
+ * The cast is intentional: `transform` is not part of rollup's `RollupOptions`,
+ * and `bundler/build.ts` already treats rolldown options as an open record.
+ */
+// eslint-disable-next-line import/prefer-default-export -- paired with src/rollup/get-rollup-options.ts which exports as named; keep both APIs symmetric
+export const getRolldownOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
+    const options = await createJsBuildOptions(context, fileCache, "rolldown");
+
+    (options as Record<string, unknown>).transform = getRolldownTransformOptions(context);
+
+    return options;
+};

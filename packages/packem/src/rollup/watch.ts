@@ -8,12 +8,13 @@ import type { BuildContext } from "@visulima/packem-share/types";
 import { join, relative } from "@visulima/path";
 import type { RollupCache, RollupWatcher, RollupWatcherEvent, WatcherOptions } from "rollup";
 
+import { getRollupOptions } from "../bundler/get-build-options";
 import { getRollupWatch } from "../bundler/get-rollup";
 import { PACKEM_CONFIG_FILES } from "../config/utils/find-packem-file";
 import loadPackageJson from "../config/utils/load-package-json";
 import prepareEntries from "../config/utils/prepare-entries";
 import type { InternalBuildOptions } from "../types";
-import { getRollupDtsOptions, getRollupOptions } from "./get-rollup-options";
+import { getRollupDtsOptions } from "./get-rollup-options";
 
 /**
  * Minimal structural view of the Pail logger.
