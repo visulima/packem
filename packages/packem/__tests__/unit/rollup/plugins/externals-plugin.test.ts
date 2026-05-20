@@ -1,6 +1,6 @@
 import type { PackageJson } from "@visulima/package";
-import type { ExternalsBuildOptions, ResolveExternalsPluginOptions } from "@visulima/packem-rollup/plugin/externals";
-import { externalsPlugin } from "@visulima/packem-rollup/plugin/externals";
+import type { ExternalsBuildOptions, ResolveExternalsPluginOptions } from "@visulima/packem-plugins/plugin/externals";
+import { externalsPlugin } from "@visulima/packem-plugins/plugin/externals";
 import type { BuildContext } from "@visulima/packem-share/types";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { InputOptions, NullValue } from "rollup";

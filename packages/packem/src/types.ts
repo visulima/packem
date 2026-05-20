@@ -1,8 +1,9 @@
 import type { CheckPackageOptions } from "@arethetypeswrong/core";
-import type { PackemRollupOptions, TransformerFn, TransformerName } from "@visulima/packem-rollup";
-import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
-import type { ResolveExternalsPluginOptions } from "@visulima/packem-rollup/plugin/externals";
-import type { NativeModulesOptions } from "@visulima/packem-rollup/plugin/native-modules";
+import type { TransformerFn, TransformerName } from "@visulima/packem-plugins";
+import type { InternalOXCTransformPluginConfig } from "@visulima/packem-plugins/oxc";
+import type { ResolveExternalsPluginOptions } from "@visulima/packem-plugins/plugin/externals";
+import type { NativeModulesOptions } from "@visulima/packem-plugins/plugin/native-modules";
+import type { PackemRollupOptions } from "@visulima/packem-rollup";
 import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
 import type { FileCache } from "@visulima/packem-share/utils";
 import type { StyleOptions } from "@visulima/rollup-plugin-css";

@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { resolveAliases } from "@visulima/packem-rollup";
-import { getShebang, makeExecutable } from "@visulima/packem-rollup/plugin/shebang";
+import { resolveAliases } from "@visulima/packem-plugins";
+import { getShebang, makeExecutable } from "@visulima/packem-plugins/plugin/shebang";
 import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getDtsExtension, getOutputExtension, warn } from "@visulima/packem-share/utils";

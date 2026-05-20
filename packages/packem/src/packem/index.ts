@@ -17,7 +17,7 @@ import browserslist from "browserslist";
 import { createHooks } from "hookable";
 import { createJiti } from "jiti";
 import type { RollupError } from "rollup";
-import { patchErrorWithTrace } from "rollup-plugin-import-trace";
+import { patchErrorWithTrace } from "@visulima/packem-rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 

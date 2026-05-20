@@ -1,4 +1,4 @@
-import type { BabelPluginConfig } from "@visulima/packem-rollup/babel";
+import type { BabelPluginConfig } from "@visulima/packem-plugins/babel";
 import type { Plugin } from "rollup";
 
 import type { BuildConfig } from "../../types";

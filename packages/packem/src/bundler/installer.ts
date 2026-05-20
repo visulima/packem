@@ -1,6 +1,6 @@
 import { detectPackageManager } from "@antfu/install-pkg";
 
-export type TransformerName = "esbuild" | "oxc" | "sucrase" | "swc";
+import type { TransformerName } from "@visulima/packem-plugins";
 
 /**
  * Map of supported transformer names to the npm package that provides

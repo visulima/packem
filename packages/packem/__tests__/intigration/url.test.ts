@@ -2,7 +2,7 @@ import { cpSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { ensureDir, isAccessibleSync, readFileSync, writeFile, writeJson } from "@visulima/fs";
-import type { UrlOptions } from "@visulima/packem-rollup/plugin/url";
+import type { UrlOptions } from "@visulima/packem-plugins/plugin/url";
 import { basename, join, resolve } from "@visulima/path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 

@@ -2,12 +2,12 @@ import { createRequire } from "node:module";
 
 import { installPackage } from "@antfu/install-pkg";
 import { confirm, isCancel, spinner } from "@clack/prompts";
+import type { TransformerName } from "@visulima/packem-plugins";
 import { join } from "@visulima/path";
 
 import { getRolldownBuild } from "../rolldown/get-rolldown";
 import type { BundlerName } from "./build";
 import { getRollupBuild } from "./get-rollup";
-import type { TransformerName } from "./installer";
 import { buildInstallHint, TRANSFORMER_PACKAGE } from "./installer";
 
 /**
@@ -33,16 +33,25 @@ const isBundlerAvailable = async (bundler: BundlerName): Promise<boolean> => {
 // Rollup's @rollup/plugin-dynamic-import-vars rejects dynamic imports with
 // variable specifiers during packem's own build; require.resolve is invisible
 // to that static analysis and behaves the same for "is this installed".
+//
+// Probe the user's project root first, then fall back to packem's own module
+// graph: the transformer plugin ships with packem and loads its engine from
+// packem's node_modules, so an engine resolvable to packem is usable even when
+// it isn't hoisted into the consumer project (e.g. test fixtures in a tmp dir).
 const isModuleAvailable = (packageName: string, rootDirectory: string): boolean => {
-    try {
-        const requireFromRoot = createRequire(join(rootDirectory, "noop.js"));
+    const probes = [join(rootDirectory, "noop.js"), import.meta.url];
 
-        requireFromRoot.resolve(packageName);
+    for (const from of probes) {
+        try {
+            createRequire(from).resolve(packageName);
 
-        return true;
-    } catch {
-        return false;
+            return true;
+        } catch {
+            // Try the next resolution context.
+        }
     }
+
+    return false;
 };
 
 const promptAndInstall = async (

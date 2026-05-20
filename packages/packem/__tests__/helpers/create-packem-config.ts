@@ -120,8 +120,8 @@ export const createPackemConfig = async (
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
 import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : transformer === "oxc" ? "oxc-transformer" : "index"}";
-${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/rollup/plugins/css/loaders/${loader}";`).join("\n")}
-${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}
+${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/css/loaders/${loader}";`).join("\n")}
+${minimizer ? `import ${minimizer} from "${distributionPath}/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
     ${bundler ? `bundler: "${bundler}",` : ""}

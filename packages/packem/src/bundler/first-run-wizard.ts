@@ -3,11 +3,11 @@ import { writeFile } from "node:fs/promises";
 import { installPackage } from "@antfu/install-pkg";
 import { cancel, intro, isCancel, log, outro, select, spinner } from "@clack/prompts";
 import { cyan } from "@visulima/colorize";
+import type { TransformerName } from "@visulima/packem-plugins";
 import { join } from "@visulima/path";
 
 import { hasPackemConfig } from "../config/utils/find-packem-file";
 import type { BundlerName } from "./build";
-import type { TransformerName } from "./installer";
 import { buildInstallHint, TRANSFORMER_PACKAGE } from "./installer";
 
 const generatePackemConfig = (bundler: BundlerName, transformer: TransformerName): string =>
