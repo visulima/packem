@@ -8,12 +8,13 @@ export default defineConfig({
     rollup: {
         dts: {
             oxc: true,
-            // Keep all node_modules types external in the emitted .d.ts. Several optional
-            // peer deps (e.g. @babel/core) ship .d.ts files that depend on global ambient
-            // types or use TS-only syntax our fake-js transform doesn't handle, so
-            // attempting to inline them breaks the build. Consumers install peers anyway,
-            // so external `import` declarations resolve correctly at type-check time.
-            resolve: false,
+            // `@visulima/packem-plugins` is private (unpublished) and consumed via
+            // build-time inlining, so its types MUST be inlined into the emitted
+            // .d.ts — otherwise downstream consumers of `@visulima/packem-rollup`
+            // hit unresolved `import ... from "@visulima/packem-plugins/*"` at
+            // type-check time. All other externals (e.g. @babel/core, @rollup/*,
+            // esbuild) ship their own published types and stay external.
+            resolve: [/^@visulima\/packem-plugins(\/|$)/],
         },
         license: {
             path: "./LICENSE.md",

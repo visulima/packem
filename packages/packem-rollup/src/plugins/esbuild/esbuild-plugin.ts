@@ -12,7 +12,7 @@ import type { Loader } from "esbuild";
 import { transform } from "esbuild";
 import type { Plugin as RollupPlugin } from "rollup";
 
-import type { TransformerFn as TransformerFunction } from "../../types";
+import type { TransformerFn as TransformerFunction } from "@visulima/packem-plugins";
 import type { EsbuildPluginConfig, OptimizeDepsResult } from "./types";
 import getRenderChunk from "./utils/get-render-chunk";
 import doOptimizeDeps from "./utils/optimize-deps";
@@ -141,4 +141,4 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
 
 esbuildTransformer.NAME = "esbuild";
 
-export default esbuildTransformer as TransformerFunction;
+export default esbuildTransformer as TransformerFunction<EsbuildPluginConfig>;

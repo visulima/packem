@@ -37,10 +37,6 @@
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
         },
-        "./babel": {
-            "types": "./dist/plugins/babel/index.d.ts",
-            "default": "./dist/plugins/babel/index.js"
-        },
         "./esbuild": {
             "types": "./dist/plugins/esbuild/index.d.ts",
             "default": "./dist/plugins/esbuild/index.js"
@@ -49,97 +45,33 @@
             "types": "./dist/plugins/swc/index.d.ts",
             "default": "./dist/plugins/swc/index.js"
         },
-        "./typescript": {
-            "types": "./dist/plugins/typescript/index.d.ts",
-            "default": "./dist/plugins/typescript/index.js"
-        },
-        "./oxc": {
-            "types": "./dist/plugins/oxc/index.d.ts",
-            "default": "./dist/plugins/oxc/index.js"
-        },
         "./sucrase": {
             "types": "./dist/plugins/sucrase/index.d.ts",
             "default": "./dist/plugins/sucrase/index.js"
         },
-        "./plugin/minify-html-literals": {
-            "types": "./dist/plugins/minify-html-literals/index.d.ts",
-            "default": "./dist/plugins/minify-html-literals/index.js"
-        },
-        "./plugin/require-cjs-transformer": {
-            "types": "./dist/plugins/require-cjs-transformer.d.ts",
-            "default": "./dist/plugins/require-cjs-transformer.js"
+        "./plugin/chunk-splitter": {
+            "types": "./dist/plugins/chunk-splitter/index.d.ts",
+            "default": "./dist/plugins/chunk-splitter/index.js"
         },
         "./plugin/cjs-interop": {
             "types": "./dist/plugins/cjs-interop.d.ts",
             "default": "./dist/plugins/cjs-interop.js"
         },
-        "./plugin/copy": {
-            "types": "./dist/plugins/copy.d.ts",
-            "default": "./dist/plugins/copy.js"
-        },
-        "./plugin/data-uri": {
-            "types": "./dist/plugins/data-uri.d.ts",
-            "default": "./dist/plugins/data-uri.js"
-        },
-        "./plugin/debarrel": {
-            "types": "./dist/plugins/debarrel.d.ts",
-            "default": "./dist/plugins/debarrel.js"
-        },
-        "./plugin/esm-shim-cjs-syntax": {
-            "types": "./dist/plugins/esm-shim-cjs-syntax.d.ts",
-            "default": "./dist/plugins/esm-shim-cjs-syntax.js"
-        },
-        "./plugin/fix-dts-default-cjs-exports": {
-            "types": "./dist/plugins/fix-dts-default-cjs-exports.d.ts",
-            "default": "./dist/plugins/fix-dts-default-cjs-exports.js"
+        "./plugin/json": {
+            "types": "./dist/plugins/json.d.ts",
+            "default": "./dist/plugins/json.js"
         },
         "./plugin/jsx-remove-attributes": {
             "types": "./dist/plugins/jsx-remove-attributes.d.ts",
             "default": "./dist/plugins/jsx-remove-attributes.js"
         },
-        "./plugin/license": {
-            "types": "./dist/plugins/license.d.ts",
-            "default": "./dist/plugins/license.js"
-        },
-        "./plugin/native-modules": {
-            "types": "./dist/plugins/native-modules-plugin.d.ts",
-            "default": "./dist/plugins/native-modules-plugin.js"
-        },
         "./plugin/preserve-directives": {
             "types": "./dist/plugins/preserve-directives.d.ts",
             "default": "./dist/plugins/preserve-directives.js"
         },
-        "./plugin/raw": {
-            "types": "./dist/plugins/raw.d.ts",
-            "default": "./dist/plugins/raw.js"
-        },
-        "./plugin/shebang": {
-            "types": "./dist/plugins/shebang.d.ts",
-            "default": "./dist/plugins/shebang.js"
-        },
-        "./plugin/source-maps": {
-            "types": "./dist/plugins/source-maps.d.ts",
-            "default": "./dist/plugins/source-maps.js"
-        },
-        "./plugin/url": {
-            "types": "./dist/plugins/url.d.ts",
-            "default": "./dist/plugins/url.js"
-        },
-        "./plugin/import-attributes": {
-            "types": "./dist/plugins/import-attributes.d.ts",
-            "default": "./dist/plugins/import-attributes.js"
-        },
-        "./plugin/json": {
-            "types": "./dist/plugins/json.d.ts",
-            "default": "./dist/plugins/json.js"
-        },
-        "./plugin/externals": {
-            "types": "./dist/plugins/externals.d.ts",
-            "default": "./dist/plugins/externals.js"
-        },
-        "./plugin/resolve-implicit-externals": {
-            "types": "./dist/plugins/resolve-implicit-externals.d.ts",
-            "default": "./dist/plugins/resolve-implicit-externals.js"
+        "./plugin/pure-new-expression": {
+            "types": "./dist/plugins/pure-new-expression-plugin.d.ts",
+            "default": "./dist/plugins/pure-new-expression-plugin.js"
         },
         "./package.json": "./package.json"
     },
@@ -166,7 +98,6 @@
         "test:watch": "vitest"
     },
     "dependencies": {
-        "@babel/parser": "catalog:prod",
         "@rollup/plugin-alias": "catalog:build",
         "@rollup/plugin-commonjs": "catalog:build",
         "@rollup/plugin-dynamic-import-vars": "catalog:build",
@@ -176,29 +107,21 @@
         "@rollup/plugin-replace": "catalog:build",
         "@rollup/plugin-wasm": "catalog:build",
         "@rollup/pluginutils": "catalog:build",
-        "@visulima/colorize": "catalog:visulima",
         "@visulima/find-cache-dir": "catalog:visulima",
         "@visulima/fs": "catalog:visulima",
         "@visulima/package": "catalog:visulima",
         "@visulima/packem-share": "workspace:*",
         "@visulima/path": "catalog:visulima",
         "@visulima/rollup-plugin-dts": "workspace:*",
-        "@visulima/source-map": "catalog:visulima",
-        "cjs-module-lexer": "catalog:prod",
         "clean-css": "catalog:style",
-        "glob-parent": "catalog:node",
         "html-minifier-next": "catalog:prod",
         "magic-string": "catalog:utils",
-        "mlly": "catalog:prod",
-        "oxc-parser": "catalog:prod",
         "oxc-resolver": "catalog:node",
-        "rollup-plugin-license": "catalog:build",
+        "rollup-plugin-import-trace": "catalog:build",
         "rollup-plugin-polyfill-node": "catalog:build",
         "rollup-plugin-pure": "catalog:build",
         "rollup-plugin-visualizer": "catalog:build",
-        "rs-module-lexer": "catalog:prod",
-        "semver": "catalog:utils",
-        "tinyglobby": "catalog:node"
+        "rs-module-lexer": "catalog:prod"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "catalog:lint",
@@ -220,6 +143,7 @@
         "@types/node": "catalog:types",
         "@types/semver": "catalog:types",
         "@visulima/packem": "catalog:visulima",
+        "@visulima/packem-plugins": "workspace:*",
         "@visulima/pail": "catalog:visulima",
         "@visulima/tsconfig": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",
@@ -245,34 +169,19 @@
         "vitest": "catalog:test"
     },
     "peerDependencies": {
-        "@babel/core": "*",
         "@swc/core": "*",
         "esbuild": "*",
-        "oxc-transform": "*",
         "rollup": ">=4",
-        "sucrase": "*",
-        "typescript": "^5.0.0 || ^6.0.0"
+        "sucrase": "*"
     },
     "peerDependenciesMeta": {
-        "@babel/core": {
-            "optional": true
-        },
         "@swc/core": {
             "optional": true
         },
         "esbuild": {
             "optional": true
         },
-        "oxc-transform": {
-            "optional": true
-        },
-        "p-queue": {
-            "optional": true
-        },
         "sucrase": {
-            "optional": true
-        },
-        "typescript": {
             "optional": true
         }
     },
