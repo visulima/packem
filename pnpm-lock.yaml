@@ -51,6 +51,9 @@ catalogs:
     rollup-plugin-license:
       specifier: 3.7.1
       version: 3.7.1
+    rollup-plugin-lit-css:
+      specifier: 6.0.1
+      version: 6.0.1
     rollup-plugin-polyfill-node:
       specifier: 0.13.0
       version: 0.13.0
@@ -83,6 +86,9 @@ catalogs:
     '@babel/core':
       specifier: 7.29.0
       version: 7.29.0
+    '@babel/parser':
+      specifier: 7.29.3
+      version: 7.29.3
     '@mozilla/readability':
       specifier: ^0.6.0
       version: 0.6.0
@@ -92,6 +98,9 @@ catalogs:
     '@oxc-project/types':
       specifier: 0.132.0
       version: 0.132.0
+    '@svgr/core':
+      specifier: ^8.1.0
+      version: 8.1.0
     '@swc/core':
       specifier: 1.15.33
       version: 1.15.33
@@ -104,6 +113,12 @@ catalogs:
     conventional-changelog-conventionalcommits:
       specifier: 9.3.1
       version: 9.3.1
+    deeks:
+      specifier: ^3.2.0
+      version: 3.2.0
+    detect-indent:
+      specifier: ^7.0.2
+      version: 7.0.2
     diff:
       specifier: 9.0.0
       version: 9.0.0
@@ -113,9 +128,15 @@ catalogs:
     hookable:
       specifier: 6.1.1
       version: 6.1.1
+    lit:
+      specifier: 3.3.3
+      version: 3.3.3
     mime:
       specifier: ^4.1.0
       version: 4.1.0
+    oxc-parser:
+      specifier: 0.132.0
+      version: 0.132.0
     oxc-transform:
       specifier: 0.132.0
       version: 0.132.0
@@ -128,6 +149,12 @@ catalogs:
     postgraphile:
       specifier: 5.0.3
       version: 5.0.3
+    rs-module-lexer:
+      specifier: 2.8.0
+      version: 2.8.0
+    sort-package-json:
+      specifier: 3.6.1
+      version: 3.6.1
     stylus:
       specifier: ^0.64.0
       version: 0.64.0
@@ -137,6 +164,18 @@ catalogs:
     sugarss:
       specifier: 5.0.1
       version: 5.0.1
+    tempy:
+      specifier: 3.2.0
+      version: 3.2.0
+    tree-kill:
+      specifier: ^1.2.2
+      version: 1.2.2
+    typedoc:
+      specifier: 0.28.19
+      version: 0.28.19
+    typedoc-plugin-rename-defaults:
+      specifier: 0.7.3
+      version: 0.7.3
   frontend:
     '@babel/preset-react':
       specifier: ^7.28.5
@@ -147,9 +186,19 @@ catalogs:
     preact:
       specifier: 10.29.2
       version: 10.29.2
+    react:
+      specifier: 19.2.6
+      version: 19.2.6
+    react-dom:
+      specifier: 19.2.6
+      version: 19.2.6
     vue:
       specifier: 3.5.34
       version: 3.5.34
+  icons:
+    lucide-static:
+      specifier: 1.16.0
+      version: 1.16.0
   lint:
     '@anolilab/commitlint-config':
       specifier: 10.0.1
@@ -203,6 +252,9 @@ catalogs:
     turndown-plugin-gfm:
       specifier: ^1.0.2
       version: 1.0.2
+    typedoc-plugin-markdown:
+      specifier: 4.11.0
+      version: 4.11.0
   monorepo:
     nx:
       specifier: 22.7.2
@@ -215,12 +267,21 @@ catalogs:
       specifier: 9.0.0
       version: 9.0.0
   node:
+    '@antfu/install-pkg':
+      specifier: 1.1.0
+      version: 1.1.0
+    '@clack/prompts':
+      specifier: 1.4.0
+      version: 1.4.0
     cac:
       specifier: 7.0.0
       version: 7.0.0
     cross-env:
       specifier: ^10.1.0
       version: 10.1.0
+    execa:
+      specifier: ^9.6.1
+      version: 9.6.1
     oxc-resolver:
       specifier: 11.19.1
       version: 11.19.1
@@ -230,6 +291,9 @@ catalogs:
     rimraf:
       specifier: 6.1.3
       version: 6.1.3
+    tinyexec:
+      specifier: 1.1.2
+      version: 1.1.2
   peer:
     package-manager-detector:
       specifier: ^1.6.0
@@ -259,12 +323,18 @@ catalogs:
     cjs-module-lexer:
       specifier: 2.2.0
       version: 2.2.0
+    fastest-levenshtein:
+      specifier: 1.0.16
+      version: 1.0.16
     gpt-tokenizer:
       specifier: ^3.4.0
       version: 3.4.0
     happy-dom:
       specifier: 20.9.0
       version: 20.9.0
+    hookable:
+      specifier: 6.1.1
+      version: 6.1.1
     html-minifier-next:
       specifier: 6.2.6
       version: 6.2.6
@@ -286,6 +356,9 @@ catalogs:
     p-queue:
       specifier: 9.3.0
       version: 9.3.0
+    picomatch:
+      specifier: 4.0.4
+      version: 4.0.4
     plop:
       specifier: 4.0.5
       version: 4.0.5
@@ -348,9 +421,15 @@ catalogs:
     lightningcss:
       specifier: 1.32.0
       version: 1.32.0
+    minireset.css:
+      specifier: 0.0.7
+      version: 0.0.7
     postcss:
       specifier: 8.5.15
       version: 8.5.15
+    postcss-custom-properties:
+      specifier: 15.0.1
+      version: 15.0.1
     postcss-load-config:
       specifier: ^6.0.1
       version: 6.0.1
@@ -441,12 +520,18 @@ catalogs:
     '@types/node':
       specifier: 25.9.1
       version: 25.9.1
+    '@types/picomatch':
+      specifier: ^4.0.3
+      version: 4.0.3
     '@types/postcss-modules-local-by-default':
       specifier: ^4.0.2
       version: 4.0.2
     '@types/postcss-modules-scope':
       specifier: ^3.0.4
       version: 3.0.4
+    '@types/react-dom':
+      specifier: ^19.2.3
+      version: 19.2.3
     '@types/semver':
       specifier: ^7.7.1
       version: 7.7.1
@@ -466,6 +551,9 @@ catalogs:
     cheerio:
       specifier: 1.2.0
       version: 1.2.0
+    defu:
+      specifier: 6.1.7
+      version: 6.1.7
     magic-string:
       specifier: 0.30.21
       version: 0.30.21
@@ -473,6 +561,9 @@ catalogs:
       specifier: 7.8.0
       version: 7.8.0
   visulima:
+    '@visulima/cerebro':
+      specifier: 3.0.0-alpha.25
+      version: 3.0.0-alpha.25
     '@visulima/colorize':
       specifier: 2.0.0-alpha.11
       version: 2.0.0-alpha.11
@@ -482,6 +573,9 @@ catalogs:
     '@visulima/fs':
       specifier: 5.0.0-alpha.24
       version: 5.0.0-alpha.24
+    '@visulima/humanizer':
+      specifier: 3.0.0-alpha.11
+      version: 3.0.0-alpha.11
     '@visulima/package':
       specifier: 5.0.0-alpha.23
       version: 5.0.0-alpha.23
@@ -1541,19 +1635,19 @@ importers:
   packages/packem:
     dependencies:
       '@antfu/install-pkg':
-        specifier: 1.1.0
+        specifier: catalog:node
         version: 1.1.0
       '@arethetypeswrong/core':
         specifier: '>=0.18.2'
         version: 0.18.2
       '@clack/prompts':
-        specifier: 1.4.0
+        specifier: catalog:node
         version: 1.4.0
       '@rollup/pluginutils':
-        specifier: 5.3.0
+        specifier: catalog:build
         version: 5.3.0(rollup@4.60.4)
       '@visulima/cerebro':
-        specifier: 3.0.0-alpha.25
+        specifier: catalog:visulima
         version: 3.0.0-alpha.25(@visulima/find-cache-dir@3.0.0-alpha.9)(@visulima/pail@4.0.0-alpha.16(express@5.2.1)(hono@4.12.19))(github-slugger@2.0.0)
       '@visulima/packem-share':
         specifier: workspace:*
@@ -1565,10 +1659,10 @@ importers:
         specifier: workspace:*
         version: link:../rollup-plugin-dts
       '@visulima/tsconfig':
-        specifier: 3.0.0-alpha.24
+        specifier: catalog:visulima
         version: 3.0.0-alpha.24(ini@6.0.0)(json5@2.2.3)(smol-toml@1.6.1)(yaml@2.9.0)
       browserslist:
-        specifier: 4.28.2
+        specifier: catalog:network
         version: 4.28.2
       cjs-module-lexer:
         specifier: catalog:prod
@@ -1577,25 +1671,25 @@ importers:
         specifier: catalog:style
         version: 5.3.3
       defu:
-        specifier: 6.1.7
+        specifier: catalog:utils
         version: 6.1.7
       fastest-levenshtein:
-        specifier: 1.0.16
+        specifier: catalog:prod
         version: 1.0.16
       hookable:
-        specifier: 6.1.1
+        specifier: catalog:prod
         version: 6.1.1
       html-minifier-next:
         specifier: catalog:prod
         version: 6.2.6(@swc/core@1.15.33(@swc/helpers@0.5.21))
       jiti:
-        specifier: 2.7.0
+        specifier: catalog:script
         version: 2.7.0
       magic-string:
-        specifier: 0.30.21
+        specifier: catalog:utils
         version: 0.30.21
       mlly:
-        specifier: 1.8.2
+        specifier: catalog:prod
         version: 1.8.2
       package-manager-detector:
         specifier: catalog:peer
@@ -1607,113 +1701,113 @@ importers:
         specifier: '>=7'
         version: 7.2.3(rollup@4.60.4)(svelte@5.55.8(@typescript-eslint/types@8.59.4))
       tinyexec:
-        specifier: 1.1.2
+        specifier: catalog:node
         version: 1.1.2
       unplugin-vue:
         specifier: '>=7'
         version: 7.2.0(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(less@4.6.4)(sass-embedded@1.99.0)(sass@1.99.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.15))(terser@5.47.1)(tsx@4.22.3)(vue@3.5.34(typescript@6.0.3))(yaml@2.9.0)
     devDependencies:
       '@anolilab/eslint-config':
-        specifier: ^27.0.2
+        specifier: catalog:lint
         version: 27.0.2(@types/node@25.9.1)(@typescript-eslint/eslint-plugin@8.59.1(@typescript-eslint/parser@8.59.1(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.7)(yaml@2.9.0)
       '@anolilab/semantic-release-pnpm':
-        specifier: ^8.1.9
+        specifier: catalog:cli
         version: 8.1.9(@types/node@25.9.1)(yaml@2.9.0)
       '@anolilab/semantic-release-preset':
-        specifier: ^13.4.10
+        specifier: catalog:cli
         version: 13.4.10(@anolilab/semantic-release-pnpm@8.1.9(@types/node@25.9.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.3(typescript@6.0.3)))(semantic-release@25.0.3(typescript@6.0.3))(yaml@2.9.0)
       '@arethetypeswrong/cli':
-        specifier: ^0.18.2
+        specifier: catalog:dev
         version: 0.18.2
       '@babel/core':
         specifier: catalog:dev
         version: 7.29.0
       '@babel/parser':
-        specifier: 7.29.3
+        specifier: catalog:dev
         version: 7.29.3
       '@babel/preset-react':
         specifier: catalog:frontend
         version: 7.28.5(@babel/core@7.29.0)
       '@csstools/css-parser-algorithms':
-        specifier: 4.0.0
+        specifier: catalog:style
         version: 4.0.0(@csstools/css-tokenizer@4.0.0)
       '@csstools/css-tokenizer':
-        specifier: 4.0.0
+        specifier: catalog:style
         version: 4.0.0
       '@csstools/postcss-slow-plugins':
-        specifier: ^3.0.0
+        specifier: catalog:style
         version: 3.0.0(postcss@8.5.15)
       '@rollup/plugin-alias':
-        specifier: 6.0.0
+        specifier: catalog:build
         version: 6.0.0(rollup@4.60.4)
       '@rollup/plugin-commonjs':
-        specifier: 29.0.2
+        specifier: catalog:build
         version: 29.0.2(rollup@4.60.4)
       '@rollup/plugin-dynamic-import-vars':
-        specifier: 2.1.5
+        specifier: catalog:build
         version: 2.1.5(rollup@4.60.4)
       '@rollup/plugin-inject':
-        specifier: 5.0.5
+        specifier: catalog:build
         version: 5.0.5(rollup@4.60.4)
       '@rollup/plugin-json':
-        specifier: 6.1.0
+        specifier: catalog:build
         version: 6.1.0(rollup@4.60.4)
       '@rollup/plugin-node-resolve':
-        specifier: 16.0.3
+        specifier: catalog:build
         version: 16.0.3(rollup@4.60.4)
       '@rollup/plugin-replace':
-        specifier: 6.0.3
+        specifier: catalog:build
         version: 6.0.3(rollup@4.60.4)
       '@rollup/plugin-wasm':
-        specifier: 6.2.2
+        specifier: catalog:build
         version: 6.2.2(rollup@4.60.4)
       '@secretlint/secretlint-rule-preset-recommend':
-        specifier: ^13.0.2
+        specifier: catalog:lint
         version: 13.0.2
       '@svgr/core':
-        specifier: ^8.1.0
+        specifier: catalog:dev
         version: 8.1.0(typescript@6.0.3)
       '@swc/core':
-        specifier: ^1.15.33
+        specifier: catalog:dev
         version: 1.15.33(@swc/helpers@0.5.21)
       '@swc/types':
-        specifier: 0.1.26
+        specifier: catalog:dev
         version: 0.1.26
       '@tailwindcss/node':
-        specifier: ^4.3.0
+        specifier: catalog:style
         version: 4.3.0
       '@tailwindcss/oxide':
-        specifier: ^4.3.0
+        specifier: catalog:style
         version: 4.3.0
       '@total-typescript/ts-reset':
-        specifier: ^0.6.1
+        specifier: catalog:tsc
         version: 0.6.1
       '@types/node':
         specifier: catalog:types
         version: 25.9.1
       '@types/picomatch':
-        specifier: ^4.0.3
+        specifier: catalog:types
         version: 4.0.3
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: catalog:types
         version: 19.2.3(@types/react@19.2.14)
       '@types/semver':
-        specifier: ^7.7.1
+        specifier: catalog:types
         version: 7.7.1
       '@visulima/colorize':
-        specifier: 2.0.0-alpha.11
+        specifier: catalog:visulima
         version: 2.0.0-alpha.11
       '@visulima/find-cache-dir':
-        specifier: 3.0.0-alpha.9
+        specifier: catalog:visulima
         version: 3.0.0-alpha.9
       '@visulima/fs':
         specifier: catalog:visulima
         version: 5.0.0-alpha.24(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.6.1)(yaml@2.9.0)
       '@visulima/humanizer':
-        specifier: 3.0.0-alpha.11
+        specifier: catalog:visulima
         version: 3.0.0-alpha.11
       '@visulima/package':
-        specifier: 5.0.0-alpha.23
+        specifier: catalog:visulima
         version: 5.0.0-alpha.23(ini@6.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
       '@visulima/packem-plugins':
         specifier: workspace:*
@@ -1722,10 +1816,10 @@ importers:
         specifier: workspace:*
         version: link:../packem-rollup
       '@visulima/pail':
-        specifier: 4.0.0-alpha.16
+        specifier: catalog:visulima
         version: 4.0.0-alpha.16(express@5.2.1)(hono@4.12.19)
       '@visulima/path':
-        specifier: 3.0.0-alpha.10
+        specifier: catalog:visulima
         version: 3.0.0-alpha.10
       '@visulima/source-map':
         specifier: catalog:visulima
@@ -1734,91 +1828,91 @@ importers:
         specifier: catalog:visulima
         version: 4.0.0-alpha.11
       '@vitest/coverage-v8':
-        specifier: ^4.1.7
+        specifier: catalog:test
         version: 4.1.7(vitest@4.1.7)
       '@vitest/ui':
-        specifier: ^4.1.7
+        specifier: catalog:test
         version: 4.1.7(vitest@4.1.7)
       babel-plugin-transform-hook-names:
         specifier: catalog:dev
         version: 1.0.2(@babel/core@7.29.0)
       conventional-changelog-conventionalcommits:
-        specifier: 9.3.1
+        specifier: catalog:dev
         version: 9.3.1
       cross-env:
-        specifier: ^10.1.0
+        specifier: catalog:node
         version: 10.1.0
       cssnano:
-        specifier: 8.0.1
+        specifier: catalog:style
         version: 8.0.1(postcss@8.5.15)
       deeks:
-        specifier: ^3.2.0
+        specifier: catalog:dev
         version: 3.2.0
       detect-indent:
-        specifier: ^7.0.2
+        specifier: catalog:dev
         version: 7.0.2
       esbuild:
-        specifier: ^0.28.0
+        specifier: catalog:build
         version: 0.28.0
       eslint:
-        specifier: 10.4.0
+        specifier: catalog:lint
         version: 10.4.0(jiti@2.7.0)
       execa:
-        specifier: ^9.6.1
+        specifier: catalog:node
         version: 9.6.1
       icss-utils:
-        specifier: ^5.1.0
+        specifier: catalog:style
         version: 5.1.0(postcss@8.5.15)
       less:
-        specifier: ^4.6.4
+        specifier: catalog:style
         version: 4.6.4
       lightningcss:
-        specifier: 1.32.0
+        specifier: catalog:style
         version: 1.32.0
       lit:
-        specifier: ^3.3.3
+        specifier: catalog:dev
         version: 3.3.3
       lucide-static:
-        specifier: ^1.16.0
+        specifier: catalog:icons
         version: 1.16.0
       minireset.css:
-        specifier: 0.0.7
+        specifier: catalog:style
         version: 0.0.7
       oxc-parser:
-        specifier: 0.132.0
+        specifier: catalog:dev
         version: 0.132.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
       oxc-resolver:
-        specifier: 11.19.1
+        specifier: catalog:node
         version: 11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
       oxc-transform:
-        specifier: ^0.132.0
+        specifier: catalog:dev
         version: 0.132.0
       picomatch:
-        specifier: 4.0.4
+        specifier: catalog:prod
         version: 4.0.4
       postcss:
-        specifier: ^8.5.15
+        specifier: catalog:style
         version: 8.5.15
       postcss-custom-properties:
-        specifier: 15.0.1
+        specifier: catalog:style
         version: 15.0.1(postcss@8.5.15)
       postcss-load-config:
-        specifier: ^6.0.1
+        specifier: catalog:style
         version: 6.0.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.3)(yaml@2.9.0)
       postcss-modules-extract-imports:
-        specifier: ^3.1.0
+        specifier: catalog:style
         version: 3.1.0(postcss@8.5.15)
       postcss-modules-local-by-default:
-        specifier: ^4.2.0
+        specifier: catalog:style
         version: 4.2.0(postcss@8.5.15)
       postcss-modules-scope:
-        specifier: ^3.2.1
+        specifier: catalog:style
         version: 3.2.1(postcss@8.5.15)
       postcss-modules-values:
-        specifier: ^4.0.0
+        specifier: catalog:style
         version: 4.0.0(postcss@8.5.15)
       postcss-value-parser:
-        specifier: ^4.2.0
+        specifier: catalog:style
         version: 4.2.0
       postgraphile:
         specifier: catalog:dev
@@ -1827,88 +1921,88 @@ importers:
         specifier: catalog:frontend
         version: 10.29.2
       react:
-        specifier: ^19.2.6
+        specifier: catalog:frontend
         version: 19.2.6
       react-dom:
-        specifier: ^19.2.6
+        specifier: catalog:frontend
         version: 19.2.6(react@19.2.6)
       rimraf:
-        specifier: ^6.1.3
+        specifier: catalog:node
         version: 6.1.3
       rolldown:
         specifier: catalog:build
         version: 1.0.2
       rollup-plugin-dts:
-        specifier: 6.4.1
+        specifier: catalog:build
         version: 6.4.1(rollup@4.60.4)(typescript@6.0.3)
       rollup-plugin-license:
-        specifier: 3.7.1
+        specifier: catalog:build
         version: 3.7.1(picomatch@4.0.4)(rollup@4.60.4)
       rollup-plugin-lit-css:
-        specifier: ^6.0.1
+        specifier: catalog:build
         version: 6.0.1(postcss@8.5.15)(rollup@4.60.4)
       rollup-plugin-polyfill-node:
-        specifier: 0.13.0
+        specifier: catalog:build
         version: 0.13.0(rollup@4.60.4)
       rollup-plugin-pure:
-        specifier: ^0.4.0
+        specifier: catalog:build
         version: 0.4.0(rollup@4.60.4)
       rollup-plugin-visualizer:
-        specifier: 7.0.1
+        specifier: catalog:build
         version: 7.0.1(rolldown@1.0.2)(rollup@4.60.4)
       rs-module-lexer:
-        specifier: ^2.8.0
+        specifier: catalog:dev
         version: 2.8.0
       sass:
-        specifier: ^1.99.0
+        specifier: catalog:style
         version: 1.99.0
       sass-embedded:
-        specifier: ^1.99.0
+        specifier: catalog:style
         version: 1.99.0
       secretlint:
-        specifier: 13.0.2
+        specifier: catalog:lint
         version: 13.0.2
       semantic-release:
-        specifier: ^25.0.3
+        specifier: catalog:cli
         version: 25.0.3(typescript@6.0.3)
       semver:
-        specifier: 7.8.0
+        specifier: catalog:utils
         version: 7.8.0
       sort-package-json:
-        specifier: 3.6.1
+        specifier: catalog:dev
         version: 3.6.1
       stylus:
-        specifier: ^0.64.0
+        specifier: catalog:dev
         version: 0.64.0
       sucrase:
-        specifier: ^3.35.1
+        specifier: catalog:dev
         version: 3.35.1
       sugarss:
-        specifier: 5.0.1
+        specifier: catalog:dev
         version: 5.0.1(postcss@8.5.15)
       tailwindcss:
-        specifier: ^4.3.0
+        specifier: catalog:style
         version: 4.3.0
       tempy:
-        specifier: ^3.2.0
+        specifier: catalog:dev
         version: 3.2.0
       tree-kill:
-        specifier: ^1.2.2
+        specifier: catalog:dev
         version: 1.2.2
       typedoc:
-        specifier: 0.28.19
+        specifier: catalog:dev
         version: 0.28.19(typescript@6.0.3)
       typedoc-plugin-markdown:
-        specifier: 4.11.0
+        specifier: catalog:markdown
         version: 4.11.0(typedoc@0.28.19(typescript@6.0.3))
       typedoc-plugin-rename-defaults:
-        specifier: 0.7.3
+        specifier: catalog:dev
         version: 0.7.3(typedoc@0.28.19(typescript@6.0.3))
       typescript:
         specifier: 6.0.3
         version: 6.0.3
       vitest:
-        specifier: ^4.1.7
+        specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(@vitest/ui@4.1.7)(happy-dom@20.9.0)(vite@8.0.13(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(less@4.6.4)(sass-embedded@1.99.0)(sass@1.99.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.15))(terser@5.47.1)(tsx@4.22.3)(yaml@2.9.0))
 
   packages/packem-plugins:
