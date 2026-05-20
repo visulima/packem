@@ -1,0 +1,506 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- Pail type from @visulima/pail alpha references a broken `./pail.d.ts` path; the underlying logger is functional at runtime */
+import fs from "node:fs";
+
+import { cyan } from "@visulima/colorize";
+import type { BuildContext } from "@visulima/packem-share/types";
+import { getPackageName, isBareSpecifier, isFromNodeModules, isOutsideProject, parseSpecifier } from "@visulima/packem-share/utils";
+import type { Pail } from "@visulima/pail";
+import { isAbsolute } from "@visulima/path";
+import { resolveAlias, toPath } from "@visulima/path/utils";
+import { isNodeBuiltin, parseNodeModulePath } from "mlly";
+import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
+
+import resolveAliases from "../utils/resolve-aliases";
+import type { ExternalsBuildOptions, ExternalsPluginOptions } from "./externals-options";
+
+type MaybeFalsy<T> = T | false | null | undefined;
+
+const REGEX_ESCAPE_RE = /[.*+?^${}()|[\]\\]/g;
+const MATCH_ALL_RE = /.*/;
+const RELATIVE_OR_NULL_RE = /^(?:\0|\.{1,2}\/)/;
+const NODE_PREFIX_RE = /^node:/;
+
+const getRegExps = (data: MaybeFalsy<RegExp | string>[], type: "exclude" | "include", logger: Pail): RegExp[] =>
+    // eslint-disable-next-line unicorn/no-array-reduce
+    data.reduce<RegExp[]>((result, entry, index) => {
+        if (entry instanceof RegExp) {
+            result.push(entry);
+        } else if (typeof entry === "string" && entry.length > 0) {
+            result.push(new RegExp(`^${entry.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}$`));
+        } else {
+            logger.warn(`Ignoring wrong entry type #${String(index)} in '${type}' option: ${JSON.stringify(entry)}`);
+        }
+
+        return result;
+    }, []);
+
+const calledImplicitExternals = new Map<string, boolean>();
+
+const logExternalMessage = (originalId: string, logger: Pail): void => {
+    if (!calledImplicitExternals.has(originalId)) {
+        logger.info({
+            message: `Inlined implicit external "${cyan(originalId)}". If this is incorrect, add it to the "externals" option.`,
+            prefix: "plugin:packem:externals",
+        });
+    }
+
+    calledImplicitExternals.set(originalId, true);
+};
+
+const prefixedBuiltins = new Set(["node:sqlite", "node:test"]);
+
+// npm package names can never contain `:` or `\`, so anything with either is
+// a misidentified filesystem path (typically a Windows drive letter or a
+// backslash-separated source path that slipped past the bare-specifier check).
+const INVALID_PACKAGE_NAME_CHAR_RE = /[\\:]/;
+
+const isValidPackageName = (name: string): boolean => name.length > 0 && !INVALID_PACKAGE_NAME_CHAR_RE.test(name);
+
+const typesPrefix = "@types/";
+
+const getAtTypesPackageName = (packageName: string): string => {
+    if (packageName.startsWith("@")) {
+        const [scope, name] = packageName.split("/");
+
+        return `${scope ?? ""}/types/${name ?? ""}`;
+    }
+
+    return `${typesPrefix}${packageName}`;
+};
+
+const getOriginalPackageName = (typePackageName: string): string => {
+    if (typePackageName.startsWith("@")) {
+        const parts = typePackageName.split("/");
+
+        if (parts[1] === "types") {
+            return `@${parts[0] ?? ""}/${parts.slice(2).join("/")}`;
+        }
+    }
+
+    return typePackageName.replace(typesPrefix, "");
+};
+
+const dependencyTypes = ["peerDependencies", "dependencies", "optionalDependencies"] as const;
+
+export type { ExternalsBuildOptions, ExternalsPluginOptions, ResolveExternalsPluginOptions } from "./externals-options";
+
+/**
+ * Unified externals plugin.
+ *
+ * Owns every external decision for bare specifiers and node builtins, and is
+ * the single place that populates `context.usedDependencies`,
+ * `context.hoistedDependencies`, and `context.implicitDependencies`.
+ *
+ * Replaces the earlier pair of plugins (`externalize-dependencies` +
+ * `resolve-externals-plugin`) where external decisions were split between a
+ * `resolveId` direct return and an `options.external` callback. That split
+ * caused type-only imports to escape usage tracking, because returning
+ * `{ external: true }` from `resolveId` short-circuits before rollup's
+ * `options.external` fallback runs.
+ *
+ * Tracking and the final "is this id external?" decision live in
+ * `options.external` (rollup's final arbiter, called for every import
+ * including ones already resolved by other plugins). `resolveId` only
+ * handles cases that need plugin context — `this.resolve`/`this.error` for
+ * devDeps, `#` imports, and node builtin prefix handling.
+ */
+// eslint-disable-next-line sonarjs/cognitive-complexity -- orchestration function that wires all external-decision logic into a single Rollup plugin
+export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildContext<T>, options?: ExternalsPluginOptions): Plugin => {
+    const cwd = fs.realpathSync.native(process.cwd());
+    const { pkg } = context;
+
+    // Build the runtime-dep set. @types/X packages are imported as X at runtime
+    // (e.g. @types/react is imported as "react"), so normalize them here.
+    const runtimeDependencies = new Set<string>();
+
+    for (const property of dependencyTypes) {
+        const deps = pkg[property];
+
+        if (deps) {
+            for (const packageName of Object.keys(deps)) {
+                if (packageName.startsWith(typesPrefix)) {
+                    runtimeDependencies.add(getOriginalPackageName(packageName));
+                } else {
+                    runtimeDependencies.add(packageName);
+                }
+            }
+        }
+    }
+
+    const devDeps = new Set<string>(Object.keys(pkg.devDependencies ?? {}));
+
+    const resolvedExternalsOptions = context.options.rollup.resolveExternals ?? {};
+
+    // User-configured externals (from `externals` option + classified deps) form
+    // the include set; `resolveExternals.exclude` + DTS `resolve` form the exclude set.
+    const include = new Set(getRegExps([...context.options.externals ?? []], "include", context.logger));
+    const exclude = new Set(getRegExps([...resolvedExternalsOptions.exclude ?? []], "exclude", context.logger));
+
+    // dtsResolve adds to `exclude` so classified-dep externalization doesn't re-externalize
+    // packages whose types the DTS plugin wants to inline.
+    if (options?.dtsResolve) {
+        if (options.dtsResolve === true) {
+            exclude.add(MATCH_ALL_RE);
+        } else {
+            for (const pattern of options.dtsResolve) {
+                if (typeof pattern === "string") {
+                    exclude.add(new RegExp(`^${pattern.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}(?:/.+)?$`));
+                } else {
+                    exclude.add(pattern);
+                }
+            }
+        }
+    }
+
+    const shouldResolveForDts = (id: string): boolean => {
+        const { dtsResolve } = options ?? {};
+
+        if (!dtsResolve) {
+            return false;
+        }
+
+        if (typeof dtsResolve === "boolean") {
+            return dtsResolve;
+        }
+
+        return dtsResolve.some((pattern) => {
+            if (typeof pattern === "string") {
+                return id === pattern;
+            }
+
+            return pattern.test(id);
+        });
+    };
+
+    const classifiedDeps: Record<string, string | undefined> = {
+        ...resolvedExternalsOptions.deps ? pkg.dependencies ?? {} : undefined,
+        ...resolvedExternalsOptions.devDeps ? pkg.devDependencies ?? {} : undefined,
+        ...resolvedExternalsOptions.peerDeps ? pkg.peerDependencies ?? {} : undefined,
+        ...resolvedExternalsOptions.optDeps ? pkg.optionalDependencies ?? {} : undefined,
+    };
+    const classifiedNames = Object.keys(classifiedDeps);
+
+    if (classifiedNames.length > 0) {
+        include.add(new RegExp(`^(?:${classifiedNames.join("|")})(?:/.+)?$`));
+    }
+
+    if (pkg.peerDependenciesMeta) {
+        for (const [key, value] of Object.entries(pkg.peerDependenciesMeta)) {
+            if (value && typeof value === "object" && "optional" in value) {
+                include.add(new RegExp(`^${key}(?:/.+)?$`));
+            }
+        }
+    }
+
+    const isIncluded = (id: string) => [...include].some((rx) => rx.test(id));
+    const isExcluded = (id: string) => [...exclude].some((rx) => rx.test(id));
+
+    let tsconfigPathPatterns: RegExp[] = [];
+
+    if (context.tsconfig) {
+        tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) => {
+            if (key.endsWith("*")) {
+                return new RegExp(`^${key.replace("*", "(.*)")}$`);
+            }
+
+            return new RegExp(`^${key}$`);
+        });
+    }
+
+    const resolvedAliases = resolveAliases(pkg, context.options);
+    const sourceDirectoryPattern = context.options.sourceDir
+        ? new RegExp(String.raw`(?:^|/)${context.options.sourceDir.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}/`)
+        : undefined;
+
+    const warnedAtTypes = new Set<string>();
+    const warnedUnlisted = new Set<string>();
+
+    // Cache the external-decision function's result per id. usedDependencies /
+    // hoistedDependencies are idempotent sets so repeated add() calls are safe;
+    // caching only skips recomputation.
+    const cacheResolved = new Map<string, boolean>();
+
+    return <Plugin>{
+        name: "packem:externals",
+
+        // The options hook sets rollup's `external` function — the final arbiter rollup
+        // consults for every import (including ones already resolved by other plugins).
+        // This is where tracking and the external decision for bare specifiers + builtins
+        // live, so type-only imports are recorded even when erased from the JS output.
+        options: (rollupOptions: InputOptions) => {
+            // eslint-disable-next-line no-param-reassign, sonarjs/cognitive-complexity
+            rollupOptions.external = (rawOriginalId: string, rawImporter: string | undefined) => {
+                if (cacheResolved.has(rawOriginalId)) {
+                    return cacheResolved.get(rawOriginalId);
+                }
+
+                const originalId = toPath(rawOriginalId);
+                const importer = rawImporter ? toPath(rawImporter) : undefined;
+
+                let resolvedId: string | undefined;
+
+                if (Object.keys(resolvedAliases).length > 0) {
+                    const resolved = resolveAlias(originalId, resolvedAliases);
+
+                    if (resolved !== originalId) {
+                        resolvedId = resolved;
+                    }
+                }
+
+                // Extract the package name for tracking.
+                let parsedName = "";
+
+                if (resolvedId && isBareSpecifier(resolvedId)) {
+                    parsedName = parseNodeModulePath(resolvedId).name ?? "";
+                }
+
+                if (!parsedName && isBareSpecifier(originalId)) {
+                    parsedName = parseNodeModulePath(originalId).name ?? getPackageName(originalId);
+                }
+
+                const packageName = parsedName && isBareSpecifier(parsedName) && isValidPackageName(parsedName) ? parsedName : "";
+
+                // Tracking runs up front (before any decision branch), so type-only
+                // imports resolved by the DTS pass are still recorded.
+                if (packageName && !isNodeBuiltin(packageName)) {
+                    context.usedDependencies.add(packageName);
+
+                    const importerFromSource = !importer || !isFromNodeModules(importer, context.options.rootDir);
+                    const declared
+                        = Object.keys(pkg.dependencies ?? {}).includes(packageName)
+                            || Object.keys(pkg.devDependencies ?? {}).includes(packageName)
+                            || Object.keys(pkg.peerDependencies ?? {}).includes(packageName)
+                            || Object.keys(pkg.optionalDependencies ?? {}).includes(packageName);
+
+                    if (
+                        importerFromSource
+                        && !declared
+                        && context.options.validation
+                        && context.options.validation.dependencies
+                        && context.options.validation.dependencies.hoisted !== false
+                        && !context.options.validation.dependencies.hoisted?.exclude.includes(packageName)
+                    ) {
+                        context.hoistedDependencies.add(packageName);
+                    }
+                }
+
+                for (const candidate of [originalId, resolvedId].filter(Boolean)) {
+                    // Self-import: `pkg.name` exactly or `pkg.name/subpath`. A loose
+                    // `startsWith(pkg.name)` match would incorrectly treat sibling workspace
+                    // packages sharing the same scope+prefix (e.g. `@visulima/packem-rollup`
+                    // for `@visulima/packem`) as self-imports and stop them from being marked
+                    // external, causing rollup to load their dist files during the DTS build.
+                    const isSelfImport = pkg.name ? candidate === pkg.name || candidate.startsWith(`${pkg.name}/`) : false;
+
+                    if (RELATIVE_OR_NULL_RE.test(candidate) || isAbsolute(candidate) || (sourceDirectoryPattern?.test(candidate) ?? false) || isSelfImport) {
+                        cacheResolved.set(rawOriginalId, false);
+
+                        return false;
+                    }
+
+                    if (isNodeBuiltin(candidate) || prefixedBuiltins.has(candidate)) {
+                        let result = resolvedExternalsOptions.builtins;
+
+                        if (result === undefined && importer) {
+                            result = isIncluded(importer) && !isExcluded(importer);
+                        }
+
+                        cacheResolved.set(rawOriginalId, result as boolean);
+
+                        return result;
+                    }
+
+                    if (candidate[0] === "#" && !candidate.startsWith("#/")) {
+                        // `#` imports are handled by the resolveId hook — never external here.
+                        cacheResolved.set(rawOriginalId, false);
+
+                        return false;
+                    }
+
+                    // A declared dependency (deps / peerDeps / optDeps / user externals)
+                    // must win over any tsconfig `paths` entry. Consumers sometimes use a
+                    // catch-all `"*": ["./*"]` paths mapping for TS type-checking fallback
+                    // — without this ordering, every bare specifier including declared
+                    // peerDeps (e.g. `vite`) would match the catch-all and skip
+                    // externalization, letting rollup load the peer's source through the
+                    // commonjs plugin and into esbuild, which blows up on vite 8's chunks.
+                    if (isIncluded(candidate) && !isExcluded(candidate)) {
+                        cacheResolved.set(rawOriginalId, true);
+
+                        return true;
+                    }
+
+                    if (tsconfigPathPatterns.some((rx) => rx.test(candidate))) {
+                        cacheResolved.set(rawOriginalId, false);
+
+                        return false;
+                    }
+
+                    if (packageName && shouldResolveForDts(packageName)) {
+                        // dtsResolve wants this package's types inlined; let rollup / DTS plugin
+                        // resolve it. Tracking already happened above.
+                        cacheResolved.set(rawOriginalId, false);
+
+                        return false;
+                    }
+                }
+
+                context.implicitDependencies.add(originalId);
+
+                logExternalMessage(originalId, context.logger);
+
+                cacheResolved.set(rawOriginalId, false);
+
+                return false;
+            };
+        },
+
+        resolveId: {
+            filter: {
+                id: (id: string) => !id.startsWith("\0"),
+            },
+            // eslint-disable-next-line sonarjs/cognitive-complexity -- resolveId handler covers many distinct external-decision branches that are clearer kept inline
+            async handler(id: string, importer: string | undefined, resolveOptions): Promise<ResolveIdResult> {
+                if (resolveOptions.isEntry) {
+                    return undefined;
+                }
+
+                // Package.json `imports` (# prefixed) from source — externalize so Node
+                // resolves them at runtime. `#/` patterns are tsconfig aliases, not package imports.
+                if (id[0] === "#" && !id.startsWith("#/") && pkg.imports) {
+                    if (importer && !isFromNodeModules(importer, context.options.rootDir)) {
+                        return { external: true, id };
+                    }
+
+                    return undefined;
+                }
+
+                if (prefixedBuiltins.has(id)) {
+                    return {
+                        external: true,
+                        id,
+                        moduleSideEffects: false,
+                    };
+                }
+
+                if (isNodeBuiltin(id)) {
+                    const stripped = id.replace(NODE_PREFIX_RE, "");
+                    let prefixId: string = stripped;
+
+                    if (resolvedExternalsOptions.builtinsPrefix === "add" || !isNodeBuiltin(stripped)) {
+                        prefixId = `node:${stripped}`;
+                    }
+
+                    return {
+                        external: (resolvedExternalsOptions.builtins ?? isIncluded(id)) && !isExcluded(id),
+                        id: resolvedExternalsOptions.builtinsPrefix === "ignore" ? id : prefixId,
+                        moduleSideEffects: false,
+                    };
+                }
+
+                if (!isBareSpecifier(id) || id.includes("?") || id.includes(" ")) {
+                    return undefined;
+                }
+
+                const [specifierPkg] = parseSpecifier(id);
+
+                // devDependency — if user externals included it, options.external handles that.
+                // Otherwise resolve and bundle; fail fast on unresolvable declared deps.
+                if (devDeps.has(specifierPkg) && !runtimeDependencies.has(specifierPkg)) {
+                    if (isIncluded(id) && !isExcluded(id)) {
+                        // Let options.external mark it external — no need to resolve.
+                        return undefined;
+                    }
+
+                    // DTS build: the DTS resolver owns type resolution entirely.
+                    //
+                    // For devDeps on the `dtsResolve` inline list, returning undefined hands
+                    // off to the DTS resolver which picks the `.d.ts` through the types
+                    // condition. Resolving here would go through the JS node-resolve
+                    // conditions and return the package's `.js` entry, erasing the types
+                    // before the DTS pipeline sees them.
+                    //
+                    // For devDeps NOT on the inline list, externalize directly. Going
+                    // through node-resolve would blow up for types-only packages that have
+                    // no `.js` entry in their `exports` field (e.g. `type-fest`, `@types/*`)
+                    // — the package is meant to be externalized anyway, so there's no
+                    // reason to look up a non-existent JS entry.
+                    if (options?.forTypes) {
+                        if (options.dtsResolve && shouldResolveForDts(specifierPkg)) {
+                            return undefined;
+                        }
+
+                        return { external: true, id, moduleSideEffects: false };
+                    }
+
+                    const resolved = await this.resolve(id, importer, { skipSelf: true, ...resolveOptions });
+
+                    if (!resolved) {
+                        throw new Error(`Could not resolve "${id}" even though it's declared in package.json. Try re-installing node_modules.`);
+                    }
+
+                    if (options?.forTypes) {
+                        const atTypesName = getAtTypesPackageName(specifierPkg);
+
+                        if (runtimeDependencies.has(atTypesName) && !warnedAtTypes.has(atTypesName)) {
+                            warnedAtTypes.add(atTypesName);
+                            context.logger.warn(
+                                `Recommendation: "${atTypesName}" is externalized but "${specifierPkg}" is bundled (devDependencies). This may cause type mismatches for consumers. Consider moving "${specifierPkg}" to dependencies or "${atTypesName}" to devDependencies.`,
+                            );
+                        }
+                    }
+
+                    return resolved;
+                }
+
+                // Runtime-dep @types recommendation + unlisted warning. The external decision
+                // for these is handled by options.external.
+                if (runtimeDependencies.has(specifierPkg)) {
+                    if (options?.forTypes) {
+                        const atTypesName = getAtTypesPackageName(specifierPkg);
+
+                        if (devDeps.has(atTypesName) && !warnedAtTypes.has(atTypesName)) {
+                            warnedAtTypes.add(atTypesName);
+                            context.logger.warn(
+                                `Recommendation: "${atTypesName}" is bundled (devDependencies) but "${specifierPkg}" is externalized. Place "${atTypesName}" in dependencies/peerDependencies as well so users don't have missing types.`,
+                            );
+                        }
+                    }
+
+                    return undefined;
+                }
+
+                if (
+                    !devDeps.has(specifierPkg)
+                    && importer
+                    && !isFromNodeModules(importer, cwd)
+                    && !options?.skipUnlistedWarnings
+                    && !warnedUnlisted.has(specifierPkg)
+                ) {
+                    warnedUnlisted.add(specifierPkg);
+                    context.logger.warn(
+                        `"${specifierPkg}" imported by "${importer}" but not declared in package.json. Will be bundled to prevent failure at runtime.`,
+                    );
+                }
+
+                // DTS build fallback: unclassified bare specifier imported from a file
+                // that is NOT part of this project's source — i.e. a transitive dep of
+                // a package we're inlining (pnpm workspace sibling's `dist/`, npm install
+                // under `node_modules/`, …). Route it to external instead of node-resolve,
+                // which would crash for types-only transitive deps with no JS entry in
+                // `exports` (e.g. `type-fest`, `tagged-tag`). Two signals:
+                //   • traditional `node_modules/` path (isFromNodeModules), or
+                //   • importer outside `cwd` entirely (pnpm workspace dep resolved via
+                //     symlink follows the realpath out of the project; from cerebro, pail's
+                //     `dist/*.d.ts` is at `../../error-debugging/pail/dist/...` — no
+                //     `node_modules` segment, but not this project's source either).
+                if (options?.forTypes && importer && isOutsideProject(importer, cwd)) {
+                    return { external: true, id, moduleSideEffects: false };
+                }
+
+                return undefined;
+            },
+            order: "pre",
+        },
+    };
+};

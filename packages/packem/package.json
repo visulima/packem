@@ -196,7 +196,7 @@
         "@visulima/cerebro": "2.1.5",
         "@visulima/colorize": "1.4.29",
         "@visulima/find-cache-dir": "2.0.7",
-        "@visulima/fs": "4.1.0",
+        "@visulima/fs": "catalog:visulima",
         "@visulima/humanizer": "2.0.5",
         "@visulima/package": "4.1.7",
         "@visulima/packem-rollup": "workspace:*",
@@ -217,8 +217,7 @@
         "picomatch": "4.0.4",
         "rollup-plugin-import-trace": "catalog:build",
         "semver": "7.8.0",
-        "tinyexec": "1.1.2",
-        "tinyglobby": "0.2.16"
+        "tinyexec": "1.1.2"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "^27.0.2",
@@ -261,7 +260,6 @@
         "esbuild": "^0.28.0",
         "eslint": "10.3.0",
         "execa": "^9.6.1",
-        "glob-parent": "6.0.2",
         "icss-utils": "^5.1.0",
         "less": "^4.6.4",
         "lightningcss": "1.32.0",

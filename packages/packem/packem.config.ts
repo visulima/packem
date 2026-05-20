@@ -23,7 +23,6 @@ export default defineConfig({
         "@visulima/rollup-plugin-dts",
         "rollup-plugin-license",
         "rs-module-lexer",
-        "glob-parent",
         "oxc-parser",
         "oxc-resolver",
     ],

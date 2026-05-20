@@ -1,0 +1,193 @@
+import { stat } from "node:fs/promises";
+
+import { readFile } from "@visulima/fs";
+import { glob } from "@visulima/fs/glob";
+import globParent from "@visulima/fs/glob-parent";
+import { arrayify } from "@visulima/packem-share/utils";
+import { basename, dirname, join, normalize, relative } from "@visulima/path";
+import type { Plugin } from "rollup";
+
+type FileDesc = { copied: string[]; dest: string[]; timestamp: number; transform?: (content: Buffer, filename: string) => Buffer | string };
+
+type SingleTargetDesc = {
+    dest?: string;
+    exclude?: string[] | string;
+    src: string[] | string;
+};
+
+type MultipleTargetsDesc = SingleTargetDesc | SingleTargetDesc[] | string[] | string;
+
+export type CopyPluginOptions = {
+    /**
+     * Copy items once. Useful in watch mode.
+     * @default false
+     */
+    copyOnce?: boolean;
+    exactFileNames?: boolean;
+
+    /**
+     * Remove the directory structure of copied files.
+     * @default true
+     */
+    flatten?: boolean;
+    targets: MultipleTargetsDesc;
+};
+
+export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin => {
+    const files = new Map<string, FileDesc>();
+    const config = {
+        copyOnce: true,
+        exactFileNames: true,
+        flatten: false,
+        ...options,
+    };
+
+    let { targets } = config;
+
+    if (Array.isArray(targets)) {
+        targets = targets
+            .map((item) => {
+                if (typeof item === "string") {
+                    return { src: item };
+                }
+
+                if (typeof item === "object" && "src" in item) {
+                    return item;
+                }
+
+                return undefined;
+            })
+            .filter(Boolean);
+    } else if (typeof targets === "string") {
+        targets = [{ src: targets }];
+    }
+
+    return <Plugin>{
+        async buildStart() {
+            const results = await Promise.all(
+                (targets as SingleTargetDesc[])
+                    .flatMap((target): SingleTargetDesc[] => {
+                        if (Array.isArray(target.src)) {
+                            return target.src.map((itemSource) => {
+                                return {
+                                    ...target,
+                                    src: itemSource,
+                                };
+                            });
+                        }
+
+                        return [target];
+                    })
+                    .map(
+                        async (target) =>
+                            await glob(arrayify(target.src), { ignore: arrayify(target.exclude).filter(Boolean) }).then((result) => {
+                                return {
+                                    dest: target.dest ?? "",
+                                    parent: globParent(target.src as string),
+                                    src: result,
+                                };
+                            }),
+                    ),
+            );
+
+            for (const result of results) {
+                for (const file of result.src) {
+                    let fileDesc: FileDesc;
+
+                    if (files.has(file)) {
+                        fileDesc = files.get(file) as FileDesc;
+                    } else {
+                        fileDesc = {
+                            copied: [],
+                            dest: [],
+                            timestamp: 0,
+                        };
+                        files.set(file, fileDesc);
+                    }
+
+                    const destination = config.flatten ? normalize(result.dest) : join(result.dest, relative(result.parent, dirname(file)));
+
+                    if (!fileDesc.dest.includes(destination)) {
+                        fileDesc.dest.push(destination);
+                    }
+
+                    this.addWatchFile(file);
+                }
+            }
+
+            logger.info({
+                message: "Copying files...",
+                prefix: "plugin:copy",
+            });
+
+            await Promise.all(
+                Array.from(files, async ([fileName, fileDesc]) => {
+                    let source: Uint8Array | undefined;
+
+                    try {
+                        const fileStat = await stat(fileName);
+
+                        if (!fileStat.isFile()) {
+                            return;
+                        }
+
+                        const timestamp = fileStat.mtime.getTime();
+
+                        if (timestamp > fileDesc.timestamp) {
+                            // eslint-disable-next-line no-param-reassign
+                            fileDesc.timestamp = timestamp;
+                            // eslint-disable-next-line no-param-reassign
+                            fileDesc.copied = [];
+                        }
+
+                        source = await readFile(fileName, {
+                            buffer: true,
+                        });
+                    } catch (error: unknown) {
+                        logger.error({
+                            context: [error],
+                            message: `error reading file ${fileName}`,
+                            prefix: "plugin:copy",
+                        });
+
+                        return;
+                    }
+
+                    for (const destination of fileDesc.dest) {
+                        if (config.copyOnce && fileDesc.copied.includes(destination)) {
+                            continue;
+                        }
+
+                        const baseName = basename(fileName);
+
+                        // path.join removes ./ from the beginning, that's needed for rollup name/fileName fields
+                        const destinationFileName = join(destination, baseName);
+
+                        try {
+                            this.emitFile({
+                                [config.exactFileNames ? "fileName" : "name"]: destinationFileName,
+                                source,
+                                type: "asset",
+                            });
+
+                            logger.debug({
+                                message: `copied ${fileName} → ${destinationFileName}`,
+                                prefix: "plugin:copy",
+                            });
+
+                            fileDesc.copied.push(destination);
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        } catch (error: any) {
+                            logger.error({
+                                context: [error],
+                                message: `error copying file ${fileName} → ${destinationFileName}`,
+                                prefix: "plugin:copy",
+                            });
+                        }
+                    }
+                }),
+            );
+        },
+        name: "packem:copy",
+    };
+};

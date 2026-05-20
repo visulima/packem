@@ -1,8 +1,9 @@
 import { VALID_EXPORT_EXTENSIONS } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getOutputExtension, warn } from "@visulima/packem-share/utils";
+import { globSync } from "@visulima/fs/glob";
+import isGlob from "@visulima/fs/is-glob";
 import { resolve } from "@visulima/path";
-import { globSync, isDynamicPattern } from "tinyglobby";
 
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
 
@@ -84,7 +85,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
             const allValidExtensions = [...VALID_EXPORT_EXTENSIONS, ...allowedExtensions];
 
             // Handle dynamic patterns by expanding glob and validating each matched file
-            if (isDynamicPattern(value)) {
+            if (isGlob(value)) {
                 try {
                     // Convert relative path to absolute path for glob expansion
                     const absolutePattern = value.startsWith("./") ? resolve(context.options.rootDir, value.slice(2)) : resolve(context.options.rootDir, value);

@@ -1,10 +1,11 @@
 import { cyan } from "@visulima/colorize";
 import { NotFoundError } from "@visulima/fs/error";
+import { globSync } from "@visulima/fs/glob";
+import isGlobPattern from "@visulima/fs/is-glob";
 import { ENDING_REGEX } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
-import { globSync, isDynamicPattern } from "tinyglobby";
 
 import type { BuildEntry, InternalBuildOptions } from "../../types";
 
@@ -97,13 +98,13 @@ const extendEntry = (entry: BuildEntry, context: BuildContext<InternalBuildOptio
 const normalizeEntries = (context: BuildContext<InternalBuildOptions>): void => {
     context.options.entries = context.options.entries.map((entry) => {
         if (typeof entry === "string") {
-            return { input: entry, isGlob: isDynamicPattern(entry) };
+            return { input: entry, isGlob: isGlobPattern(entry) };
         }
 
         return {
             ...entry,
             exportKey: entry.exportKey ?? new Set(),
-            isGlob: isDynamicPattern(entry.input),
+            isGlob: isGlobPattern(entry.input),
         };
     });
 };

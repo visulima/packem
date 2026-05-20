@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { rollupBuild as rolldownBuild } from "@sxzz/test-utils";
-import { glob } from "tinyglobby";
+import { glob } from "@visulima/fs/glob";
 import { describe, expect, it } from "vitest";
 
 import { dts } from "../src/index.js";
