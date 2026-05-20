@@ -4936,7 +4936,7 @@ class ElementPart {
 }
 const polyfillSupport$1 = global$1.litHtmlPolyfillSupportDevMode ;
 polyfillSupport$1?.(Template, ChildPart);
-(global$1.litHtmlVersions ??= []).push("3.3.2");
+(global$1.litHtmlVersions ??= []).push("3.3.3");
 if (global$1.litHtmlVersions.length > 1) {
   queueMicrotask(() => {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
@@ -6885,7 +6885,7 @@ class ElementPart {
 }
 const polyfillSupport$1 = global$1.litHtmlPolyfillSupportDevMode ;
 polyfillSupport$1?.(Template, ChildPart);
-(global$1.litHtmlVersions ??= []).push("3.3.2");
+(global$1.litHtmlVersions ??= []).push("3.3.3");
 if (global$1.litHtmlVersions.length > 1) {
   queueMicrotask(() => {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
@@ -8874,7 +8874,7 @@ class ElementPart {
 }
 const polyfillSupport$1 = global$1.litHtmlPolyfillSupportDevMode ;
 polyfillSupport$1?.(Template, ChildPart);
-(global$1.litHtmlVersions ??= []).push("3.3.2");
+(global$1.litHtmlVersions ??= []).push("3.3.3");
 if (global$1.litHtmlVersions.length > 1) {
   queueMicrotask(() => {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
@@ -10824,7 +10824,7 @@ class ElementPart {
 }
 const polyfillSupport$1 = global$1.litHtmlPolyfillSupportDevMode ;
 polyfillSupport$1?.(Template, ChildPart);
-(global$1.litHtmlVersions ??= []).push("3.3.2");
+(global$1.litHtmlVersions ??= []).push("3.3.3");
 if (global$1.litHtmlVersions.length > 1) {
   queueMicrotask(() => {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
@@ -12776,7 +12776,7 @@ class ElementPart {
 }
 const polyfillSupport$1 = global$1.litHtmlPolyfillSupportDevMode ;
 polyfillSupport$1?.(Template, ChildPart);
-(global$1.litHtmlVersions ??= []).push("3.3.2");
+(global$1.litHtmlVersions ??= []).push("3.3.3");
 if (global$1.litHtmlVersions.length > 1) {
   queueMicrotask(() => {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
@@ -14726,7 +14726,7 @@ class ElementPart {
 }
 const polyfillSupport$1 = global$1.litHtmlPolyfillSupportDevMode ;
 polyfillSupport$1?.(Template, ChildPart);
-(global$1.litHtmlVersions ??= []).push("3.3.2");
+(global$1.litHtmlVersions ??= []).push("3.3.3");
 if (global$1.litHtmlVersions.length > 1) {
   queueMicrotask(() => {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
