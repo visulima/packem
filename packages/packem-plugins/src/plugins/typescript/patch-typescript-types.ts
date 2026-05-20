@@ -133,8 +133,36 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
 
     const s = new MagicString(code);
     const parsed = parseSync(chunk.fileName, code, {
+        lang: "dts",
         sourceType: "module",
     });
+
+    // For each `@internal` block comment, compute the start position of the AST node it
+    // precedes. We must skip BOTH whitespace and any intervening comments — babel attached
+    // consecutive leading comments to the same node, and we preserve that grouping so
+    // stacked `/* @internal */` markers all collapse into a single removal.
+    const skipPastCommentsAndWhitespace = (from: number): number => {
+        let pos = from;
+        let advanced = true;
+
+        while (advanced) {
+            advanced = false;
+
+            while (pos < code.length && WHITESPACE_RE.test(code[pos] as string)) {
+                pos += 1;
+            }
+
+            for (const c of parsed.comments) {
+                if (c.start === pos) {
+                    pos = c.end;
+                    advanced = true;
+                    break;
+                }
+            }
+        }
+
+        return pos;
+    };
 
     const pending: PendingInternalComment[] = [];
 
@@ -143,13 +171,7 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
             continue;
         }
 
-        let pos = comment.end;
-
-        while (pos < code.length && WHITESPACE_RE.test(code[pos] as string)) {
-            pos += 1;
-        }
-
-        pending.push({ commentStart: comment.start, nextStart: pos });
+        pending.push({ commentStart: comment.start, nextStart: skipPastCommentsAndWhitespace(comment.end) });
     }
 
     if (pending.length > 0) {
@@ -169,26 +191,21 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
                     return;
                 }
 
+                const index = pending.findIndex((c) => c.nextStart === start);
+
+                if (index === -1) {
+                    return;
+                }
+
                 // Examples:
                 // function a(foo: string, /* @internal */ bar: number)
                 //                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
                 // strip trailing comma
-                for (let index = 0; index < pending.length; index += 1) {
-                    const candidate = pending[index] as PendingInternalComment;
+                const [{ commentStart }] = pending.splice(index, 1) as [PendingInternalComment];
+                const removalEnd = code[end] === "," ? end + 1 : end;
 
-                    if (candidate.nextStart !== start) {
-                        continue;
-                    }
-
-                    pending.splice(index, 1);
-
-                    const removalEnd = code[end] === "," ? end + 1 : end;
-
-                    s.remove(candidate.commentStart, removalEnd);
-                    this.skip();
-
-                    return;
-                }
+                s.remove(commentStart, removalEnd);
+                this.skip();
             },
         });
     }

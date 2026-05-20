@@ -1,0 +1,207 @@
+{
+    "name": "@visulima/packem-plugins",
+    "version": "1.0.0-alpha.0",
+    "private": true,
+    "description": "Internal: bundler-agnostic custom plugins shared by @visulima/packem-rollup and @visulima/packem-rolldown. Not published — consumers inline this package at build time via workspace devDependency.",
+    "keywords": [
+        "visulima",
+        "packem-plugins"
+    ],
+    "homepage": "https://github.com/visulima/packem/tree/main/packages/packem-plugins",
+    "bugs": {
+        "url": "https://github.com/visulima/packem/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/visulima/packem.git",
+        "directory": "packages/packem-plugins"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/prisis"
+        },
+        {
+            "type": "consulting",
+            "url": "https://anolilab.com/support"
+        }
+    ],
+    "license": "MIT",
+    "author": {
+        "name": "Daniel Bannert",
+        "email": "d.bannert@anolilab.de"
+    },
+    "sideEffects": false,
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        },
+        "./babel": {
+            "types": "./dist/plugins/babel/index.d.ts",
+            "default": "./dist/plugins/babel/index.js"
+        },
+        "./typescript": {
+            "types": "./dist/plugins/typescript/index.d.ts",
+            "default": "./dist/plugins/typescript/index.js"
+        },
+        "./oxc": {
+            "types": "./dist/plugins/oxc/index.d.ts",
+            "default": "./dist/plugins/oxc/index.js"
+        },
+        "./plugin/minify-html-literals": {
+            "types": "./dist/plugins/minify-html-literals/index.d.ts",
+            "default": "./dist/plugins/minify-html-literals/index.js"
+        },
+        "./plugin/require-cjs-transformer": {
+            "types": "./dist/plugins/require-cjs-transformer.d.ts",
+            "default": "./dist/plugins/require-cjs-transformer.js"
+        },
+        "./plugin/copy": {
+            "types": "./dist/plugins/copy.d.ts",
+            "default": "./dist/plugins/copy.js"
+        },
+        "./plugin/data-uri": {
+            "types": "./dist/plugins/data-uri.d.ts",
+            "default": "./dist/plugins/data-uri.js"
+        },
+        "./plugin/debarrel": {
+            "types": "./dist/plugins/debarrel.d.ts",
+            "default": "./dist/plugins/debarrel.js"
+        },
+        "./plugin/esm-shim-cjs-syntax": {
+            "types": "./dist/plugins/esm-shim-cjs-syntax.d.ts",
+            "default": "./dist/plugins/esm-shim-cjs-syntax.js"
+        },
+        "./plugin/fix-dts-default-cjs-exports": {
+            "types": "./dist/plugins/fix-dts-default-cjs-exports.d.ts",
+            "default": "./dist/plugins/fix-dts-default-cjs-exports.js"
+        },
+        "./plugin/license": {
+            "types": "./dist/plugins/license.d.ts",
+            "default": "./dist/plugins/license.js"
+        },
+        "./plugin/native-modules": {
+            "types": "./dist/plugins/native-modules-plugin.d.ts",
+            "default": "./dist/plugins/native-modules-plugin.js"
+        },
+        "./plugin/raw": {
+            "types": "./dist/plugins/raw.d.ts",
+            "default": "./dist/plugins/raw.js"
+        },
+        "./plugin/shebang": {
+            "types": "./dist/plugins/shebang.d.ts",
+            "default": "./dist/plugins/shebang.js"
+        },
+        "./plugin/source-maps": {
+            "types": "./dist/plugins/source-maps.d.ts",
+            "default": "./dist/plugins/source-maps.js"
+        },
+        "./plugin/url": {
+            "types": "./dist/plugins/url.d.ts",
+            "default": "./dist/plugins/url.js"
+        },
+        "./plugin/import-attributes": {
+            "types": "./dist/plugins/import-attributes.d.ts",
+            "default": "./dist/plugins/import-attributes.js"
+        },
+        "./plugin/externals": {
+            "types": "./dist/plugins/externals.d.ts",
+            "default": "./dist/plugins/externals.js"
+        },
+        "./plugin/resolve-implicit-externals": {
+            "types": "./dist/plugins/resolve-implicit-externals.d.ts",
+            "default": "./dist/plugins/resolve-implicit-externals.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "CHANGELOG.md",
+        "README.md",
+        "dist"
+    ],
+    "scripts": {
+        "build": "../../node_modules/.bin/packem build --development",
+        "build:prod": "../../node_modules/.bin/packem build --production",
+        "clean": "rimraf node_modules dist .eslintcache",
+        "dev": "pnpm run build --watch",
+        "lint:attw": "attw --pack",
+        "lint:eslint": "eslint . --cache --concurrency auto",
+        "lint:eslint:fix": "eslint . --cache --concurrency auto --fix,",
+        "lint:package-json": "publint --strict",
+        "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
+        "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
+        "lint:types": "tsc --noEmit",
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage",
+        "test:ui": "vitest --ui --coverage.enabled=true",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@rollup/plugin-alias": "catalog:build",
+        "@rollup/pluginutils": "catalog:build",
+        "@visulima/colorize": "catalog:visulima",
+        "@visulima/fs": "catalog:visulima",
+        "@visulima/package": "catalog:visulima",
+        "@visulima/packem-share": "workspace:*",
+        "@visulima/path": "catalog:visulima",
+        "@visulima/source-map": "catalog:visulima",
+        "cjs-module-lexer": "catalog:prod",
+        "clean-css": "catalog:style",
+        "html-minifier-next": "catalog:prod",
+        "magic-string": "catalog:utils",
+        "mlly": "catalog:prod",
+        "oxc-parser": "catalog:prod",
+        "oxc-resolver": "catalog:node",
+        "rollup-plugin-license": "catalog:build",
+        "rs-module-lexer": "catalog:prod",
+        "semver": "catalog:utils"
+    },
+    "devDependencies": {
+        "@anolilab/eslint-config": "catalog:lint",
+        "@anolilab/prettier-config": "catalog:lint",
+        "@anolilab/semantic-release-pnpm": "catalog:cli",
+        "@anolilab/semantic-release-preset": "catalog:cli",
+        "@arethetypeswrong/cli": "catalog:dev",
+        "@babel/core": "catalog:dev",
+        "@oxc-parser/binding-linux-x64-gnu": "catalog:dev",
+        "@oxc-project/types": "catalog:dev",
+        "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
+        "@total-typescript/ts-reset": "catalog:tsc",
+        "@types/babel__core": "catalog:types",
+        "@types/clean-css": "catalog:types",
+        "@types/estree": "catalog:types",
+        "@types/html-minifier-next": "catalog:types",
+        "@types/node": "catalog:types",
+        "@types/semver": "catalog:types",
+        "@visulima/packem": "catalog:visulima",
+        "@visulima/pail": "catalog:visulima",
+        "@visulima/tsconfig": "catalog:visulima",
+        "@vitest/coverage-v8": "catalog:test",
+        "@vitest/ui": "catalog:test",
+        "conventional-changelog-conventionalcommits": "catalog:dev",
+        "esbuild": "catalog:build",
+        "eslint": "catalog:lint",
+        "estree-walker": "catalog:dev",
+        "hookable": "catalog:dev",
+        "jiti": "catalog:script",
+        "mime": "catalog:dev",
+        "oxc-transform": "catalog:dev",
+        "prettier": "catalog:lint",
+        "publint": "catalog:lint",
+        "rimraf": "catalog:node",
+        "rollup": "catalog:build",
+        "secretlint": "catalog:lint",
+        "semantic-release": "catalog:cli",
+        "typescript": "catalog:tsc",
+        "vitest": "catalog:test"
+    },
+    "engines": {
+        "node": "^22.14.0 || >= 24.10.0"
+    },
+    "publishConfig": {
+        "access": "public",
+        "provenance": true
+    }
+}
