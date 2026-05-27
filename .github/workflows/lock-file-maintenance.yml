@@ -21,12 +21,12 @@ jobs:
 
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0" # v2.12.0
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
                   egress-policy: "audit"
 
             - name: "Git checkout"
-              uses: "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683" # v4.2.2
+              uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6.0.2
               with:
                   token: "${{ secrets.LOCK_MAINTENANCE_GITHUB_TOKEN }}"
               env:
@@ -36,7 +36,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1
+              uses: "anolilab/workflows/step/setup@94b27723e80256ce9bcace59884a051aca8fef22" # v18.0.1
               with:
                   node-version: "22.x"
                   cache-prefix: "lock-file"
@@ -48,7 +48,7 @@ jobs:
 
             - name: "Commit lock file"
               if: "success()"
-              uses: "stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403" # v5.2.0
+              uses: "stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9" # v7.1.0
               with:
                   file_pattern: "pnpm-lock.yaml"
                   commit_message: "chore: updated lock file [ci skip]"
