@@ -41,7 +41,7 @@ catalogs:
     "@visulima/packem-rollup": 1.0.0-alpha.65
     "@visulima/rollup-plugin-css": 1.0.0-alpha.45
     esbuild: 0.28.0
-    rolldown: 1.0.2
+    rolldown: 1.0.3
     rollup: 4.60.4
     rollup-plugin-dts: 6.4.1
     rollup-plugin-import-trace: 1.0.1
@@ -52,28 +52,28 @@ catalogs:
     rollup-plugin-svelte: ^7.2.3
     rollup-plugin-visualizer: 7.0.1
     unplugin-vue: 7.2.0
-    vite: 8.0.13
+    vite: 8.0.14
   cli:
-    "@anolilab/multi-semantic-release": 4.4.1
-    "@anolilab/semantic-release-pnpm": 8.1.9
-    "@anolilab/semantic-release-preset": 13.4.10
+    "@anolilab/multi-semantic-release": 4.4.4
+    "@anolilab/semantic-release-pnpm": 8.1.15
+    "@anolilab/semantic-release-preset": 13.4.16
     commitizen: ^4.3.1
     semantic-release: 25.0.3
   dev:
     "@arethetypeswrong/cli": ^0.18.2
-    "@babel/core": 7.29.0
-    "@babel/parser": 7.29.3
+    "@babel/core": 7.29.7
+    "@babel/parser": 7.29.7
     "@mozilla/readability": ^0.6.0
-    "@oxc-parser/binding-linux-x64-gnu": 0.132.0
-    "@oxc-project/types": 0.132.0
+    "@oxc-parser/binding-linux-x64-gnu": 0.133.0
+    "@oxc-project/types": 0.133.0
     "@svgr/core": ^8.1.0
-    "@swc/core": 1.15.33
-    "@swc/helpers": 0.5.21
+    "@swc/core": 1.15.40
+    "@swc/helpers": 0.5.23
     "@swc/types": 0.1.26
     babel-plugin-transform-hook-names: ^1.0.2
     babel-preset-solid: 1.9.12
     conventional-changelog-conventionalcommits: 9.3.1
-    deeks: ^3.2.0
+    deeks: ^3.2.1
     detect-indent: ^7.0.2
     diff: 9.0.0
     estree-walker: ^3.0.3
@@ -81,8 +81,8 @@ catalogs:
     lit: 3.3.3
     mime: ^4.1.0
     nodehun: ^3.0.2
-    oxc-parser: 0.132.0
-    oxc-transform: 0.132.0
+    oxc-parser: 0.133.0
+    oxc-transform: 0.133.0
     p-queue: 9.3.0
     package-manager-detector: ^1.6.0
     picocolors: ^1.1.1
@@ -98,15 +98,15 @@ catalogs:
     typedoc: 0.28.19
     typedoc-plugin-rename-defaults: 0.7.3
   frontend:
-    "@babel/preset-react": ^7.28.5
+    "@babel/preset-react": ^7.29.7
     "@radix-ui/react-tooltip": ^1.2.8
-    "@vue/language-core": 3.3.1
+    "@vue/language-core": 3.3.2
     babel-plugin-react-compiler: 1.0.0
     preact: 10.29.2
     react: 19.2.6
     react-dom: 19.2.6
     svelte: 5.55.9
-    vue: 3.5.34
+    vue: 3.5.35
   icons:
     lucide-static: 1.16.0
   lint:
@@ -130,13 +130,13 @@ catalogs:
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.11.0
   monorepo:
-    nx: 22.7.2
+    nx: 22.7.4
   network:
     browserslist: 4.28.2
     browserslist-config-anolilab: 9.0.0
   node:
     "@antfu/install-pkg": 1.1.0
-    "@babel/preset-env": 7.29.5
+    "@babel/preset-env": 7.29.7
     "@clack/prompts": 1.4.0
     cac: 7.0.0
     cross-env: ^10.1.0
@@ -146,16 +146,16 @@ catalogs:
     oxc-resolver: 11.19.1
     pkg-pr-new: 0.0.75
     rimraf: 6.1.3
-    tinyexec: 1.1.2
+    tinyexec: 1.2.2
     tinyglobby: 0.2.16
   peer:
     package-manager-detector: ^1.6.0
   prod:
     "@arethetypeswrong/core": ^0.18.2
-    "@babel/generator": 7.29.1
-    "@babel/helper-validator-identifier": 7.28.5
-    "@babel/parser": 7.29.3
-    "@babel/types": 7.29.0
+    "@babel/generator": 7.29.7
+    "@babel/helper-validator-identifier": 7.29.7
+    "@babel/parser": 7.29.7
+    "@babel/types": 7.29.7
     "@visulima/packem-share": 1.0.0-alpha.46
     ast-kit: ^2.2.0
     audit-ci: ^7.1.0
@@ -167,12 +167,12 @@ catalogs:
     gpt-tokenizer: ^3.4.0
     happy-dom: 20.9.0
     hookable: 6.1.1
-    html-minifier-next: 6.2.6
+    html-minifier-next: 6.2.7
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.2
     obug: 2.1.1
-    oxc-parser: 0.132.0
+    oxc-parser: 0.133.0
     p-queue: 9.3.0
     picomatch: 4.0.4
     plop: 4.0.5
@@ -211,8 +211,8 @@ catalogs:
     postcss-modules-scope: ^3.2.1
     postcss-modules-values: ^4.0.0
     postcss-value-parser: ^4.2.0
-    sass: 1.99.0
-    sass-embedded: 1.99.0
+    sass: 1.100.0
+    sass-embedded: 1.100.0
     tailwindcss: 4.3.0
   test:
     "@jridgewell/source-map": ^0.3.11
@@ -221,12 +221,12 @@ catalogs:
     "@vitest/ui": 4.1.7
     vitest: 4.1.7
   tsc:
-    "@babel/preset-typescript": ^7.28.5
+    "@babel/preset-typescript": ^7.29.7
     "@total-typescript/ts-reset": ^0.6.1
     "@ts-macro/tsc": 0.3.7
     "@volar/typescript": 2.4.28
     typescript: 6.0.3
-    vue-tsc: 3.3.1
+    vue-tsc: 3.3.2
   types:
     "@types/babel__core": ^7.20.5
     "@types/babel__generator": ^7.27.0
@@ -255,7 +255,7 @@ catalogs:
     cheerio: 1.2.0
     defu: 6.1.7
     magic-string: 0.30.21
-    semver: 7.8.0
+    semver: 7.8.1
   visulima:
     "@visulima/cerebro": 3.0.0-alpha.25
     "@visulima/colorize": 2.0.0-alpha.11
@@ -287,25 +287,22 @@ minimumReleaseAgeExclude:
   - '@visulima/fs@5.0.0-alpha.24'
   - '@visulima/package@5.0.0-alpha.23'
   - '@visulima/tsconfig@3.0.0-alpha.24'
-  - '@rolldown/binding-android-arm64@1.0.2'
-  - '@rolldown/binding-darwin-arm64@1.0.2'
-  - '@rolldown/binding-darwin-x64@1.0.2'
-  - '@rolldown/binding-freebsd-x64@1.0.2'
-  - '@rolldown/binding-linux-arm-gnueabihf@1.0.2'
-  - '@rolldown/binding-linux-arm64-gnu@1.0.2'
-  - '@rolldown/binding-linux-arm64-musl@1.0.2'
-  - '@rolldown/binding-linux-ppc64-gnu@1.0.2'
-  - '@rolldown/binding-linux-s390x-gnu@1.0.2'
-  - '@rolldown/binding-linux-x64-gnu@1.0.2'
-  - '@rolldown/binding-linux-x64-musl@1.0.2'
-  - '@rolldown/binding-openharmony-arm64@1.0.2'
-  - '@rolldown/binding-wasm32-wasi@1.0.2'
-  - '@rolldown/binding-win32-arm64-msvc@1.0.2'
-  - '@rolldown/binding-win32-x64-msvc@1.0.2'
+  - '@rolldown/*'
   - '@vue/language-core@3.3.1'
-  - rolldown@1.0.2
   - vue-tsc@3.3.1
   - brace-expansion@5.0.6
+  - '@swc/helpers@0.5.23'
+  - '@vue/compiler-core@3.5.35'
+  - '@vue/compiler-dom@3.5.35'
+  - '@vue/compiler-sfc@3.5.35'
+  - '@vue/compiler-ssr@3.5.35'
+  - '@vue/reactivity@3.5.35'
+  - '@vue/runtime-core@3.5.35'
+  - '@vue/runtime-dom@3.5.35'
+  - '@vue/server-renderer@3.5.35'
+  - '@vue/shared@3.5.35'
+  - rolldown@1.0.3
+  - vue@3.5.35
 
 onlyBuiltDependencies:
   - "@parcel/watcher"
