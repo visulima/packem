@@ -303,6 +303,7 @@ minimumReleaseAgeExclude:
   - '@vue/shared@3.5.35'
   - rolldown@1.0.3
   - vue@3.5.35
+  - tmp@0.2.6
 
 onlyBuiltDependencies:
   - "@parcel/watcher"
@@ -364,6 +365,7 @@ overrides:
   svelte@<=5.55.6: '>=5.55.7'
   svelte@>=5.46.0 <=5.55.6: '>=5.55.7'
   svelte@>=5.51.5 <=5.55.6: '>=5.55.7'
+  tmp@<0.2.6: ^0.2.6
   tmp@<=0.2.3: ">=0.2.4"
   # Force a single typescript version across the whole dep graph. Without this, deps that pin
   # an older 6.0.x (e.g. @anolilab/eslint-config, @sxzz/test-utils) pull typescript@6.0.2 while
