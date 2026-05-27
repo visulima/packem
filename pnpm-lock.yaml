@@ -647,7 +647,6 @@ overrides:
   svelte@>=5.46.0 <=5.55.6: '>=5.55.7'
   svelte@>=5.51.5 <=5.55.6: '>=5.55.7'
   tmp@<0.2.6: ^0.2.6
-  tmp@<=0.2.3: '>=0.2.4'
   typescript: 6.0.3
   undici@<6.23.0: '>=6.23.0'
   undici@<6.24.0: '>=6.24.0'
@@ -7841,7 +7840,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.16'
+      hono: '>=4.12.12'
       next: '>=14.0'
       rotating-file-stream: 3.2.9
     peerDependenciesMeta:
@@ -14431,10 +14430,6 @@ packages:
 
   title-case@4.3.2:
     resolution: {integrity: sha512-I/nkcBo73mO42Idfv08jhInV61IMb61OdIFxk+B4Gu1oBjWBPOLmhZdsli+oJCVaD+86pYQA93cJfFt224ZFAA==}
-
-  tmp@0.2.5:
-    resolution: {integrity: sha512-voyz6MApa1rQGUxT3E+BK7/ROe8itEx7vD8/HEvt4xwXucvQ5G5oeEiHkmHZJuBO21RpOf+YYm9MOivj709jow==}
-    engines: {node: '>=14.14'}
 
   tmp@0.2.6:
     resolution: {integrity: sha512-5sJPdPjfI5Kx+qbrDesxkglRBxW//g7hCsqspEjwkewGvBMGIKMOTKzLt1hFVJzyadba3lDUN20O9qhvbQUSTA==}
@@ -23032,7 +23027,7 @@ snapshots:
     dependencies:
       chardet: 0.7.0
       iconv-lite: 0.4.24
-      tmp: 0.2.5
+      tmp: 0.2.6
 
   fast-content-type-parse@3.0.0: {}
 
@@ -28823,8 +28818,6 @@ snapshots:
   tinyrainbow@3.1.0: {}
 
   title-case@4.3.2: {}
-
-  tmp@0.2.5: {}
 
   tmp@0.2.6: {}
 
