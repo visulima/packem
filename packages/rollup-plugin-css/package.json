@@ -1,6 +1,6 @@
 {
     "name": "@visulima/rollup-plugin-css",
-    "version": "1.0.0-alpha.44",
+    "version": "1.0.0-alpha.46",
     "description": "CSS processing plugin for packem",
     "keywords": [
         "visulima",
@@ -116,7 +116,7 @@
         "@rollup/pluginutils": "catalog:build",
         "@visulima/fs": "catalog:visulima",
         "@visulima/package": "catalog:visulima",
-        "@visulima/packem-share": "1.0.0-alpha.45",
+        "@visulima/packem-share": "1.0.0-alpha.47",
         "@visulima/path": "catalog:visulima",
         "mlly": "catalog:prod",
         "oxc-resolver": "catalog:node",
@@ -144,7 +144,7 @@
         "@types/postcss-modules-scope": "catalog:types",
         "@types/stylus": "catalog:types",
         "@types/uglifycss": "catalog:types",
-        "@visulima/css-style-inject": "^1.0.0-alpha.15",
+        "@visulima/css-style-inject": "1.0.0-alpha.16",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",
@@ -180,7 +180,7 @@
         "@csstools/postcss-slow-plugins": ">=3.0.0",
         "@tailwindcss/node": ">=4.3.0",
         "@tailwindcss/oxide": ">=4.3.0",
-        "@visulima/css-style-inject": "^1.0.0-alpha.15",
+        "@visulima/css-style-inject": "1.0.0-alpha.16",
         "cssnano": ">=8.0.1",
         "icss-utils": ">=5.1.0",
         "less": ">=4.6.4",
@@ -274,7 +274,6 @@
             "optional": true
         }
     },
-    "optionalDependencies": {},
     "engines": {
         "node": "^22.14.0 || >= 24.10.0"
     },
