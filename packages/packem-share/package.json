@@ -91,7 +91,6 @@
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",
-        "@visulima/packem": "catalog:visulima",
         "@visulima/pail": "catalog:visulima",
         "@visulima/tsconfig": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",

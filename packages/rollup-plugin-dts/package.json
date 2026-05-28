@@ -97,7 +97,6 @@
         "@types/node": "catalog:types",
         "@typescript/native-preview": "catalog:types",
         "@visulima/fs": "catalog:visulima",
-        "@visulima/packem": "catalog:visulima",
         "@volar/typescript": "catalog:tsc",
         "@vue/language-core": "catalog:frontend",
         "conventional-changelog-conventionalcommits": "catalog:dev",
