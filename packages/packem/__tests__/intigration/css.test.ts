@@ -19,6 +19,17 @@ const CSS_DTS_SUFFIX_REGEX = /\.css\.d\.ts$/;
 
 const AUTO_MODULES_STYL_REGEX = /(?<!\.module\.)\.styl/;
 
+// `minireset.css` is pnpm-installed as a symlink into the content-addressable
+// store, whose absolute location is machine-specific (`/home/<user>/…` locally,
+// `/home/runner/work/packem/packem/…` on CI). The sourcemap relativizes against
+// that realpath, so the climbed-out store path leaks into the snapshot. Rewrite
+// it to the stable project-local form the `~minireset.css/…` import resolves to,
+// matching how the local `node_modules/foo/bar/*` sources already appear.
+const MINIRESET_STORE_PATH_REGEX
+    = /(?:\.\.\/)+[^"]*?\/node_modules\/\.pnpm\/minireset\.css@[^"/]+\/node_modules\/minireset\.css\/minireset\.min\.css/g;
+
+const normalizeSourceMap = (content: string): string => content.replaceAll(MINIRESET_STORE_PATH_REGEX, "../node_modules/minireset.css/minireset.min.css");
+
 type BaseWriteData = {
     dependencies?: Record<string, string>;
     errorMessage?: string;
@@ -227,7 +238,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 return [...cjs, ...mjs].map((file) => readFileSync(file));
             },
             map(): string[] {
-                return cssMap.map((file) => readFileSync(file));
+                return cssMap.map((file) => normalizeSourceMap(readFileSync(file)));
             },
         };
     };
