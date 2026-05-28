@@ -1,3 +1,20 @@
+## @visulima/css-style-inject [1.0.0-alpha.16](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.15...@visulima/css-style-inject@1.0.0-alpha.16) (2026-05-28)
+
+### Features
+
+* rolldown ([#196](https://github.com/visulima/packem/issues/196)) ([197d465](https://github.com/visulima/packem/commit/197d465c2465993a17039319f8ede13398e00def))
+
+### Bug Fixes
+
+* **release:** break multi-semantic-release dependency cycle ([1443e4c](https://github.com/visulima/packem/commit/1443e4ca7bad413e52ea61a68f360dd5d355c570))
+
+### Miscellaneous Chores
+
+* bump node engines to ^22.14.0 || >=24.10.0 ([32f705a](https://github.com/visulima/packem/commit/32f705aa866f9daea6a094df74ef66aa8088e2c6))
+* **css-style-inject:** add empty dependencies field to package.json ([960ab56](https://github.com/visulima/packem/commit/960ab56927aaf8b050ac1afc56c84bdba27ad795))
+* **css-style-inject:** update source ([1c3cf14](https://github.com/visulima/packem/commit/1c3cf1417813593c1fadd6aaa0fb331ca19f62f8))
+* **css-style-inject:** update source and fix TypeScript type errors in tests ([67dec29](https://github.com/visulima/packem/commit/67dec29b4a246275d92ff86f46ad55bbdebdbc9c))
+
 ## @visulima/css-style-inject [1.0.0-alpha.15](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.14...@visulima/css-style-inject@1.0.0-alpha.15) (2025-12-29)
 
 ### Miscellaneous Chores
