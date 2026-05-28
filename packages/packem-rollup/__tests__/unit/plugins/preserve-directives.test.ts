@@ -4,6 +4,12 @@ import { describe, expect, it, vi } from "vitest";
 
 import { preserveDirectivesPlugin } from "../../../src/plugins/preserve-directives";
 
+const USE_DIRECTIVE_REGEX = /^use /;
+const INCLUDE_TSX_REGEX = /\.tsx?$/;
+const USE_CLIENT_SERVER_REGEX = /'use client';\n'use server';|'use server';\n'use client';/;
+const LEADING_USE_CLIENT_REGEX = /^'use client';\n/;
+const LEADING_SHEBANG_REGEX = /^#!\/usr\/bin\/env node\n/;
+
 const createLogger = () => ({ debug: vi.fn(), error: vi.fn(), info: vi.fn(), log: vi.fn(), warn: vi.fn() }) as unknown as Console;
 
 type TransformContext = {
@@ -17,9 +23,9 @@ type TransformResult = {
     meta: { preserveDirectives: { directives: string[]; shebang: string | undefined } };
 };
 
-const callTransform = (plugin: ReturnType<typeof preserveDirectivesPlugin>, code: string, id: string, ctx?: Partial<TransformContext>) => {
+const callTransform = (plugin: ReturnType<typeof preserveDirectivesPlugin>, code: string, id: string, context_?: Partial<TransformContext>) => {
     const handler = plugin.transform as (this: TransformContext, code: string, id: string) => TransformResult | undefined;
-    const context: TransformContext = { parse: parseAst, warn: vi.fn(), ...ctx };
+    const context: TransformContext = { parse: parseAst, warn: vi.fn(), ...context_ };
 
     return handler.call(context, code, id);
 };
@@ -30,7 +36,7 @@ const callRenderChunk = (
     chunk: Partial<RenderedChunk>,
     options: Partial<NormalizedOutputOptions>,
 ) => {
-    const renderChunk = plugin.renderChunk;
+    const { renderChunk } = plugin;
     const handler = (typeof renderChunk === "function" ? renderChunk : renderChunk?.handler) as (
         code: string,
         chunk: RenderedChunk,
@@ -44,7 +50,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should return a plugin named packem:preserve-directives", () => {
         expect.assertions(1);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
 
         expect(plugin.name).toBe("packem:preserve-directives");
     });
@@ -52,7 +58,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should extract a 'use client' directive and remove it from source", () => {
         expect.assertions(3);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const code = "'use client';\nexport const x = 1;";
         const result = callTransform(plugin, code, "/path/file.js");
 
@@ -64,7 +70,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should skip 'use strict' even when it matches the regex", () => {
         expect.assertions(1);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const code = "'use strict';\nexport const x = 1;";
         const result = callTransform(plugin, code, "/path/file.js");
 
@@ -74,7 +80,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should extract a shebang and remove it from source", () => {
         expect.assertions(3);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const code = "#!/usr/bin/env node\nexport const x = 1;";
         const result = callTransform(plugin, code, "/path/cli.js");
 
@@ -86,7 +92,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should return undefined when neither shebang nor directive is present", () => {
         expect.assertions(1);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const result = callTransform(plugin, "export const x = 1;", "/path/file.js");
 
         expect(result).toBeUndefined();
@@ -95,7 +101,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should respect include filter", () => {
         expect.assertions(1);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, include: /\.tsx?$/, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, include: INCLUDE_TSX_REGEX, logger: createLogger() });
         const result = callTransform(plugin, "'use client';\nexport const x = 1;", "/path/file.js");
 
         // file.js is NOT included → handler returns undefined early
@@ -105,7 +111,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should warn and return undefined on parse errors", () => {
         expect.assertions(2);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const warn = vi.fn();
         // Shebang then broken syntax — the shebang strip succeeds but then parse fails.
         const result = callTransform(plugin, "#!/usr/bin/env node\n@@@", "/path/file.js", { warn });
@@ -117,7 +123,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should suppress MODULE_LEVEL_DIRECTIVE rollup warnings", () => {
         expect.assertions(1);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const onLog = plugin.onLog as (level: string, log: { code: string }) => boolean | undefined;
         const handled = onLog("warn", { code: "MODULE_LEVEL_DIRECTIVE" });
 
@@ -127,7 +133,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should pass other rollup warnings through (return undefined) from onLog", () => {
         expect.assertions(2);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const onLog = plugin.onLog as (level: string, log: { code: string }) => boolean | undefined;
 
         // Different code at warn level → fall through.
@@ -139,7 +145,7 @@ describe("preserveDirectivesPlugin", () => {
     it("should merge multiple distinct directives from a single module into one set", () => {
         expect.assertions(2);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const code = "'use client';\n'use server';\nexport const x = 1;";
         const result = callTransform(plugin, code, "/path/a.js");
 
@@ -148,25 +154,25 @@ describe("preserveDirectivesPlugin", () => {
 
         const chunk = callRenderChunk(plugin, "export const x = 1;\n", { fileName: "out.js", moduleIds: ["/path/a.js"] }, { sourcemap: false });
 
-        expect(chunk?.code).toMatch(/'use client';\n'use server';|'use server';\n'use client';/);
+        expect(chunk?.code).toMatch(USE_CLIENT_SERVER_REGEX);
     });
 
     it("should prepend collected directives to the chunk", () => {
         expect.assertions(1);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
 
         callTransform(plugin, "'use client';\nexport const x = 1;", "/path/a.js");
 
         const result = callRenderChunk(plugin, "export const x = 1;\n", { fileName: "out.js", moduleIds: ["/path/a.js"] }, { sourcemap: false });
 
-        expect(result?.code).toMatch(/^'use client';\n/);
+        expect(result?.code).toMatch(LEADING_USE_CLIENT_REGEX);
     });
 
     it("should prepend a captured shebang to the entry chunk", () => {
         expect.assertions(1);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
 
         callTransform(plugin, "#!/usr/bin/env node\nexport const x = 1;", "/path/cli.js");
 
@@ -177,13 +183,13 @@ describe("preserveDirectivesPlugin", () => {
             { sourcemap: false },
         );
 
-        expect(result?.code).toMatch(/^#!\/usr\/bin\/env node\n/);
+        expect(result?.code).toMatch(LEADING_SHEBANG_REGEX);
     });
 
     it("should return undefined from renderChunk when nothing was collected", () => {
         expect.assertions(1);
 
-        const plugin = preserveDirectivesPlugin({ directiveRegex: /^use /, logger: createLogger() });
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const result = callRenderChunk(plugin, "export const x = 1;\n", { fileName: "out.js", moduleIds: ["/path/clean.js"] }, { sourcemap: false });
 
         expect(result).toBeUndefined();

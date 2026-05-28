@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import gatherExports from "../../../../src/plugins/chunk-splitter/gather";
 
+const CANT_RESOLVE_REGEX = /can't resolve/;
+
 const buildContext = (overrides: Record<string, unknown> = {}): PluginContext =>
     ({
         load: vi.fn(),
@@ -29,9 +31,9 @@ describe("chunk-splitter gatherExports", () => {
         expect.assertions(1);
 
         const context = buildContext();
-        const module_ = buildModule("/a.js", "export const foo = 1; export const bar = 2;");
+        const moduleInfo = buildModule("/a.js", "export const foo = 1; export const bar = 2;");
 
-        const exported = await drain(gatherExports(context, module_));
+        const exported = await drain(gatherExports(context, moduleInfo));
 
         expect(exported).toEqual([
             { exportedName: "foo", id: "/a.js", sourceName: "foo" },
@@ -42,14 +44,16 @@ describe("chunk-splitter gatherExports", () => {
     it("should follow `export { x } from './y'` re-exports and rebind exported names to the binding alias", async () => {
         expect.assertions(3);
 
-        const resolve = vi.fn(async (source: string) => ({ external: false, id: `/resolved${source}` }));
-        const load = vi.fn(async () => buildModule("/resolved/y.js", "export const foo = 1; export const bar = 2;"));
+        const resolve = vi.fn((source: string) => {
+            return { external: false, id: `/resolved${source}` };
+        });
+        const load = vi.fn(() => buildModule("/resolved/y.js", "export const foo = 1; export const bar = 2;"));
 
         const context = buildContext({ load, resolve });
 
-        const module_ = buildModule("/a.js", "export { foo, bar as baz } from './y.js';");
+        const moduleInfo = buildModule("/a.js", "export { foo, bar as baz } from './y.js';");
 
-        const exported = await drain(gatherExports(context, module_));
+        const exported = await drain(gatherExports(context, moduleInfo));
 
         expect(exported).toEqual([
             { exportedName: "foo", id: "/resolved/y.js", sourceName: "foo" },
@@ -62,13 +66,15 @@ describe("chunk-splitter gatherExports", () => {
     it("should follow `export *` barrel re-exports and yield every export from the source module", async () => {
         expect.assertions(1);
 
-        const resolve = vi.fn(async (source: string) => ({ external: false, id: `/resolved${source}` }));
-        const load = vi.fn(async () => buildModule("/resolved/y.js", "export const foo = 1; export const bar = 2;"));
+        const resolve = vi.fn((source: string) => {
+            return { external: false, id: `/resolved${source}` };
+        });
+        const load = vi.fn(() => buildModule("/resolved/y.js", "export const foo = 1; export const bar = 2;"));
 
         const context = buildContext({ load, resolve });
-        const module_ = buildModule("/a.js", "export * from './y.js';");
+        const moduleInfo = buildModule("/a.js", "export * from './y.js';");
 
-        const exported = await drain(gatherExports(context, module_));
+        const exported = await drain(gatherExports(context, moduleInfo));
 
         expect(exported).toEqual([
             { exportedName: "foo", id: "/resolved/y.js", sourceName: "foo" },
@@ -79,14 +85,16 @@ describe("chunk-splitter gatherExports", () => {
     it("should drop bindings on a named re-export whose imported name does not exist in the source module", async () => {
         expect.assertions(1);
 
-        const resolve = vi.fn(async (source: string) => ({ external: false, id: `/resolved${source}` }));
-        const load = vi.fn(async () => buildModule("/resolved/y.js", "export const foo = 1;"));
+        const resolve = vi.fn((source: string) => {
+            return { external: false, id: `/resolved${source}` };
+        });
+        const load = vi.fn(() => buildModule("/resolved/y.js", "export const foo = 1;"));
 
         const context = buildContext({ load, resolve });
 
-        const module_ = buildModule("/a.js", "export { missing as x } from './y.js';");
+        const moduleInfo = buildModule("/a.js", "export { missing as x } from './y.js';");
 
-        const exported = await drain(gatherExports(context, module_));
+        const exported = await drain(gatherExports(context, moduleInfo));
 
         expect(exported).toEqual([]);
     });
@@ -94,14 +102,16 @@ describe("chunk-splitter gatherExports", () => {
     it("should skip external re-exports and yield nothing for that source", async () => {
         expect.assertions(2);
 
-        const resolve = vi.fn(async () => ({ external: true, id: "react" }));
+        const resolve = vi.fn(() => {
+            return { external: true, id: "react" };
+        });
         const load = vi.fn();
 
         const context = buildContext({ load, resolve });
 
-        const module_ = buildModule("/a.js", "export * from 'react';");
+        const moduleInfo = buildModule("/a.js", "export * from 'react';");
 
-        const exported = await drain(gatherExports(context, module_));
+        const exported = await drain(gatherExports(context, moduleInfo));
 
         expect(exported).toEqual([]);
         expect(load).not.toHaveBeenCalled();
@@ -110,29 +120,31 @@ describe("chunk-splitter gatherExports", () => {
     it("should skip external named re-exports without trying to load the source module", async () => {
         expect.assertions(2);
 
-        const resolve = vi.fn(async () => ({ external: true, id: "react" }));
+        const resolve = vi.fn(() => {
+            return { external: true, id: "react" };
+        });
         const load = vi.fn();
 
         const context = buildContext({ load, resolve });
 
-        const module_ = buildModule("/a.js", "export { useState } from 'react';");
+        const moduleInfo = buildModule("/a.js", "export { useState } from 'react';");
 
-        const exported = await drain(gatherExports(context, module_));
+        const exported = await drain(gatherExports(context, moduleInfo));
 
         expect(exported).toEqual([]);
         expect(load).not.toHaveBeenCalled();
     });
 
-    it("should throw an assertion error when resolve returns null", async () => {
+    it("should throw an assertion error when resolve returns nothing", async () => {
         expect.assertions(1);
 
-        const resolve = vi.fn(async () => null);
+        const resolve = vi.fn(() => undefined);
         const load = vi.fn();
 
         const context = buildContext({ load, resolve });
 
-        const module_ = buildModule("/a.js", "export * from './missing.js';");
+        const moduleInfo = buildModule("/a.js", "export * from './missing.js';");
 
-        await expect(drain(gatherExports(context, module_))).rejects.toThrow(/can't resolve/);
+        await expect(drain(gatherExports(context, moduleInfo))).rejects.toThrow(CANT_RESOLVE_REGEX);
     });
 });

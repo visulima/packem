@@ -6,7 +6,7 @@ import { pureNewExpressionPlugin } from "../../../src/plugins/pure-new-expressio
 type TransformHandler = (this: { parse: typeof parseAst }, code: string, id: string) => { code: string; map: unknown } | undefined;
 
 const callTransform = (plugin: ReturnType<typeof pureNewExpressionPlugin>, code: string, id = "test.js") => {
-    const transform = plugin.transform;
+    const { transform } = plugin;
     const handler = (typeof transform === "function" ? transform : transform?.handler) as TransformHandler | undefined;
 
     return handler?.call({ parse: parseAst }, code, id);

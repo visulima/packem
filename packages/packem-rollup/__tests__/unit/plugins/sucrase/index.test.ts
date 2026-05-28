@@ -1,7 +1,8 @@
 import type { PluginContext } from "rollup";
 import { describe, expect, it } from "vitest";
 
-import { sucrasePlugin, type SucrasePluginConfig } from "../../../../src/plugins/sucrase";
+import type { SucrasePluginConfig } from "../../../../src/plugins/sucrase";
+import { sucrasePlugin } from "../../../../src/plugins/sucrase";
 
 const callTransform = (plugin: ReturnType<typeof sucrasePlugin>, code: string, id: string) => {
     const transform = plugin.transform as (this: PluginContext, code: string, id: string) => { code: string; map?: unknown } | undefined;
@@ -9,8 +10,11 @@ const callTransform = (plugin: ReturnType<typeof sucrasePlugin>, code: string, i
     return transform.call({} as PluginContext, code, id);
 };
 
-const baseConfig = (overrides: Partial<SucrasePluginConfig> = {}): SucrasePluginConfig =>
-    ({ transforms: ["typescript"], ...overrides }) as SucrasePluginConfig;
+const FOO_TS_REGEX = /\.foo\.ts$/;
+
+const baseConfig = (overrides: Partial<SucrasePluginConfig> = {}): SucrasePluginConfig => {
+    return { transforms: ["typescript"], ...overrides };
+};
 
 describe("sucrasePlugin", () => {
     it("should be named packem:sucrase", () => {
@@ -57,7 +61,7 @@ describe("sucrasePlugin", () => {
     it("should honor a user-supplied include filter and skip unmatched ids", () => {
         expect.assertions(2);
 
-        const plugin = sucrasePlugin(baseConfig({ include: [/\.foo\.ts$/] }));
+        const plugin = sucrasePlugin(baseConfig({ include: [FOO_TS_REGEX] }));
 
         expect(callTransform(plugin, "const x: number = 1; export { x };", "/bar.ts")).toBeUndefined();
         expect(callTransform(plugin, "const x: number = 1; export { x };", "/bar.foo.ts")?.code).toContain("const x = 1");

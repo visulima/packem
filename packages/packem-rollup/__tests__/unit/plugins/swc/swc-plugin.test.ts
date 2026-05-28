@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import swcPlugin from "../../../../src/plugins/swc/swc-plugin";
 import type { SwcPluginConfig } from "../../../../src/plugins/swc/types";
 
+const FOO_TS_REGEX = /\.foo\.ts$/;
+
 const callTransform = async (plugin: ReturnType<typeof swcPlugin>, code: string, id: string) => {
     const transform = plugin.transform as (
         this: PluginContext,
@@ -14,14 +16,15 @@ const callTransform = async (plugin: ReturnType<typeof swcPlugin>, code: string,
     return transform.call({} as PluginContext, code, id);
 };
 
-const baseConfig = (overrides: Partial<SwcPluginConfig> = {}): SwcPluginConfig =>
-    ({
+const baseConfig = (overrides: Partial<SwcPluginConfig> = {}): SwcPluginConfig => {
+    return {
         jsc: {
             parser: { syntax: "typescript" },
             target: "es2022",
         },
         ...overrides,
-    }) as SwcPluginConfig;
+    };
+};
 
 describe("swcPlugin", () => {
     it("should be named packem:swc", () => {
@@ -75,9 +78,12 @@ describe("swcPlugin", () => {
     it("should honor a user-supplied include filter and skip unmatched ids", async () => {
         expect.assertions(2);
 
-        const plugin = swcPlugin(baseConfig({ include: [/\.foo\.ts$/] }));
+        const plugin = swcPlugin(baseConfig({ include: [FOO_TS_REGEX] }));
 
-        expect(await callTransform(plugin, "const x: number = 1; export { x };", "/bar.ts")).toBeUndefined();
-        expect((await callTransform(plugin, "const x: number = 1; export { x };", "/bar.foo.ts"))?.code).toContain("const x = 1");
+        await expect(callTransform(plugin, "const x: number = 1; export { x };", "/bar.ts")).resolves.toBeUndefined();
+
+        const matched = await callTransform(plugin, "const x: number = 1; export { x };", "/bar.foo.ts");
+
+        expect(matched?.code).toContain("const x = 1");
     });
 });

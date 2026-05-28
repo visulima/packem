@@ -8,6 +8,8 @@ const buildContext = (): PluginContext => ({ parse: parseAst }) as unknown as Pl
 
 const buildModule = (id: string, code: string): ModuleInfo => ({ code, id }) as unknown as ModuleInfo;
 
+const NO_CODE_REGEX = /doesn't have associated code/;
+
 describe("chunk-splitter parseExports", () => {
     it("should yield named self-exports for `export const`", () => {
         expect.assertions(1);
@@ -94,9 +96,9 @@ describe("chunk-splitter parseExports", () => {
     it("should throw when module.code is null", () => {
         expect.assertions(1);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const module_ = ({ code: null, id: "/a.js" }) as any;
+        // eslint-disable-next-line unicorn/no-null -- ModuleInfo.code is typed `string | null`; this exercises the null branch.
+        const moduleInfo = { code: null, id: "/a.js" } as unknown as ModuleInfo;
 
-        expect(() => [...parseExports(buildContext(), module_)]).toThrow(/doesn't have associated code/);
+        expect(() => [...parseExports(buildContext(), moduleInfo)]).toThrow(NO_CODE_REGEX);
     });
 });

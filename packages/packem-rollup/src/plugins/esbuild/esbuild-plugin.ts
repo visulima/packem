@@ -6,13 +6,13 @@
  * Copyright (c) 2020 EGOIST
  */
 import { createFilter } from "@rollup/pluginutils";
+import type { TransformerFn as TransformerFunction } from "@visulima/packem-plugins";
 import { DEFAULT_LOADERS } from "@visulima/packem-share/constants";
 import { extname } from "@visulima/path";
 import type { Loader } from "esbuild";
 import { transform } from "esbuild";
 import type { Plugin as RollupPlugin } from "rollup";
 
-import type { TransformerFn as TransformerFunction } from "@visulima/packem-plugins";
 import type { EsbuildPluginConfig, OptimizeDepsResult } from "./types";
 import getRenderChunk from "./utils/get-render-chunk";
 import doOptimizeDeps from "./utils/optimize-deps";

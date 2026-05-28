@@ -7,14 +7,14 @@ import chunkSplitter from "../../../../src/plugins/chunk-splitter";
 const callModuleParsed = (
     plugin: ReturnType<typeof chunkSplitter>,
     info: Partial<ModuleInfo>,
-    ctx: Record<string, unknown>,
+    context_: Record<string, unknown>,
 ) => {
-    const moduleParsed = plugin.moduleParsed;
+    const { moduleParsed } = plugin;
     const handler = (typeof moduleParsed === "function" ? moduleParsed : moduleParsed?.handler) as (
         this: PluginContext,
         info: ModuleInfo,
     ) => Promise<void> | undefined;
-    const context = { emitFile: vi.fn(), load: vi.fn(), parse: parseAst, resolve: vi.fn(), ...ctx } as unknown as PluginContext;
+    const context = { emitFile: vi.fn(), load: vi.fn(), parse: parseAst, resolve: vi.fn(), ...context_ } as unknown as PluginContext;
 
     return handler.call(context, info as ModuleInfo);
 };
@@ -52,11 +52,15 @@ describe("chunkSplitter", () => {
         // The plugin compares `exported.id === info.id` and skips when equal.
         // For NamedSelfExport, `id` is set to `module_.id` → so SELF-exports of an entry are skipped.
         // To assert emitFile is called, we need re-exports from a *different* module.
-        const resolve = vi.fn(async (source: string) => ({ external: false, id: `/resolved${source}` }));
-        const load = vi.fn(async () => ({
-            code: "export const foo = 1; export const bar = 2;",
-            id: "/resolved/y.js",
-        }));
+        const resolve = vi.fn((source: string) => {
+            return { external: false, id: `/resolved${source}` };
+        });
+        const load = vi.fn(() => {
+            return {
+                code: "export const foo = 1; export const bar = 2;",
+                id: "/resolved/y.js",
+            };
+        });
 
         await callModuleParsed(
             chunkSplitter(),

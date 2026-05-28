@@ -13,20 +13,23 @@ const makeLogger = () =>
         warn: vi.fn(),
     }) as unknown as Console;
 
-const baseConfig = (overrides: Partial<EsbuildPluginConfig> = {}): EsbuildPluginConfig =>
-    ({ logger: makeLogger(), ...overrides }) as EsbuildPluginConfig;
+const SKIP_TS_REGEX = /\.skip\.ts$/;
+
+const baseConfig = (overrides: Partial<EsbuildPluginConfig> = {}): EsbuildPluginConfig => {
+    return { logger: makeLogger(), ...overrides };
+};
 
 const callTransform = async (
     plugin: ReturnType<typeof esbuildPlugin>,
     code: string,
     id: string,
-    ctx: Partial<PluginContext> = {},
+    context_: Partial<PluginContext> = {},
 ) => {
     const transform = plugin.transform as {
         filter: { id: RegExp };
         handler: (this: PluginContext, code: string, id: string) => Promise<{ code: string; map?: unknown } | undefined>;
     };
-    const context: PluginContext = { warn: vi.fn(), ...ctx } as PluginContext;
+    const context: PluginContext = { warn: vi.fn(), ...context_ } as PluginContext;
 
     if (!transform.filter.id.test(id)) {
         return undefined;
@@ -87,7 +90,7 @@ describe("esbuildPlugin", () => {
     it("should skip transform when the user-provided exclude filter rejects the id", async () => {
         expect.assertions(1);
 
-        const plugin = esbuildPlugin(baseConfig({ exclude: [/\.skip\.ts$/] }));
+        const plugin = esbuildPlugin(baseConfig({ exclude: [SKIP_TS_REGEX] }));
         const result = await callTransform(plugin, "const x: number = 1; export { x };", "/foo.skip.ts");
 
         expect(result).toBeUndefined();
@@ -106,9 +109,10 @@ describe("esbuildPlugin", () => {
         expect.assertions(1);
 
         const plugin = esbuildPlugin(baseConfig());
-        const options = plugin.options as (this: PluginContext, opts: { context?: string }) => undefined;
+        const options = plugin.options as (this: PluginContext, options_: { context?: string }) => unknown;
+        const result = options.call({} as PluginContext, { context: "/custom/root" });
 
-        expect(options.call({} as PluginContext, { context: "/custom/root" })).toBeUndefined();
+        expect(result).toBeUndefined();
     });
 
     it("should treat _loaders entries without a leading dot as if they had one", async () => {
@@ -120,7 +124,7 @@ describe("esbuildPlugin", () => {
         expect(result?.code).toContain("const x = 1");
     });
 
-    it("should remove a loader from the registry when its mapped value is false", async () => {
+    it("should remove a loader from the registry when its mapped value is false", () => {
         expect.assertions(1);
 
         const plugin = esbuildPlugin(baseConfig({ loaders: { ".ts": false } }));
@@ -136,13 +140,14 @@ describe("esbuildPlugin", () => {
 
         const plugin = esbuildPlugin(baseConfig());
         const warn = vi.fn();
+
         // `with{ type: 'json' }` import attribute on an unsupported target produces an esbuild warning.
         await callTransform(plugin, "typeof a == 'undefined' && b;", "/foo.ts", { warn });
 
         // We don't strictly require a warning here; the test just verifies the warn pipeline
         // doesn't blow up. The presence-or-absence assertion guarantees the call is fed
         // through, even when esbuild reports zero warnings (then `warn` is not called).
-        expect(typeof warn).toBe("function");
+        expect(warn).toBeTypeOf("function");
     });
 
     it("should not perform optimizeDeps work in buildStart when optimizeDeps is not configured", async () => {
@@ -150,7 +155,7 @@ describe("esbuildPlugin", () => {
 
         const logger = makeLogger();
         const plugin = esbuildPlugin(baseConfig({ logger }));
-        const buildStart = plugin.buildStart as (this: PluginContext, opts: NormalizedInputOptions) => Promise<void>;
+        const buildStart = plugin.buildStart as (this: PluginContext, options: NormalizedInputOptions) => Promise<void>;
 
         await buildStart.call({} as PluginContext, {} as NormalizedInputOptions);
 
@@ -167,7 +172,7 @@ describe("esbuildPlugin", () => {
             code: string,
             chunk: RenderedChunk,
             options: NormalizedOutputOptions,
-        ) => Promise<undefined>;
+        ) => Promise<unknown>;
 
         const result = await renderChunk.call(
             { warn: vi.fn() } as unknown as PluginContext,

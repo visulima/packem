@@ -10,24 +10,24 @@ describe("esbuild warn util", () => {
     it("should be a no-op when there are no messages", async () => {
         expect.assertions(1);
 
-        const ctx = makePluginContext();
+        const context = makePluginContext();
 
-        await warn(ctx, []);
+        await warn(context, []);
 
-        expect(ctx.warn).not.toHaveBeenCalled();
+        expect(context.warn).not.toHaveBeenCalled();
     });
 
     it("should call pluginContext.warn once per esbuild message", async () => {
         expect.assertions(1);
 
-        const ctx = makePluginContext();
+        const context = makePluginContext();
         const messages = [
-            { id: "", location: null, notes: [], pluginName: "", text: "first warning" },
-            { id: "", location: null, notes: [], pluginName: "", text: "second warning" },
+            { id: "", location: undefined, notes: [], pluginName: "", text: "first warning" },
+            { id: "", location: undefined, notes: [], pluginName: "", text: "second warning" },
         ] as unknown as Message[];
 
-        await warn(ctx, messages);
+        await warn(context, messages);
 
-        expect(ctx.warn).toHaveBeenCalledTimes(2);
+        expect(context.warn).toHaveBeenCalledTimes(2);
     });
 });

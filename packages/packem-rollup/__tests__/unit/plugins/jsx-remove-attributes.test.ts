@@ -5,6 +5,8 @@ import { jsxRemoveAttributes } from "../../../src/plugins/jsx-remove-attributes"
 
 const createLogger = () => ({ debug: vi.fn(), error: vi.fn(), info: vi.fn(), log: vi.fn(), warn: vi.fn() }) as unknown as Console;
 
+const NON_EMPTY_ARRAY_REGEX = /non-empty array/;
+
 type TransformContext = {
     parse: typeof parseAst;
     warn: (warning: { code: string; message: string }) => void;
@@ -12,10 +14,10 @@ type TransformContext = {
 
 type TransformHandler = (this: TransformContext, code: string, id: string) => { code: string; map: unknown } | undefined;
 
-const callTransform = (plugin: ReturnType<typeof jsxRemoveAttributes>, code: string, id: string, ctx?: Partial<TransformContext>) => {
-    const transform = plugin.transform;
+const callTransform = (plugin: ReturnType<typeof jsxRemoveAttributes>, code: string, id: string, context_?: Partial<TransformContext>) => {
+    const { transform } = plugin;
     const handler = (typeof transform === "function" ? transform : transform?.handler) as TransformHandler | undefined;
-    const context: TransformContext = { parse: parseAst, warn: vi.fn(), ...ctx };
+    const context: TransformContext = { parse: parseAst, warn: vi.fn(), ...context_ };
 
     return handler?.call(context, code, id);
 };
@@ -25,8 +27,8 @@ describe("jsxRemoveAttributes", () => {
         expect.assertions(2);
 
         // @ts-expect-error testing runtime guard
-        expect(() => jsxRemoveAttributes({ logger: createLogger() })).toThrow(/non-empty array/);
-        expect(() => jsxRemoveAttributes({ attributes: [], logger: createLogger() })).toThrow(/non-empty array/);
+        expect(() => jsxRemoveAttributes({ logger: createLogger() })).toThrow(NON_EMPTY_ARRAY_REGEX);
+        expect(() => jsxRemoveAttributes({ attributes: [], logger: createLogger() })).toThrow(NON_EMPTY_ARRAY_REGEX);
     });
 
     it("should return a plugin named packem:jsx-remove-attributes", () => {

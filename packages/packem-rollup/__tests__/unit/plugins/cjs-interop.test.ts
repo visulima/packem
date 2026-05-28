@@ -104,12 +104,13 @@ describe("cjsInteropPlugin", () => {
     it("should call logger.debug with chunk metadata when a transform is applied", () => {
         expect.assertions(2);
 
-        const logger = createLogger();
+        const debug = vi.fn();
+        const logger = { debug, error: vi.fn(), info: vi.fn(), log: vi.fn(), warn: vi.fn() } as unknown as Console;
         const plugin = cjsInteropPlugin({ logger });
         const result = callRenderChunk(plugin, "exports.default = 1;", { fileName: "entry.cjs", isEntry: true }, { exports: "auto", format: "cjs" });
 
         expect(result?.code).toBeDefined();
-        expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining({ prefix: "plugin:cjs-interop" }));
+        expect(debug).toHaveBeenCalledWith(expect.objectContaining({ prefix: "plugin:cjs-interop" }));
     });
 
     it("should return a sourcemap", () => {

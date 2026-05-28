@@ -7,7 +7,7 @@ const callRenderChunk = (
     renderChunk: ReturnType<typeof getRenderChunk>,
     code: string,
     options: Partial<NormalizedOutputOptions>,
-    ctx: Partial<PluginContext> = {},
+    context_: Partial<PluginContext> = {},
 ) => {
     const handler = renderChunk as unknown as (
         this: PluginContext,
@@ -15,7 +15,7 @@ const callRenderChunk = (
         chunk: RenderedChunk,
         options: NormalizedOutputOptions,
     ) => Promise<{ code: string; map: unknown } | undefined>;
-    const context: PluginContext = { warn: vi.fn(), ...ctx } as PluginContext;
+    const context: PluginContext = { warn: vi.fn(), ...context_ } as PluginContext;
 
     return handler.call(context, code, {} as RenderedChunk, options as NormalizedOutputOptions);
 };

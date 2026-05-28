@@ -1,21 +1,25 @@
 import type { NormalizedInputOptions, PluginContext } from "rollup";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../../src/plugins/esbuild/utils/optimize-deps", () => ({
-    default: vi.fn(),
-}));
+vi.mock(import("../../../../src/plugins/esbuild/utils/optimize-deps"), () => {
+    return {
+        default: vi.fn(),
+    };
+});
 
 // eslint-disable-next-line import/first
 import esbuildPlugin from "../../../../src/plugins/esbuild/esbuild-plugin";
 // eslint-disable-next-line import/first
-import doOptimizeDeps from "../../../../src/plugins/esbuild/utils/optimize-deps";
+import type { OptimizeDepsResult } from "../../../../src/plugins/esbuild/types";
 // eslint-disable-next-line import/first
-import type { EsbuildPluginConfig, OptimizeDepsResult } from "../../../../src/plugins/esbuild/types";
+import doOptimizeDeps from "../../../../src/plugins/esbuild/utils/optimize-deps";
 
 const makeLogger = () => ({ debug: vi.fn(), error: vi.fn(), info: vi.fn(), log: vi.fn(), warn: vi.fn() }) as unknown as Console;
 
+const AS_DEFAULT_REGEX = /as default/;
+
 const primeOptimizeDeps = async (plugin: ReturnType<typeof esbuildPlugin>) => {
-    const buildStart = plugin.buildStart as (this: PluginContext, opts: NormalizedInputOptions) => Promise<void>;
+    const buildStart = plugin.buildStart as (this: PluginContext, options: NormalizedInputOptions) => Promise<void>;
 
     await buildStart.call({} as PluginContext, {} as NormalizedInputOptions);
 };
@@ -39,7 +43,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
         const plugin = esbuildPlugin({
             logger,
             optimizeDeps: { include: ["react"] },
-        } as EsbuildPluginConfig);
+        });
 
         await primeOptimizeDeps(plugin);
 
@@ -59,7 +63,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
         const plugin = esbuildPlugin({
             logger: makeLogger(),
             optimizeDeps: { include: ["react"] },
-        } as EsbuildPluginConfig);
+        });
 
         await primeOptimizeDeps(plugin);
         await primeOptimizeDeps(plugin);
@@ -78,7 +82,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
         const plugin = esbuildPlugin({
             logger: makeLogger(),
             optimizeDeps: { include: ["lodash-es"] },
-        } as EsbuildPluginConfig);
+        });
 
         await primeOptimizeDeps(plugin);
 
@@ -98,7 +102,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
         const plugin = esbuildPlugin({
             logger: makeLogger(),
             optimizeDeps: { include: ["lodash-es"] },
-        } as EsbuildPluginConfig);
+        });
 
         await primeOptimizeDeps(plugin);
 
@@ -118,12 +122,12 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
         const plugin = esbuildPlugin({
             logger: makeLogger(),
             optimizeDeps: { include: ["/foo.ts"] },
-        } as EsbuildPluginConfig);
+        });
 
         await primeOptimizeDeps(plugin);
 
         const transform = plugin.transform as {
-            handler: (this: PluginContext, code: string, id: string) => Promise<undefined>;
+            handler: (this: PluginContext, code: string, id: string) => Promise<unknown>;
         };
         const result = await transform.handler.call({ warn: vi.fn() } as unknown as PluginContext, "const x = 1; export { x };", "/foo.ts");
 
@@ -137,9 +141,9 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
         expect.assertions(2);
 
         const plugin = esbuildPlugin({
-            logger: makeLogger(),
             loaders: { ".json": "json" },
-        } as EsbuildPluginConfig);
+            logger: makeLogger(),
+        });
 
         const transform = plugin.transform as {
             handler: (this: PluginContext, code: string, id: string) => Promise<{ code: string } | undefined>;
@@ -151,7 +155,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
             "/data.json",
         );
 
-        expect(result?.code).toMatch(/as default/);
+        expect(result?.code).toMatch(AS_DEFAULT_REGEX);
         expect(result?.code).toContain("export {");
     });
 });
