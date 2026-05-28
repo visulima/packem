@@ -19,6 +19,13 @@ const MATCH_ALL_RE = /.*/;
 const RELATIVE_OR_NULL_RE = /^(?:\0|\.{1,2}\/)/;
 const NODE_PREFIX_RE = /^node:/;
 
+// packem's CSS plugin injects `import { cssStyleInject } from "@visulima/css-style-inject"`.
+// It is a runtime helper consumers install, so it must always stay external — never inlined —
+// regardless of whether it is resolvable in node_modules. Without this, the same build inlines
+// it when hoisted (loose dev layout) but externalizes it under strict pnpm (where it is
+// unresolvable), producing non-deterministic output. A user `resolveExternals.exclude` still wins.
+const CSS_STYLE_INJECT_RE = /^@visulima\/css-style-inject(?:\/.+)?$/;
+
 const getRegExps = (data: MaybeFalsy<RegExp | string>[], type: "exclude" | "include", logger: Pail): RegExp[] =>
     // eslint-disable-next-line unicorn/no-array-reduce
     data.reduce<RegExp[]>((result, entry, index) => {
@@ -182,6 +189,8 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     if (classifiedNames.length > 0) {
         include.add(new RegExp(`^(?:${classifiedNames.join("|")})(?:/.+)?$`));
     }
+
+    include.add(CSS_STYLE_INJECT_RE);
 
     if (pkg.peerDependenciesMeta) {
         for (const [key, value] of Object.entries(pkg.peerDependenciesMeta)) {
