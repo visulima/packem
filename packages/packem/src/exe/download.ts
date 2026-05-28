@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 import { Buffer } from "node:buffer";
 import { chmod, mkdir, rename, rm, writeFile } from "node:fs/promises";
 

@@ -1,8 +1,8 @@
+import { globSync } from "@visulima/fs/glob";
+import isGlob from "@visulima/fs/is-glob";
 import { VALID_EXPORT_EXTENSIONS } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getOutputExtension, warn } from "@visulima/packem-share/utils";
-import { globSync } from "@visulima/fs/glob";
-import isGlob from "@visulima/fs/is-glob";
 import { resolve } from "@visulima/path";
 
 import type { InternalBuildOptions, ValidationOptions } from "../../types";

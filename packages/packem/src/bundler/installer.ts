@@ -1,5 +1,4 @@
 import { detectPackageManager } from "@antfu/install-pkg";
-
 import type { TransformerName } from "@visulima/packem-plugins";
 
 /**

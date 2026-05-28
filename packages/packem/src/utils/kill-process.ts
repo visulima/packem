@@ -4,7 +4,7 @@
  * MIT License
  * Copyright (c) 2021 EGOIST
  */
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import kill from "tree-kill";
 
 import type { KillSignal } from "../types";

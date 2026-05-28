@@ -865,9 +865,10 @@ const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsR
     const userDtsOptions: DtsOptions = context.options.rollup.dts ?? {};
 
     // @visulima/rollup-plugin-dts re-bundles its own copy of rollup's `Plugin`
-    // type whose `SourceDescription.ast` differs structurally from rollup 4's;
-    // the runtime objects are interchangeable but TS needs a cast to bridge
-    // the two declarations.
+    // type whose `SourceDescription.ast` (`ProgramNode`) differs structurally
+    // from rollup 4's; the runtime objects are interchangeable but TS rejects
+    // the assignment without a cast to bridge the two declarations.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- the cast is required; tsc fails without it. The rule's heuristic misfires on the `as unknown as` double-assertion.
     return dts({
         ...userDtsOptions,
         compilerOptions: {

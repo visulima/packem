@@ -29,6 +29,7 @@ import {
     chunkSplitter,
     commonjs as commonjsPlugin,
     dynamicImportVars as dynamicImportVariablesPlugin,
+    importTrace,
     jsxRemoveAttributes,
     polyfillNode as polyfillPlugin,
     preserveDirectivesPlugin,
@@ -44,7 +45,6 @@ import { getOutputExtension, sortUserPlugins } from "@visulima/packem-share/util
 import { resolve } from "@visulima/path";
 import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-plugin-css";
 import type { OutputOptions, Plugin, RollupOptions } from "rollup";
-import { importTrace } from "@visulima/packem-rollup";
 
 import {
     BABEL_DEFAULT_INCLUDE_REGEX,
