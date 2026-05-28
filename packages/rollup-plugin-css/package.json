@@ -131,6 +131,7 @@
         "@csstools/css-parser-algorithms": "catalog:style",
         "@csstools/css-tokenizer": "catalog:style",
         "@csstools/postcss-slow-plugins": "catalog:style",
+        "@eslint/css": "catalog:lint",
         "@rollup/plugin-inject": "catalog:build",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@tailwindcss/node": "catalog:style",
@@ -170,6 +171,7 @@
         "semantic-release": "catalog:cli",
         "stylus": "catalog:dev",
         "sugarss": "catalog:dev",
+        "tailwind-csstree": "catalog:lint",
         "typescript": "catalog:tsc",
         "vitest": "catalog:test"
     },
