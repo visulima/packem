@@ -1,3 +1,19 @@
+## @visulima/packem-rollup [1.0.0-alpha.66](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.65...@visulima/packem-rollup@1.0.0-alpha.66) (2026-05-28)
+
+### Features
+
+* rolldown ([#196](https://github.com/visulima/packem/issues/196)) ([197d465](https://github.com/visulima/packem/commit/197d465c2465993a17039319f8ede13398e00def))
+
+### Bug Fixes
+
+* **release:** break multi-semantic-release dependency cycle ([1443e4c](https://github.com/visulima/packem/commit/1443e4ca7bad413e52ea61a68f360dd5d355c570))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.47
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.27
+
 ## @visulima/packem-rollup [1.0.0-alpha.65](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.64...@visulima/packem-rollup@1.0.0-alpha.65) (2026-05-07)
 
 ### Bug Fixes
