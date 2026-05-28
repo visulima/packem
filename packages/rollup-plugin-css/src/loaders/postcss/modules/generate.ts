@@ -4,6 +4,8 @@ import { basename, parse } from "@visulima/path";
 
 import { HASH_REGEXP } from "../constants";
 
+const MODULE_SUFFIX_REGEXP = /\.module$/;
+
 /**
  * For reference, postcss-modules's default:
  * https://github.com/madyankin/postcss-modules/blob/v6.0.0/src/scoping.js#L41
@@ -24,7 +26,7 @@ const generate
             return makeLegalIdentifier(
                 placeholder
                     .replace("[dir]", basename(dir))
-                    .replace("[name]", name.replace(/\.module$/, ""))
+                    .replace("[name]", name.replace(MODULE_SUFFIX_REGEXP, ""))
                     .replace("[local]", local)
                     .replace(HASH_REGEXP, hashLength ? hash.slice(0, hashLength) : hash),
             );

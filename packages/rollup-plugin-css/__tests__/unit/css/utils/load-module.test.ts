@@ -9,10 +9,10 @@ const fixturePath = join(__dirname, "../../../../__fixtures__/css");
 
 // Mock RollupLogger
 const mockLogger = {
-    debug: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
+    debug: vi.fn<(...args: unknown[]) => void>(),
+    error: vi.fn<(...args: unknown[]) => void>(),
+    info: vi.fn<(...args: unknown[]) => void>(),
+    warn: vi.fn<(...args: unknown[]) => void>(),
 };
 
 describe("load-module", () => {

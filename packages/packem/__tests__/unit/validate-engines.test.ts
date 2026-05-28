@@ -1,11 +1,14 @@
+import type { PackageJson } from "@visulima/package";
 import type { BuildContext } from "@visulima/packem-share/types";
+import type { warn } from "@visulima/packem-share/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { InternalBuildOptions, ValidationOptions } from "../../src/types";
 import validateEngines from "../../src/validator/package-json/validate-engines";
 
 const { mockedWarn } = vi.hoisted(() => {
     return {
-        mockedWarn: vi.fn(),
+        mockedWarn: vi.fn<typeof warn>(),
     };
 });
 
@@ -17,7 +20,10 @@ vi.mock(import("@visulima/packem-share/utils"), () => {
 });
 
 describe(validateEngines, () => {
-    const createMockContext = (package_: any, validation: any = {}): BuildContext =>
+    const createMockContext = (
+        package_: Partial<PackageJson>,
+        validation: NonNullable<ValidationOptions["packageJson"]> = {},
+    ): BuildContext<InternalBuildOptions> =>
         ({
             options: {
                 validation: {
@@ -25,7 +31,7 @@ describe(validateEngines, () => {
                 },
             },
             pkg: package_,
-        }) as BuildContext;
+        }) as unknown as BuildContext<InternalBuildOptions>;
 
     beforeEach(() => {
         vi.resetAllMocks();
@@ -89,8 +95,10 @@ describe(validateEngines, () => {
             name: "test-package",
         });
 
-        expect(() => validateEngines(context)).toThrowError(
-            `Node.js version mismatch: Current version ${process.version} does not satisfy the required range \">=99.0.0\" specified in package.json engines.node field.`,
+        expect(() => {
+            validateEngines(context);
+        }).toThrow(
+            `Node.js version mismatch: Current version ${process.version} does not satisfy the required range ">=99.0.0" specified in package.json engines.node field.`,
         );
     });
 

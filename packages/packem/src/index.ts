@@ -39,7 +39,7 @@ export interface PackemOptions extends BuildConfig {
 }
 
 /**
- * Runs the Packem bundler with the specified options
+ * Runs the Packem bundler with the specified options.
  * @param rootDirectory The root directory of the project to bundle
  * @param options Configuration options for the bundler
  * @returns Promise that resolves with the build result
@@ -61,7 +61,7 @@ export const packem = async (rootDirectory: string, options: PackemOptions = {})
         ...options,
     };
 
-    const pail = createPail({
+    const pailOptions: ConstructorOptions<string, string> = {
         reporters: [
             new SimpleReporter({
                 error: {
@@ -73,13 +73,19 @@ export const packem = async (rootDirectory: string, options: PackemOptions = {})
         ],
         scope: "packem",
         ...logger,
-    } as any);
+    };
 
-    await internalPackem(rootDirectory, mode, environment, pail, debug, inputConfig as BuildConfig, tsconfigPath);
+    // `createPail` expects `ServerConstructorOptions`, which `@visulima/pail` does
+    // not re-export from its package root (only `ConstructorOptions` is public).
+    // The two types are structurally compatible for the options we pass; the cast
+    // bridges the gap without naming an unexported type or using `any`.
+    const pail = createPail(pailOptions as unknown as Parameters<typeof createPail>[0]);
+
+    await internalPackem(rootDirectory, mode, environment, pail, debug, inputConfig, tsconfigPath);
 };
 
 export type { BuildEntry, BuildOptions, RollupBuildOptions } from "./types";
-export type { TransformerFn, TransformerName } from "@visulima/packem-rollup";
+export type { TransformerFn, TransformerName } from "@visulima/packem-plugins";
 export type {
     BuildContext,
     BuildContextBuildAssetAndChunk,

@@ -9,9 +9,26 @@ import type { BuildConfig, InternalBuildOptions } from "../../types";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 
+// eslint-disable-next-line sonarjs/slow-regex -- bounded path segment match against collected file list
+const DIST_PATH_REGEXP = /.*\/dist\/.*/;
+
+const TRAILING_SLASH_REGEXP = /\/$/;
+
+/**
+ * Minimal structural view of the {@link BuildContext}'s `logger` (a `Pail`
+ * instance). The `@visulima/pail` package's export map is not resolvable by
+ * the typed-linting program (it resolves fine under `tsc`), which would
+ * otherwise surface as `no-unsafe-*` false positives. Narrowing to the
+ * methods actually used here keeps the call sites correctly typed.
+ */
+interface AutoPresetLogger {
+    debug: (...arguments_: unknown[]) => void;
+    info: (...arguments_: unknown[]) => void;
+    warn: (...arguments_: unknown[]) => void;
+}
+
 const autoPreset: BuildConfig = {
     hooks: {
-        // eslint-disable-next-line sonarjs/cognitive-complexity
         "build:prepare": async function (context: BuildContext<InternalBuildOptions>) {
             // For unbundle mode, always create entries for all source files
             if (context.options.unbundle) {
@@ -28,8 +45,7 @@ const autoPreset: BuildConfig = {
                     extensions: [],
                     includeDirs: false,
                     includeSymlinks: false,
-                    // eslint-disable-next-line sonarjs/slow-regex
-                    skip: [EXCLUDE_REGEXP, /.*\/dist\/.*/],
+                    skip: [EXCLUDE_REGEXP, DIST_PATH_REGEXP],
                 });
 
                 // Filter for TypeScript/JavaScript files
@@ -64,72 +80,53 @@ const autoPreset: BuildConfig = {
                 extensions: [],
                 includeDirs: false,
                 includeSymlinks: false,
-                // eslint-disable-next-line sonarjs/slow-regex
-                skip: [EXCLUDE_REGEXP, /.*\/dist\/.*/],
+                skip: [EXCLUDE_REGEXP, DIST_PATH_REGEXP],
             });
 
             if (sourceFiles.length === 0) {
                 throw new Error("No source files found in 'src' directory. Please provide entries manually.");
             }
 
+            const logger = context.logger as AutoPresetLogger;
+
             let packageJson = { ...context.pkg } as NormalizedPackageJson;
 
             if (packageJson.publishConfig) {
-                context.logger.info(
+                logger.info(
                     `Using publishConfig found in package.json, to override the default key-value pairs of "${Object.keys(packageJson.publishConfig).join(
                         ", ",
                     )}".`,
                 );
-                context.logger.debug(packageJson.publishConfig);
+                logger.debug(packageJson.publishConfig);
 
                 packageJson = overwriteWithPublishConfig(packageJson, context.options.declaration);
             }
 
-            // For unbundle mode, create entries for all source files
-            if (context.options.unbundle) {
-                context.logger.info("Unbundle mode detected, creating entries for all source files");
+            // Unbundle mode is handled by the early branch above (which
+            // returns), so by here we always run inferEntries.
+            const result = await inferEntries(packageJson, sourceFiles, context);
 
-                // Filter for TypeScript/JavaScript files
-                const codeFiles = sourceFiles.filter((file) => ALLOWED_TRANSFORM_EXTENSIONS_REGEX.test(file) && !file.endsWith(".d.ts"));
-
-                context.logger.info(`Found ${codeFiles.length} code files for unbundle mode`);
-
-                for (const file of codeFiles) {
-                    const relativePath = file.replace(`${sourceDirectory}/`, "");
-                    const name = relativePath.replace(ALLOWED_TRANSFORM_EXTENSIONS_REGEX, "").replaceAll("/", "/");
-
-                    context.logger.info(`Adding entry: ${name} -> ${file}`);
-
-                    context.options.entries.push({
-                        input: file,
-                        name,
-                    });
-                }
-            } else {
-                const result = await inferEntries(packageJson, sourceFiles, context);
-
-                for (const message of result.warnings) {
-                    context.logger.warn(message);
-                }
-
-                context.options.entries.push(...result.entries);
+            for (const message of result.warnings) {
+                logger.warn(message);
             }
+
+            context.options.entries.push(...result.entries);
 
             if (context.options.entries.length === 0) {
                 throw new Error("No entries detected. Please provide entries manually.");
             } else {
-                context.logger.info(
+                logger.info(
                     "Automatically detected entries:",
                     cyan(
                         context.options.entries
                             .map((buildEntry) => {
                                 if (buildEntry.fileAlias) {
                                     return `${bold(buildEntry.fileAlias)} => ${bold(
-                                        buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"),
+                                        buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(TRAILING_SLASH_REGEXP, "/*"),
                                     )}`;
                                 }
 
-                                return bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"));
+                                return bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(TRAILING_SLASH_REGEXP, "/*"));
                             })
                             .join(", "),
                     ),

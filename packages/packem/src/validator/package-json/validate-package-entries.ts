@@ -9,59 +9,78 @@ import type { InternalBuildOptions, ValidationOptions } from "../../types";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
 import levenstein from "../../utils/find-alternatives";
 
+// Strips a trailing glob segment (and anything after it) so wildcard export
+// entries resolve to their containing directory.
+const GLOB_SUFFIX_REGEX = /\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/;
+
+const collectExportFilenames = (context: BuildContext<InternalBuildOptions>, packageType: "cjs" | "esm"): (string | undefined)[] => {
+    const { options } = context;
+
+    return extractExportFilenames(context.pkg.exports, packageType, options.declaration, [], options.ignoreExportKeys ?? [])
+        .filter((outputDescriptor) => !outputDescriptor.ignored)
+        .map((outputDescriptor) => {
+            if (options.dtsOnly) {
+                return outputDescriptor.subKey === "types" ? outputDescriptor.file : undefined;
+            }
+
+            return outputDescriptor.file;
+        });
+};
+
+const resolveBinEntries = (context: BuildContext<InternalBuildOptions>, validateBin: boolean): string[] => {
+    if (context.options.dtsOnly || !validateBin) {
+        return [""];
+    }
+
+    if (typeof context.pkg.bin === "string") {
+        return [context.pkg.bin];
+    }
+
+    if (typeof context.pkg.bin === "object") {
+        return Object.values(context.pkg.bin as Record<string, string>);
+    }
+
+    return [];
+};
+
+const buildMissingOutputsMessage = (missingOutputs: string[], listOfGeneratedFiles: string[]): string => {
+    let message = "Potential missing or wrong package.json files:";
+
+    for (const missingOutput of missingOutputs) {
+        const levensteinOutput = levenstein(missingOutput, listOfGeneratedFiles);
+
+        message += `\n  - ${cyan(
+            missingOutput,
+        )}${levensteinOutput.length > 0 ? grey` (did you mean ${levensteinOutput.map((output) => `"${output}"`).join(", ")}?)` : ""}`;
+    }
+
+    return message;
+};
+
 const validatePackageEntries = (context: BuildContext<InternalBuildOptions>): void => {
     const { options } = context;
     const validation = options.validation as ValidationOptions;
+    const { packageJson } = validation;
 
-    if (validation.packageJson?.exports === false) {
+    if (!packageJson?.exports) {
         return;
     }
 
-    let bin: string[] = [];
-
-    if (options.dtsOnly || validation.packageJson?.bin === false) {
-        bin = [""];
-    } else if (typeof context.pkg.bin === "string") {
-        bin = [context.pkg.bin];
-    } else if (typeof context.pkg.bin === "object") {
-        bin = Object.values(context.pkg.bin as object);
-    }
+    const bin = resolveBinEntries(context, Boolean(packageJson.bin));
 
     const packageType = context.pkg.type === "module" ? "esm" : "cjs";
 
     const filenames = new Set(
         [
-            options.declaration && validation.packageJson?.types ? context.pkg.types : "",
-            options.declaration && validation.packageJson?.types ? context.pkg.typings : "",
+            options.declaration && packageJson.types ? context.pkg.types : "",
+            options.declaration && packageJson.types ? context.pkg.typings : "",
             ...bin,
-            options.dtsOnly && validation.packageJson?.main === false ? "" : context.pkg.main,
-            options.dtsOnly && validation.packageJson?.module === false ? "" : context.pkg.module,
-            ...validation.packageJson?.exports
-                ? extractExportFilenames(context.pkg.exports, packageType, options.declaration, [], options.ignoreExportKeys)
-                    .filter((outputDescriptor) => !outputDescriptor.ignored)
-                    .map((outputDescriptor) => {
-                        if (options.dtsOnly) {
-                            if (outputDescriptor.subKey === "types") {
-                                return outputDescriptor.file;
-                            }
-
-                            return undefined;
-                        }
-
-                        return outputDescriptor.file;
-                    })
-                : [],
+            options.dtsOnly && !packageJson.main ? "" : context.pkg.main,
+            options.dtsOnly && !packageJson.module ? "" : context.pkg.module,
+            ...collectExportFilenames(context, packageType),
         ]
             .filter(Boolean)
-            .map(
-                (index) =>
-                    index
-                    && resolve(
-                        options.rootDir,
-
-                        index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, ""),
-                    ),
-            ),
+            .map((index) => index && resolve(options.rootDir, index.replace(GLOB_SUFFIX_REGEX, ""))),
     );
 
     const missingOutputs: string[] = [];
@@ -77,15 +96,7 @@ const validatePackageEntries = (context: BuildContext<InternalBuildOptions>): vo
     const listOfGeneratedFiles = context.buildEntries.filter((bEntry) => !bEntry.chunk).map((bEntry) => rPath(bEntry.path));
 
     if (missingOutputs.length > 0) {
-        let message = "Potential missing or wrong package.json files:";
-
-        for (const missingOutput of missingOutputs) {
-            const levensteinOutput = levenstein(missingOutput, listOfGeneratedFiles);
-
-            message += `\n  - ${cyan(
-                missingOutput,
-            )}${levensteinOutput.length > 0 ? grey` (did you mean ${levensteinOutput.map((output) => `"${output}"`).join(", ")}?)` : ""}`;
-        }
+        const message = buildMissingOutputsMessage(missingOutputs, listOfGeneratedFiles);
 
         warn(context, message);
     }

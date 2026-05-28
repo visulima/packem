@@ -4,12 +4,20 @@ import { walk } from "estree-walker";
 import MagicString from "magic-string";
 import type { Plugin } from "rollup";
 
+interface NewExpressionWithRollupExtras {
+    callee?: { name?: string; type?: string };
+    rollupAnnotations?: { type: string }[];
+    start?: number;
+    type?: string;
+}
+
 /**
  * A Rollup plugin that adds `/*@__PURE__*\/` annotations before `new Constructor(...)` expressions
  * for a given list of constructor names. This allows tree-shaking of unused instantiations.
  *
  * `rollup-plugin-pure` only handles `CallExpression` nodes; this plugin handles `NewExpression`.
  */
+// eslint-disable-next-line import/prefer-default-export -- public API surface stays named for plugin consumers
 export const pureNewExpressionPlugin = (options: { constructors: string[]; sourcemap?: boolean }): Plugin => {
     const constructorSet = new Set(options.constructors.filter((c) => !c.includes(".")));
 
@@ -38,43 +46,42 @@ export const pureNewExpressionPlugin = (options: { constructors: string[]; sourc
                 let ast: Node | undefined;
 
                 try {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    ast = this.parse(code) as any;
+                    ast = this.parse(code);
                 } catch {
                     return undefined;
                 }
 
-                if (!ast) {
-                    return undefined;
-                }
-
                 const s = new MagicString(code);
-                let hasChanges = false;
 
                 walk(ast, {
                     enter(rawNode) {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const node = rawNode as any;
+                        const node = rawNode as unknown as NewExpressionWithRollupExtras;
+                        const calleeName = node.callee?.name;
+                        // eslint-disable-next-line no-underscore-dangle -- `_rollupAnnotations` is rollup's extended ast property name
+                        const annotations = (rawNode as unknown as { _rollupAnnotations?: { type: string }[] })._rollupAnnotations;
 
                         if (
                             node.type === "NewExpression"
-                            && node.callee.type === "Identifier"
-                            && constructorSet.has(node.callee.name)
+                            && node.callee?.type === "Identifier"
+                            && typeof calleeName === "string"
+                            && constructorSet.has(calleeName)
                             // Don't double-annotate if rollup already has a pure annotation
-                            && !node._rollupAnnotations?.some((a: { type: string }) => a.type === "pure")
+                            && !annotations?.some((annotation) => annotation.type === "pure")
+                            && typeof node.start === "number"
                         ) {
                             s.prependLeft(node.start, "/* @__PURE__ */ ");
-                            hasChanges = true;
                         }
                     },
                 });
 
-                if (!hasChanges) {
+                const transformed = s.toString();
+
+                if (transformed === code) {
                     return undefined;
                 }
 
                 return {
-                    code: s.toString(),
+                    code: transformed,
                     map: options.sourcemap ? s.generateMap({ hires: true }) : undefined,
                 };
             },

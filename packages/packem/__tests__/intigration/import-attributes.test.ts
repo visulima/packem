@@ -1,10 +1,10 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
 
 describe("packem import-attributes", () => {
     let temporaryDirectoryPath: string;
@@ -19,7 +19,7 @@ describe("packem import-attributes", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    describe('type: "text"', () => {
+    describe("type: \"text\"", () => {
         it("should inline file content as string in ESM output", async () => {
             expect.assertions(3);
 
@@ -116,15 +116,15 @@ export const content = text;`,
 
             const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-            expect(mjsContent).toContain('""');
+            expect(mjsContent).toContain("\"\"");
         });
     });
 
-    describe('type: "bytes"', () => {
+    describe("type: \"bytes\"", () => {
         it("should inline file content as Uint8Array in ESM output", async () => {
             expect.assertions(3);
 
-            writeFileSync(`${temporaryDirectoryPath}/src/data.bin`, Buffer.from([0x00, 0x01, 0x02, 0xff]));
+            writeFileSync(`${temporaryDirectoryPath}/src/data.bin`, Buffer.from([0x00, 0x01, 0x02, 0xFF]));
             writeFileSync(
                 `${temporaryDirectoryPath}/src/index.ts`,
                 `import bytes from "./data.bin" with { type: "bytes" };
@@ -157,7 +157,7 @@ export const data = bytes;`,
         it("should inline file content as Uint8Array in CJS output", async () => {
             expect.assertions(3);
 
-            writeFileSync(`${temporaryDirectoryPath}/src/data.bin`, Buffer.from([0x00, 0x01, 0x02, 0xff]));
+            writeFileSync(`${temporaryDirectoryPath}/src/data.bin`, Buffer.from([0x00, 0x01, 0x02, 0xFF]));
             writeFileSync(
                 `${temporaryDirectoryPath}/src/index.ts`,
                 `import bytes from "./data.bin" with { type: "bytes" };
@@ -227,7 +227,7 @@ export const data = bytes;`,
     describe("any file extension", () => {
         const extensions = [".js", ".mjs", ".cjs", ".ts", ".mts", ".cts", ".tsx", ".jsx", ".txt", ".html", ".bin", ".wasm"];
 
-        for (const extension of extensions) {
+        describe.each(extensions)("%s", (extension) => {
             it(`type: "text" with ${extension}`, async () => {
                 expect.assertions(3);
 
@@ -268,7 +268,7 @@ export const content = text;`,
 
                 const fileName = `data${extension}`;
 
-                writeFileSync(`${temporaryDirectoryPath}/src/${fileName}`, Buffer.from([0xca, 0xfe]));
+                writeFileSync(`${temporaryDirectoryPath}/src/${fileName}`, Buffer.from([0xCA, 0xFE]));
                 writeFileSync(
                     `${temporaryDirectoryPath}/src/index.ts`,
                     `import bytes from "./${fileName}" with { type: "bytes" };
@@ -297,7 +297,7 @@ export const data = bytes;`,
 
                 expect(mjsContent).toContain("Uint8Array");
             });
-        }
+        });
     });
 
     describe("both ESM and CJS outputs", () => {

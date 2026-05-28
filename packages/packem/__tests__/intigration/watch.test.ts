@@ -4,7 +4,9 @@ import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
+// eslint-disable-next-line e18e/ban-dependencies -- execa is core test-runner infra for spawning the watch process; tinyexec migration tracked separately
 import { execaNode } from "execa";
+// eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -15,6 +17,8 @@ const distributionPath = join(
     // Reuse the same resolution strategy as exec-packem-sync helper
     fileURLToPath(new URL("../../dist", import.meta.url)),
 );
+
+const ON_SUCCESS_OK_REGEX = /ON_SUCCESS_OK/g;
 
 describe("packem watch", () => {
     let temporaryDirectoryPath: string;
@@ -53,7 +57,7 @@ describe("packem watch", () => {
         // Accumulate stdout to detect markers
         let stdout = "";
 
-        proc.stdout?.on("data", (chunk) => {
+        proc.stdout.on("data", (chunk) => {
             stdout += String(chunk);
         });
 
@@ -69,6 +73,7 @@ describe("packem watch", () => {
                     return;
                 }
 
+                // eslint-disable-next-line no-await-in-loop -- intentional sequential poll: must wait between stdout checks for the build markers
                 await sleep(100);
             }
             throw new Error("Timed out waiting for initial onSuccess");
@@ -81,16 +86,16 @@ describe("packem watch", () => {
 
         const waitForSecondSuccess = async () => {
             const start = Date.now();
-            let count = 0;
 
             while (Date.now() - start < 10_000) {
                 // Count occurrences of marker; need 2 (initial + rebuild)
-                count = (stdout.match(/ON_SUCCESS_OK/g) ?? []).length;
+                const count = (stdout.match(ON_SUCCESS_OK_REGEX) ?? []).length;
 
                 if (count >= 2) {
                     return;
                 }
 
+                // eslint-disable-next-line no-await-in-loop -- intentional sequential poll: must wait between stdout checks until the marker count reaches 2
                 await sleep(100);
             }
             throw new Error("Timed out waiting for second onSuccess after change");
@@ -114,18 +119,14 @@ describe("packem watch", () => {
         // Start with a single entry
         writeFileSync(`${temporaryDirectoryPath}/src/utils.js`, `export const b = 2;\n`);
 
-        const proc = execaNode(
-            join(distributionPath, "cli/index.js"),
-            ["build", "--development", "--watch", "--no-validation"],
-            {
-                cwd: temporaryDirectoryPath,
-                reject: false,
-            },
-        );
+        const proc = execaNode(join(distributionPath, "cli/index.js"), ["build", "--development", "--watch", "--no-validation"], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
 
         let stdout = "";
 
-        proc.stdout?.on("data", (chunk) => {
+        proc.stdout.on("data", (chunk) => {
             stdout += String(chunk);
         });
 
@@ -138,6 +139,7 @@ describe("packem watch", () => {
                     return;
                 }
 
+                // eslint-disable-next-line no-await-in-loop -- intentional sequential poll: must wait between stdout checks until the pattern appears
                 await sleep(100);
             }
 

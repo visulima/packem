@@ -1,15 +1,24 @@
 import { isAccessible } from "@visulima/fs";
 import type { NormalizedPackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
-import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 
+/**
+ * Minimal structural logger contract. `@visulima/pail`'s shipped `Pail` type
+ * re-exports from a non-existent `./pail.d.ts`, so the structural alias below
+ * keeps the methods we call fully type-checked without the broken import.
+ */
+interface Logger {
+    debug: (message: string, ...arguments_: unknown[]) => void;
+    info: (message: string, ...arguments_: unknown[]) => void;
+}
+
 const loadTsconfig = async (
     rootDirectory: string,
     packageJson: NormalizedPackageJson,
-    logger: Pail,
+    logger: Logger,
     tsconfigPath?: string,
 ): Promise<TsConfigResult | undefined> => {
     let tsconfig: TsConfigResult | undefined;

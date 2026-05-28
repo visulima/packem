@@ -4,6 +4,14 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createJob, getFileContents, getFileNamesFromDirectory } from "../helpers/testing-utils";
 
+// Directive assertions tolerate either quote style: rolldown preserves the
+// source's double-quoted form (`"use client";`) while rollup rewrites to
+// single quotes — semantically identical.
+const USE_CLIENT_DIRECTIVE = /(['"])use client\1/;
+const USE_SERVER_DIRECTIVE = /(['"])use server\1/;
+const USE_DIRECTIVE_AT_START_REGEX = /^['"]use (client|server)['"]/m;
+const CLIENT_ONLY_SHARED_REGEX = /client-only-shared|clientOnlyUtil/;
+
 describe("integration - shared-module-cross-boundary", () => {
     let distDirectory: string;
     let temporaryDirectory: string;
@@ -52,7 +60,7 @@ describe("integration - shared-module-cross-boundary", () => {
         expect(sharedContent).toContain("shared-constant");
 
         // The shared chunk should NOT have any directive
-        expect(sharedContent).not.toMatch(/^['"]use (client|server)['"]/m);
+        expect(sharedContent).not.toMatch(USE_DIRECTIVE_AT_START_REGEX);
 
         // Verify the main entry file exists
         expect(jsFiles).toContain("index.js");
@@ -67,13 +75,13 @@ describe("integration - shared-module-cross-boundary", () => {
 
         // Validate that client chunks import from shared chunk (not inline)
         // Extract just the filename from the full path for matching imports
-        const sharedChunkFilename = sharedChunk.split("/").pop() || sharedChunk;
+        const sharedChunkFilename = sharedChunk.split("/").pop() ?? sharedChunk;
 
         for (const clientChunk of clientChunks) {
             // Check for the import pattern (relative path to shared chunk)
             // The import will be like: import ... from './shared-1ko-Dbltucaw.js'
             expect(fileContents[clientChunk]).toContain(sharedChunkFilename);
-            expect(fileContents[clientChunk]).toContain("'use client'");
+            expect(fileContents[clientChunk]).toMatch(USE_CLIENT_DIRECTIVE);
         }
 
         // Validate that server chunk imports from shared chunk (not inline)
@@ -86,7 +94,7 @@ describe("integration - shared-module-cross-boundary", () => {
 
         // Check for the import pattern (relative path to shared chunk)
         expect(fileContents[serverChunk]).toContain(sharedChunkFilename);
-        expect(fileContents[serverChunk]).toContain("'use server'");
+        expect(fileContents[serverChunk]).toMatch(USE_SERVER_DIRECTIVE);
     });
 
     it("should have client and server chunks import from the cross-boundary shared chunk", async () => {
@@ -112,7 +120,7 @@ describe("integration - shared-module-cross-boundary", () => {
         expect(sharedContent).toContain("shared-constant");
 
         // The shared chunk should NOT have any directive
-        expect(sharedContent).not.toMatch(/^['"]use (client|server)['"]/m);
+        expect(sharedContent).not.toMatch(USE_DIRECTIVE_AT_START_REGEX);
 
         // Find client and server boundary chunks (named after exports)
         const clientChunk = Object.keys(fileContents).find(
@@ -131,12 +139,12 @@ describe("integration - shared-module-cross-boundary", () => {
         }
 
         // Extract just the filename from the full path for matching imports
-        const sharedChunkFilename = crossBoundarySharedChunk.split("/").pop() || crossBoundarySharedChunk;
+        const sharedChunkFilename = crossBoundarySharedChunk.split("/").pop() ?? crossBoundarySharedChunk;
 
         // Client chunk should import from the cross-boundary shared chunk
         // The import will be like: import ... from './shared-1ko-Dbltucaw.js'
         expect(fileContents[clientChunk]).toContain(sharedChunkFilename);
-        expect(fileContents[clientChunk]).toContain("'use client'");
+        expect(fileContents[clientChunk]).toMatch(USE_CLIENT_DIRECTIVE);
 
         // Client chunk should NOT contain the cross-boundary shared utilities directly
         expect(fileContents[clientChunk]).not.toContain("shared-util-value");
@@ -144,7 +152,7 @@ describe("integration - shared-module-cross-boundary", () => {
         // Server chunk should import from the cross-boundary shared chunk
         // The import will be like: import ... from './shared-1ko-Dbltucaw.js'
         expect(fileContents[serverChunk]).toContain(sharedChunkFilename);
-        expect(fileContents[serverChunk]).toContain("'use server'");
+        expect(fileContents[serverChunk]).toMatch(USE_SERVER_DIRECTIVE);
 
         // Server chunk should NOT contain the shared utilities directly
         expect(fileContents[serverChunk]).not.toContain("shared-util-value");
@@ -232,12 +240,12 @@ describe("integration - shared-module-cross-boundary", () => {
 
         // Both chunks should reference the shared code (either via import or inline)
         // This ensures the client-only-shared module is accessible to both client chunks
-        expect(clientChunkContent).toMatch(/client-only-shared|clientOnlyUtil/);
-        expect(client2ChunkContent).toMatch(/client-only-shared|clientOnlyUtil/);
+        expect(clientChunkContent).toMatch(CLIENT_ONLY_SHARED_REGEX);
+        expect(client2ChunkContent).toMatch(CLIENT_ONLY_SHARED_REGEX);
 
         // Both client chunks should still have the 'use client' directive
-        expect(fileContents[clientChunk]).toContain("'use client'");
-        expect(fileContents[client2Chunk]).toContain("'use client'");
+        expect(fileContents[clientChunk]).toMatch(USE_CLIENT_DIRECTIVE);
+        expect(fileContents[client2Chunk]).toMatch(USE_CLIENT_DIRECTIVE);
 
         // IMPORTANT: Server chunk should NOT import from any client chunk
         // This is the key difference - cross-boundary shared modules get split,

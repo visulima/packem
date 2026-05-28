@@ -16,10 +16,10 @@ jobs:
 
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0" # v2.12.0
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
                   egress-policy: "audit"
 
-            - uses: "ljharb/require-allow-edits@13f90bc8cc5de000f2b44a0e2c3a11d108e8cd9f" # main
+            - uses: "ljharb/require-allow-edits@13f90bc8cc5de000f2b44a0e2c3a11d108e8cd9f" # v2.0.1 # main
               with:
                   pull_number: "${{ github.event.pull_request.number }}"

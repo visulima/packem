@@ -1,37 +1,38 @@
 import { rm } from "node:fs/promises";
 
 import { writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers/index";
+import temporaryDirectory from "../helpers/temporary-directory";
 
 describe("debug-raw2", () => {
     it("second build stderr with ?raw", async () => {
-        const tmpDir = temporaryDirectory();
+        expect.assertions(4);
 
-        await createPackemConfig(tmpDir);
+        const temporaryDirectoryPath = temporaryDirectory();
 
-        writeFileSync(`${tmpDir}/src/content.txt`, `first-version`);
-        writeFileSync(`${tmpDir}/src/index.ts`, `import content from './content.txt?raw';\n\nexport const data = content;`);
+        await createPackemConfig(temporaryDirectoryPath);
 
-        await installPackage(tmpDir, "typescript");
-        await createTsConfig(tmpDir);
-        await createPackageJson(tmpDir, { devDependencies: { typescript: "*" }, main: "./dist/index.cjs", module: "./dist/index.mjs" });
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `first-version`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `import content from './content.txt?raw';\n\nexport const data = content;`);
 
-        const r1 = await execPackem("build", [], { cwd: tmpDir, reject: false });
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, { devDependencies: { typescript: "*" }, main: "./dist/index.cjs", module: "./dist/index.mjs" });
 
-        console.log("FIRST exitCode:", r1.exitCode);
-        console.log("FIRST stderr:", r1.stderr.slice(0, 2000));
+        const r1 = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
 
-        writeFileSync(`${tmpDir}/src/content.txt`, `second-version`);
+        expect(r1.exitCode).toBe(0);
+        expect(r1.stderr).toBe("");
 
-        const r2 = await execPackem("build", [], { cwd: tmpDir, reject: false });
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `second-version`);
 
-        console.log("SECOND exitCode:", r2.exitCode);
-        console.log("SECOND stderr:", r2.stderr.slice(0, 2000));
-        console.log("SECOND stdout:", r2.stdout?.slice(-3000));
+        const r2 = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
 
-        await rm(tmpDir, { recursive: true });
+        expect(r2.exitCode).toBe(0);
+        expect(r2.stderr).toBe("");
+
+        await rm(temporaryDirectoryPath, { recursive: true });
     }, 60_000);
 });

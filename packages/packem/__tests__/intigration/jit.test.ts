@@ -4,15 +4,15 @@ import { rm } from "node:fs/promises";
 import { readFileSync, writeFileSync } from "@visulima/fs";
 import { join, relative } from "@visulima/path";
 import { resolvePath } from "mlly";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
 
 describe("packem build --jit", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -69,6 +69,7 @@ describe("packem build --jit", () => {
 
 const jiti = createJiti(__filename, {
   "alias": {},
+  "debug": false,
   "interopDefault": true,
   "transformOptions": {
     "babel": {
@@ -99,6 +100,7 @@ export { default } from "${temporaryDirectoryPath}/src/index.d.cts";`);
 
 const jiti = createJiti(import.meta.url, {
   "alias": {},
+  "debug": false,
   "interopDefault": true,
   "transformOptions": {
     "babel": {
@@ -166,6 +168,7 @@ export { default } from "${temporaryDirectoryPath}/src/index.d.mts";`);
 
 const jiti = createJiti(__filename, {
   "alias": {},
+  "debug": false,
   "interopDefault": true,
   "transformOptions": {
     "babel": {
@@ -196,6 +199,7 @@ module.exports = jiti("${temporaryDirectoryPath}/src/index.ts")`);
 
 const jiti = createJiti(import.meta.url, {
   "alias": {},
+  "debug": false,
   "interopDefault": true,
   "transformOptions": {
     "babel": {
@@ -269,7 +273,7 @@ export { __packem_export_0 as "'module.exports'" };`);
                 test: "value",
             });
         } catch (error) {
-            throw new Error(`CJS test failed: ${error}`);
+            throw new Error(`CJS test failed: ${String(error)}`, { cause: error });
         }
 
         // Test ESM import (import the named export, not default)
@@ -291,7 +295,7 @@ export { __packem_export_0 as "'module.exports'" };`);
                 test: "value",
             });
         } catch (error) {
-            throw new Error(`ESM test failed: ${error}`);
+            throw new Error(`ESM test failed: ${String(error)}`, { cause: error });
         }
     });
 });

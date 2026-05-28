@@ -1,24 +1,24 @@
 import type { ExistingRawSourceMap, RollupOutput } from "rollup";
 
-/**
- * Find and parse a source map from the output chunks
- */
-export function findSourceMapChunk(chunks: RollupOutput["output"], fileName: string): ExistingRawSourceMap {
-    const chunk = chunks.find((chunk) => chunk.fileName === fileName);
+/** Find and parse a source map from the output chunks. */
+const findSourceMapChunk = (chunks: RollupOutput["output"], fileName: string): ExistingRawSourceMap => {
+    const target = chunks.find((entry) => entry.fileName === fileName);
 
-    if (!chunk) {
-        throw new Error(`Unable to find file ${fileName} from the following chunks: ${chunks.map((chunk) => chunk.fileName).join(", ")}`);
+    if (!target) {
+        throw new Error(`Unable to find file ${fileName} from the following chunks: ${chunks.map((entry) => entry.fileName).join(", ")}`);
     }
 
-    if (chunk.type !== "asset") {
+    if (target.type !== "asset") {
         throw new Error("Sourcemap chunk is not an asset");
     }
 
-    if (typeof chunk.source !== "string") {
+    if (typeof target.source !== "string") {
         throw new TypeError("Sourcemap chunk source is not a string");
     }
 
-    const map = JSON.parse(chunk.source) as ExistingRawSourceMap;
+    const map = JSON.parse(target.source) as ExistingRawSourceMap;
 
     return map;
-}
+};
+
+export default findSourceMapChunk;

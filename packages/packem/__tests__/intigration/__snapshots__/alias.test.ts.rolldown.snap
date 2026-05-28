@@ -1,0 +1,61 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem alias > should not trigger a warning if alias option and original is used > cjs content 1`] = `
+"//#region src/test/logger.ts
+const log = () => console.log("test");
+//#endregion
+//#region src/test2/foo/bar.ts
+const bar = () => console.log("bar");
+//#endregion
+//#region src/index.ts
+bar();
+var src_default = log();
+//#endregion
+module.exports = src_default;
+"
+`;
+
+exports[`packem alias > should not trigger a warning if alias option and original is used > mjs content 1`] = `
+"//#region src/test/logger.ts
+const log = () => console.log("test");
+//#endregion
+//#region src/test2/foo/bar.ts
+const bar = () => console.log("bar");
+//#endregion
+//#region src/index.ts
+bar();
+var src_default = log();
+//#endregion
+export { src_default as default };
+"
+`;
+
+exports[`packem alias > should not trigger a warning if alias option is used > cjs content 1`] = `
+"//#region src/test/logger.ts
+const log = () => console.log("test");
+//#endregion
+//#region src/test2/foo/bar.ts
+const bar = () => console.log("bar");
+//#endregion
+//#region src/index.ts
+bar();
+var src_default = log();
+//#endregion
+module.exports = src_default;
+"
+`;
+
+exports[`packem alias > should not trigger a warning if alias option is used > mjs content 1`] = `
+"//#region src/test/logger.ts
+const log = () => console.log("test");
+//#endregion
+//#region src/test2/foo/bar.ts
+const bar = () => console.log("bar");
+//#endregion
+//#region src/index.ts
+bar();
+var src_default = log();
+//#endregion
+export { src_default as default };
+"
+`;

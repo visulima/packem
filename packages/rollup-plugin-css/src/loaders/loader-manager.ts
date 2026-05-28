@@ -77,6 +77,10 @@ class LoaderManager {
     /**
      * Creates a new LoaderManager instance.
      * @param options Configuration options for the loader manager
+     * @param options.extensions Supported file extensions
+     * @param options.loaders Loaders to register with the manager
+     * @param options.logger Logger instance for debugging and error reporting
+     * @param options.options Internal style processing options
      */
     public constructor({ extensions, loaders, logger, options }: LoadersOptions) {
         this.test = (file: string): boolean => extensions.some((extension) => file.toLowerCase().endsWith(extension));
@@ -130,43 +134,40 @@ class LoaderManager {
      * - Has `alwaysProcess` set to true, or
      * - Has a test that matches the file being processed
      * @param payload The payload to process
-     * @param context The loader context
-     * @returns The processed payload after all applicable loaders have run
+     * @param context Shared loader context propagated to each registered loader
+     * @returns The transformed payload produced by the loader pipeline
      */
     public async process(payload: Payload, context: LoaderContext): Promise<Payload> {
-        if (!this.workQueue) {
-            this.workQueue = new PQueueClass({ concurrency: threadPoolSize - 1 });
-        }
+        this.workQueue ??= new PQueueClass({ concurrency: threadPoolSize - 1 });
 
-        for await (const [name, loader] of this.loaders) {
+        for (const [name, loader] of this.loaders) {
             const loaderContext: LoaderContext = {
                 ...context,
 
-                options: (this.options[name as keyof StyleOptions] as Record<string, unknown>) ?? {},
+                options: (this.options[name as keyof StyleOptions] as Record<string, unknown> | undefined) ?? {},
             };
 
             if (loader.alwaysProcess || matchFile(loaderContext.id, loader.test)) {
                 this.logger.debug({ message: `Processing ${name} loader for ${loaderContext.id}`, plugin: "css" });
 
                 try {
+                    // eslint-disable-next-line no-await-in-loop
                     const process = await this.workQueue.add(loader.process.bind(loaderContext, payload));
 
-                    if (process) {
-                        // Preserve meta and extracted across loaders: if a loader does
-                        // not return them, don't wipe what an earlier loader produced.
-                        // eslint-disable-next-line no-param-reassign
-                        payload = {
-                            ...process,
-                            extracted: process.extracted ?? payload.extracted,
-                            meta: process.meta ?? payload.meta,
-                        };
+                    // Preserve meta and extracted across loaders: if a loader does
+                    // not return them, don't wipe what an earlier loader produced.
+                    // eslint-disable-next-line no-param-reassign
+                    payload = {
+                        ...process,
+                        extracted: process.extracted ?? payload.extracted,
+                        meta: process.meta ?? payload.meta,
+                    };
 
-                        this.logger.debug({
-                            message: `Completed ${name} loader for ${loaderContext.id}`,
-                            outputSize: process.code?.length || 0,
-                            plugin: "css",
-                        });
-                    }
+                    this.logger.debug({
+                        message: `Completed ${name} loader for ${loaderContext.id}`,
+                        outputSize: process.code.length,
+                        plugin: "css",
+                    });
                 } catch (error) {
                     this.logger.error({
                         file: loaderContext.id,

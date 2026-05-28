@@ -5,33 +5,33 @@ import type { RollupNodeResolveOptions } from "@rollup/plugin-node-resolve";
 import type { RollupReplaceOptions } from "@rollup/plugin-replace";
 import type { RollupWasmOptions } from "@rollup/plugin-wasm";
 import type { FilterPattern } from "@rollup/pluginutils";
+import type { BabelPluginConfig } from "@visulima/packem-plugins/babel";
+import type { OXCResolveOptions, OXCTransformPluginConfig } from "@visulima/packem-plugins/oxc";
+import type { CopyPluginOptions } from "@visulima/packem-plugins/plugin/copy";
+import type { DataUriPluginOptions } from "@visulima/packem-plugins/plugin/data-uri";
+import type { DebarrelPluginOptions } from "@visulima/packem-plugins/plugin/debarrel";
+import type { EsmShimCjsSyntaxOptions } from "@visulima/packem-plugins/plugin/esm-shim-cjs-syntax";
+import type { ResolveExternalsPluginOptions } from "@visulima/packem-plugins/plugin/externals";
+import type { LicenseOptions } from "@visulima/packem-plugins/plugin/license";
+import type { MinifyHTMLLiteralsOptions } from "@visulima/packem-plugins/plugin/minify-html-literals";
+import type { NativeModulesOptions } from "@visulima/packem-plugins/plugin/native-modules";
+import type { RawLoaderOptions } from "@visulima/packem-plugins/plugin/raw";
+import type { Options as RequireCJSPluginOptions } from "@visulima/packem-plugins/plugin/require-cjs-transformer";
+import type { ShebangOptions } from "@visulima/packem-plugins/plugin/shebang";
+import type { SourcemapsPluginOptions } from "@visulima/packem-plugins/plugin/source-maps";
+import type { UrlOptions } from "@visulima/packem-plugins/plugin/url";
+import type { PatchTypesOptions, TsconfigPathsPluginOptions } from "@visulima/packem-plugins/typescript";
 import type { Options as RollupDtsOptions } from "@visulima/rollup-plugin-dts";
 import type { OutputOptions, Plugin, RollupOptions } from "rollup";
 import type { NodePolyfillsOptions } from "rollup-plugin-polyfill-node";
 import type { PureAnnotationsOptions } from "rollup-plugin-pure";
 import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";
 
-import type { BabelPluginConfig } from "./plugins/babel";
 import type { CJSInteropOptions } from "./plugins/cjs-interop";
-import type { CopyPluginOptions } from "./plugins/copy";
-import type { DataUriPluginOptions } from "./plugins/data-uri";
-import type { DebarrelPluginOptions } from "./plugins/debarrel";
-import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./plugins/esbuild/types";
-import type { EsmShimCjsSyntaxOptions } from "./plugins/esm-shim-cjs-syntax";
+import type { Options as EsbuildOptions } from "./plugins/esbuild/types";
 import type { JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
-import type { LicenseOptions } from "./plugins/license";
-import type { MinifyHTMLLiteralsOptions } from "./plugins/minify-html-literals";
-import type { NativeModulesOptions } from "./plugins/native-modules-plugin";
-import type { InternalOXCTransformPluginConfig, OxcResolveOptions, OXCTransformPluginConfig } from "./plugins/oxc/types";
-import type { RawLoaderOptions } from "./plugins/raw";
-import type { Options as RequireCJSPluginOptions } from "./plugins/require-cjs-transformer";
-import type { ShebangOptions } from "./plugins/shebang";
-import type { SourcemapsPluginOptions } from "./plugins/source-maps";
 import type { SucrasePluginConfig } from "./plugins/sucrase";
 import type { SwcPluginConfig } from "./plugins/swc/types";
-import type { PatchTypesOptions } from "./plugins/typescript/patch-typescript-types";
-import type { TsconfigPathsPluginOptions } from "./plugins/typescript/resolve-tsconfig-paths-plugin";
-import type { UrlOptions } from "./plugins/url";
 
 interface RollupDynamicImportVariablesOptions {
     /**
@@ -86,7 +86,7 @@ export interface PackemRollupOptions {
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
     esbuild?: EsbuildOptions | false;
     experimental?: {
-        resolve?: OxcResolveOptions | false;
+        resolve?: OXCResolveOptions | false;
     };
     json?: RollupJsonOptions | false;
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
@@ -110,6 +110,7 @@ export interface PackemRollupOptions {
     replace?: Omit<RollupReplaceOptions, "cwd"> | false;
     requireCJS?: RequireCJSPluginOptions | false;
     resolve?: ExtendedRollupNodeResolveOptions | false;
+    resolveExternals?: ResolveExternalsPluginOptions;
     shebang?: Partial<ShebangOptions> | false;
     shim?: EsmShimCjsSyntaxOptions | false;
     sourcemap?: SourcemapsPluginOptions;
@@ -128,9 +129,3 @@ export type RollupPlugins = {
     plugin: Plugin;
     type?: "build" | "dts";
 }[];
-
-export type TransformerFn = ((config: EsbuildPluginConfig | InternalOXCTransformPluginConfig | SucrasePluginConfig | SwcPluginConfig) => Plugin) & {
-    NAME?: TransformerName;
-};
-
-export type TransformerName = "esbuild" | "oxc" | "sucrase" | "swc";

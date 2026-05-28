@@ -1,0 +1,169 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > dirname.mjs output 1`] = `
+"const __dirname = import.meta.dirname;
+function getDirname() {
+	return __dirname;
+}
+
+export { getDirname };
+"
+`;
+
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > dirname.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+function getDirname() {
+	return __dirname;
+}
+
+exports.getDirname = getDirname;
+"
+`;
+
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > filename.mjs output 1`] = `
+"const __filename = import.meta.filename;
+function getFilename() {
+	return __filename;
+}
+
+export { getFilename };
+"
+`;
+
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > filename.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+function getFilename() {
+	return __filename;
+}
+
+exports.getFilename = getFilename;
+"
+`;
+
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > require.mjs output 1`] = `
+"var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? /* @__PURE__ */ new Proxy(x, { get: (a, b) => (typeof require !== "undefined" ? require : a)[b] }) : x)(function(x) {
+	if (typeof require !== "undefined") return require.apply(this, arguments);
+	throw Error("Calling \`require\` for \\"" + x + "\\" in an environment that doesn't expose the \`require\` function. See https://rolldown.rs/in-depth/bundling-cjs#require-external-modules for more details.");
+});
+
+function getRequireModule() {
+	return __require("node:fs");
+}
+function esmImport() {
+	return import.meta.url;
+}
+
+export { esmImport, getRequireModule };
+"
+`;
+
+exports[`packem shims > should include esm shim for node >20.11, if dirname, filename or require are found > require.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+function getRequireModule() {
+	return require('node:fs');
+}
+function esmImport() {
+	return require('url').pathToFileURL(__filename).href;
+}
+
+exports.esmImport = esmImport;
+exports.getRequireModule = getRequireModule;
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > dirname.mjs output 1`] = `
+"import __cjs_url__ from 'node:url';
+import __cjs_path__ from 'node:path';
+const __filename = __cjs_url__.fileURLToPath(import.meta.url);
+const __dirname = __cjs_path__.dirname(__filename);
+function getDirname() {
+	return __dirname;
+}
+
+export { getDirname };
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > dirname.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+function getDirname() {
+	return __dirname;
+}
+
+exports.getDirname = getDirname;
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > filename.mjs output 1`] = `
+"import __cjs_url__ from 'node:url';
+const __filename = __cjs_url__.fileURLToPath(import.meta.url);
+function getFilename() {
+	return __filename;
+}
+
+export { getFilename };
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > filename.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+function getFilename() {
+	return __filename;
+}
+
+exports.getFilename = getFilename;
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > require.mjs output 1`] = `
+"var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? /* @__PURE__ */ new Proxy(x, { get: (a, b) => (typeof require !== "undefined" ? require : a)[b] }) : x)(function(x) {
+	if (typeof require !== "undefined") return require.apply(this, arguments);
+	throw Error("Calling \`require\` for \\"" + x + "\\" in an environment that doesn't expose the \`require\` function. See https://rolldown.rs/in-depth/bundling-cjs#require-external-modules for more details.");
+});
+
+function getRequireModule() {
+	return __require("node:fs");
+}
+function esmImport() {
+	return import.meta.url;
+}
+
+export { esmImport, getRequireModule };
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > require.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+function getRequireModule() {
+	return require('node:fs');
+}
+function esmImport() {
+	return require('url').pathToFileURL(__filename).href;
+}
+
+exports.esmImport = esmImport;
+exports.getRequireModule = getRequireModule;
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > custom-require.mjs output 1`] = `
+"const a = 1;
+
+export { a };
+"
+`;
+
+exports[`packem shims > should include esm shim, if dirname, filename or require are found > custom-require.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const a = 1;
+
+exports.a = a;
+"
+`;
+
+exports[`packem shims > should not include esm shim, if dirname, filename or require are not found 1`] = `
+"const test = "this should be in final bundle";
+
+export { test as default };
+"
+`;

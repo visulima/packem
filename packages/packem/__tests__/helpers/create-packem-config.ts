@@ -10,12 +10,16 @@ import type { BuildConfig } from "../../src/types";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
+const ENV_BUNDLER = process.env.PACKEM_TEST_BUNDLER;
+const envBundler: PackemConfigProperties["bundler"] = ENV_BUNDLER === "rollup" || ENV_BUNDLER === "rolldown" ? ENV_BUNDLER : undefined;
+
 export type PackemConfigProperties = {
-    config?: BuildConfig | string | undefined;
+    bundler?: "rollup" | "rolldown";
+    config?: BuildConfig | string;
     cssLoader?: ("less" | "lightningcss" | "postcss" | "sass" | "sourcemap" | "stylus" | "tailwindcss")[];
-    cssOptions?: StyleOptions | string | undefined;
+    cssOptions?: StyleOptions | string;
     experimental?: Record<string, boolean>;
-    minimizer?: "cssnano" | "lightningcss" | undefined;
+    minimizer?: "cssnano" | "lightningcss";
     plugins?: {
         code: string;
         from?: string;
@@ -31,13 +35,14 @@ export type PackemConfigProperties = {
 export const createPackemConfig = async (
     fixturePath: string,
     {
-        config = undefined,
+        bundler = envBundler,
+        config,
         cssLoader = [],
-        cssOptions = undefined,
+        cssOptions,
         experimental = {},
-        minimizer = undefined,
+        minimizer,
         plugins = [],
-        preset = undefined,
+        preset,
         runtime = "node",
         transformer = "esbuild",
     }: PackemConfigProperties = {},
@@ -115,10 +120,11 @@ export const createPackemConfig = async (
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
 import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : transformer === "oxc" ? "oxc-transformer" : "index"}";
-${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/rollup/plugins/css/loaders/${loader}";`).join("\n")}
-${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}
+${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/css/loaders/${loader}";`).join("\n")}
+${minimizer ? `import ${minimizer} from "${distributionPath}/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
+    ${bundler ? `bundler: "${bundler}",` : ""}
     runtime: "${runtime}",
     experimental: ${JSON.stringify(experimental, undefined, 4)},
     transformer,${config as string}${rollupConfig}

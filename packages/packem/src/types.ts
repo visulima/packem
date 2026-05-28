@@ -1,7 +1,9 @@
 import type { CheckPackageOptions } from "@arethetypeswrong/core";
-import type { PackemRollupOptions, TransformerFn, TransformerName } from "@visulima/packem-rollup";
-import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
-import type { NativeModulesOptions } from "@visulima/packem-rollup/plugin/native-modules";
+import type { TransformerFn, TransformerName } from "@visulima/packem-plugins";
+import type { InternalOXCTransformPluginConfig } from "@visulima/packem-plugins/oxc";
+import type { ResolveExternalsPluginOptions } from "@visulima/packem-plugins/plugin/externals";
+import type { NativeModulesOptions } from "@visulima/packem-plugins/plugin/native-modules";
+import type { PackemRollupOptions } from "@visulima/packem-rollup";
 import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
 import type { FileCache } from "@visulima/packem-share/utils";
 import type { StyleOptions } from "@visulima/rollup-plugin-css";
@@ -11,7 +13,6 @@ import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
 import type { ExeOptions } from "./exe";
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
-import type { ResolveExternalsPluginOptions } from "./rollup/plugins/externals-plugin";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -83,6 +84,10 @@ export type BuildEntry = {
     declaration?: boolean | "compatible" | "node16";
     /** Whether to generate .d.cts declaration file without triggering CJS JS build */
     declarationCjs?: boolean;
+
+    /** Whether to generate .d.mts declaration file without triggering ESM JS build */
+    declarationEsm?: boolean;
+
     /**
      * Set of declaration file extensions package.json's exports map references for
      * this entry (e.g. `{ "d.mts", "d.cts" }`). Derived by infer-entries from the
@@ -91,8 +96,6 @@ export type BuildEntry = {
      * `emitCJS`/`emitESM` + `declaration` flags when present.
      */
     declarationExtensions?: Set<"d.cts" | "d.mts" | "d.ts">;
-    /** Whether to generate .d.mts declaration file without triggering ESM JS build */
-    declarationEsm?: boolean;
     /** Build environment for this entry */
     environment?: Environment;
     /** Whether to generate ESM output for this entry */
@@ -131,6 +134,8 @@ export interface BuildOptions {
     browserTargets?: string[];
     /** Custom builder functions for different build types */
     builder?: Record<string, (context: BuildContext<BuildOptions>, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
+    /** Bundler to use for building source files */
+    bundler?: "rollup" | "rolldown";
     /** Whether to enable CommonJS interop for ESM modules */
     cjsInterop?: boolean;
     /** Whether to clean the output directory before building */
@@ -145,7 +150,15 @@ export interface BuildOptions {
      * `false` will disable declaration generation.
      * `undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
      */
-    declaration?: boolean | "compatible" | "node16" | undefined;
+    declaration?: boolean | "compatible" | "node16";
+
+    /**
+     * Maximum number of DTS bundles to build in parallel. Each
+     * `@visulima/rollup-plugin-dts` instance keeps a TypeScript program in
+     * memory, so this is capped low by default to avoid OOM on large monorepos.
+     * @default 2
+     */
+    dtsConcurrency?: number;
 
     /**
      * If `true`, only generate declaration files.
@@ -170,9 +183,7 @@ export interface BuildOptions {
     exe?: boolean | ExeOptions;
     /** Experimental features configuration */
     experimental?: {
-        /**
-         * If `true`, the `oxc resolve` plugin will be used instead of the default `@rollup/plugin-node-resolve` and `@rollup/plugin-alias`.
-         */
+        // If true, the `oxc resolve` plugin will be used instead of the default `@rollup/plugin-node-resolve` and `@rollup/plugin-alias`.
         oxcResolve?: boolean;
     };
     /** External dependencies that should not be bundled */
@@ -197,14 +208,14 @@ export interface BuildOptions {
     /** Signal to use when killing child processes */
     killSignal?: KillSignal;
     /** Whether to minify the output */
-    minify?: boolean | undefined;
+    minify?: boolean;
     /** Name of the build */
     name: string;
     /** Node.js 10 compatibility options */
     node10Compatibility?: Node10CompatibilityOptions | false;
     /** Command to run or function to execute after successful build */
 
-    onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined | void>);
+    onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined>);
     /** Timeout for the onSuccess command in milliseconds */
     onSuccessTimeout?: number;
     /** Output directory for build artifacts */
@@ -216,7 +227,7 @@ export interface BuildOptions {
     /** Root directory of the project */
     rootDir: string;
     /** Target runtime environment */
-    runtime?: "browser" | "node";
+    runtime?: Runtime;
     /** Source directory containing the source files */
     sourceDir: string;
     /** Whether to generate source maps */

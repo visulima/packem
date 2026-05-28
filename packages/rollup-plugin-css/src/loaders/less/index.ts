@@ -10,7 +10,7 @@ import type { LESSLoaderOptions } from "./types";
  *
  * This loader:
  * - Compiles Less syntax to standard CSS
- * - Resolves @import statements and dependencies
+ * - Resolves `@import` statements and dependencies
  * - Handles alias resolution for imports
  * - Tracks file dependencies for watch mode
  * - Generates source maps for debugging
@@ -56,11 +56,8 @@ const loader: Loader<LESSLoaderOptions> = {
             plugins.push(...this.options.plugins);
         }
 
-        // Get the Less render function with proper typing
-        const render = less.render as (input: string, options: Less.Options) => Promise<Less.RenderOutput>;
-
         // Compile Less to CSS with source map generation
-        const result: Less.RenderOutput = await render(code, {
+        const result: Less.RenderOutput = await (less.render.bind(less) as (input: string, options: Less.Options) => Promise<Less.RenderOutput>)(code, {
             ...this.options,
             filename: this.id,
             plugins,
@@ -74,7 +71,7 @@ const loader: Loader<LESSLoaderOptions> = {
             this.deps.add(normalize(dep));
         }
 
-        return { code: result.css, map: result.map ?? map };
+        return { code: result.css, map: result.map || map };
     },
 
     /** RegExp pattern to match Less files */

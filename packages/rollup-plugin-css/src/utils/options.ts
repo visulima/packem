@@ -74,12 +74,12 @@ export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
 
     if (modeName === "extract") {
         // Use provided output file name if present, otherwise enable extraction
-        extract = (m[1] as string | undefined) ?? true;
+        extract = (m[1] ?? true) as Mode["extract"];
     }
 
     if (modeName === "inject") {
         // Preserve injector options or function if provided; otherwise enable with defaults
-        inject = (m[1] as Mode["inject"]) ?? true;
+        inject = (m[1] ?? true) as Mode["inject"];
     }
 
     return {
@@ -109,7 +109,7 @@ export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
  * inferOption(undefined, { default: true }) // { default: true }
  * ```
  */
-export const inferOption = <T, TDefine extends T | boolean | undefined>(option: T | boolean | undefined, defaultValue: TDefine): OptionType<T, TDefine> => {
+export const inferOption = <T, TDefine extends OptionInput<T>>(option: OptionInput<T>, defaultValue: TDefine): OptionType<T, TDefine> => {
     if (typeof option === "boolean") {
         return option && ({} as TDefine);
     }
@@ -242,12 +242,15 @@ export const ensurePCSSPlugins = async (plugins: PostCSSOptions["plugins"], cwd:
         return [];
     }
 
+    type ResultPlugin = NonNullable<Result["plugins"]>[number];
+    type PluginEntry = ResultPlugin | string | [ResultPlugin | string, unknown];
+
     const ps: Result["plugins"] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    for await (const plugin of (plugins as any[]).filter(Boolean)) {
+    for (const plugin of (plugins as PluginEntry[]).filter(Boolean)) {
         if (!Array.isArray(plugin)) {
-            ps.push(await ensurePCSSOption(plugin, "plugin", cwd, logger));
+            // eslint-disable-next-line no-await-in-loop
+            ps.push(await ensurePCSSOption<ResultPlugin>(plugin, "plugin", cwd, logger));
 
             continue;
         }
@@ -255,11 +258,18 @@ export const ensurePCSSPlugins = async (plugins: PostCSSOptions["plugins"], cwd:
         const [plug, options] = plugin;
 
         if (options) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ps.push((await ensurePCSSOption<any>(plug, "plugin", cwd, logger))(options));
+            // eslint-disable-next-line no-await-in-loop
+            const factory = await ensurePCSSOption<(pluginOptions: unknown) => ResultPlugin>(
+                plug as string | ((pluginOptions: unknown) => ResultPlugin),
+                "plugin",
+                cwd,
+                logger,
+            );
+
+            ps.push(factory(options));
         } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ps.push(await ensurePCSSOption<any>(plug, "plugin", cwd, logger));
+            // eslint-disable-next-line no-await-in-loop
+            ps.push(await ensurePCSSOption<ResultPlugin>(plug, "plugin", cwd, logger));
         }
     }
 
@@ -267,6 +277,11 @@ export const ensurePCSSPlugins = async (plugins: PostCSSOptions["plugins"], cwd:
 };
 
 /**
+ * Type alias representing the accepted inputs for {@link inferOption}.
+ */
+export type OptionInput<T> = T | boolean | undefined;
+
+/**
  * Type alias for option function return types
  */
-export type OptionType<T, TDefine extends T | boolean | undefined> = T | TDefine | false;
+export type OptionType<T, TDefine extends OptionInput<T>> = TDefine | false | T;

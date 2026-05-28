@@ -99,6 +99,8 @@ class FileCache {
      * @param subDirectory Optional subdirectory within the cache
      * @returns The cached data or undefined if not found
      */
+    // The generic R lets callers type the cached value at the call site without an extra cast.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
     public get<R>(name: string, subDirectory?: string): R | undefined {
         if (!this.#isEnabled) {
             return undefined;
@@ -118,14 +120,14 @@ class FileCache {
             return undefined;
         }
 
-        const fileData = readFileSync(filePath) as unknown as string;
+        const fileData = readFileSync(filePath);
 
         if (isJson(fileData)) {
             const value = JSON.parse(fileData);
 
             this.#memoryCache.set(filePath, value);
 
-            return value as unknown as R;
+            return value as R;
         }
 
         this.#memoryCache.set(filePath, fileData);

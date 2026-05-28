@@ -6,18 +6,72 @@ import picomatch from "picomatch";
 
 import type { InternalBuildOptions, ValidationOptions } from "../types";
 
-const validateBundleSize = (context: BuildContext<InternalBuildOptions>, logged: boolean): void => {
-    const validation = context.options.validation as ValidationOptions;
+/**
+ * Minimal structural view of the Pail logger.
+ *
+ * `@visulima/pail`'s `dist/index.server.d.ts` re-exports `Pail` from a
+ * non-existent `./pail.d.ts` (the real file is `./pail.server.d.ts`), so the
+ * upstream `Pail` type used by `BuildContext.logger` resolves to an error type.
+ * That makes every `context.logger.*` access trip `no-unsafe-*`. Until the
+ * upstream package fixes its re-export, we narrow the logger to the subset of
+ * methods this module actually uses; the runtime object implements them.
+ */
+interface LogPayload {
+    message: string;
+    prefix: string;
+}
 
-    const { allowFail = false, limit: totalLimit, limits = {} } = validation.bundleLimit ?? {};
+interface Logger {
+    debug: (payload: LogPayload) => void;
+    raw: (message: string) => void;
+    warn: (payload: LogPayload) => void;
+}
 
+const getLogger = (context: BuildContext<InternalBuildOptions>): Logger => context.logger as Logger;
+
+const FILE_SIZE_PREFIX = "Validation: File Size";
+
+type SizeLimit = number | `${number}${"B" | "GB" | "KB" | "MB" | "TB"}`;
+
+const resolveLimit = (rawLimit: SizeLimit): number => {
+    if (typeof rawLimit === "string") {
+        return parseBytes(rawLimit);
+    }
+
+    return rawLimit;
+};
+
+const emitMessage = (logger: Logger, message: string, allowFail: boolean, context: BuildContext<InternalBuildOptions>, addBlankLine: boolean): void => {
+    if (allowFail) {
+        if (addBlankLine) {
+            logger.raw("\n");
+        }
+
+        logger.warn({
+            message,
+            prefix: "validation:file-size",
+        });
+
+        return;
+    }
+
+    warn(context, message);
+};
+
+const checkPerFileLimits = (
+    context: BuildContext<InternalBuildOptions>,
+    logger: Logger,
+    limits: Record<string, SizeLimit>,
+    allowFail: boolean,
+    logged: boolean,
+): void => {
     for (const [path, rawLimit] of Object.entries(limits)) {
-        const limit = typeof rawLimit === "string" ? parseBytes(rawLimit) : rawLimit;
+        const limit = resolveLimit(rawLimit);
 
         if (!Number.isFinite(limit) || limit <= 0) {
-            context.logger.debug({
-                message: `Invalid limit for ${path}: ${rawLimit}`,
-                prefix: "Validation: File Size",
+            logger.debug({
+                message: `Invalid limit for ${path}: ${String(rawLimit)}`,
+                prefix: FILE_SIZE_PREFIX,
             });
 
             continue;
@@ -30,74 +84,72 @@ const validateBundleSize = (context: BuildContext<InternalBuildOptions>, logged:
         });
 
         if (!foundEntry?.size?.bytes) {
-            context.logger.debug({
+            logger.debug({
                 message: foundEntry ? `Entry file has no size information: ${path}.` : `Entry file not found: ${path}, please check your configuration.`,
-                prefix: "Validation: File Size",
+                prefix: FILE_SIZE_PREFIX,
             });
 
             continue;
         }
 
         if (foundEntry.size.bytes > limit) {
-            const message = `File size exceeds the limit: ${join(context.options.outDir, foundEntry.path)} (${formatBytes(foundEntry.size.bytes as number)} / ${formatBytes(
+            const message = `File size exceeds the limit: ${join(context.options.outDir, foundEntry.path)} (${formatBytes(foundEntry.size.bytes)} / ${formatBytes(
                 limit,
                 {
                     decimals: 2,
                 },
             )})`;
 
-            if (allowFail) {
-                if (logged) {
-                    context.logger.raw("\n");
-                }
-
-                context.logger.warn({
-                    message,
-                    prefix: "validation:file-size",
-                });
-            } else {
-                warn(context, message);
-            }
+            emitMessage(logger, message, allowFail, context, logged);
         }
     }
+};
+
+const checkTotalLimit = (
+    context: BuildContext<InternalBuildOptions>,
+    logger: Logger,
+    totalLimit: SizeLimit,
+    allowFail: boolean,
+    addBlankLine: boolean,
+): void => {
+    // eslint-disable-next-line unicorn/no-array-reduce
+    const totalSize = context.buildEntries.reduce((accumulator, entry) => {
+        const bytes = entry.size?.bytes;
+
+        return accumulator + (typeof bytes === "number" ? bytes : 0);
+    }, 0);
+
+    const maxLimit = resolveLimit(totalLimit);
+
+    if (!Number.isFinite(maxLimit) || maxLimit <= 0) {
+        logger.debug({
+            message: `Invalid total limit: ${String(totalLimit)}`,
+            prefix: FILE_SIZE_PREFIX,
+        });
+
+        return;
+    }
+
+    if (totalSize > maxLimit) {
+        const message = `Total file size exceeds the limit: ${formatBytes(totalSize)} / ${formatBytes(maxLimit, {
+            decimals: 2,
+        })}`;
+
+        emitMessage(logger, message, allowFail, context, addBlankLine);
+    }
+};
+
+const validateBundleSize = (context: BuildContext<InternalBuildOptions>, logged: boolean): void => {
+    const validation = context.options.validation as ValidationOptions;
+
+    const { allowFail = false, limit: totalLimit, limits = {} } = validation.bundleLimit ?? {};
+
+    const logger = getLogger(context);
+
+    checkPerFileLimits(context, logger, limits, allowFail, logged);
 
     if (totalLimit) {
-        // eslint-disable-next-line unicorn/no-array-reduce
-        const totalSize = context.buildEntries.reduce((accumulator, entry) => {
-            const bytes = entry.size?.bytes;
-
-            return accumulator + (typeof bytes === "number" ? bytes : 0);
-        }, 0);
-
-        const maxLimit = typeof totalLimit === "string" ? parseBytes(totalLimit) : totalLimit;
-
-        if (!Number.isFinite(maxLimit) || maxLimit <= 0) {
-            context.logger.debug({
-                message: `Invalid total limit: ${totalLimit}`,
-                prefix: "Validation: File Size",
-            });
-
-            return;
-        }
-
-        if (totalSize > maxLimit) {
-            const message = `Total file size exceeds the limit: ${formatBytes(totalSize)} / ${formatBytes(maxLimit, {
-                decimals: 2,
-            })}`;
-
-            if (allowFail) {
-                if (logged && Object.keys(limits).length === 0) {
-                    context.logger.raw("\n");
-                }
-
-                context.logger.warn({
-                    message,
-                    prefix: "validation:file-size",
-                });
-            } else {
-                warn(context, message);
-            }
-        }
+        checkTotalLimit(context, logger, totalLimit, allowFail, logged && Object.keys(limits).length === 0);
     }
 };
 

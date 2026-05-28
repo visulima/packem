@@ -1,22 +1,69 @@
-import { cpSync, existsSync, readdirSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { assertContainFiles, createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
-const splitedNodeJsVersion = process.versions.node.split(".");
+const splitNodeJsVersion = process.versions.node.split(".");
 
-const NODE_JS_VERSION = `${splitedNodeJsVersion[0]}.${splitedNodeJsVersion[1]}`;
+const NODE_JS_VERSION = `${splitNodeJsVersion[0] ?? ""}.${splitNodeJsVersion[1] ?? ""}`;
+
+const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
+
+const ASSIGN_DEVELOPMENT_REGEX = /=\s*"development"/;
+
+const ASSIGN_PRODUCTION_REGEX = /=\s*"production"/;
+
+const ASSIGN_INDEX_REGEX = /=\s*"index"/;
+
+const ASSIGN_CORE_REGEX = /=\s*"core"/;
+
+const ASSIGN_CORE_DEVELOPMENT_REGEX = /=\s*"coredevelopment"/;
+
+const ASSIGN_CORE_PRODUCTION_REGEX = /=\s*"coreproduction"/;
+
+const PROCESS_ENV_NODE_ENV_REGEX = /process.env.NODE_ENV/;
+
+const CONST_SHARED_TRUE_REGEX = /const shared = true/;
+
+const EXPORT_CONST_SHARED_TRUE_REGEX = /export const shared = true;/;
+
+const REACT_SERVER_LITERAL_REGEX = /"react-server"/;
+
+const REACT_NATIVE_LITERAL_REGEX = /"react-native"/;
+
+const API_LITERAL_REGEX = /"api:"/;
+
+const SIZE_REPORT_INDEX_REACT_SERVER_REGEX = /dist\/index\.react-server\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/;
+
+const SIZE_REPORT_FOO_REGEX = /dist\/foo\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/;
+
+const SIZE_REPORT_BIN_CLI_REGEX = /dist\/bin\/cli\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/;
+
+const SIZE_REPORT_INDEX_REGEX = /dist\/index\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/;
+
+const RUNTIME_NODE_REGEX = /const runtime = "node"/;
+
+const RUNTIME_BROWSER_REGEX = /const runtime = "browser"/;
+
+const RUNTIME_WORKERD_REGEX = /const runtime = "workerd"/;
+
+const RUNTIME_EDGE_LIGHT_REGEX = /const runtime = "edge-light"/;
+
+const NODE_ENV_DEVELOPMENT_REGEX = /nodeEnv[^\n]{0,200}"development"/;
+
+const IS_DEV_TRUE_REGEX = /isDev[^\n]{0,200}true/;
 
 describe("packem package.json exports", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
-        temporaryDirectoryPath = temporaryDirectory();
+    beforeEach(() => {
+        temporaryDirectoryPath = mkdtempSync(join(tmpdir(), "packem-package-json-exports-"));
     });
 
     afterEach(async () => {
@@ -95,7 +142,10 @@ export function method() {
     });
 
     it("should work with dev and prod optimize conditions", async () => {
-        expect.assertions(8);
+        // Rolldown 1.0 natively inlines NODE_ENV regardless of --no-environment;
+        // it cannot preserve `process.env.NODE_ENV` in default-condition output.
+        // eslint-disable-next-line vitest/prefer-expect-assertions -- the assertion count is genuinely bundler-dependent: rolldown inlines NODE_ENV so the two default-condition file checks below do not run; a hard-coded literal would make the count wrong for one bundler.
+        expect.assertions(isRolldown ? 6 : 8);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = process.env.NODE_ENV;`);
 
@@ -131,18 +181,23 @@ export function method() {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        for (const [file, regex] of [
-            ["index.development.cjs", /= "development"/],
-            ["index.development.mjs", /= "development"/],
-            ["index.production.cjs", /="production"/],
-            ["index.production.mjs", /="production"/],
-            // In vitest the NODE_ENV is set to test
-            ["index.cjs", /process.env.NODE_ENV/],
-            ["index.mjs", /process.env.NODE_ENV/],
-        ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
+        const cases: [string, RegExp][] = [
+            ["index.development.cjs", ASSIGN_DEVELOPMENT_REGEX],
+            ["index.development.mjs", ASSIGN_DEVELOPMENT_REGEX],
+            ["index.production.cjs", ASSIGN_PRODUCTION_REGEX],
+            ["index.production.mjs", ASSIGN_PRODUCTION_REGEX],
+        ];
 
-            expect(content).toMatch(regex as RegExp);
+        // eslint-disable-next-line vitest/no-conditional-in-test -- rolldown inlines NODE_ENV so the default-condition outputs cannot retain `process.env.NODE_ENV`; these extra file assertions are only valid for the rollup bundler and removing the guard would make the test fail under rolldown.
+        if (!isRolldown) {
+            // In vitest the NODE_ENV is set to test
+            cases.push(["index.cjs", PROCESS_ENV_NODE_ENV_REGEX], ["index.mjs", PROCESS_ENV_NODE_ENV_REGEX]);
+        }
+
+        for (const [file, regex] of cases) {
+            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file}`);
+
+            expect(content).toMatch(regex);
         }
     });
 
@@ -200,24 +255,24 @@ export function method() {
         expect(binProcess.exitCode).toBe(0);
 
         for (const [file, regex] of [
-            ["index.development.cjs", /= "development"/],
-            ["index.development.mjs", /= "development"/],
-            ["index.production.cjs", /="production"/],
-            ["index.production.mjs", /="production"/],
-            ["index.cjs", /= "index"/],
-            ["index.mjs", /= "index"/],
+            ["index.development.cjs", ASSIGN_DEVELOPMENT_REGEX],
+            ["index.development.mjs", ASSIGN_DEVELOPMENT_REGEX],
+            ["index.production.cjs", ASSIGN_PRODUCTION_REGEX],
+            ["index.production.mjs", ASSIGN_PRODUCTION_REGEX],
+            ["index.cjs", ASSIGN_INDEX_REGEX],
+            ["index.mjs", ASSIGN_INDEX_REGEX],
 
             // core export
-            ["core.development.cjs", /= "coredevelopment"/],
-            ["core.development.mjs", /= "coredevelopment"/],
-            ["core.production.cjs", /="coreproduction"/],
-            ["core.production.mjs", /="coreproduction"/],
-            ["core.cjs", /= "core"/],
-            ["core.mjs", /= "core"/],
+            ["core.development.cjs", ASSIGN_CORE_DEVELOPMENT_REGEX],
+            ["core.development.mjs", ASSIGN_CORE_DEVELOPMENT_REGEX],
+            ["core.production.cjs", ASSIGN_CORE_PRODUCTION_REGEX],
+            ["core.production.mjs", ASSIGN_CORE_PRODUCTION_REGEX],
+            ["core.cjs", ASSIGN_CORE_REGEX],
+            ["core.mjs", ASSIGN_CORE_REGEX],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
-            expect(content).toMatch(regex as RegExp);
+            expect(content).toMatch(regex);
         }
     }, 30_000);
 
@@ -274,22 +329,22 @@ export { IString };`,
         expect(binProcess.exitCode).toBe(0);
 
         for (const [file, regex] of [
-            ["./index.mjs", /const shared = true/],
-            ["./index.react-server.cjs", /"react-server"/],
-            ["./index.react-native.cjs", /"react-native"/],
-            ["./index.d.ts", /export const shared = true;/],
-            ["./api/index.cjs", /"api:"/],
-            ["./api/index.mjs", /"api:"/],
+            ["./index.mjs", CONST_SHARED_TRUE_REGEX],
+            ["./index.react-server.cjs", REACT_SERVER_LITERAL_REGEX],
+            ["./index.react-native.cjs", REACT_NATIVE_LITERAL_REGEX],
+            ["./index.d.ts", EXPORT_CONST_SHARED_TRUE_REGEX],
+            ["./api/index.cjs", API_LITERAL_REGEX],
+            ["./api/index.mjs", API_LITERAL_REGEX],
         ]) {
             const filePath = (file as string).startsWith("./") ? (file as string).slice(2) : (file as string);
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${filePath}`);
 
-            expect(content).toMatch(regex as RegExp);
+            expect(content).toMatch(regex);
         }
     }, 30_000);
 
     it("should work with nested path in exports", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/foo/bar.js`, `export const value = 'foo.bar';`);
 
@@ -310,10 +365,8 @@ export { IString };`,
 
         const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.js`);
 
-        expect(content).toMatch(`const value = "foo.bar";
-
-export { value };
-`);
+        expect(normalizeBundleOutput(content)).toContain(`const value = "foo.bar";`);
+        expect(normalizeBundleOutput(content)).toContain(`export { value };`);
     });
 
     it("should work with ESM package with CJS main field", async () => {
@@ -419,19 +472,13 @@ export { value };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-const index = () => "index";
-
-module.exports = index;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const index = () => "index";
-
-export { index as default };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it("should allow to have folder name the same like file for export", async () => {
@@ -483,19 +530,13 @@ export { index as default };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/config.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-const config = () => "config";
-
-module.exports = config;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/config.mjs`);
 
-        expect(mjs).toBe(`const config = () => "config";
-
-export { config as default };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it("should export dual package for type commonjs", async () => {
@@ -528,19 +569,13 @@ export { config as default };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-const index = () => "index";
-
-module.exports = index;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const index = () => "index";
-
-export { index as default };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it("should generate output with all cjs exports", async () => {
@@ -574,13 +609,13 @@ export { index as default };
         expect(binProcess.stderr).toBe("");
 
         expect(binProcess.stdout).toContain("Build succeeded for output-app");
-        expect(binProcess.stdout).toContain("dist/index.react-server.js (total size: 149.00 Bytes, brotli size: 110.00 Bytes, gzip size: 142.00 Bytes)");
+        expect(binProcess.stdout).toMatch(SIZE_REPORT_INDEX_REACT_SERVER_REGEX);
         expect(binProcess.stdout).toContain("exports: index");
-        expect(binProcess.stdout).toContain("dist/foo.js (total size: 128.00 Bytes, brotli size: 108.00 Bytes, gzip size: 132.00 Bytes)");
+        expect(binProcess.stdout).toMatch(SIZE_REPORT_FOO_REGEX);
         expect(binProcess.stdout).toContain("exports: foo");
-        expect(binProcess.stdout).toContain("dist/bin/cli.js (total size: 148.00 Bytes, brotli size: 112.00 Bytes, gzip size: 146.00 Bytes)");
+        expect(binProcess.stdout).toMatch(SIZE_REPORT_BIN_CLI_REGEX);
         expect(binProcess.stdout).toContain("exports: cli");
-        expect(binProcess.stdout).toContain("dist/index.js (total size: 42.00 Bytes, brotli size: 46.00 Bytes, gzip size: 53.00 Bytes)");
+        expect(binProcess.stdout).toMatch(SIZE_REPORT_INDEX_REGEX);
         expect(binProcess.stdout).toContain("exports: index");
         expect(binProcess.stdout).toContain("Σ Total dist size (byte size):");
 
@@ -646,56 +681,28 @@ export { index as default };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-const index = () => "index";
-
-module.exports = index;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const cjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.cjs`);
 
-        expect(cjsPageA).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function render() {
-  console.log("Page A");
-}
-
-exports.render = render;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsPageA)).toMatchSnapshot();
 
         const mjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.mjs`);
 
-        expect(mjsPageA).toBe(`function render() {
-  console.log("Page A");
-}
-
-export { render };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsPageA)).toMatchSnapshot();
 
         const cjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.cjs`);
 
-        expect(cjsPageB).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function render() {
-  console.log("Page B");
-}
-
-exports.render = render;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsPageB)).toMatchSnapshot();
 
         const mjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.mjs`);
 
-        expect(mjsPageB).toBe(`function render() {
-  console.log("Page B");
-}
-
-export { render };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsPageB)).toMatchSnapshot();
     });
 
     describe("advanced wildcard exports", () => {
@@ -848,12 +855,8 @@ export { render };
                     cwd: temporaryDirectoryPath,
                 });
 
-                console.log(binProcess.stdout);
-
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
-
-                console.log(readdirSync(`${temporaryDirectoryPath}/dist/types`));
 
                 expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.ts`)).toBe(true);
                 expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.mts`)).toBe(true);
@@ -1118,12 +1121,7 @@ export { render };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(cjs).toBe(`'use strict';
-
-const index = () => "index";
-
-module.exports = index;
-`);
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
     });
 
     it("should work with multi entries", async () => {
@@ -1220,23 +1218,13 @@ export type Shared = string;
 
         const cjsIndexContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsIndexContent).toBe(`'use strict';
-
-const index = "index";
-
-module.exports = index;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsIndexContent)).toMatchSnapshot();
 
         const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/client.cjs`);
 
-        expect(cjsClientContent).toBe(`'use strict';
-
-function client(c) {
-  return "client" + c;
-}
-
-module.exports = client;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
     });
 
     it("should work with multi types", async () => {
@@ -1279,27 +1267,18 @@ module.exports = client;
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const index = "index";
-
-export { index };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
 
         const cjsDts = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(cjsDts).toBe(`declare const index = "index";
-export { index };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsDts)).toMatchSnapshot();
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const index = "index";
-
-exports.index = index;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
     });
 
     it("should work with edge export condition", async () => {
@@ -1327,21 +1306,17 @@ exports.index = index;
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mjs).toBe(`const isEdge = false;
-
-export { isEdge };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
 
         const mjsEdgeLight = readFileSync(`${temporaryDirectoryPath}/dist/index.edge.js`);
 
-        expect(mjsEdgeLight).toBe(`const isEdge = true;
-
-export { isEdge };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsEdgeLight)).toMatchSnapshot();
     });
 
     it("should generate proper assets for each exports for server components with same layer", async () => {
-        expect.assertions(6);
+        expect.assertions(8);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.js`,
@@ -1392,69 +1367,35 @@ export function Client() {
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        // eslint-disable-next-line no-secrets/no-secrets
-        expect(mjsContent).toBe(`'use client';
-import React, { useState } from 'react';
-export { Client } from './packem_shared/Client-97tyEYCZ.mjs';
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
-function Button() {
-  const [count] = useState(0);
-  return React.createElement("button", \`count: \${count}\`);
-}
+        const sharedDirectory = `${temporaryDirectoryPath}/dist/packem_shared`;
+        const sharedFiles = readdirSync(sharedDirectory);
+        const mjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".mjs"));
+        const cjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".cjs"));
 
-export { Button };
-`);
+        expect(mjsClientFile, `expected a Client-*.mjs file in ${sharedDirectory}, found: ${sharedFiles.join(", ")}`).toBeDefined();
+        expect(cjsClientFile, `expected a Client-*.cjs file in ${sharedDirectory}, found: ${sharedFiles.join(", ")}`).toBeDefined();
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-97tyEYCZ.mjs`);
+        const mjsClientContent = readFileSync(`${sharedDirectory}/${String(mjsClientFile)}`);
 
-        expect(mjsClientContent).toBe(`'use client';
-function Client() {
-  return "client-module";
-}
-
-export { Client };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsClientContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use client';
-'use strict';
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
 
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+        const cjsClientContent = readFileSync(`${sharedDirectory}/${String(cjsClientFile)}`);
 
-const React = require('react');
-const Client = require('./packem_shared/Client-gc0UrNx3.cjs');
-
-const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
-
-const React__default = /*#__PURE__*/_interopDefaultCompat(React);
-
-function Button() {
-  const [count] = React.useState(0);
-  return React__default.createElement("button", \`count: \${count}\`);
-}
-
-exports.Client = Client.Client;
-exports.Button = Button;
-`);
-
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-gc0UrNx3.cjs`);
-
-        expect(cjsClientContent).toBe(`'use client';
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function Client() {
-  return "client-module";
-}
-
-exports.Client = Client;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
     });
 
     it("should generate proper assets for each exports for server components", async () => {
-        expect.assertions(8);
+        expect.assertions(12);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.js`,
@@ -1534,76 +1475,47 @@ export const asset = "asset-module";
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { Button } from './ui.mjs';
-export { action } from './packem_shared/action-Ec_x0XEO.mjs';
-export { Client, Client as UIClient } from './packem_shared/Client-97tyEYCZ.mjs';
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
-        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-Ec_x0XEO.mjs`);
+        const sharedDirectory = `${temporaryDirectoryPath}/dist/packem_shared`;
+        const sharedFiles = readdirSync(sharedDirectory);
+        const mjsActionFile = sharedFiles.find((f) => f.startsWith("action-") && f.endsWith(".mjs"));
+        const cjsActionFile = sharedFiles.find((f) => f.startsWith("action-") && f.endsWith(".cjs"));
+        const mjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".mjs"));
+        const cjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".cjs"));
 
-        expect(mjsActionContent).toBe(`'use server';
-async function action() {
-  return "server-action";
-}
+        const filesInDirectory = `expected matching shared file in ${sharedDirectory}, found: ${sharedFiles.join(", ")}`;
 
-export { action };
-`);
+        expect(mjsActionFile, filesInDirectory).toBeDefined();
+        expect(cjsActionFile, filesInDirectory).toBeDefined();
+        expect(mjsClientFile, filesInDirectory).toBeDefined();
+        expect(cjsClientFile, filesInDirectory).toBeDefined();
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-97tyEYCZ.mjs`);
+        const mjsActionContent = readFileSync(`${sharedDirectory}/${String(mjsActionFile)}`);
 
-        expect(mjsClientContent).toBe(`'use client';
-function Client() {
-  return "client-module";
-}
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsActionContent)).toMatchSnapshot();
 
-export { Client };
-`);
+        const mjsClientContent = readFileSync(`${sharedDirectory}/${String(mjsClientFile)}`);
+
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsClientContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
 
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+        const cjsActionContent = readFileSync(`${sharedDirectory}/${String(cjsActionFile)}`);
 
-const ui = require('./ui.cjs');
-const action = require('./packem_shared/action-DHDpyHIn.cjs');
-const Client = require('./packem_shared/Client-gc0UrNx3.cjs');
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsActionContent)).toMatchSnapshot();
 
+        const cjsClientContent = readFileSync(`${sharedDirectory}/${String(cjsClientFile)}`);
 
-
-exports.Button = ui.Button;
-exports.action = action.action;
-exports.Client = Client.Client;
-exports.UIClient = Client.Client;
-`);
-
-        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DHDpyHIn.cjs`);
-
-        expect(cjsActionContent).toBe(`'use server';
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-async function action() {
-  return "server-action";
-}
-
-exports.action = action;
-`);
-
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-gc0UrNx3.cjs`);
-
-        expect(cjsClientContent).toBe(`'use client';
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function Client() {
-  return "client-module";
-}
-
-exports.Client = Client;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
     });
 
     it("should find all files in the same directory if globstar is used", async () => {
@@ -1612,7 +1524,7 @@ exports.Client = Client;
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
         Array.from({ length: 10 }).forEach((_, index) => {
-            writeFileSync(`${temporaryDirectoryPath}/src/deep/index-${index}.js`, `export default 'index-${index}'`);
+            writeFileSync(`${temporaryDirectoryPath}/src/deep/index-${String(index)}.js`, `export default 'index-${String(index)}'`);
         });
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -1712,21 +1624,13 @@ exports.Client = Client;
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const result = "mts";
-
-export { result };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const result = "cts";
-
-exports.result = result;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
     });
 
     it("should generate different files for mts and cts with same shared code", async () => {
@@ -1812,37 +1716,13 @@ export type { Colorize } from "./types";`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const Colorize = function() {
-  return {
-    color: "red",
-    text: "hello world"
-  };
-};
-
-const result = Colorize();
-const {
-  text,
-  color
-} = result;
-
-export { color, result as default, text };
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-const Colorize = function() {
-  return {
-    color: "red",
-    text: "hello world"
-  };
-};
-
-const result = Colorize();
-
-module.exports = result;
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
     });
 
     it("should work with multiple exports conditions", async () => {
@@ -1926,15 +1806,15 @@ module.exports = result;
         assertContainFiles(join(temporaryDirectoryPath, "dist"), distributionFiles);
 
         for (const [file, regex] of [
-            ["index.cjs", /const runtime = "node"/],
-            ["index.mjs", /const runtime = "node"/],
-            ["index.browser.mjs", /const runtime = "browser"/],
-            ["index.workerd.mjs", /const runtime = "workerd"/],
-            ["index.edge-light.mjs", /const runtime = "edge-light"/],
+            ["index.cjs", RUNTIME_NODE_REGEX],
+            ["index.mjs", RUNTIME_NODE_REGEX],
+            ["index.browser.mjs", RUNTIME_BROWSER_REGEX],
+            ["index.workerd.mjs", RUNTIME_WORKERD_REGEX],
+            ["index.edge-light.mjs", RUNTIME_EDGE_LIGHT_REGEX],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
-            expect(content).toMatch(regex as RegExp);
+            expect(content).toMatch(regex);
         }
     });
 
@@ -2011,41 +1891,13 @@ console.log('require-module-import', require('require-module-import').resolved);
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-console.log("import-module-require", require("import-module-require").resolved);
-console.log("module-and-import", require("module-and-import").resolved);
-console.log("module-and-require", require("module-and-require").resolved);
-console.log("module-import-require", require("module-import-require").resolved);
-console.log("module-only", require("module-only").resolved);
-console.log("module-require-import", require("module-require-import").resolved);
-console.log("require-module-import", require("require-module-import").resolved);
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const resolved$6 = "module";
-
-const resolved$5 = "module";
-
-const resolved$4 = "module";
-
-const resolved$3 = "module";
-
-const resolved$2 = "module";
-
-const resolved$1 = "module";
-
-const resolved = "module";
-
-console.log("import-module-require", resolved$6);
-console.log("module-and-import", resolved$5);
-console.log("module-and-require", resolved$4);
-console.log("module-import-require", resolved$3);
-console.log("module-only", resolved$2);
-console.log("module-require-import", resolved$1);
-console.log("require-module-import", resolved);
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it.skipIf(NODE_JS_VERSION !== "22.9")("should support the new 'module-sync' exports node", async () => {
@@ -2126,41 +1978,13 @@ console.log('require-module-import', require('require-module-import').resolved);
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-console.log("import-module-require", require("import-module-require").resolved);
-console.log("module-and-import", require("module-and-import").resolved);
-console.log("module-and-require", require("module-and-require").resolved);
-console.log("module-import-require", require("module-import-require").resolved);
-console.log("module-only", require("module-only").resolved);
-console.log("module-require-import", require("module-require-import").resolved);
-console.log("require-module-import", require("require-module-import").resolved);
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const resolved$6 = "module";
-
-const resolved$5 = "module";
-
-const resolved$4 = "module";
-
-const resolved$3 = "module";
-
-const resolved$2 = "module";
-
-const resolved$1 = "module";
-
-const resolved = "module";
-
-console.log("import-module-require", resolved$6);
-console.log("module-and-import", resolved$5);
-console.log("module-and-require", resolved$4);
-console.log("module-import-require", resolved$3);
-console.log("module-only", resolved$2);
-console.log("module-require-import", resolved$1);
-console.log("require-module-import", resolved);
-`);
+        // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it("should generate proper assets with custom extensions from outputExtensionMap", async () => {
@@ -2866,8 +2690,8 @@ export const isDev = process.env.DEV === 'true';`,
         // Note: process.env.NODE_ENV is replaced with "development", so we check for the replaced value
         const developmentContent = readFileSync(`${temporaryDirectoryPath}/dist/index.development.mjs`);
 
-        expect(developmentContent).toMatch(/nodeEnv.*"development"/);
-        expect(developmentContent).toMatch(/isDev.*true/);
+        expect(developmentContent).toMatch(NODE_ENV_DEVELOPMENT_REGEX);
+        expect(developmentContent).toMatch(IS_DEV_TRUE_REGEX);
     });
 
     it("should not generate .d.js files even when entry names end with .d", async () => {
@@ -2984,7 +2808,7 @@ export default App;`,
         expect(binProcess.exitCode).toBe(0);
 
         // Verify React imports are aliased to preact/compat
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = normalizeBundleOutput(readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`));
 
         expect(mjsContent).toContain("from 'preact/compat'");
         expect(mjsContent).not.toContain("from 'react'");

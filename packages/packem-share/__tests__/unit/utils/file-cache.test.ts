@@ -1,18 +1,18 @@
 /* eslint-disable vitest/require-mock-type-parameters */
-import { rm } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join as pathJoin } from "node:path";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
 import { join } from "@visulima/path";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { RollupLogger } from "../../../src/utils/create-rollup-logger";
 import FileCache from "../../../src/utils/file-cache";
 
 const hoisted = vi.hoisted(() => {
     return {
         fs: { isAccessibleSync: vi.fn(), readFileSync: vi.fn(), writeFileSync: vi.fn() },
-        logger: { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() } as unknown as RollupLogger,
+        logger: { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() },
     };
 });
 
@@ -25,7 +25,7 @@ describe("fileCache", () => {
     let cacheDirectoryPath: string;
 
     beforeEach(async () => {
-        temporaryDirectoryPath = temporaryDirectory();
+        temporaryDirectoryPath = await mkdtemp(pathJoin(tmpdir(), "packem-share-"));
         cacheDirectoryPath = join(temporaryDirectoryPath, "cache");
     });
 
@@ -120,7 +120,9 @@ describe("fileCache", () => {
 
         const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
 
-        expect(() => fileCache.set("testFile", undefined)).not.toThrowError();
+        expect(() => {
+            fileCache.set("testFile", undefined);
+        }).not.toThrow();
     });
 
     it("should return false if cache is disabled in has method", () => {

@@ -58,7 +58,7 @@ const stripHash = (string_: string): string => {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const parseAtImport = (parameters: string): false | { fullUri: string; layer?: string; media?: string; scope?: string; supports?: string; uri: string } => {
+const parseAtImport = (parameters: string): undefined | { fullUri: string; layer?: string; media?: string; scope?: string; supports?: string; uri: string } => {
     const tokens = tokenize({ css: parameters });
 
     // Fast path for common cases:
@@ -68,7 +68,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
         uri = stripHash(uri);
 
         if (!uri) {
-            return false;
+            return undefined;
         }
 
         return {
@@ -96,7 +96,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
 
         if (isTokenNode(componentValue) && (isTokenString(componentValue.value) || isTokenURL(componentValue.value))) {
             if (uri) {
-                return false;
+                return undefined;
             }
 
             uri = componentValue.value[4].value;
@@ -108,7 +108,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
 
         if (isFunctionNode(componentValue) && IS_URL_REGEX.test(componentValue.getName())) {
             if (uri) {
-                return false;
+                return undefined;
             }
 
             // eslint-disable-next-line no-plusplus
@@ -126,19 +126,19 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
                     continue;
                 }
 
-                return false;
+                return undefined;
             }
 
             continue;
         }
 
         if (!uri) {
-            return false;
+            return undefined;
         }
 
         if (isTokenNode(componentValue) && isTokenIdent(componentValue.value) && IS_LAYER_REGEX.test(componentValue.value[4].value)) {
             if (layer !== undefined || supports !== undefined) {
-                return false;
+                return undefined;
             }
 
             layer = "";
@@ -148,7 +148,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
 
         if (isFunctionNode(componentValue) && IS_LAYER_REGEX.test(componentValue.getName())) {
             if (layer !== undefined || supports !== undefined) {
-                return false;
+                return undefined;
             }
 
             layer = stringify([componentValue.value]);
@@ -158,7 +158,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
 
         if (isFunctionNode(componentValue) && IS_SUPPORTS_REGEX.test(componentValue.getName())) {
             if (supports !== undefined) {
-                return false;
+                return undefined;
             }
 
             supports = stringify([componentValue.value]);
@@ -168,7 +168,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
 
         if (isFunctionNode(componentValue) && IS_SCOPE_REGEX.test(componentValue.getName())) {
             if (scope !== undefined) {
-                return false;
+                return undefined;
             }
 
             scope = stringify([wrapInParenthesisIfNeeded(componentValue.value)]);
@@ -183,7 +183,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
     uri = stripHash(uri);
 
     if (!uri) {
-        return false;
+        return undefined;
     }
 
     return {

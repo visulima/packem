@@ -49,7 +49,7 @@ const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
                     contents = `/* ${canonicalUrl.pathname} */\n${contents}`;
                 }
 
-                return { contents: contents as string, sourceMapUrl: canonicalUrl, syntax };
+                return { contents, sourceMapUrl: canonicalUrl, syntax };
             } catch {
                 // eslint-disable-next-line unicorn/no-null
                 return null;

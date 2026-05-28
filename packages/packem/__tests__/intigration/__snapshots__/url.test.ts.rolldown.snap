@@ -1,0 +1,341 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`url > copy "large" binary files, limit: 10 > cjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+module.exports = svg_default;
+"
+`;
+
+exports[`url > copy "large" binary files, limit: 10 > mjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+export { svg_default as default };
+"
+`;
+
+exports[`url > inline "large" files > cjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+module.exports = svg_default;
+"
+`;
+
+exports[`url > inline "large" files > mjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+export { svg_default as default };
+"
+`;
+
+exports[`url > should copy files with include by absolute path, limit: 0 > cjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+module.exports = svg_default;
+"
+`;
+
+exports[`url > should copy files with include by absolute path, limit: 0 > mjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+export { svg_default as default };
+"
+`;
+
+exports[`url > should copy files, limit: 0 > cjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+module.exports = svg_default;
+"
+`;
+
+exports[`url > should copy files, limit: 0 > mjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+export { svg_default as default };
+"
+`;
+
+exports[`url > should copy the file according to destDir option > cjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "src/6b71fbe07b498a82.png";
+//#endregion
+module.exports = png_default;
+"
+`;
+
+exports[`url > should copy the file according to destDir option > mjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "src/6b71fbe07b498a82.png";
+//#endregion
+export { png_default as default };
+"
+`;
+
+exports[`url > should create a file with the name and extension of the file > cjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "png.png";
+//#endregion
+module.exports = png_default;
+"
+`;
+
+exports[`url > should create a file with the name and extension of the file > mjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "png.png";
+//#endregion
+export { png_default as default };
+"
+`;
+
+exports[`url > should create a file with the name, hash and extension of the file > cjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "png-6b71fbe07b498a82.png";
+//#endregion
+module.exports = png_default;
+"
+`;
+
+exports[`url > should create a file with the name, hash and extension of the file > mjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "png-6b71fbe07b498a82.png";
+//#endregion
+export { png_default as default };
+"
+`;
+
+exports[`url > should create a nested directory for the output, if required > cjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "joker/6b71fbe07b498a82.png";
+//#endregion
+module.exports = png_default;
+"
+`;
+
+exports[`url > should create a nested directory for the output, if required > mjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "joker/6b71fbe07b498a82.png";
+//#endregion
+export { png_default as default };
+"
+`;
+
+exports[`url > should import images from the node_modules > cjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "data:image/svg+xml;base64,PHN2Zz48cGF0aCBkPSIiLz48L3N2Zz4=";
+//#endregion
+module.exports = svg_default;
+"
+`;
+
+exports[`url > should import images from the node_modules > mjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "data:image/svg+xml;base64,PHN2Zz48cGF0aCBkPSIiLz48L3N2Zz4=";
+//#endregion
+export { svg_default as default };
+"
+`;
+
+exports[`url > should inline gif files > cjs 1`] = `
+"//#endregion
+//#region src/gif.js
+var gif_default = "data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAAIf8LSW1hZ2VNYWdpY2sOZ2FtbWE9MC40NTQ1NDUALAAAAAABAAEAAAICRAEAOw==";
+//#endregion
+module.exports = gif_default;
+"
+`;
+
+exports[`url > should inline gif files > mjs 1`] = `
+"//#endregion
+//#region src/gif.js
+var gif_default = "data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAAIf8LSW1hZ2VNYWdpY2sOZ2FtbWE9MC40NTQ1NDUALAAAAAABAAEAAAICRAEAOw==";
+//#endregion
+export { gif_default as default };
+"
+`;
+
+exports[`url > should inline jpeg files > cjs 1`] = `
+"//#endregion
+//#region src/jpeg.js
+var jpeg_default = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAFA3PEY8MlBGQUZaVVBfeMiCeG5uePWvuZHI////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAABP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8Aa//Z";
+//#endregion
+module.exports = jpeg_default;
+"
+`;
+
+exports[`url > should inline jpeg files > mjs 1`] = `
+"//#endregion
+//#region src/jpeg.js
+var jpeg_default = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAFA3PEY8MlBGQUZaVVBfeMiCeG5uePWvuZHI////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAABP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8Aa//Z";
+//#endregion
+export { jpeg_default as default };
+"
+`;
+
+exports[`url > should inline jpg files > cjs 1`] = `
+"//#endregion
+//#region src/jpg.js
+var jpg_default = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAFA3PEY8MlBGQUZaVVBfeMiCeG5uePWvuZHI////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAABP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8Aa//Z";
+//#endregion
+module.exports = jpg_default;
+"
+`;
+
+exports[`url > should inline jpg files > mjs 1`] = `
+"//#endregion
+//#region src/jpg.js
+var jpg_default = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAFA3PEY8MlBGQUZaVVBfeMiCeG5uePWvuZHI////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAABP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8Aa//Z";
+//#endregion
+export { jpg_default as default };
+"
+`;
+
+exports[`url > should inline png files > cjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg==";
+//#endregion
+module.exports = png_default;
+"
+`;
+
+exports[`url > should inline png files > mjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg==";
+//#endregion
+export { png_default as default };
+"
+`;
+
+exports[`url > should inline text files > cjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "data:image/svg+xml;base64,PHN2Zz48cGF0aCBkPSIiLz48L3N2Zz4=";
+//#endregion
+module.exports = svg_default;
+"
+`;
+
+exports[`url > should inline text files > mjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "data:image/svg+xml;base64,PHN2Zz48cGF0aCBkPSIiLz48L3N2Zz4=";
+//#endregion
+export { svg_default as default };
+"
+`;
+
+exports[`url > should inline webp files > cjs 1`] = `
+"//#endregion
+//#region src/webp.js
+var webp_default = "data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAB0CWJaQAA3AA/u9gAAA=";
+//#endregion
+module.exports = webp_default;
+"
+`;
+
+exports[`url > should inline webp files > mjs 1`] = `
+"//#endregion
+//#region src/webp.js
+var webp_default = "data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAB0CWJaQAA3AA/u9gAAA=";
+//#endregion
+export { webp_default as default };
+"
+`;
+
+exports[`url > should limit: 0, emitFiles: false, publicPath: empty > cjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+module.exports = svg_default;
+"
+`;
+
+exports[`url > should limit: 0, emitFiles: false, publicPath: empty > mjs 1`] = `
+"//#endregion
+//#region src/svg.js
+var svg_default = "98ea1a8cc8cd9baf.svg";
+//#endregion
+export { svg_default as default };
+"
+`;
+
+exports[`url > should prefix the file with the parent directory of the source file > cjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "src/6b71fbe07b498a82.png";
+//#endregion
+module.exports = png_default;
+"
+`;
+
+exports[`url > should prefix the file with the parent directory of the source file > mjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "src/6b71fbe07b498a82.png";
+//#endregion
+export { png_default as default };
+"
+`;
+
+exports[`url > should use publicPath > cjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "/batman/6b71fbe07b498a82.png";
+//#endregion
+module.exports = png_default;
+"
+`;
+
+exports[`url > should use publicPath > mjs 1`] = `
+"//#endregion
+//#region src/png.js
+var png_default = "/batman/6b71fbe07b498a82.png";
+//#endregion
+export { png_default as default };
+"
+`;
+
+exports[`url > should use publicPath with file that has empty dirname > cjs 1`] = `
+"
+var png_default = "/batman/6b71fbe07b498a82.png";
+
+module.exports = png_default;
+"
+`;
+
+exports[`url > should use publicPath with file that has empty dirname > mjs 1`] = `
+"
+var png_default = "/batman/6b71fbe07b498a82.png";
+
+export { png_default as default };
+"
+`;

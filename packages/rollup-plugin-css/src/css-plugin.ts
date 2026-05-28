@@ -4,7 +4,7 @@ import type { RollupLogger } from "@visulima/packem-share/utils";
 import { createRollupLogger } from "@visulima/packem-share/utils";
 import { basename, dirname, isAbsolute, join, normalize, parse, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
-import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
+import type { GetModuleInfo, OutputChunk, Plugin } from "rollup";
 
 import LoaderManager from "./loaders/loader-manager";
 import type { Extracted, Loader, LoaderContext } from "./loaders/types";
@@ -12,6 +12,8 @@ import type { ExtractedData, InternalStyleOptions, StyleOptions } from "./types"
 import concat from "./utils/concat";
 import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOption, inferOption, inferSourceMapOption } from "./utils/options";
 import { mm } from "./utils/sourcemap";
+
+const RELATIVE_PATH_RE = /^\.[/\\]/;
 
 /**
  * Sorts loaders by their name order according to the specified processing sequence.
@@ -22,8 +24,8 @@ import { mm } from "./utils/sourcemap";
  * @param nameOrder Desired order of loader names
  * @returns Promise resolving to sorted loader array
  */
-const sortByNameOrder = async (objectsArray: Loader[], nameOrder: string[]): Promise<Loader[]> =>
-    objectsArray.sort((a, b) => nameOrder.indexOf(a.name) - nameOrder.indexOf(b.name));
+const sortByNameOrder = (objectsArray: Loader[], nameOrder: string[]): Loader[] =>
+    objectsArray.toSorted((a, b) => nameOrder.indexOf(a.name) - nameOrder.indexOf(b.name));
 
 /**
  * Creates the main CSS processing plugin for Rollup.
@@ -64,7 +66,7 @@ const sortByNameOrder = async (objectsArray: Loader[], nameOrder: string[]): Pro
  * }, ['> 1%'], process.cwd(), 'src', 'production', false, false, true, {});
  * ```
  */
-const cssPlugin = async (
+const cssPlugin = (
     options: StyleOptions,
     browserTargets: string[],
     cwd: string,
@@ -74,7 +76,7 @@ const cssPlugin = async (
     debug: boolean,
     minify: boolean,
     alias: Record<string, string>,
-): Promise<Plugin> => {
+): Plugin => {
     const mergedAlias = { ...alias, ...options.alias };
     const isIncluded = createFilter(options.include, options.exclude);
 
@@ -82,9 +84,9 @@ const cssPlugin = async (
     const loaderOptions: NonNullable<InternalStyleOptions> = {
         ...inferModeOption(options.mode),
         autoModules: options.autoModules ?? false,
-        dts: options.dts as boolean,
+        dts: options.dts,
         extensions: options.extensions as string[],
-        namedExports: options.namedExports as boolean,
+        namedExports: options.namedExports,
     };
 
     let logger: RollupLogger;
@@ -186,7 +188,7 @@ const cssPlugin = async (
 
             const hashable = extracted
                 .filter((extract) => ids.includes(extract.id))
-                .sort((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id))
+                .toSorted((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id))
                 .map((extract) => `${basename(extract.id)}:${extract.css}`);
 
             if (hashable.length === 0) {
@@ -234,7 +236,7 @@ const cssPlugin = async (
             // Initialize loaders with logger
             loaders = new LoaderManager({
                 extensions: loaderOptions.extensions,
-                loaders: await sortByNameOrder(options.loaders || [], ["sourcemap", "stylus", "less", "sass", "postcss"]),
+                loaders: sortByNameOrder(options.loaders ?? [], ["sourcemap", "stylus", "less", "sass", "postcss"]),
                 logger,
                 options: {
                     ...options,
@@ -246,12 +248,12 @@ const cssPlugin = async (
             // Log plugin configuration
             logger.info({
                 extract: typeof loaderOptions.extract === "string" ? loaderOptions.extract : "individual",
-                loaders: options.loaders?.map((l) => l.name) || [],
+                loaders: options.loaders?.map((l) => l.name) ?? [],
                 message: "CSS plugin initialized",
                 minify: Boolean(minify && options.minifier),
                 namedExports: Boolean(loaderOptions.namedExports),
                 plugin: "css",
-                sourceMap: Boolean(useSourcemap),
+                sourceMap: useSourcemap,
             });
 
             // Check treeshakeable option
@@ -279,7 +281,7 @@ const cssPlugin = async (
 
             const getExtractedData = async (name: string, ids: string[]): Promise<ExtractedData> => {
                 const fileName
-                    = typeof loaderOptions.extract === "string" ? normalize(loaderOptions.extract).replace(/^\.[/\\]/, "") : normalize(`${name}.css`);
+                    = typeof loaderOptions.extract === "string" ? normalize(loaderOptions.extract).replace(RELATIVE_PATH_RE, "") : normalize(`${name}.css`);
 
                 if (isAbsolute(fileName)) {
                     this.error(["Extraction path must be relative to the output directory,", `which is ${relative(cwd, directory)}`].join("\n"));
@@ -289,7 +291,7 @@ const cssPlugin = async (
                     this.error(["Extraction path must be nested inside output directory,", `which is ${relative(cwd, directory)}`].join("\n"));
                 }
 
-                const entries = extracted.filter((extract) => ids.includes(extract.id)).sort((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id));
+                const entries = extracted.filter((extract) => ids.includes(extract.id)).toSorted((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id));
                 const result = await concat(entries);
 
                 return {
@@ -372,7 +374,10 @@ const cssPlugin = async (
                 }
             }
 
-            for await (const [name, ids] of emittedList) {
+            // Sequential processing required: each iteration emits assets via this.emitFile() which
+            // mutates Rollup's internal bundle state; concurrent emission would race.
+            for (const [name, ids] of emittedList) {
+                // eslint-disable-next-line no-await-in-loop
                 const extractedData = await getExtractedData(name, ids);
 
                 if (typeof options.onExtract === "function") {
@@ -386,10 +391,11 @@ const cssPlugin = async (
                 // Perform minimization on the extracted file
                 if (minify && options.minifier) {
                     logger.info({
-                        message: `Minifying ${extractedData.name} with ${options.minifier.name as string}`,
+                        message: `Minifying ${extractedData.name} with ${options.minifier.name}`,
                         prefix: "css",
                     });
 
+                    // eslint-disable-next-line no-await-in-loop
                     const { css: minifiedCss, map: minifiedMap } = await options.minifier.handler.bind({
                         browserTargets,
                         logger,
@@ -397,7 +403,7 @@ const cssPlugin = async (
                         extractedData,
                         sourceMap,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (options[options.minifier.name as keyof StyleOptions] as Record<string, any>) ?? {},
+                        (options[options.minifier.name as keyof StyleOptions] as Record<string, any> | undefined) ?? {},
                     );
 
                     extractedData.css = minifiedCss;
@@ -414,18 +420,11 @@ const cssPlugin = async (
                     type: "asset" as const,
                 };
 
-                const cssFileId = this.emitFile(cssFile);
-
-                logger.info({
-                    chunkIds: ids.length,
-                    hasSourceMap: Boolean(extractedData.map && sourceMap),
-                    message: `Emitted CSS file: ${extractedData.name}`,
-                    plugin: "css",
-                    size: extractedData.css.length,
-                });
-
+                // Pre-compute the sourcemap comment and append it to cssFile.source BEFORE emitFile.
+                // Rollup's bundle param is mutated by emitFile in-place, but rolldown does not — so we
+                // build the final source up front instead of mutating bundle[fileName] afterwards.
                 if (extractedData.map && sourceMap) {
-                    const fileName = this.getFileName(cssFileId);
+                    const fileName = extractedData.name;
 
                     let assetDirectory = "assert";
 
@@ -468,8 +467,7 @@ const cssPlugin = async (
                     if (sourceMap.inline) {
                         map.modify((m) => sourceMap.transform?.(m, normalize(join(directory, fileName))));
 
-                        // eslint-disable-next-line no-param-reassign
-                        (bundle[fileName] as OutputAsset).source += map.toCommentData();
+                        cssFile.source += map.toCommentData();
 
                         logger.debug({
                             message: `Generated inline source map for ${fileName}`,
@@ -484,8 +482,7 @@ const cssPlugin = async (
 
                         const { base } = parse(mapFileName);
 
-                        // eslint-disable-next-line no-param-reassign
-                        (bundle[fileName] as OutputAsset).source += map.toCommentFile(base);
+                        cssFile.source += map.toCommentFile(base);
 
                         logger.debug({
                             message: `Generated external source map: ${mapFileName}`,
@@ -493,6 +490,16 @@ const cssPlugin = async (
                         });
                     }
                 }
+
+                this.emitFile(cssFile);
+
+                logger.info({
+                    chunkIds: ids.length,
+                    hasSourceMap: Boolean(extractedData.map && sourceMap),
+                    message: `Emitted CSS file: ${extractedData.name}`,
+                    plugin: "css",
+                    size: cssFile.source.length,
+                });
             }
 
             // Log summary

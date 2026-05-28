@@ -1,9 +1,9 @@
 import { createFilter } from "@rollup/pluginutils";
 import { transform as swcTransform } from "@swc/core";
+import type { TransformerFn as TransformerFunction } from "@visulima/packem-plugins";
 import { EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { Plugin } from "rollup";
 
-import type { TransformerFn as TransformerFunction } from "../../types";
 import type { SwcPluginConfig } from "./types";
 
 const swcPlugin = ({ exclude, include, ...transformOptions }: SwcPluginConfig): Plugin => {
@@ -34,4 +34,4 @@ const swcPlugin = ({ exclude, include, ...transformOptions }: SwcPluginConfig): 
 
 swcPlugin.NAME = "swc";
 
-export default swcPlugin as TransformerFunction;
+export default swcPlugin as TransformerFunction<SwcPluginConfig>;

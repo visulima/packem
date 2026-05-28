@@ -1,11 +1,11 @@
+/* eslint-disable consistent-return, sonarjs/cognitive-complexity, @typescript-eslint/no-use-before-define, unicorn/no-null, func-style, no-confusing-arrow -- this resolver uses rollup's handler conventions where falsy returns mean "fall through"; helper functions are intentionally hoisted as expressions for readability */
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { ResolverFactory } from "oxc-resolver";
 import type { Plugin, ResolvedId } from "rollup";
 
-import { existsSync, readFileSync } from "node:fs";
-
-import { filename_js_to_dts, filename_to_dts, RE_CSS, RE_DTS, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
+import { filenameJsToDts, filenameToDts, RE_CSS, RE_DTS, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
 import type { OptionsResolved } from "./options";
 
 const isSourceFile = (id: string) => RE_TS.test(id) || RE_VUE.test(id) || RE_JSON.test(id);
@@ -62,7 +62,7 @@ const createDtsResolvePlugin = ({
                     if (directDtsResolution && isSourceFile(directDtsResolution)) {
                         await this.load({ id: directDtsResolution });
 
-                        return { id: filename_to_dts(directDtsResolution), moduleSideEffects };
+                        return { id: filenameToDts(directDtsResolution), moduleSideEffects };
                     }
 
                     // Couldn't find types despite being on the bundle list — fall through
@@ -114,7 +114,7 @@ const createDtsResolvePlugin = ({
                     await this.load({ id: dtsResolution });
 
                     return {
-                        id: filename_to_dts(dtsResolution),
+                        id: filenameToDts(dtsResolution),
                         moduleSideEffects,
                     };
                 }
@@ -129,7 +129,7 @@ const createDtsResolvePlugin = ({
         if (typeof resolve === "boolean")
             return resolve;
 
-        return resolve.some((pattern) => (typeof pattern === "string" ? id === pattern : pattern.test(id)));
+        return resolve.some((pattern) => typeof pattern === "string" ? id === pattern : pattern.test(id));
     }
 
     // Given a node_modules importer path, extract its npm package name and check whether
@@ -138,14 +138,14 @@ const createDtsResolvePlugin = ({
     // look like `…/node_modules/.pnpm/deeks@X/node_modules/deeks/…` so we match the LAST
     // `node_modules/<pkg>` segment — the first one would return `.pnpm`.
     function shouldBundleImporterPackage(importer: string) {
-        const normalized = importer.replace(/\\/g, "/");
+        const normalized = importer.replaceAll("\\", "/");
         const marker = "/node_modules/";
-        const lastIdx = normalized.lastIndexOf(marker);
+        const lastIndex = normalized.lastIndexOf(marker);
 
-        if (lastIdx < 0)
+        if (lastIndex === -1)
             return false;
 
-        const after = normalized.slice(lastIdx + marker.length);
+        const after = normalized.slice(lastIndex + marker.length);
         const firstSlash = after.indexOf("/");
         let packageName = firstSlash === -1 ? after : after.slice(0, firstSlash);
 
@@ -199,7 +199,7 @@ const createDtsResolvePlugin = ({
         // consumers would not have resolvable. Users who want those inlined can
         // pass an explicit `resolve: [...]` list.
         if (dtsPath && RE_JS.test(dtsPath) && canFallBackToSiblingDts(dtsPath)) {
-            const siblingDts = filename_js_to_dts(dtsPath);
+            const siblingDts = filenameJsToDts(dtsPath);
 
             if (existsSync(siblingDts)) {
                 return siblingDts;

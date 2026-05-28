@@ -86,7 +86,7 @@ const parseExportDefault = function* (): Generator<ParsedExportInfo> {
 };
 
 const parseExports = function* (context: PluginContext, module_: ModuleInfo): Generator<ParsedExportInfo> {
-    assert.ok(module_.code != undefined, `Module ${module_.id} doesn't have associated code`);
+    assert.ok(module_.code !== null, `Module ${module_.id} doesn't have associated code`);
     const node = context.parse(module_.code);
 
     for (const statement of node.body) {

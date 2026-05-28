@@ -3,16 +3,18 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { rollupBuild as rolldownBuild } from "@sxzz/test-utils";
-import { glob } from "tinyglobby";
+import { glob } from "@visulima/fs/glob";
 import { describe, expect, it } from "vitest";
 
 import { dts } from "../src/index.js";
-import { findSourceMapChunk } from "./utils.js";
+import findSourceMapChunk from "./utils.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe("tsc", () => {
     it("typescript compiler", async () => {
+        expect.assertions(1);
+
         const root = path.resolve(dirname, "fixtures/tsc");
         const { snapshot } = await rolldownBuild(
             [path.resolve(root, "entry1.ts"), path.resolve(root, "entry2.ts")],
@@ -32,6 +34,8 @@ describe("tsc", () => {
     });
 
     it("multi declarations", async () => {
+        expect.assertions(1);
+
         const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/multi-decls/index.ts"), [
             dts({
                 compilerOptions: { isolatedDeclarations: false },
@@ -43,6 +47,8 @@ describe("tsc", () => {
     });
 
     it("references", async () => {
+        expect.assertions(1);
+
         const root = path.resolve(dirname, "fixtures/refs");
 
         const { snapshot } = await rolldownBuild(
@@ -60,6 +66,8 @@ describe("tsc", () => {
     });
 
     it("compiler project sourcemap (build: false)", async () => {
+        expect.assertions(3);
+
         const root = path.resolve(dirname, "fixtures/deep-source-map");
         const { chunks, snapshot } = await rolldownBuild(
             [path.resolve(root, "src/index.ts")],
@@ -85,6 +93,8 @@ describe("tsc", () => {
     });
 
     it("compiler project sourcemap (build: true)", async () => {
+        expect.assertions(3);
+
         const root = path.resolve(dirname, "fixtures/deep-source-map");
         const { chunks, snapshot } = await rolldownBuild(
             [path.resolve(root, "src/index.ts")],
@@ -110,6 +120,8 @@ describe("tsc", () => {
     });
 
     it("composite projects sourcemap #80", async () => {
+        expect.assertions(2);
+
         const root = path.resolve(dirname, "fixtures/composite-refs-sourcemap");
 
         const { chunks } = await rolldownBuild(
@@ -127,21 +139,23 @@ describe("tsc", () => {
         );
 
         const sourcemap = findSourceMapChunk(chunks, "index.d.ts.map");
-        const sources = sourcemap.sources || [];
+        const { sources } = sourcemap;
 
         // Cross-project source must always appear; entry re-export file may be omitted by newer TypeScript
-        expect(sources).toEqual(expect.arrayContaining(["../../src/types.ts"]));
+        expect(sources).toStrictEqual(expect.arrayContaining(["../../src/types.ts"]));
         expect(sourcemap.sourcesContent).toBeOneOf([undefined, []]);
     });
 
     it("composite references", async () => {
+        expect.assertions(2);
+
         const root = path.resolve(dirname, "fixtures/composite-refs");
 
         // The outDir in tsconfig files.
-        const tempDir = path.resolve(root, "temp");
+        const temporaryDirectory = path.resolve(root, "temp");
 
         // Ensure .tsbuildinfo files do not exist before the test
-        await fs.rm(tempDir, { force: true, recursive: true });
+        await fs.rm(temporaryDirectory, { force: true, recursive: true });
 
         const { snapshot } = await rolldownBuild(
             [path.resolve(root, "dir1/input1.ts"), path.resolve(root, "dir2/input2.ts")],
@@ -159,20 +173,22 @@ describe("tsc", () => {
         // Ensure .tsbuildinfo files are not created after the test
         const tsBuildInfoFiles = await glob("**/*.tsbuildinfo", {
             absolute: false,
-            cwd: tempDir,
+            cwd: temporaryDirectory,
         });
 
         expect(tsBuildInfoFiles).toHaveLength(0);
     });
 
     it("composite references incremental", async () => {
+        expect.assertions(2);
+
         const root = path.resolve(dirname, "fixtures/composite-refs-incremental");
 
         // The outDir in tsconfig files.
-        const tempDir = path.resolve(root, "temp");
+        const temporaryDirectory = path.resolve(root, "temp");
 
         // Ensure .tsbuildinfo files do not exist before the test
-        await fs.rm(tempDir, { force: true, recursive: true });
+        await fs.rm(temporaryDirectory, { force: true, recursive: true });
 
         const { snapshot } = await rolldownBuild(
             [path.resolve(root, "dir1/input1.ts"), path.resolve(root, "dir2/input2.ts")],
@@ -190,10 +206,10 @@ describe("tsc", () => {
         // Ensure .tsbuildinfo files are created after the test
         const tsBuildInfoFiles = await glob("**/*.tsbuildinfo", {
             absolute: false,
-            cwd: tempDir,
+            cwd: temporaryDirectory,
         });
 
-        expect(tsBuildInfoFiles.toSorted()).toMatchInlineSnapshot(`
+        expect(tsBuildInfoFiles.toSorted((a, b) => a.localeCompare(b))).toMatchInlineSnapshot(`
       [
         "dir1/tsconfig.1.tsbuildinfo",
         "dir2/tsconfig.2.tsbuildinfo",
@@ -202,6 +218,8 @@ describe("tsc", () => {
     });
 
     it("vue-sfc w/ ts-compiler", async () => {
+        expect.assertions(1);
+
         const root = path.resolve(dirname, "fixtures/vue-sfc");
         const { snapshot } = await rolldownBuild(path.resolve(root, "main.ts"), [
             dts({
@@ -217,6 +235,8 @@ describe("tsc", () => {
     });
 
     it("vue-sfc w/ ts-compiler w/ vueCompilerOptions in tsconfig", async () => {
+        expect.assertions(1);
+
         const root = path.resolve(dirname, "fixtures/vue-sfc-fallthrough");
         const { snapshot } = await rolldownBuild(path.resolve(root, "main.ts"), [
             dts({
@@ -230,12 +250,16 @@ describe("tsc", () => {
     });
 
     it("jsdoc", async () => {
+        expect.assertions(1);
+
         const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/jsdoc.ts"), [dts({ oxc: false })]);
 
         expect(snapshot).toMatchSnapshot();
     });
 
     it.fails("jsdoc in js", async () => {
+        expect.assertions(1);
+
         const root = path.resolve(dirname, "fixtures/jsdoc-js");
         const { snapshot } = await rolldownBuild(path.resolve(root, "main.js"), [
             dts({
@@ -248,6 +272,8 @@ describe("tsc", () => {
     });
 
     it("ts-macro w/ ts-compiler", async () => {
+        expect.assertions(1);
+
         const root = path.resolve(dirname, "fixtures/ts-macro");
         const { snapshot } = await rolldownBuild(path.resolve(root, "main.ts"), [
             dts({
@@ -261,6 +287,8 @@ describe("tsc", () => {
     });
 
     it("vue-sfc w/ ts-macro w/ ts-compiler", async () => {
+        expect.assertions(1);
+
         const root = path.resolve(dirname, "fixtures/vue-sfc-with-ts-macro");
         const { snapshot } = await rolldownBuild(path.resolve(root, "main.ts"), [
             dts({
@@ -275,6 +303,8 @@ describe("tsc", () => {
     });
 
     it("arktype", async () => {
+        expect.assertions(1);
+
         const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/arktype.ts"), [
             dts({
                 compilerOptions: {
@@ -288,6 +318,8 @@ describe("tsc", () => {
     });
 
     it("import JSON", async () => {
+        expect.assertions(1);
+
         const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/import-json/index.ts"), [
             dts({
                 compilerOptions: {
@@ -302,6 +334,8 @@ describe("tsc", () => {
 
     describe("resolve paths", () => {
         it.each(["oxc", "tsc"] as const)("resolver: %s", async (resolver) => {
+            expect.assertions(1);
+
             const root = path.resolve(dirname, "fixtures/paths");
             const { snapshot } = await rolldownBuild(path.resolve(root, "index.ts"), [
                 dts({
@@ -317,6 +351,8 @@ describe("tsc", () => {
     });
 
     it("rename infer", async () => {
+        expect.assertions(1);
+
         const { snapshot } = await rolldownBuild(
             path.resolve(dirname, "fixtures/infer-renaming.ts"),
             [

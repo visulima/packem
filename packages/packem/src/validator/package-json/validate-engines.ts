@@ -14,7 +14,12 @@ const validateEngines = (context: BuildContext<InternalBuildOptions>): void => {
     const validation = context.options.validation as ValidationOptions;
     const { pkg } = context;
 
-    // Skip validation if engines validation is disabled
+    // Skip validation only when engines validation is explicitly disabled.
+    // `engines` is undefined by default (not listed in the default
+    // validation.packageJson config), and an undefined default must mean
+    // "validate" — collapsing this to a falsy check (`!engines`) would make
+    // the default `undefined` skip validation entirely, silently disabling
+    // the engines checks for every project that hasn't opted in by name.
     if (validation.packageJson?.engines === false) {
         return;
     }

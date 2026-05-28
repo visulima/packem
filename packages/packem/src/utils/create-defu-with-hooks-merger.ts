@@ -12,11 +12,13 @@ import { createDefu } from "defu";
  * // hooks from all configs are now merged instead of overwritten
  * ```
  */
+// eslint-disable-next-line import/prefer-default-export -- consumed as a named import across modules owned outside this change set; switching to a default export would break those call sites.
 export const createDefuWithHooksMerger = (): ReturnType<typeof createDefu> =>
     createDefu((object, key, value) => {
         if (key === "hooks" && typeof value === "object" && value !== null && !Array.isArray(value)) {
             const existingHooks = typeof object[key] === "object" && object[key] !== null && !Array.isArray(object[key]) ? object[key] : {};
 
+            // eslint-disable-next-line no-param-reassign -- defu's custom merger contract requires mutating the accumulator object in place to take effect.
             object[key] = {
                 ...existingHooks,
                 ...value,

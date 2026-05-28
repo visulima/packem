@@ -1,8 +1,26 @@
 import { isAccessibleSync, readJsonSync, writeJsonSync } from "@visulima/fs";
-import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 
-const createOrUpdateKeyStorage = (hashKey: string, storePath: string, logger: Pail, shouldUpdate?: true): void => {
+interface LoggerMessage {
+    context?: unknown[];
+    message: unknown;
+    prefix?: string;
+}
+
+/**
+ * Minimal, precisely-typed view of the `@visulima/pail` logger surface used here.
+ *
+ * The published `@visulima/pail` types re-export `Pail` from a non-existent
+ * `./pail.d.ts`, so the upstream `Pail` type resolves to an unresolved/`any`-like
+ * type. Modelling only the methods we call keeps the call sites strictly typed
+ * without an `any` escape.
+ * @internal
+ */
+interface Logger {
+    debug: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
+}
+
+const createOrUpdateKeyStorage = (hashKey: string, storePath: string, logger: Logger, shouldUpdate?: true): void => {
     try {
         let keyStore: Record<string, string> = {};
 
@@ -12,18 +30,17 @@ const createOrUpdateKeyStorage = (hashKey: string, storePath: string, logger: Pa
             keyStore = readJsonSync(keyStorePath) as Record<string, string>;
         }
 
-        if (keyStore[hashKey] === undefined) {
+        if (!Object.hasOwn(keyStore, hashKey)) {
             keyStore[hashKey] = new Date().toISOString();
         }
 
         writeJsonSync(keyStorePath, keyStore, {
             overwrite: true,
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+    } catch (error) {
         logger.debug({
             context: [error],
-            message: error.message,
+            message: error instanceof Error ? error.message : String(error),
             prefix: "cache-key-store",
         });
     }

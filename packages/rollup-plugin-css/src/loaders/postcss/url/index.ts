@@ -16,6 +16,19 @@ const placeholderHashDefault = "assets/[name]-[hash][extname]";
 const placeholderNoHashDefault = "assets/[name][extname]";
 const defaultPublicPath = "./assets/";
 const defaultAssetDirectory = ".";
+const TRAILING_SLASH_REGEXP = /[/\\]$/;
+
+const resolvePlaceholder = (hash: boolean | string | undefined): string => {
+    if (hash === false) {
+        return placeholderNoHashDefault;
+    }
+
+    if (typeof hash === "string") {
+        return hash;
+    }
+
+    return placeholderHashDefault;
+};
 
 const plugin: PluginCreator<UrlOptions> = (userOptions) => {
     const options = {
@@ -25,9 +38,10 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
         resolve: urlResolve,
         ...userOptions,
     };
-    const placeholder = options.hash ?? true ? typeof options.hash === "string" ? options.hash : placeholderHashDefault : placeholderNoHashDefault;
+    const placeholder = resolvePlaceholder(options.hash);
 
     return {
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         async Once(css, { result }) {
             if (!css.source?.input.file) {
                 return;
@@ -35,6 +49,9 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
             const { file } = css.source.input;
 
+            // PostCSS types declare `input.map` as always present, but at runtime
+            // it is undefined when the stylesheet has no inline/previous source map.
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- runtime value is nullable despite the type
             const map = mm(css.source.input.map?.text ?? undefined)
                 .resolve(dirname(file))
                 .toConsumer();
@@ -80,15 +97,8 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
                     }
 
                     // Skip Web URLs
-                    if (!isAbsolute(url)) {
-                        try {
-                            // eslint-disable-next-line no-new
-                            new URL(url);
-
-                            return;
-                        } catch {
-                            // Is not a Web URL, continuing
-                        }
+                    if (!isAbsolute(url) && URL.canParse(url)) {
+                        return;
                     }
 
                     const baseDirectories = new Set<string>();
@@ -118,13 +128,12 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
             const usedNames = new Map<string, string>();
 
-            for await (const { baseDirs, decl, node, parsed, url } of urlList) {
+            for (const { baseDirs, decl, node, parsed, url } of urlList) {
                 let resolved: UrlFile | undefined;
 
                 try {
-                    if (!resolved) {
-                        resolved = await options.resolve(url, [...baseDirs]);
-                    }
+                    // eslint-disable-next-line no-await-in-loop
+                    resolved ??= await options.resolve(url, [...baseDirs]);
                 } catch {
                     /* noop */
                 }
@@ -155,17 +164,18 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
                     // Avoid file overrides
                     const hasExtension = FIRST_EXTENSION_REGEXP.test(unsafeTo);
 
-                    // eslint-disable-next-line no-plusplus
-                    for (let index = 1; usedNames.has(to) && usedNames.get(to) !== from; index++) {
+                    let index = 1;
+
+                    while (usedNames.has(to) && usedNames.get(to) !== from) {
                         to = hasExtension ? unsafeTo.replace(FIRST_EXTENSION_REGEXP, `${String(index)}$1`) : `${unsafeTo}${String(index)}`;
+                        index += 1;
                     }
 
                     usedNames.set(to, from);
 
+                    const publicPathSuffix = typeof options.publicPath === "string" && !TRAILING_SLASH_REGEXP.test(options.publicPath) ? "/" : "";
                     const resolvedPublicPath
-                        = typeof options.publicPath === "string"
-                            ? options.publicPath + (/[/\\]$/.test(options.publicPath) ? "" : "/") + basename(to)
-                            : `${defaultPublicPath}${basename(to)}`;
+                        = typeof options.publicPath === "string" ? options.publicPath + publicPathSuffix + basename(to) : `${defaultPublicPath}${basename(to)}`;
 
                     node.type = "string";
                     node.value = typeof options.publicPath === "function" ? options.publicPath(node.value, resolvedPublicPath, file) : resolvedPublicPath;
@@ -183,7 +193,7 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
                     result.messages.push({ plugin: name, source, to, type: "asset" });
                 }
 
-                decl.value = parsed.toString();
+                decl.value = valueParser.stringify(parsed.nodes);
             }
         },
         postcssPlugin: name,
@@ -202,9 +212,9 @@ export interface UrlOptions {
     alias?: Record<string, string>;
 
     /**
-     * Directory path for outputted CSS assets,
-     * which is not included into resulting URL
-     * @default "."
+     * Filesystem destination for emitted CSS assets. This prefix is appended to
+     * the generated filename but excluded from the URL written into the
+     * referencing stylesheet.
      */
     assetDir?: string | ((original: string, resolved: string, file: string) => string);
 
@@ -228,8 +238,8 @@ export interface UrlOptions {
     inline?: boolean;
 
     /**
-     * Public Path for URLs in CSS files
-     * @default "./"
+     * Prefix used when rewriting asset references in the emitted CSS output.
+     * Pass a function to customise per-asset, e.g. for cdn-style URLs.
      */
     publicPath?: string | ((original: string, resolved: string, file: string) => string);
 

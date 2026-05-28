@@ -1,18 +1,36 @@
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { readFileSync, writeFile } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
+const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
+
+// Rollup uses `createRequire`; rolldown emits its own require shim
+// (`typeof require !== "undefined" ? require : Proxy ...`). Both give us a
+// callable `require` in ESM; this only checks a require-style call is present.
+const ROLLDOWN_REQUIRE_REGEX = /require\s*(?:!==|\()/;
+
+const SINGLE_NATIVE_SOURCE = `
+import native from './native.node';
+console.log(native);
+`;
+
+const COLLISION_NATIVE_SOURCE = `
+import native1 from './addon.node';
+import native2 from './lib/addon.node';
+console.log(native1, native2);
+`;
+
 describe("native modules", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
-        temporaryDirectoryPath = temporaryDirectory();
+    beforeEach(() => {
+        temporaryDirectoryPath = mkdtempSync(join(tmpdir(), "packem-native-modules-"));
     });
 
     afterEach(async () => {
@@ -36,13 +54,7 @@ describe("native modules", () => {
         });
 
         // Create source files
-        await writeFile(
-            join(temporaryDirectoryPath, "src", "index.js"),
-            `
-					import native from './native.node';
-					console.log(native);
-				`,
-        );
+        await writeFile(join(temporaryDirectoryPath, "src", "index.js"), SINGLE_NATIVE_SOURCE);
 
         // Create dummy .node file
         await writeFile(join(temporaryDirectoryPath, "src", "native.node"), Buffer.from("dummy native module"));
@@ -63,12 +75,13 @@ describe("native modules", () => {
         expect(files.some((file) => file.endsWith(".node"))).toBe(true);
 
         // Check that import was rewritten and uses createRequire for ESM
-        const content = readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), "utf8");
-
-        console.log(content);
+        const content = readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), { encoding: "utf8" });
 
         expect(content).toMatch("./natives");
-        expect(content).toMatch("createRequire");
+
+        const requireMatcher: RegExp | string = isRolldown ? ROLLDOWN_REQUIRE_REGEX : "createRequire";
+
+        expect(content).toMatch(requireMatcher);
     });
 
     it("cJS: copies .node files to natives directory", async () => {
@@ -82,13 +95,7 @@ describe("native modules", () => {
         await createPackemConfig(temporaryDirectoryPath);
 
         // Create source files
-        await writeFile(
-            join(temporaryDirectoryPath, "src", "index.js"),
-            `
-					import native from './native.node';
-					console.log(native);
-				`,
-        );
+        await writeFile(join(temporaryDirectoryPath, "src", "index.js"), SINGLE_NATIVE_SOURCE);
 
         // Create dummy .node file
         await writeFile(join(temporaryDirectoryPath, "src", "native.node"), Buffer.from("dummy native module"));
@@ -109,7 +116,7 @@ describe("native modules", () => {
         expect(files.some((file) => file.endsWith(".node"))).toBe(true);
 
         // Check that import was transformed to require for CJS
-        const content = readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), "utf8");
+        const content = readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), { encoding: "utf8" });
 
         expect(content).toMatch("./natives");
         expect(content).toMatch("require");
@@ -136,13 +143,7 @@ describe("native modules", () => {
         });
 
         // Create source files
-        await writeFile(
-            join(temporaryDirectoryPath, "src", "index.js"),
-            `
-					import native from './native.node';
-					console.log(native);
-				`,
-        );
+        await writeFile(join(temporaryDirectoryPath, "src", "index.js"), SINGLE_NATIVE_SOURCE);
 
         // Create dummy .node file
         await writeFile(join(temporaryDirectoryPath, "src", "native.node"), Buffer.from("dummy native module"));
@@ -163,7 +164,7 @@ describe("native modules", () => {
         expect(files.some((file) => file.endsWith(".node"))).toBe(true);
 
         // Check that import was rewritten with custom directory
-        const content = readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), "utf8");
+        const content = readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), { encoding: "utf8" });
 
         expect(content).toMatch("./custom-natives");
     });
@@ -179,14 +180,7 @@ describe("native modules", () => {
         await createPackemConfig(temporaryDirectoryPath);
 
         // Create source files with same base name
-        await writeFile(
-            join(temporaryDirectoryPath, "src", "index.js"),
-            `
-					import native1 from './addon.node';
-					import native2 from './lib/addon.node';
-					console.log(native1, native2);
-				`,
-        );
+        await writeFile(join(temporaryDirectoryPath, "src", "index.js"), COLLISION_NATIVE_SOURCE);
 
         // Create dummy .node files with same name
         await writeFile(join(temporaryDirectoryPath, "src", "addon.node"), Buffer.from("native module 1"));
@@ -213,7 +207,7 @@ describe("native modules", () => {
         expect(nodeFiles.some((file) => file.startsWith("addon_") && file.endsWith(".node"))).toBe(true);
 
         // Check that imports were rewritten correctly
-        const content = readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), "utf8");
+        const content = readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), { encoding: "utf8" });
 
         expect(content).toMatch("./natives/addon.node");
         expect(content).toMatch("./natives/addon_");

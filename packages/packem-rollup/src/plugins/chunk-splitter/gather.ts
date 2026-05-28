@@ -62,7 +62,7 @@ const gatherNamedReExports = async function* (context: PluginContext, reexported
     }
 };
 
-const gatherNamedSelfExports = async function* (module_: ModuleInfo, exported: NamedSelfExport): AsyncGenerator<ExportInfo> {
+const gatherNamedSelfExports = function* (module_: ModuleInfo, exported: NamedSelfExport): Generator<ExportInfo> {
     yield {
         exportedName: exported.exportedName,
         id: module_.id,

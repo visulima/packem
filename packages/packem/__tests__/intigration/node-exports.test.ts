@@ -1,15 +1,17 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFile } from "@visulima/fs";
+// eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 describe("packem node exports", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -51,19 +53,11 @@ describe("packem node exports", () => {
 
             const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-            expect(mjsContent).toBe(`const test = () => "this should be in final bundle";
-
-export { test as default };
-`);
+            expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs output");
 
             const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-            expect(cjsContent).toBe(`'use strict';
-
-const test = () => "this should be in final bundle";
-
-module.exports = test;
-`);
+            expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs output");
 
             const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
@@ -237,19 +231,11 @@ export { test2, test3, test4, test5, test as default };`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const test = "this should be in final bundle";
-
-export { test as default };
-`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-const test = "this should be in final bundle";
-
-module.exports = test;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs output");
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
@@ -298,19 +284,11 @@ export = test;
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.mjs`);
 
-        expect(mjsContent).toBe(`const test = "this should be in final bundle";
-
-export { test as default };
-`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("mjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-const test = "this should be in final bundle";
-
-module.exports = test;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("cjs output");
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.cts`);
 
@@ -543,41 +521,19 @@ export class Child extends Parent {
 
         const mjsPackageContent = readFileSync(`${temporaryDirectoryPath}/dist/package.mjs`);
 
-        expect(mjsPackageContent).toBe(`const packageA = () => "This is a named export";
-const d = "This is a default export";
-
-export { d as default, packageA };
-`);
+        expect(normalizeBundleOutput(mjsPackageContent)).toMatchSnapshot("package.mjs output");
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { packageA } from './package.mjs';\n`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot("index.mjs output");
 
         const cjsPackageContent = readFileSync(`${temporaryDirectoryPath}/dist/package.cjs`);
 
-        expect(cjsPackageContent).toBe(`'use strict';
-
-Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
-
-const packageA = () => "This is a named export";
-const d = "This is a default export";
-
-exports.default = d;
-exports.packageA = packageA;
-`);
+        expect(normalizeBundleOutput(cjsPackageContent)).toMatchSnapshot("package.cjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const _package = require('./package.cjs');
-
-
-
-exports.packageA = _package.packageA;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot("index.cjs output");
     });
 
     it("should only find the correct export file, if files with the same name exist but with different extension", async () => {

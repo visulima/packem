@@ -14,6 +14,69 @@ import { ensurePCSSOption, ensurePCSSPlugins } from "../../utils/options";
 // at the time it was cached so watch-mode changes are detected.
 const configCache = new Map<string, { mtime: number; result: Result }>();
 
+const safeMtime = async (file: string): Promise<number> => {
+    try {
+        const stats = await stat(file);
+
+        return stats.mtimeMs;
+    } catch {
+        return 0;
+    }
+};
+
+const resolveStopDirectory = async (cwd: string): Promise<string | undefined> => {
+    try {
+        const foundMonorepoRoot = await findMonorepoRoot(cwd);
+
+        return foundMonorepoRoot.path;
+    } catch {
+        try {
+            return await findPackageRoot(cwd);
+        } catch {
+            return undefined;
+        }
+    }
+};
+
+const loadOrCachePostcssConfig = async (
+    options: PostCSSConfigLoaderOptions,
+    cwd: string,
+    environment: Environment,
+    searchPath: string,
+    stopDirectory: string | undefined,
+): Promise<Result> => {
+    const cached = configCache.get(searchPath);
+
+    if (cached) {
+        const currentMtime = await safeMtime(cached.result.file);
+
+        if (currentMtime > 0 && currentMtime <= cached.mtime) {
+            return cached.result;
+        }
+
+        // File changed or disappeared, clear and reload below.
+        configCache.delete(searchPath);
+    }
+
+    const postcssConfig = await postcssrc(
+        {
+            cwd,
+            env: environment,
+            ...options.ctx,
+        },
+        searchPath,
+        {
+            stopDir: stopDirectory,
+        },
+    );
+
+    const mtime = await safeMtime(postcssConfig.file);
+
+    configCache.set(searchPath, { mtime, result: postcssConfig });
+
+    return postcssConfig;
+};
+
 const loadConfig = async (
     id: string,
     cwd: string,
@@ -29,93 +92,10 @@ const loadConfig = async (
 
     const searchPath = options.path ? resolve(options.path) : dir;
 
-    let stopDirectory: string | undefined;
+    const stopDirectory = await resolveStopDirectory(cwd);
 
     try {
-        const foundMonorepoRoot = await findMonorepoRoot(cwd);
-
-        stopDirectory = foundMonorepoRoot.path;
-    } catch {
-        try {
-            const foundPackageRoot = await findPackageRoot(cwd);
-
-            stopDirectory = foundPackageRoot;
-        } catch {
-            // Do nothing
-        }
-    }
-
-    try {
-        let postcssConfig: Result;
-
-        const cached = configCache.get(searchPath);
-
-        if (cached) {
-            // Re-validate the cached entry against the config file's current mtime.
-            let currentMtime = 0;
-
-            try {
-                const stats = await stat(cached.result.file);
-
-                currentMtime = stats.mtimeMs;
-            } catch {
-                // Config file disappeared — fall through to reload.
-            }
-
-            if (currentMtime > 0 && currentMtime <= cached.mtime) {
-                postcssConfig = cached.result;
-            } else {
-                // File changed or disappeared, clear and reload below.
-                configCache.delete(searchPath);
-                postcssConfig = await postcssrc(
-                    {
-                        cwd,
-                        env: environment,
-                        ...options.ctx,
-                    },
-                    searchPath,
-                    {
-                        stopDir: stopDirectory,
-                    },
-                );
-
-                let mtime = 0;
-
-                try {
-                    const stats = await stat(postcssConfig.file);
-
-                    mtime = stats.mtimeMs;
-                } catch {
-                    // No config file on disk (e.g. programmatic config).
-                }
-
-                configCache.set(searchPath, { mtime, result: postcssConfig });
-            }
-        } else {
-            postcssConfig = await postcssrc(
-                {
-                    cwd,
-                    env: environment,
-                    ...options.ctx,
-                },
-                searchPath,
-                {
-                    stopDir: stopDirectory,
-                },
-            );
-
-            let mtime = 0;
-
-            try {
-                const stats = await stat(postcssConfig.file);
-
-                mtime = stats.mtimeMs;
-            } catch {
-                // No config file on disk (e.g. programmatic config).
-            }
-
-            configCache.set(searchPath, { mtime, result: postcssConfig });
-        }
+        const postcssConfig = await loadOrCachePostcssConfig(options, cwd, environment, searchPath, stopDirectory);
 
         const result: Result = {
             file: postcssConfig.file,
@@ -136,9 +116,8 @@ const loadConfig = async (
         }
 
         return result;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-        if (error.message.includes("No PostCSS Config found in")) {
+    } catch (error) {
+        if (error instanceof Error && error.message.includes("No PostCSS Config found in")) {
             return { file: "", options: {}, plugins: [] };
         }
 

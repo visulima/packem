@@ -2,7 +2,7 @@ import { yellow } from "@visulima/colorize";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { warn } from "@visulima/packem-share/utils";
 
-import type { InternalBuildOptions, ValidationOptions } from "../../types";
+import type { InternalBuildOptions } from "../../types";
 
 const joinWarnings = (warnings: Set<string> | string[]): string => Array.from(warnings, (id) => yellow(id)).join(", ");
 
@@ -13,13 +13,14 @@ const validateDependencies = (context: BuildContext<InternalBuildOptions>): void
         warn(context, message);
     }
 
-    let unusedDependencies = Object.keys(context.pkg.dependencies || {}).filter((index) => !context.usedDependencies.has(index));
+    let unusedDependencies = Object.keys(context.pkg.dependencies ?? {}).filter((index) => !context.usedDependencies.has(index));
 
-    if (context.options?.validation && context.options?.validation?.dependencies !== false && context.options?.validation?.dependencies?.unused !== false) {
-        unusedDependencies = unusedDependencies.filter(
-            (dependency) =>
-                !((context.options?.validation as ValidationOptions)?.dependencies as { unused: { exclude: string[] } })?.unused?.exclude.includes(dependency),
-        );
+    const { validation } = context.options;
+    const dependenciesValidation = validation === false || validation === undefined ? false : validation.dependencies;
+    const unusedValidation = dependenciesValidation === false ? false : dependenciesValidation.unused;
+
+    if (unusedValidation !== false) {
+        unusedDependencies = unusedDependencies.filter((dependency) => !unusedValidation.exclude.includes(dependency));
     }
 
     if (unusedDependencies.length > 0) {

@@ -1,3 +1,4 @@
+/* eslint-disable import/exports-last -- exports are intentionally interleaved with helper code by topic */
 import { existsSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -5,11 +6,13 @@ import process from "node:process";
 
 import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
 import { findTsConfigSync, readTsConfig } from "@visulima/tsconfig";
-import ts from "typescript";
 import type { IsolatedDeclarationsOptions } from "oxc-transform";
-import type { AddonFunction } from "rollup";
+import type { RenderedChunk } from "rollup";
+import ts from "typescript";
 
-export type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | null;
+type AddonFunction = (chunk: RenderedChunk) => string | Promise<string>;
+
+export type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | undefined;
 
 // #region General Options
 export interface GeneralOptions {
@@ -21,15 +24,6 @@ export interface GeneralOptions {
      * This is useful for compatibility with CommonJS.
      */
     cjsDefault?: boolean;
-
-    /**
-     * A pattern (or array of patterns) specifying files to exclude from DTS generation.
-     * Files matching this pattern will be skipped by the transform hook and will not have
-     * `.d.ts` files generated.
-     *
-     * Accepts minimatch glob patterns, regular expressions, or arrays of either.
-     */
-    exclude?: FilterPattern;
 
     /**
      * Override the `compilerOptions` specified in `tsconfig.json`.
@@ -55,6 +49,15 @@ export interface GeneralOptions {
      * This is especially useful when generating `.d.ts` files for the CommonJS format as part of a separate build step.
      */
     emitDtsOnly?: boolean;
+
+    /**
+     * A pattern (or array of patterns) specifying files to exclude from DTS generation.
+     * Files matching this pattern will be skipped by the transform hook and will not have
+     * `.d.ts` files generated.
+     *
+     * Accepts minimatch glob patterns, regular expressions, or arrays of either.
+     */
+    exclude?: FilterPattern;
 
     /**
      * A pattern (or array of patterns) specifying files to include in DTS generation.
@@ -255,13 +258,55 @@ export type OptionsResolved = Overwrite<
 let warnedTsgo = false;
 
 type RawTsconfig = {
+    [key: string]: unknown;
     compilerOptions?: {
+        [key: string]: unknown;
         incremental?: boolean;
         tsBuildInfoFile?: string;
-        [key: string]: unknown;
     };
     extends?: string | string[];
-    [key: string]: unknown;
+};
+
+type IncrementalCheck = -1 | 0 | 1;
+
+const checkCompilerOptionsIncremental = (compilerOptions: RawTsconfig["compilerOptions"]): IncrementalCheck => {
+    if (!compilerOptions) {
+        return 0;
+    }
+
+    // Explicit opt-out wins anywhere in the chain.
+    if (compilerOptions.incremental === false) {
+        return -1;
+    }
+
+    if (compilerOptions.incremental === true || typeof compilerOptions.tsBuildInfoFile === "string") {
+        return 1;
+    }
+
+    return 0;
+};
+
+const resolveExtendedTsconfigPath = (extend: string, baseDirectory: string): string | undefined => {
+    if (extend.startsWith(".")) {
+        return path.resolve(baseDirectory, extend.endsWith(".json") ? extend : `${extend}.json`);
+    }
+
+    // Resolve bare specifiers (e.g. `@tsconfig/node20/tsconfig.json`) via
+    // node's resolver, scoped to the importing tsconfig's directory.
+    // Failures are ignored; the chain is best-effort.
+    try {
+        return createRequire(path.join(baseDirectory, "package.json")).resolve(extend);
+    } catch {
+        return undefined;
+    }
+};
+
+const readTsconfigFile = (p: string): string | undefined => {
+    if (existsSync(p)) {
+        return ts.sys.readFile(p);
+    }
+
+    return undefined;
 };
 
 // Detects *explicit* user intent to persist build info to disk by reading raw
@@ -280,24 +325,17 @@ const hasExplicitIncrementalInTsconfig = (tsconfigPath: string, seen = new Set<s
 
     seen.add(tsconfigPath);
 
-    const result = ts.readConfigFile(tsconfigPath, (p) => (existsSync(p) ? ts.sys.readFile(p) : undefined));
+    const result = ts.readConfigFile(tsconfigPath, readTsconfigFile);
 
     if (result.error || !result.config) {
         return false;
     }
 
     const config = result.config as RawTsconfig;
-    const compilerOptions = config.compilerOptions;
+    const directCheck = checkCompilerOptionsIncremental(config.compilerOptions);
 
-    if (compilerOptions) {
-        // Explicit opt-out wins anywhere in the chain.
-        if (compilerOptions.incremental === false) {
-            return false;
-        }
-
-        if (compilerOptions.incremental === true || typeof compilerOptions.tsBuildInfoFile === "string") {
-            return true;
-        }
+    if (directCheck !== 0) {
+        return directCheck === 1;
     }
 
     if (!config.extends) {
@@ -305,27 +343,14 @@ const hasExplicitIncrementalInTsconfig = (tsconfigPath: string, seen = new Set<s
     }
 
     const extendsList = Array.isArray(config.extends) ? config.extends : [config.extends];
-    const baseDir = path.dirname(tsconfigPath);
+    const baseDirectory = path.dirname(tsconfigPath);
 
     for (const extend of extendsList) {
         if (typeof extend !== "string") {
             continue;
         }
 
-        let extendedPath: string | undefined;
-
-        if (extend.startsWith(".")) {
-            extendedPath = path.resolve(baseDir, extend.endsWith(".json") ? extend : `${extend}.json`);
-        } else {
-            // Resolve bare specifiers (e.g. `@tsconfig/node20/tsconfig.json`) via
-            // node's resolver, scoped to the importing tsconfig's directory.
-            // Failures are ignored; the chain is best-effort.
-            try {
-                extendedPath = createRequire(path.join(baseDir, "package.json")).resolve(extend);
-            } catch {
-                extendedPath = undefined;
-            }
-        }
+        const extendedPath = resolveExtendedTsconfigPath(extend, baseDirectory);
 
         if (extendedPath && hasExplicitIncrementalInTsconfig(extendedPath, seen)) {
             return true;
@@ -335,62 +360,145 @@ const hasExplicitIncrementalInTsconfig = (tsconfigPath: string, seen = new Set<s
     return false;
 };
 
+const resolveTsconfigPath = (
+    tsconfigOption: string | boolean | undefined,
+    cwd: string,
+): { resolvedTsconfig: TsConfigJsonResolved | undefined; tsconfig: string | undefined } => {
+    if (tsconfigOption === true || tsconfigOption === undefined) {
+        try {
+            const result = findTsConfigSync(cwd);
+
+            return { resolvedTsconfig: result.config, tsconfig: result.path };
+        } catch {
+            return { resolvedTsconfig: undefined, tsconfig: undefined };
+        }
+    }
+
+    if (typeof tsconfigOption === "string") {
+        const resolved = path.resolve(cwd || process.cwd(), tsconfigOption);
+
+        return { resolvedTsconfig: readTsConfig(resolved), tsconfig: resolved };
+    }
+
+    return { resolvedTsconfig: undefined, tsconfig: undefined };
+};
+
+const validateTsgoCompatibility = (tsgo: false | { path?: string }, vue: boolean, tsMacro: boolean, oxc: unknown): void => {
+    if (!tsgo) {
+        return;
+    }
+
+    if (vue) {
+        throw new Error("[@visulima/rollup-plugin-dts] The `tsgo` option is not compatible with the `vue` option. Please disable one of them.");
+    }
+
+    if (tsMacro) {
+        throw new Error("[@visulima/rollup-plugin-dts] The `tsgo` option is not compatible with the `tsMacro` option. Please disable one of them.");
+    }
+
+    if (oxc) {
+        throw new Error("[@visulima/rollup-plugin-dts] The `tsgo` option is not compatible with the `oxc` option. Please disable one of them.");
+    }
+};
+
+const validateOxcCompatibility = (oxc: IsolatedDeclarationsOptions | false, vue: boolean, tsMacro: boolean): void => {
+    if (!oxc) {
+        return;
+    }
+
+    if (vue) {
+        throw new Error("[@visulima/rollup-plugin-dts] The `oxc` option is not compatible with the `vue` option. Please disable one of them.");
+    }
+
+    if (tsMacro) {
+        throw new Error("[@visulima/rollup-plugin-dts] The `oxc` option is not compatible with the `tsMacro` option. Please disable one of them.");
+    }
+};
+
+// eslint-disable-next-line sonarjs/function-return-type -- the union return is the documented public contract
+const normalizeTsgo = (tsgoOption: boolean | { path?: string }): false | { path?: string } => {
+    if (tsgoOption === false) {
+        return false;
+    }
+
+    return tsgoOption === true ? {} : tsgoOption;
+};
+
+const normalizeOxc = (
+    oxcOption: boolean | Omit<IsolatedDeclarationsOptions, "sourcemap"> | undefined,
+    compilerOptions: TsConfigJson.CompilerOptions,
+    vue: boolean,
+    tsgo: false | { path?: string },
+    tsMacro: boolean,
+): IsolatedDeclarationsOptions | false => {
+    let oxcResolved: IsolatedDeclarationsOptions | false;
+
+    switch (oxcOption) {
+        case false: {
+            oxcResolved = false;
+            break;
+        }
+        case true: {
+            oxcResolved = {};
+            break;
+        }
+        case undefined: {
+            oxcResolved = compilerOptions.isolatedDeclarations && !vue && !tsgo && !tsMacro ? {} : false;
+            break;
+        }
+        default: {
+            oxcResolved = oxcOption;
+        }
+    }
+
+    if (oxcResolved) {
+        oxcResolved.stripInternal ??= compilerOptions.stripInternal ?? false;
+        oxcResolved.sourcemap = compilerOptions.declarationMap ?? false;
+    }
+
+    return oxcResolved;
+};
+
 export const resolveOptions = ({
     banner,
     // tsc
     build = false,
     cjsDefault = false,
-    compilerOptions = {},
+    compilerOptions: userCompilerOptions = {},
     cwd = process.cwd(),
     dtsInput = false,
     eager = false,
     emitDtsOnly = false,
-    emitJs,
-    exclude = null,
+    emitJs: emitJsOption,
+    exclude,
     footer,
-    include = null,
-    incremental = false,
+    include,
+    incremental: incrementalOption = false,
     newContext = false,
-    oxc,
+    oxc: oxcOption,
 
     parallel = false,
     resolve = false,
     resolver = "oxc",
     sideEffects = false,
-    sourcemap,
-    tsconfig,
+    sourcemap: sourcemapOption,
+    tsconfig: tsconfigOption,
     tsconfigRaw: overriddenTsconfigRaw = {},
     tsgo: tsgoOption = false,
 
     tsMacro = false,
     vue = false,
 }: Options): OptionsResolved => {
-    let resolvedTsconfig: TsConfigJsonResolved | undefined;
-
-    if (tsconfig === true || tsconfig == undefined) {
-        try {
-            const result = findTsConfigSync(cwd);
-
-            tsconfig = result.path;
-            resolvedTsconfig = result.config;
-        } catch {
-            tsconfig = undefined;
-        }
-    } else if (typeof tsconfig === "string") {
-        tsconfig = path.resolve(cwd || process.cwd(), tsconfig);
-        resolvedTsconfig = readTsConfig(tsconfig);
-    } else {
-        tsconfig = undefined;
-    }
+    const { resolvedTsconfig, tsconfig } = resolveTsconfigPath(tsconfigOption, cwd);
 
     // Capture user's plugin-level compilerOptions BEFORE merging with the resolved
     // tsconfig — needed below to honor explicit incremental opt-in via the plugin
     // option without confusing it with the `composite ??= incremental` auto-fill.
-    const pluginCompilerOptions = compilerOptions;
+    const pluginCompilerOptions = userCompilerOptions;
 
-    compilerOptions = {
+    const compilerOptions = {
         ...resolvedTsconfig?.compilerOptions,
-        ...compilerOptions,
+        ...userCompilerOptions,
     };
 
     // Disk-writing incremental mode is opt-in. Trigger only on signals that reflect
@@ -404,10 +512,13 @@ export const resolveOptions = ({
     // TypeScript's parser and `@visulima/tsconfig` auto-add `incremental: true`
     // whenever `composite: true` is set, which would otherwise force every
     // composite project into disk mode and leave `.tsbuildinfo` files behind.
-    incremental ||= pluginCompilerOptions.incremental === true
-        || typeof pluginCompilerOptions.tsBuildInfoFile === "string"
-        || (typeof tsconfig === "string" && hasExplicitIncrementalInTsconfig(tsconfig));
-    sourcemap ??= !!compilerOptions.declarationMap;
+    const incremental
+        = incrementalOption
+            || pluginCompilerOptions.incremental === true
+            || typeof pluginCompilerOptions.tsBuildInfoFile === "string"
+            || (typeof tsconfig === "string" && hasExplicitIncrementalInTsconfig(tsconfig));
+    const sourcemap = sourcemapOption ?? Boolean(compilerOptions.declarationMap);
+
     compilerOptions.declarationMap = sourcemap;
 
     const tsconfigRaw = {
@@ -417,49 +528,22 @@ export const resolveOptions = ({
     };
 
     // Normalize tsgo: true → {} so downstream code can always treat it as an object or false.
-    let tsgo: { path?: string } | false = false;
+    const tsgo = normalizeTsgo(tsgoOption);
+    const oxcResolved = normalizeOxc(oxcOption, compilerOptions, vue, tsgo, tsMacro);
 
-    if (tsgoOption) {
-        tsgo = tsgoOption === true ? {} : tsgoOption;
-    }
+    // `checkJs` and `allowJs` independently justify emitting declarations for
+    // `.js` sources, so this is an OR — not a `??` precedence chain. An explicit
+    // `checkJs: false` (e.g. a consumer disabling JS type-checking to "avoid
+    // extra work") must not veto `allowJs: true`, which still requires `.js`
+    // declarations to be emitted.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- `||` is intentional: this is boolean OR semantics (either flag enables JS emit), not a null/undefined fallback; `??` would let an explicit `checkJs: false` veto `allowJs: true`.
+    const emitJs = emitJsOption ?? Boolean(compilerOptions.checkJs || compilerOptions.allowJs);
 
-    oxc ??= !!(compilerOptions?.isolatedDeclarations && !vue && !tsgo && !tsMacro);
-
-    if (oxc === true) {
-        oxc = {};
-    }
-
-    if (oxc) {
-        oxc.stripInternal ??= !!compilerOptions?.stripInternal;
-        // @ts-expect-error omitted in user options
-        oxc.sourcemap = !!compilerOptions.declarationMap;
-    }
-
-    emitJs ??= !!(compilerOptions.checkJs || compilerOptions.allowJs);
-
-    if (tsgo) {
-        if (vue) {
-            throw new Error("[@visulima/rollup-plugin-dts] The `tsgo` option is not compatible with the `vue` option. Please disable one of them.");
-        }
-
-        if (tsMacro) {
-            throw new Error("[@visulima/rollup-plugin-dts] The `tsgo` option is not compatible with the `tsMacro` option. Please disable one of them.");
-        }
-
-        if (oxc) {
-            throw new Error("[@visulima/rollup-plugin-dts] The `tsgo` option is not compatible with the `oxc` option. Please disable one of them.");
-        }
-    }
-
-    if (oxc && vue) {
-        throw new Error("[@visulima/rollup-plugin-dts] The `oxc` option is not compatible with the `vue` option. Please disable one of them.");
-    }
-
-    if (oxc && tsMacro) {
-        throw new Error("[@visulima/rollup-plugin-dts] The `oxc` option is not compatible with the `tsMacro` option. Please disable one of them.");
-    }
+    validateTsgoCompatibility(tsgo, vue, tsMacro, oxcResolved);
+    validateOxcCompatibility(oxcResolved, vue, tsMacro);
 
     if (tsgo && !warnedTsgo) {
+        // eslint-disable-next-line no-console -- user-facing warning is the intended UX for an experimental option
         console.warn("The `tsgo` option is experimental and may change in the future.");
         warnedTsgo = true;
     }
@@ -479,7 +563,7 @@ export const resolveOptions = ({
         include,
         incremental,
         newContext,
-        oxc,
+        oxc: oxcResolved,
 
         parallel,
         resolve,

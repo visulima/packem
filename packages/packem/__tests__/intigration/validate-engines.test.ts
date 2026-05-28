@@ -11,7 +11,7 @@ import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 describe("packem validate engines", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = mkdtempSync(join(tmpdir(), "packem-validate-engines-"));
 
         // Create a basic src/index.js file for the build to work

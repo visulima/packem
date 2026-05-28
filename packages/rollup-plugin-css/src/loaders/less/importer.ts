@@ -15,7 +15,7 @@ const getStylesFileManager = (less: LessStatic, aliases: Record<string, string>)
         }
 
         // eslint-disable-next-line class-methods-use-this
-        public override async loadFile(filename: string, fileDirectory: string, options: Less.Options): Promise<Less.FileLoadResult> {
+        public override loadFile(filename: string, fileDirectory: string, options: Less.Options): Promise<Less.FileLoadResult> {
             const url = normalizeUrl(resolveAlias(filename, aliases));
             const partialUrl = getUrlOfPartial(url);
 
@@ -30,7 +30,7 @@ const getStylesFileManager = (less: LessStatic, aliases: Record<string, string>)
             // Give precedence to importing a partial
             const id = resolve([partialUrl, url], resolveOptions);
 
-            return { contents: readFileSync(id), filename: id };
+            return Promise.resolve({ contents: readFileSync(id), filename: id });
         }
     }();
 

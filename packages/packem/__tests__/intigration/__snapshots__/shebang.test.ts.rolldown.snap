@@ -1,0 +1,93 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`shebang > should preserve shebang in files without an EOF character > cjs output 1`] = `
+"#!/usr/bin/env node
+//#region src/index.ts
+for (let i = 0; i < 10; i++) console.log("🦄");
+//#endregion
+"
+`;
+
+exports[`shebang > should preserve shebang in files without an EOF character > mjs output 1`] = `
+"#!/usr/bin/env node
+//#region src/index.ts
+for (let i = 0; i < 10; i++) console.log("🦄");
+//#endregion
+"
+`;
+
+exports[`shebang > should preserves existing shebang after successful rollup bundle > cjs output 1`] = `
+"#!/usr/bin/env node
+//#region src/index.ts
+console.log("Hello, world!");
+//#endregion
+"
+`;
+
+exports[`shebang > should preserves existing shebang after successful rollup bundle > mjs output 1`] = `
+"#!/usr/bin/env node
+//#region src/index.ts
+console.log("Hello, world!");
+//#endregion
+"
+`;
+
+exports[`shebang > should replaces an existing shebang with a custom shebang > cjs output 1`] = `
+"#!/path/to/custom/interpreter
+//#region src/index.ts
+console.log("Hello, world!");
+//#endregion
+"
+`;
+
+exports[`shebang > should replaces an existing shebang with a custom shebang > mjs output 1`] = `
+"#!/path/to/custom/interpreter
+//#region src/index.ts
+console.log("Hello, world!");
+//#endregion
+"
+`;
+
+exports[`shebang > should retain comments defined after a shebang > cjs output 1`] = `
+"#!/usr/bin/env node // <-- this thing is a shebang. :)
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.ts
+function getNodeSheBang() {
+	return "#!/usr/bin/env node";
+}
+//#endregion
+exports.getNodeSheBang = getNodeSheBang;
+"
+`;
+
+exports[`shebang > should retain comments defined after a shebang > mjs output 1`] = `
+"#!/usr/bin/env node // <-- this thing is a shebang. :)
+//#region src/index.ts
+function getNodeSheBang() {
+	return "#!/usr/bin/env node";
+}
+//#endregion
+export { getNodeSheBang };
+"
+`;
+
+exports[`shebang > should retain shebangs defined elsewhere in a file > cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.ts
+function getNodeSheBang() {
+	return "#!/usr/bin/env node";
+}
+//#endregion
+exports.getNodeSheBang = getNodeSheBang;
+"
+`;
+
+exports[`shebang > should retain shebangs defined elsewhere in a file > mjs output 1`] = `
+"//#region src/index.ts
+function getNodeSheBang() {
+	return "#!/usr/bin/env node";
+}
+//#endregion
+export { getNodeSheBang };
+"
+`;

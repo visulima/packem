@@ -194,7 +194,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: 1 });
 
-            expect((mockElement.children[1] as Element).before).toHaveBeenCalledWith(mockElement);
+            expect((mockElement.children[1] as unknown as { before: Mock }).before).toHaveBeenCalledWith(mockElement);
         });
 
         it("should insert at beginning for index 0", () => {
@@ -266,7 +266,7 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }", { container: ".non-existent" });
-            }).toThrowError("Unable to find container element");
+            }).toThrow("Unable to find container element");
         });
 
         it("should use head as default container", () => {
@@ -337,7 +337,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject(css);
 
-            expect((mockElement.styleSheet as any).cssText).toBe(css);
+            expect((mockElement.styleSheet as unknown as { cssText: string }).cssText).toBe(css);
         });
 
         it("should append to existing styleSheet.cssText", () => {
@@ -350,7 +350,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject(newCss);
 
-            expect((mockElement.styleSheet as any).cssText).toBe(existingCss + newCss);
+            expect((mockElement.styleSheet as unknown as { cssText: string }).cssText).toBe(existingCss + newCss);
         });
     });
 
@@ -417,7 +417,7 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }");
-            }).toThrowError("Unable to find container element");
+            }).toThrow("Unable to find container element");
         });
 
         it("should handle all options together", () => {
@@ -444,12 +444,12 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }", options);
-            }).not.toThrowError();
+            }).not.toThrow();
 
             expect(mockElement.setAttribute).toHaveBeenCalledWith("id", "test-style");
             expect(mockElement.setAttribute).toHaveBeenCalledWith("data-test", "value");
             expect(mockElement.setAttribute).toHaveBeenCalledWith("nonce", "abc123");
-            expect((customContainer.children[1] as any).before).toHaveBeenCalledWith(mockElement);
+            expect((customContainer.children[1] as unknown as { before: Mock }).before).toHaveBeenCalledWith(mockElement);
         });
 
         it("should handle empty options object", () => {
@@ -460,7 +460,7 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }", {});
-            }).not.toThrowError();
+            }).not.toThrow();
         });
 
         it("should handle no options parameter", () => {
@@ -471,7 +471,7 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }");
-            }).not.toThrowError();
+            }).not.toThrow();
         });
     });
 });

@@ -1,6 +1,5 @@
 import type { CSSImports } from "icss-utils";
-import type { ProcessOptions } from "postcss";
-import type Processor from "postcss/lib/processor";
+import type { ProcessOptions, Processor } from "postcss";
 
 import type { Load } from "./load";
 
@@ -14,7 +13,8 @@ const resolve = async (
 ): Promise<Record<string, string>> => {
     const imports: Record<string, string> = {};
 
-    for await (const [url, values] of Object.entries(icssImports)) {
+    for (const [url, values] of Object.entries(icssImports)) {
+        // eslint-disable-next-line no-await-in-loop
         const exports = await load(url, file, extensions, processor, options);
 
         for (const [k, v] of Object.entries(values)) {

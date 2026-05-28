@@ -13,6 +13,23 @@ import { exec } from "tinyexec";
 import findPackemFile from "../../config/utils/find-packem-file";
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
 
+/**
+ * Minimal structural logger contract used by this command.
+ * `Pail` (the runtime logger) is structurally assignable to this, but its
+ * intersection-with-constructor shape cannot be resolved by the typed linter,
+ * so the command narrows to this precise subset of methods it actually uses.
+ */
+interface CommandLogger {
+    debug: (...message: unknown[]) => void;
+    error: (...message: unknown[]) => void;
+    info: (...message: unknown[]) => void;
+    success: (...message: unknown[]) => void;
+    warn: (...message: unknown[]) => void;
+}
+
+const DEFINE_CONFIG_REGEXP = /defineConfig\s*\(\s*\{/;
+const PRESET_REGEXP = /preset:\s*['"][^'"]+['"]/;
+
 const typedocPackages = ["typedoc", "typedoc-plugin-markdown", "typedoc-plugin-rename-defaults"];
 
 const reactDevDependencies = ["@babel/core", "@babel/preset-react"];
@@ -31,7 +48,7 @@ const svelteDevDependencies = ["rollup-plugin-svelte"];
 const svelteDependencies = ["svelte"];
 
 interface AddFeatureContext {
-    logger: Pail;
+    logger: CommandLogger;
     magic: MagicString;
     packemConfig: string;
     packemConfigFilePath: string;
@@ -53,13 +70,13 @@ const checkPresetExists = (config: string, presetName: string, importName: strin
 const insertPreset = (context: AddFeatureContext, presetName: string): void => {
     const { logger, magic, packemConfig } = context;
 
-    const defineConfigMatch = packemConfig.match(/defineConfig\s*\(\s*\{/);
+    const defineConfigMatch = DEFINE_CONFIG_REGEXP.exec(packemConfig);
 
-    if (defineConfigMatch && defineConfigMatch.index !== undefined) {
+    if (defineConfigMatch?.index !== undefined) {
         const insertIndex = defineConfigMatch.index + defineConfigMatch[0].length;
 
         if (packemConfig.includes("preset:")) {
-            const presetMatch = packemConfig.match(/preset:\s*['"]([^'"]+)['"]/);
+            const presetMatch = PRESET_REGEXP.exec(packemConfig);
 
             if (presetMatch) {
                 magic.replace(presetMatch[0], `preset: '${presetName}'`);
@@ -91,6 +108,7 @@ const checkGitDirty = async (rootDirectory: string): Promise<boolean> => {
             },
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- tinyexec types stdout as non-nullable string, but a child process may produce no stdout at runtime, so the guard is required.
         return (result.stdout?.trim().length ?? 0) > 0;
     } catch {
         return false;
@@ -288,16 +306,12 @@ const addSvelte = async (context: AddFeatureContext): Promise<void> => {
     logger.success("\nSvelte preset added!");
 };
 
-const addCss = async (context: AddFeatureContext): Promise<void> => {
-    const { logger, magic, packemConfig, packemConfigFormat, transformerReplaceKey, transformerSearchKey } = context;
-
-    if (packemConfig.includes("css: {") || packemConfig.includes("@visulima/packem/css")) {
-        logger.warn("Css loaders have already been added to the packem config.");
-
-        return;
-    }
-
-    const cssLoaders: (keyof typeof cssLoaderDependencies | "sourceMap")[] = [];
+/**
+ * Runs the interactive prompts that decide which CSS loaders to wire up.
+ * The loader list is a plain string array because the dependency map is keyed by string.
+ */
+const promptCssLoaders = async (): Promise<{ cssLoaders: string[]; mainCssLoader: string }> => {
+    const cssLoaders: string[] = [];
 
     const mainCssLoader = (await select({
         message: "Pick a css loader",
@@ -357,10 +371,65 @@ const addCss = async (context: AddFeatureContext): Promise<void> => {
         cssLoaders.push(...extraCssLoaders);
     }
 
+    return { cssLoaders, mainCssLoader };
+};
+
+/**
+ * Prompts for an optional CSS minifier and, when chosen, prepends the matching
+ * import and registers the package to install. Returns the selected minifier
+ * (or `undefined` when the user opts out).
+ */
+const promptCssMinifier = async (
+    magic: MagicString,
+    packemConfigFormat: "cjs" | "esm",
+    cssLoaders: string[],
+    packagesToInstall: string[],
+): Promise<"cssnano" | "lightningcss" | undefined> => {
+    const useCssMinifier = (await confirm({
+        initialValue: false,
+        message: "Do you want to minify your css?",
+    })) as boolean;
+
+    if (!useCssMinifier) {
+        return undefined;
+    }
+
+    const cssMinifier = (await select({
+        message: "Pick a css minifier",
+        options: [
+            { label: "CSSNano", value: "cssnano" },
+            { label: "Lightning CSS", value: "lightningcss" },
+        ],
+    })) as "cssnano" | "lightningcss";
+
+    if (!cssLoaders.includes("lightningcss")) {
+        packagesToInstall.push(cssMinifier);
+    }
+
+    if (packemConfigFormat === "cjs") {
+        magic.prepend(`const ${cssMinifier as string}Minifier = require("@visulima/packem/css/minifier/${cssMinifier.toLowerCase()}");\n`);
+    } else {
+        magic.prepend(`import ${cssMinifier as string}Minifier from "@visulima/packem/css/minifier/${cssMinifier.toLowerCase()}";\n`);
+    }
+
+    return cssMinifier;
+};
+
+const addCss = async (context: AddFeatureContext): Promise<void> => {
+    const { logger, magic, packemConfig, packemConfigFormat, transformerReplaceKey, transformerSearchKey } = context;
+
+    if (packemConfig.includes("css: {") || packemConfig.includes("@visulima/packem/css")) {
+        logger.warn("Css loaders have already been added to the packem config.");
+
+        return;
+    }
+
+    const { cssLoaders, mainCssLoader } = await promptCssLoaders();
+
     const packagesToInstall: string[] = [];
 
     for (const loader of cssLoaders) {
-        packagesToInstall.push(...(cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]));
+        packagesToInstall.push(...cssLoaderDependencies[loader]);
     }
 
     if (mainCssLoader !== "tailwindcss") {
@@ -371,38 +440,13 @@ const addCss = async (context: AddFeatureContext): Promise<void> => {
         const normalizedLoader = loader === "sass-embedded" || loader === "node-sass" ? "sass" : loader;
 
         if (packemConfigFormat === "cjs") {
-            magic.prepend(`const ${normalizedLoader as string}Loader = require("@visulima/packem/css/loader/${normalizedLoader.toLowerCase() as string}");\n`);
+            magic.prepend(`const ${normalizedLoader}Loader = require("@visulima/packem/css/loader/${normalizedLoader.toLowerCase()}");\n`);
         } else {
-            magic.prepend(`import ${normalizedLoader as string}Loader from "@visulima/packem/css/loader/${normalizedLoader.toLowerCase() as string}";\n`);
+            magic.prepend(`import ${normalizedLoader}Loader from "@visulima/packem/css/loader/${normalizedLoader.toLowerCase()}";\n`);
         }
     }
 
-    const useCssMinifier = (await confirm({
-        initialValue: false,
-        message: "Do you want to minify your css?",
-    })) as boolean;
-
-    let cssMinifier: "cssnano" | "lightningcss" | undefined;
-
-    if (useCssMinifier) {
-        cssMinifier = (await select({
-            message: "Pick a css minifier",
-            options: [
-                { label: "CSSNano", value: "cssnano" },
-                { label: "Lightning CSS", value: "lightningcss" },
-            ],
-        })) as "cssnano" | "lightningcss";
-
-        if (!cssLoaders.includes("lightningcss")) {
-            packagesToInstall.push(cssMinifier);
-        }
-
-        if (packemConfigFormat === "cjs") {
-            magic.prepend(`const ${cssMinifier as string}Minifier = require("@visulima/packem/css/minifier/${cssMinifier.toLowerCase() as string}");\n`);
-        } else {
-            magic.prepend(`import ${cssMinifier as string}Minifier from "@visulima/packem/css/minifier/${cssMinifier.toLowerCase() as string}";\n`);
-        }
-    }
+    const cssMinifier = await promptCssMinifier(magic, packemConfigFormat, cssLoaders, packagesToInstall);
 
     const stringCssLoaders = cssLoaders
         .map((loader) => {
@@ -447,9 +491,12 @@ const createAddCommand = (cli: Cli<Pail>): void => {
             required: true,
         },
         description: "Add a optional packem feature to your project",
-        execute: async ({ argument, logger, options }): Promise<void> => {
+        execute: async ({ argument, logger: rawLogger, options }): Promise<void> => {
+            // `rawLogger` is a Pail instance; narrow it to the structural
+            // subset of logger methods this command actually uses.
+            const logger: CommandLogger = rawLogger as CommandLogger;
             const s = spinner();
-            const rootDirectory = resolve(cwd(), (options.dir as string) ?? ".");
+            const rootDirectory = resolve(cwd(), typeof options.dir === "string" ? options.dir : ".");
 
             let packemConfigFilePath: string | undefined;
 

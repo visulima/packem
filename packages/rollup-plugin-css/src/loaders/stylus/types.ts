@@ -38,14 +38,19 @@ export type StylusDefinition = [string, unknown] | [string, unknown, boolean];
  * ```
  * @see {@link https://stylus-lang.com/docs/js.html} Stylus.js API Documentation
  */
-export type StylusLoaderOptions = {
+export type StylusLoaderOptions = RenderOptions & {
     /**
      * Prepends or appends Stylus code to the entry file before compilation.
      * Useful for injecting shared variables, mixins, or plugin imports.
      */
-    additionalData?:
-        | string
-        | ((content: string, loaderContext: StylusLoaderContext) => Promise<string> | string);
+    additionalData?: string | ((content: string, loaderContext: StylusLoaderContext) => Promise<string> | string);
+
+    /**
+     * Pre-define variables/functions on the renderer.
+     * Accepts either a plain object keyed by name or a list of
+     * `[name, value]` / `[name, value, raw]` tuples.
+     */
+    define?: Record<string, unknown> | StylusDefinition[];
 
     /**
      * Disable stylus internal cache.
@@ -88,15 +93,8 @@ export type StylusLoaderOptions = {
     lineNumbers?: boolean;
 
     /**
-     * Pre-define variables/functions on the renderer.
-     * Accepts either a plain object keyed by name or a list of
-     * `[name, value]` / `[name, value, raw]` tuples.
-     */
-    define?: Record<string, unknown> | StylusDefinition[];
-
-    /**
      * Stylus plugins to apply via `.use()`.
      * Strings are resolved and required relative to the current working directory.
      */
     use?: StylusPlugin[];
-} & RenderOptions;
+};

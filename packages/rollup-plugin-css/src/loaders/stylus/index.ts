@@ -17,24 +17,22 @@ import type { StylusDefinition, StylusLoaderContext, StylusLoaderOptions, Stylus
  * Stylus compiler doesn't support sourcesContent generation, so we manually
  * read the source files and populate this field for proper source map functionality.
  */
-const populateSourcemapContent = async (sourcemap: RawSourceMap, basePath: string): Promise<string[] | undefined> => {
-    if (!sourcemap.sources || sourcemap.sourcesContent) {
+const populateSourcemapContent = (sourcemap: RawSourceMap, basePath: string): string[] | undefined => {
+    if (sourcemap.sourcesContent) {
         return undefined;
     }
 
-    return (await Promise.all(
-        sourcemap.sources
-            .map(async (source) => {
-                const file = normalize(join(basePath, source));
+    return sourcemap.sources
+        .map((source) => {
+            const file = normalize(join(basePath, source));
 
-                if (!existsSync(file)) {
-                    return undefined;
-                }
+            if (!existsSync(file)) {
+                return undefined;
+            }
 
-                return readFileSync(file);
-            })
-            .filter(Boolean),
-    )) as string[];
+            return readFileSync(file);
+        })
+        .filter(Boolean) as string[];
 };
 
 /**
@@ -48,7 +46,7 @@ interface StylusInstance {
     include: (path: string) => StylusInstance;
     render: (callback: (error: Error | undefined, css: string) => void) => void;
     set: (key: string, value: unknown) => StylusInstance;
-    sourcemap: RawSourceMap;
+    sourcemap?: RawSourceMap;
     use: (plugin: (renderer: unknown) => void) => StylusInstance;
 }
 
@@ -64,10 +62,10 @@ const resolveImplementation = async (
     }
 
     if (typeof implementation === "string") {
-        const loaded = await loadModule(implementation, cwd, logger);
+        const loaded: unknown = await loadModule(implementation, cwd, logger);
 
         if (typeof loaded !== "function") {
-            throw new Error(`The Stylus implementation "${implementation}" is not a function.`);
+            throw new TypeError(`The Stylus implementation "${implementation}" is not a function.`);
         }
 
         return loaded as StylusImplementation;
@@ -81,9 +79,7 @@ const applyDefinitions = (style: StylusInstance, define: StylusLoaderOptions["de
         return;
     }
 
-    const entries: StylusDefinition[] = Array.isArray(define)
-        ? define
-        : (Object.entries(define) as StylusDefinition[]);
+    const entries: StylusDefinition[] = Array.isArray(define) ? define : Object.entries(define);
 
     for (const entry of entries) {
         const [name, value, raw] = entry;
@@ -92,12 +88,7 @@ const applyDefinitions = (style: StylusInstance, define: StylusLoaderOptions["de
     }
 };
 
-const applyPlugins = async (
-    style: StylusInstance,
-    use: StylusPlugin[] | undefined,
-    cwd: string,
-    logger: RollupLogger,
-): Promise<void> => {
+const applyPlugins = async (style: StylusInstance, use: StylusPlugin[] | undefined, cwd: string, logger: RollupLogger): Promise<void> => {
     if (!use || use.length === 0) {
         return;
     }
@@ -110,15 +101,17 @@ const applyPlugins = async (
         }
 
         // eslint-disable-next-line no-await-in-loop
-        const loaded = await loadModule(plugin, cwd, logger);
+        const loaded: unknown = await loadModule(plugin, cwd, logger);
 
         if (typeof loaded !== "function") {
-            throw new Error(`Failed to load "${plugin}" Stylus plugin. Are you sure it's installed and exports a function?`);
+            throw new TypeError(`Failed to load "${plugin}" Stylus plugin. Are you sure it's installed and exports a function?`);
         }
 
-        const factoryResult = loaded();
+        const pluginFactory = loaded as (...args: unknown[]) => unknown;
+        const factoryResult = pluginFactory();
+        const pluginCallback = (typeof factoryResult === "function" ? factoryResult : pluginFactory) as (renderer: unknown) => void;
 
-        style.use(typeof factoryResult === "function" ? factoryResult : (loaded as (renderer: unknown) => void));
+        style.use(pluginCallback);
     }
 };
 
@@ -145,7 +138,7 @@ const loader: Loader<StylusLoaderOptions> = {
         } = this.options;
 
         const basePath = normalize(dirname(this.id));
-        const cwd = (this.cwd as string) ?? process.cwd();
+        const cwd = this.cwd ?? process.cwd();
 
         // Build include paths (user paths + common roots)
         const paths = [basePath, join(basePath, "node_modules"), join(cwd, "node_modules")];
@@ -164,17 +157,12 @@ const loader: Loader<StylusLoaderOptions> = {
                 rootContext: cwd,
             };
 
-            data = typeof additionalData === "function"
-                ? await additionalData(data, context)
-                : `${additionalData}\n${data}`;
+            data = typeof additionalData === "function" ? await additionalData(data, context) : `${additionalData}\n${data}`;
         }
 
         const impl = await resolveImplementation(implementation, cwd, this.logger);
 
-        const style = impl(data, renderOptions)
-            .set("filename", this.id)
-            .set("paths", paths)
-            .set("sourcemap", { basePath, comment: false });
+        const style = impl(data, renderOptions).set("filename", this.id).set("paths", paths).set("sourcemap", { basePath, comment: false });
 
         if (includeCSS) {
             style.set("include css", true);
@@ -212,7 +200,13 @@ const loader: Loader<StylusLoaderOptions> = {
 
         // Compile Stylus to CSS
         const css = await new Promise<string>((resolve, reject) => {
-            style.render((error, result) => (error ? reject(error) : resolve(result)));
+            style.render((error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
         });
 
         // Track file dependencies for watch mode
@@ -222,10 +216,10 @@ const loader: Loader<StylusLoaderOptions> = {
 
         // Populate sourcesContent since Stylus doesn't generate it
         if (style.sourcemap) {
-            style.sourcemap.sourcesContent = await populateSourcemapContent(style.sourcemap, basePath);
+            style.sourcemap.sourcesContent = populateSourcemapContent(style.sourcemap, basePath);
         }
 
-        return { code: css, map: mm(style.sourcemap as unknown as RawSourceMap).toString() ?? map };
+        return { code: css, map: mm(style.sourcemap).toString() ?? map };
     },
 
     test: /\.(styl|stylus)$/i,

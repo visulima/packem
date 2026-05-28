@@ -2,12 +2,14 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { dirname } from "@visulima/path";
-import type { Options } from "execa";
+// eslint-disable-next-line e18e/ban-dependencies -- execa is core test-runner infra; tinyexec migration tracked separately
+import type { Options, Result } from "execa";
+// eslint-disable-next-line e18e/ban-dependencies -- execa is core test-runner infra; tinyexec migration tracked separately
 import { execaNode } from "execa";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
-const execPackem = async (command: "build" | "init" | "migrate", flags: string[] = [], options: Options = {}) => {
+const execPackem = async (command: "build" | "init" | "migrate", flags: string[] = [], options: Options = {}): Promise<Result> => {
     let environmentFlag: string | undefined = "--development";
 
     if (command !== "build" || flags.includes("--production") || flags.includes("--development") || flags.includes("--no-environment")) {
@@ -24,7 +26,7 @@ const execPackem = async (command: "build" | "init" | "migrate", flags: string[]
         flags.push("--no-validation");
     }
 
-    return await execaNode(join(distributionPath, "cli/index.js"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
+    return await execaNode(join(distributionPath, "cli/index.js"), [command, environmentFlag, ...flags].filter(Boolean), {
         cleanup: true,
         ...options,
         env: {

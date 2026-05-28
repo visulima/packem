@@ -9,6 +9,55 @@ import arrayFmt from "./array-fmt";
 const baseDirectory = dirname(fileURLToPath(import.meta.url));
 
 /**
+ * Attempts to resolve a single identifier from a single base directory.
+ * @param resolver Configured OXC resolver factory instance.
+ * @param basedir Base directory to resolve from.
+ * @param id Module identifier to resolve.
+ * @param userOptions Resolution configuration options (used for debug context).
+ * @returns Absolute path to the resolved module, or `undefined` if it cannot be resolved.
+ */
+const tryResolve = (resolver: ResolverFactory, basedir: string, id: string, userOptions: ResolveOptions): string | undefined => {
+    try {
+        const { error, path } = resolver.sync(basedir, id);
+
+        if (path) {
+            return path;
+        }
+
+        if (error) {
+            // eslint-disable-next-line no-console
+            console.debug(error, {
+                context: [
+                    {
+                        basedir,
+                        caller: userOptions.caller,
+                        extensions: userOptions.extensions,
+                        id,
+                    },
+                ],
+            });
+        }
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        // eslint-disable-next-line no-console
+        console.debug(message, {
+            context: [
+                {
+                    basedir,
+                    caller: userOptions.caller,
+                    error,
+                    extensions: userOptions.extensions,
+                    id,
+                },
+            ],
+        });
+    }
+
+    return undefined;
+};
+
+/**
  * Resolves module identifiers using advanced resolution strategies.
  *
  * This function implements sophisticated module resolution logic using the OXC resolver,
@@ -21,10 +70,10 @@ const baseDirectory = dirname(fileURLToPath(import.meta.url));
  * - Symlink resolution
  * - Detailed error reporting and debugging
  * - Fallback resolution strategies
- * @param ids Array of module identifiers to resolve
- * @param userOptions Resolution configuration options
- * @returns Absolute path to the resolved module
- * @throws Error if no module can be resolved
+ * @param ids Array of module identifiers to resolve.
+ * @param userOptions Resolution configuration options.
+ * @returns Absolute path to the resolved module.
+ * @throws Error if no module can be resolved.
  * @example
  * ```typescript
  * // Resolving a PostCSS plugin
@@ -45,46 +94,16 @@ export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
     } satisfies ResolveOptions;
 
     const resolver = new ResolverFactory({
-        extensions: options.extensions as string[],
+        extensions: options.extensions,
         symlinks: options.symlinks,
     });
 
     for (const basedir of options.baseDirs) {
         for (const id of ids) {
-            try {
-                const { error, path } = resolver.sync(basedir, id);
+            const path = tryResolve(resolver, basedir, id, userOptions);
 
-                if (path) {
-                    return path;
-                }
-
-                if (error) {
-                    // eslint-disable-next-line no-console
-                    console.debug(error, {
-                        context: [
-                            {
-                                basedir,
-                                caller: userOptions.caller,
-                                extensions: userOptions.extensions,
-                                id,
-                            },
-                        ],
-                    });
-                }
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } catch (error: any) {
-                // eslint-disable-next-line no-console
-                console.debug(error.message, {
-                    context: [
-                        {
-                            basedir,
-                            caller: userOptions.caller,
-                            error,
-                            extensions: userOptions.extensions,
-                            id,
-                        },
-                    ],
-                });
+            if (path) {
+                return path;
             }
         }
     }

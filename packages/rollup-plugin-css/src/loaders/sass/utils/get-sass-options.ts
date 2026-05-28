@@ -16,7 +16,6 @@ const getSassOptions = async (
     options: SassLoaderOptions,
     content: string,
     useSourceMap: boolean,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<SassLoaderOptions> => {
     const { warnRuleAsWarning, ...otherOptions } = options;
     let data = content;
@@ -32,16 +31,21 @@ const getSassOptions = async (
 
     if (!(sassOptions as StringOptions<"async">).logger) {
         const needEmitWarning = warnRuleAsWarning !== false;
-        const formatSpan = (span: SourceSpan) =>
-            `Warning on line ${span.start.line}, column ${span.start.column} of ${span.url ?? "-"}:${span.start.line}:${span.start.column}:\n`;
+        const formatSpan = (span: SourceSpan) => {
+            const line = String(span.start.line);
+            const column = String(span.start.column);
+            const url = span.url ? String(span.url) : "-";
 
-        const formatDebugSpan = (span: SourceSpan) => `[debug:${span.start.line}:${span.start.column}] `;
+            return `Warning on line ${line}, column ${column} of ${url}:${line}:${column}:\n`;
+        };
+
+        const formatDebugSpan = (span: SourceSpan) => `[debug:${String(span.start.line)}:${String(span.start.column)}] `;
 
         (sassOptions as StringOptions<"async">).logger = {
             debug(message, loggerOptions) {
                 let builtMessage = "";
 
-                if (loggerOptions.span) {
+                if (loggerOptions.span as SourceSpan | undefined) {
                     builtMessage = formatDebugSpan(loggerOptions.span);
                 }
 
@@ -63,7 +67,7 @@ const getSassOptions = async (
                 builtMessage += message;
 
                 if (loggerOptions.span?.context) {
-                    builtMessage += `\n\n${loggerOptions.span.start.line} | ${loggerOptions.span.context}`;
+                    builtMessage += `\n\n${String(loggerOptions.span.start.line)} | ${loggerOptions.span.context}`;
                 }
 
                 if (loggerOptions.stack && loggerOptions.stack !== "undefined") {
@@ -98,19 +102,21 @@ const getSassOptions = async (
 
     const separator = isWindows() ? ";" : ":";
 
+    const normalizeIncludePath = function normalizeIncludePath(includePath: string): string {
+        return isAbsolute(includePath) ? includePath : join(process.cwd(), includePath);
+    };
+
     (sassOptions as StringOptions<"async">).loadPaths = [
-        ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map(
-            (includePath: string) => isAbsolute(includePath) ? includePath : join(process.cwd(), includePath),
+        ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map((includePath) =>
+            normalizeIncludePath(includePath),
         ),
         ...process.env.SASS_PATH ? process.env.SASS_PATH.split(separator) : [],
     ];
 
     if ((sassOptions as StringOptions<"async">).importers) {
-        if (Array.isArray((sassOptions as StringOptions<"async">).importers)) {
-            (sassOptions as StringOptions<"async">).importers = [...((sassOptions as StringOptions<"async">).importers as Importer[])];
-        } else {
-            (sassOptions as StringOptions<"async">).importers = (sassOptions as StringOptions<"async">).importers;
-        }
+        (sassOptions as StringOptions<"async">).importers = Array.isArray((sassOptions as StringOptions<"async">).importers)
+            ? [...((sassOptions as StringOptions<"async">).importers as Importer[])]
+            : (sassOptions as StringOptions<"async">).importers;
     } else {
         (sassOptions as StringOptions<"async">).importers = [];
     }

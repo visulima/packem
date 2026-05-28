@@ -70,29 +70,40 @@ const reservedKeywords = new Set([
     "yield",
 ]);
 
+const validateAliasEntry = (alias: string, target: string): void => {
+    if (alias.trim() === "") {
+        throw new Error(`Alias name "${alias}" is invalid. Alias names should be non-empty strings.`);
+    }
+
+    if (invalidAliasPattern.test(alias)) {
+        throw new Error(
+            `Alias name "${alias}" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.`,
+        );
+    }
+
+    if (reservedKeywords.has(alias)) {
+        throw new Error(`Alias name "${alias}" is a reserved keyword and cannot be used.`);
+    }
+
+    const resolvedPath = resolve(target);
+
+    if (!isAccessibleSync(resolvedPath)) {
+        throw new Error(`Target path "${resolvedPath}" for alias "${alias}" does not exist.`);
+    }
+};
+
 const validateAliasEntries = (entries: ReadonlyArray<Alias> | Record<string, string>): void => {
-    if (!Array.isArray(entries) && entries !== undefined) {
-        for (const [alias, target] of Object.entries(entries)) {
-            if (typeof alias !== "string" || alias.trim() === "") {
-                throw new Error(`Alias name "${alias}" is invalid. Alias names should be non-empty strings.`);
-            }
+    if (Array.isArray(entries)) {
+        return;
+    }
 
-            if (invalidAliasPattern.test(alias)) {
-                throw new Error(
-                    `Alias name "${alias}" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.`,
-                );
-            }
+    // `Array.isArray` does not narrow the `ReadonlyArray<Alias>` member of the
+    // union, but the early return above guarantees the remaining runtime shape
+    // is the record form.
+    const aliasRecord = entries as Record<string, string>;
 
-            if (reservedKeywords.has(alias)) {
-                throw new Error(`Alias name "${alias}" is a reserved keyword and cannot be used.`);
-            }
-
-            const resolvedPath = resolve(target);
-
-            if (!isAccessibleSync(resolvedPath)) {
-                throw new Error(`Target path "${resolvedPath}" for alias "${alias}" does not exist.`);
-            }
-        }
+    for (const [alias, target] of Object.entries(aliasRecord)) {
+        validateAliasEntry(alias, target);
     }
 };
 

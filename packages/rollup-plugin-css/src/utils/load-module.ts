@@ -6,13 +6,13 @@ import { interopDefault, loadModule as mllyLoadModule } from "mlly";
 import type { ResolveOptions } from "./resolve";
 import { resolve } from "./resolve";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const loaded: Record<string, any> = {};
+type Require = (id: string) => unknown;
+
+const loaded: Record<string, unknown> = {};
 const extensions = [".js", ".mjs", ".cjs", ".json"];
 
 // Helper function to load module from resolved path
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const loadModuleFromPath = async (resolvedPath: string, require: NodeRequire): Promise<any> => {
+const loadModuleFromPath = async (resolvedPath: string, require: Require): Promise<unknown> => {
     try {
         // First try to load as CommonJS using require
         // eslint-disable-next-line import/no-dynamic-require
@@ -30,8 +30,7 @@ const loadModuleFromPath = async (resolvedPath: string, require: NodeRequire): P
     }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): Promise<any> => {
+const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): Promise<unknown> => {
     if (loaded[moduleId]) {
         return loaded[moduleId];
     }
@@ -47,7 +46,7 @@ const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): 
         symlinks: false,
     };
 
-    const require = createRequire(import.meta.url);
+    const require = createRequire(import.meta.url) as unknown as Require;
 
     try {
         const resolvedPath = resolve([moduleId, `./${moduleId}`], options);
@@ -76,7 +75,7 @@ const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): 
         return undefined;
     }
 
-    const module = loaded[moduleId];
+    const module = loaded[moduleId] as { default?: unknown } | undefined;
 
     return module?.default ?? module;
 };

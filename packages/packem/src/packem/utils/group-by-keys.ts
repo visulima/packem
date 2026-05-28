@@ -1,6 +1,41 @@
 type Key = number | string | symbol;
 
 /**
+ * Stringifies a grouping key value. Primitives are coerced directly; anything
+ * else falls back to a JSON representation so object keys do not collapse into
+ * the useless `[object Object]` form.
+ */
+const toGroupKey = (value: unknown): string => {
+    if (value === undefined || value === null) {
+        return "undefined";
+    }
+
+    if (typeof value === "string") {
+        return value;
+    }
+
+    if (typeof value === "number" || typeof value === "boolean" || typeof value === "bigint" || typeof value === "symbol") {
+        return value.toString();
+    }
+
+    return JSON.stringify(value);
+};
+
+/**
+ * Returns the existing value for `key`, creating and storing it with `factory` when absent.
+ */
+const getOrCreate = <K, V>(map: Map<K, V>, key: K, factory: () => V): V => {
+    let value = map.get(key);
+
+    if (value === undefined) {
+        value = factory();
+        map.set(key, value);
+    }
+
+    return value;
+};
+
+/**
  * Groups an array of objects by multiple keys, creating nested objects.
  * Supports 2 or 3 keys for grouping.
  * @param array Array of objects to group
@@ -17,53 +52,48 @@ const groupByKeys = <T extends Record<Key, unknown>>(
 ): Record<string, Record<string, T[]>> | Record<string, Record<string, Record<string, T[]>>> => {
     if (key3 !== undefined) {
         // Group by 3 keys
-        // eslint-disable-next-line unicorn/no-array-reduce
-        return array.reduce<Record<string, Record<string, Record<string, T[]>>>>((result, currentItem) => {
-            const groupKey1 = String(currentItem[key1] ?? "undefined");
-            const groupKey2 = String(currentItem[key2] ?? "undefined");
-            const groupKey3 = String(currentItem[key3] ?? "undefined");
+        const threeLevel = new Map<string, Map<string, Map<string, T[]>>>();
 
-            if (!result[groupKey1]) {
-                // eslint-disable-next-line no-param-reassign
-                result[groupKey1] = {};
+        for (const currentItem of array) {
+            const level1 = getOrCreate(threeLevel, toGroupKey(currentItem[key1]), () => new Map<string, Map<string, T[]>>());
+            const level2 = getOrCreate(level1, toGroupKey(currentItem[key2]), () => new Map<string, T[]>());
+            const bucket = getOrCreate(level2, toGroupKey(currentItem[key3]), () => []);
+
+            bucket.push(currentItem);
+        }
+
+        const threeResult: Record<string, Record<string, Record<string, T[]>>> = {};
+
+        for (const [k1, level1] of threeLevel) {
+            const inner: Record<string, Record<string, T[]>> = {};
+
+            for (const [k2, level2] of level1) {
+                inner[k2] = Object.fromEntries(level2);
             }
 
-            if (!result[groupKey1][groupKey2]) {
-                // eslint-disable-next-line no-param-reassign
-                result[groupKey1][groupKey2] = {};
-            }
+            threeResult[k1] = inner;
+        }
 
-            if (!result[groupKey1][groupKey2][groupKey3]) {
-                // eslint-disable-next-line no-param-reassign
-                result[groupKey1][groupKey2][groupKey3] = [];
-            }
-
-            result[groupKey1][groupKey2][groupKey3].push(currentItem);
-
-            return result;
-        }, {});
+        return threeResult;
     }
 
     // Group by 2 keys (original behavior)
-    // eslint-disable-next-line unicorn/no-array-reduce
-    return array.reduce<Record<string, Record<string, T[]>>>((result, currentItem) => {
-        const groupKey1 = String(currentItem[key1] ?? "undefined");
-        const groupKey2 = String(currentItem[key2] ?? "undefined");
+    const twoLevel = new Map<string, Map<string, T[]>>();
 
-        if (!result[groupKey1]) {
-            // eslint-disable-next-line no-param-reassign
-            result[groupKey1] = {};
-        }
+    for (const currentItem of array) {
+        const level1 = getOrCreate(twoLevel, toGroupKey(currentItem[key1]), () => new Map<string, T[]>());
+        const bucket = getOrCreate(level1, toGroupKey(currentItem[key2]), () => []);
 
-        if (!result[groupKey1][groupKey2]) {
-            // eslint-disable-next-line no-param-reassign
-            result[groupKey1][groupKey2] = [];
-        }
+        bucket.push(currentItem);
+    }
 
-        result[groupKey1][groupKey2].push(currentItem);
+    const twoResult: Record<string, Record<string, T[]>> = {};
 
-        return result;
-    }, {});
+    for (const [k1, level1] of twoLevel) {
+        twoResult[k1] = Object.fromEntries(level1);
+    }
+
+    return twoResult;
 };
 
 export default groupByKeys;

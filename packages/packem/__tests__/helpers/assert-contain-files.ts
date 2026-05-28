@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { expect } from "vitest";
 
 const assertContainFiles = (directory: string, filePaths: string[]): void => {
-    const results = [];
+    const results: string[] = [];
 
     for (const filePath of filePaths) {
         if (existsSync(resolve(directory, filePath))) {

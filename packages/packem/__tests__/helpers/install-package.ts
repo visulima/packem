@@ -19,21 +19,21 @@ const installPackage = async (fixturePath: string, packageName: string): Promise
     // Resolve node_modules relative to the workspace root (packages/packem)
     // Go up from helpers directory to packages/packem, then to workspace root
     const currentFile = fileURLToPath(import.meta.url);
-    const helpersDir = dirname(currentFile);
-    const packemPackageDir = join(helpersDir, "../..");
-    const workspaceRoot = join(packemPackageDir, "../..");
+    const helpersDirectory = dirname(currentFile);
+    const packemPackageDirectory = join(helpersDirectory, "../..");
+    const workspaceRoot = join(packemPackageDirectory, "../..");
 
     // Try workspace root first, then packem package directory
     let sourcePath = resolve(workspaceRoot, `node_modules/${packageName}`);
 
     if (!existsSync(sourcePath)) {
         // Fallback to packem package's node_modules
-        sourcePath = resolve(packemPackageDir, `node_modules/${packageName}`);
+        sourcePath = resolve(packemPackageDirectory, `node_modules/${packageName}`);
     }
 
     if (!existsSync(sourcePath)) {
         throw new Error(
-            `Package ${packageName} not found. Checked:\n  - ${resolve(workspaceRoot, `node_modules/${packageName}`)}\n  - ${resolve(packemPackageDir, `node_modules/${packageName}`)}\nMake sure it's installed in the workspace.`,
+            `Package ${packageName} not found. Checked:\n  - ${resolve(workspaceRoot, `node_modules/${packageName}`)}\n  - ${resolve(packemPackageDirectory, `node_modules/${packageName}`)}\nMake sure it's installed in the workspace.`,
         );
     }
 

@@ -13,7 +13,7 @@ const ecosystemSuites = readdirSync(ecosystemPath, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name);
 
-const ecosystemConfigs = {
+const ecosystemConfigs: Record<string, unknown> = {
     "advanced-tailwind": {
         config: { declaration: false },
         cssLoader: ["tailwindcss"] as "tailwindcss"[],
@@ -25,12 +25,14 @@ const ecosystemConfigs = {
 
 describe("packem ecosystem", () => {
     afterEach(async () => {
-        for await (const suite of ecosystemSuites) {
-            await rm(join(ecosystemPath, suite, "dist"), {
-                force: true,
-                recursive: true,
-            });
-        }
+        await Promise.all(
+            ecosystemSuites.map((suite) =>
+                rm(join(ecosystemPath, suite, "dist"), {
+                    force: true,
+                    recursive: true,
+                }),
+            ),
+        );
     });
 
     it.each(ecosystemSuites)("should work with provided '%s' ecosystem suite", async (suite) => {
@@ -40,7 +42,7 @@ describe("packem ecosystem", () => {
 
         await createPackemConfig(fullSuitePath, {
             transformer: "esbuild",
-            ...ecosystemConfigs[suite],
+            ...(ecosystemConfigs[suite] as Record<string, unknown>),
         });
 
         const binProcess = await execPackem("build", [], {

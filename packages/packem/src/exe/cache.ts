@@ -35,13 +35,7 @@ const getCachedBinaryPath = (target: ExeTarget): string => {
     const cacheDirectory = getCacheDirectory();
     const binaryName = target.platform === "win" ? "node.exe" : "node";
 
-    return join(
-        cacheDirectory,
-        "node",
-        `v${target.nodeVersion}`,
-        `${target.platform}-${target.arch}`,
-        binaryName,
-    );
+    return join(cacheDirectory, "node", `v${target.nodeVersion}`, `${target.platform}-${target.arch}`, binaryName);
 };
 
 export { getCachedBinaryPath, getCacheDirectory };

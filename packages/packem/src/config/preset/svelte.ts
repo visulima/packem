@@ -3,6 +3,15 @@ import svelte from "rollup-plugin-svelte";
 
 import type { BuildConfig } from "../../types";
 
+const SVELTE_FILE_REGEX = /\.svelte$/;
+
+// `rollup-plugin-svelte`'s published types narrow `include`/`exclude` to
+// `string` minimatch patterns, but the plugin forwards them to
+// `@rollup/pluginutils`'s `createFilter`, which also accepts `RegExp`. The
+// preset deliberately exposes `RegExp` filters, so the value is cast through
+// the plugin's actual accepted shape rather than the too-strict declared one.
+type SvelteOptionFilter = NonNullable<Parameters<typeof svelte>[0]>["include"];
+
 export interface SveltePresetOptions {
     /**
      * Svelte plugin options
@@ -95,11 +104,9 @@ export const createSveltePreset = (options: SveltePresetOptions = {}): BuildConf
                             ...pluginOptions.compilerOptions,
                         },
                         emitCss: false,
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        exclude: pluginOptions.exclude as any,
+                        exclude: pluginOptions.exclude as unknown as SvelteOptionFilter,
                         extensions: [".svelte"],
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        include: (pluginOptions.include ?? [/\.svelte$/]) as any,
+                        include: (pluginOptions.include ?? [SVELTE_FILE_REGEX]) as unknown as SvelteOptionFilter,
                         preprocess: pluginOptions.preprocess,
                     }),
                 },

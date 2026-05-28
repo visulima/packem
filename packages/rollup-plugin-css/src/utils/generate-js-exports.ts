@@ -96,6 +96,159 @@ const getClassNameIdentifier = (name: string): string => {
     return id;
 };
 
+interface AppendNamedExportsOptions {
+    dts?: boolean;
+    dtsOutput: string[];
+    namedExports?: boolean | ((name: string) => string);
+    output: string[];
+    outputExports: string[];
+}
+
+const appendNamedExports = ({ dts, dtsOutput, namedExports, output, outputExports }: AppendNamedExportsOptions): void => {
+    if (!namedExports) {
+        return;
+    }
+
+    const namedExport = `export {\n  ${outputExports.filter(Boolean).join(",\n  ")}\n};`;
+
+    output.push(namedExport);
+
+    if (dts) {
+        dtsOutput.push(namedExport);
+    }
+};
+
+interface AppendModulesDtsOptions {
+    defaultExport: string;
+    dtsOutput: string[];
+    inject?: JsExportOptions["inject"];
+    modulesExports: Record<string, string>;
+    modulesVariableName: string;
+    supportModules: boolean;
+}
+
+/**
+ * Pushes ModulesExports interface declarations and a default export into `dtsOutput`.
+ */
+const appendModulesDts = ({ defaultExport, dtsOutput, inject, modulesExports, modulesVariableName, supportModules }: AppendModulesDtsOptions): void => {
+    if (supportModules) {
+        dtsOutput.push(
+            `\ninterface ModulesExports {
+${Object.keys(modulesExports)
+    .map((key) => `  '${key}': string;`)
+    .join("\n")}
+}\n`,
+            typeof inject === "object" && inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "",
+            `declare const ${modulesVariableName}: ModulesExports;`,
+        );
+    }
+
+    dtsOutput.push(defaultExport);
+};
+
+interface ApplyInjectOptions {
+    cssVariableName: string;
+    id: string;
+    inject: NonNullable<JsExportOptions["inject"]>;
+    modulesExports: Record<string, string>;
+    modulesVariableName: string;
+    output: string[];
+    saferId: (identifier: string) => string;
+}
+
+/**
+ * Builds the injected variant of the CSS exports and pushes generated code into `output`.
+ */
+const applyInject = ({ cssVariableName: cssVName, id, inject, modulesExports, modulesVariableName, output, saferId }: ApplyInjectOptions): void => {
+    if (typeof inject === "function") {
+        output.push(inject(cssVName, id, output), `var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
+
+        return;
+    }
+
+    const { treeshakeable, ...injectorOptions } = typeof inject === "object" ? inject : ({} as InjectOptions);
+
+    const injectorName = saferId("injector");
+    const injectorCall = `${injectorName}(${cssVName},${JSON.stringify(injectorOptions)});`;
+
+    const packageName = typeof inject === "object" && inject.package ? inject.package : "@visulima/css-style-inject";
+    const methodName = typeof inject === "object" && inject.method ? inject.method : "cssStyleInject";
+
+    output.unshift(`import { ${methodName} as ${injectorName} } from "${packageName}";`);
+
+    if (!treeshakeable) {
+        output.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`, injectorCall);
+
+        return;
+    }
+
+    output.push("var injected = false;");
+
+    const injectorCallOnce = `if (!injected) { injected = true; ${injectorCall} }`;
+
+    if (modulesExports.inject) {
+        throw new Error("`inject` keyword is reserved when using `inject.treeshakeable` option");
+    }
+
+    let getters = "";
+
+    for (const [k, v] of Object.entries(modulesExports)) {
+        const name = JSON.stringify(k);
+        const value = JSON.stringify(v);
+
+        getters += `get ${name}() { ${injectorCallOnce} return ${value}; },\n`;
+    }
+
+    getters += `inject: function inject() { ${injectorCallOnce} },`;
+
+    output.push(`var ${modulesVariableName} = {${getters}};`);
+};
+
+interface AppendClassExportsOptions {
+    cwd?: string;
+    dts?: boolean;
+    dtsOutput: string[];
+    id: string;
+    logger?: JsExportOptions["logger"];
+    modulesExports: Record<string, string>;
+    namedExports?: boolean | ((name: string) => string);
+    output: string[];
+    outputExports?: string[];
+}
+
+/**
+ * Appends class name exports to the output and dts arrays.
+ *
+ * Returns the resolved getClassName function for callers that need it.
+ */
+const appendClassExports = ({ cwd, dts, dtsOutput, id, logger, modulesExports, namedExports, output, outputExports }: AppendClassExportsOptions): void => {
+    if (!namedExports || Object.keys(modulesExports).length === 0) {
+        return;
+    }
+
+    const getClassName = typeof namedExports === "function" ? namedExports : getClassNameIdentifier;
+
+    for (const [name, value] of Object.entries(modulesExports)) {
+        const newName = getClassName(name);
+
+        if (name !== newName && logger) {
+            const relativePath = cwd ? relative(cwd, id) : id;
+
+            logger.warn({ message: `Exported \`${name}\` as \`${newName}\` in ${relativePath}` });
+        }
+
+        const fmt = JSON.stringify(value);
+
+        output.push(`var ${newName} = ${fmt};`);
+
+        if (dts) {
+            dtsOutput.push(`declare const ${newName}: ${fmt};`);
+        }
+
+        outputExports?.push(newName);
+    }
+};
+
 /**
  * Parameters for generating inline CSS exports
  */
@@ -131,28 +284,7 @@ const generateInlineExports = ({
 }: GenerateInlineExportsParameters): JsExportResult => {
     const inlineOutput = [`var ${cssVName} = ${JSON.stringify(css)};`];
 
-    if (namedExports && Object.keys(modulesExports).length > 0) {
-        const getClassName = typeof namedExports === "function" ? namedExports : getClassNameIdentifier;
-
-        // Add named exports for CSS modules
-        for (const [name, value] of Object.entries(modulesExports)) {
-            const newName = getClassName(name);
-
-            if (name !== newName && logger) {
-                const relativePath = cwd ? relative(cwd, id) : id;
-
-                logger.warn({ message: `Exported \`${name}\` as \`${newName}\` in ${relativePath}` });
-            }
-
-            const fmt = JSON.stringify(value);
-
-            inlineOutput.push(`var ${newName} = ${fmt};`);
-
-            if (dts) {
-                dtsOutput.push(`declare const ${newName}: ${fmt};`);
-            }
-        }
-    }
+    appendClassExports({ cwd, dts, dtsOutput, id, logger, modulesExports, namedExports, output: inlineOutput });
 
     // Create the modules object for inline mode
     if (Object.keys(modulesExports).length > 0) {
@@ -290,28 +422,7 @@ export const generateJsExports = ({
             dtsOutput.push(`declare const ${cssVariableName}: string;`);
         }
 
-        const getClassName = typeof namedExports === "function" ? namedExports : getClassNameIdentifier;
-
-        // Use Object.entries instead of for..in to avoid prototype chain iteration
-        for (const [name, value] of Object.entries(modulesExports)) {
-            const newName = getClassName(name);
-
-            if (name !== newName && logger) {
-                const relativePath = cwd ? relative(cwd, id) : id;
-
-                logger.warn({ message: `Exported \`${name}\` as \`${newName}\` in ${relativePath}` });
-            }
-
-            const fmt = JSON.stringify(value);
-
-            output.push(`var ${newName} = ${fmt};`);
-
-            if (dts) {
-                dtsOutput.push(`declare const ${newName}: ${fmt};`);
-            }
-
-            outputExports.push(newName);
-        }
+        appendClassExports({ cwd, dts, dtsOutput, id, logger, modulesExports, namedExports, output, outputExports });
     }
 
     // Handle inline mode - embed CSS directly as strings
@@ -333,46 +444,7 @@ export const generateJsExports = ({
 
     // Handle CSS injection for runtime styles
     if (inject) {
-        if (typeof inject === "function") {
-            output.push(inject(cssVariableName, id, output), `var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
-        } else {
-            const { treeshakeable, ...injectorOptions } = typeof inject === "object" ? inject : ({} as InjectOptions);
-
-            const injectorName = saferId("injector");
-            const injectorCall = `${injectorName}(${cssVariableName},${JSON.stringify(injectorOptions)});`;
-
-            const packageName = typeof inject === "object" && inject.package ? inject.package : "@visulima/css-style-inject";
-            const methodName = typeof inject === "object" && inject.method ? inject.method : "cssStyleInject";
-
-            output.unshift(`import { ${methodName} as ${injectorName} } from "${packageName}";`);
-
-            if (!treeshakeable) {
-                output.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`, injectorCall);
-            }
-
-            if (treeshakeable) {
-                output.push("var injected = false;");
-
-                const injectorCallOnce = `if (!injected) { injected = true; ${injectorCall} }`;
-
-                if (modulesExports.inject) {
-                    throw new Error("`inject` keyword is reserved when using `inject.treeshakeable` option");
-                }
-
-                let getters = "";
-
-                for (const [k, v] of Object.entries(modulesExports)) {
-                    const name = JSON.stringify(k);
-                    const value = JSON.stringify(v);
-
-                    getters += `get ${name}() { ${injectorCallOnce} return ${value}; },\n`;
-                }
-
-                getters += `inject: function inject() { ${injectorCallOnce} },`;
-
-                output.push(`var ${modulesVariableName} = {${getters}};`);
-            }
-        }
+        applyInject({ cssVariableName, id, inject, modulesExports, modulesVariableName, output, saferId });
     }
 
     if (!inject && Object.keys(modulesExports).length > 0) {
@@ -384,30 +456,10 @@ export const generateJsExports = ({
     output.push(defaultExport);
 
     if (dts) {
-        if (supportModules) {
-            dtsOutput.push(
-                `\ninterface ModulesExports {
-${Object.keys(modulesExports)
-    .map((key) => `  '${key}': string;`)
-    .join("\n")}
-}\n`,
-                typeof inject === "object" && inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "",
-                `declare const ${modulesVariableName}: ModulesExports;`,
-            );
-        }
-
-        dtsOutput.push(defaultExport);
+        appendModulesDts({ defaultExport, dtsOutput, inject, modulesExports, modulesVariableName, supportModules });
     }
 
-    if (namedExports) {
-        const namedExport = `export {\n  ${outputExports.filter(Boolean).join(",\n  ")}\n};`;
-
-        output.push(namedExport);
-
-        if (dts) {
-            dtsOutput.push(namedExport);
-        }
-    }
+    appendNamedExports({ dts, dtsOutput, namedExports, output, outputExports });
 
     const outputString = output.filter(Boolean).join("\n");
     const types = dtsOutput.length > 0 ? dtsOutput.filter(Boolean).join("\n") : undefined;

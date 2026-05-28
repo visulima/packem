@@ -17,11 +17,7 @@ interface ExeTarget {
      *
      * The minimum required version is 25.7.0, which is when stable SEA support landed in Node.js.
      */
-    nodeVersion:
-        | "latest"
-        | "latest-lts"
-        | (string & {})
-        | `${string}.${string}.${string}`;
+    nodeVersion: "latest" | "latest-lts" | (string & {}) | `${string}.${string}.${string}`;
     platform: ExePlatform;
 }
 
@@ -87,9 +83,7 @@ const resolveNodeVersion = async (nodeVersion: string): Promise<string> => {
         const response = await fetch(NODE_DIST_INDEX_URL);
 
         if (!response.ok) {
-            throw new Error(
-                `Failed to fetch Node.js releases: HTTP ${String(response.status)} from ${NODE_DIST_INDEX_URL}`,
-            );
+            throw new Error(`Failed to fetch Node.js releases: HTTP ${String(response.status)} from ${NODE_DIST_INDEX_URL}`);
         }
 
         const releases = (await response.json()) as NodeRelease[];
@@ -113,9 +107,7 @@ const resolveNodeVersion = async (nodeVersion: string): Promise<string> => {
     const version = valid(resolved);
 
     if (!version) {
-        throw new Error(
-            `Invalid Node.js version: ${resolved}. Please provide a valid version string (e.g., "25.7.0").`,
-        );
+        throw new Error(`Invalid Node.js version: ${resolved}. Please provide a valid version string (e.g., "25.7.0").`);
     }
 
     if (!satisfies(version, ">=25.7.0")) {
@@ -130,10 +122,4 @@ const resolveNodeVersion = async (nodeVersion: string): Promise<string> => {
 const getTargetSuffix = (target: ExeTarget): string => `-${target.platform}-${target.arch}`;
 
 export type { ExeArch, ExeExtensionOptions, ExePlatform, ExeTarget };
-export {
-    getArchiveExtension,
-    getBinaryPathInArchive,
-    getDownloadUrl,
-    getTargetSuffix,
-    resolveNodeVersion,
-};
+export { getArchiveExtension, getBinaryPathInArchive, getDownloadUrl, getTargetSuffix, resolveNodeVersion };

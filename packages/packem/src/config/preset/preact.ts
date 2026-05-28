@@ -1,4 +1,4 @@
-import type { BabelPluginConfig } from "@visulima/packem-rollup/babel";
+import type { BabelPluginConfig } from "@visulima/packem-plugins/babel";
 import type { Plugin } from "rollup";
 
 import type { BuildConfig } from "../../types";
@@ -149,7 +149,7 @@ export interface PreactPresetOptions {
 }
 
 export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConfig => {
-    const { devtoolsInProd: devtoolsInProduction = false, plugins = [], presets = [] } = options;
+    const { devtoolsInProd: devtoolsInProduction = false, plugins, presets } = options;
 
     const babelPlugins: BabelPluginConfig["plugins"] = [];
     const babelPresets: BabelPluginConfig["presets"] = [
@@ -185,6 +185,7 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
                         babelConfig.presets[presetIndex] = [
                             preset[0],
                             {
+                                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- `typeof x === "object"` is also true for null, so the explicit null check is a real runtime guard; relaxed strictNullChecks hides the union from the type checker.
                                 ...typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {},
                                 development: !isProduction,
                             },
@@ -212,7 +213,6 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
                         || (Array.isArray(p)
                             && p[0]
                             && typeof p[0] === "object"
-                            && p[0] !== null
                             && "name" in p[0]
                             && (p[0] as { name: string }).name === "packem:preact-alias-transform"),
                 );
@@ -230,7 +230,6 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
                         || (Array.isArray(p)
                             && p[0]
                             && typeof p[0] === "object"
-                            && p[0] !== null
                             && "name" in p[0]
                             && (p[0] as { name: string }).name === "packem:preact-devtools"),
                 );

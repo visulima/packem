@@ -51,7 +51,7 @@ The migration of rollup functionality from `packages/packem/src/rollup/` into th
 
 ### 🏗️ Architecture
 
-```
+```text
 @visulima/packem-rollup/     ✅ COMPLETE
 ├── Core rollup functionality (build, buildTypes, watch)
 ├── Complete get-rollup-options.ts (37KB migrated)

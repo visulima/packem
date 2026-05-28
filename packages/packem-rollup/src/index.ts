@@ -1,20 +1,9 @@
-export { default as cachingPlugin } from "./plugins/cache-plugin";
 export { default as chunkSplitter } from "./plugins/chunk-splitter";
 export { default as browserslistToEsbuild } from "./plugins/esbuild/browserslist-to-esbuild";
-export { default as fixDynamicImportExtension } from "./plugins/fix-dynamic-import-extension";
-export { default as metafilePlugin } from "./plugins/metafile";
+export { jsxRemoveAttributes, type JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
+export { preserveDirectivesPlugin, type PreserveDirectivesPluginOptions } from "./plugins/preserve-directives";
 export { pureNewExpressionPlugin } from "./plugins/pure-new-expression-plugin";
-export { default as resolveFileUrlPlugin } from "./plugins/resolve-file-url";
-export type {
-    ExtendedRollupNodeResolveOptions,
-    PackemRollupOptions,
-    RollupPlugins,
-    TransformerFn,
-    TransformerName,
-} from "./types";
-export { default as createSplitChunks } from "./utils/chunks/create-split-chunks";
-export { default as getCustomModuleLayer } from "./utils/chunks/get-custom-module-layer";
-export { default as getModuleLayer } from "./utils/chunks/get-module-layer";
+export type { ExtendedRollupNodeResolveOptions, PackemRollupOptions, RollupPlugins } from "./types";
 export type { Alias, ResolverObject as AliasResolverObject, ResolvedAlias, RollupAliasOptions } from "@rollup/plugin-alias";
 export { default as alias } from "@rollup/plugin-alias";
 export type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
@@ -25,6 +14,7 @@ export { default as inject, type RollupInjectOptions } from "@rollup/plugin-inje
 export { default as nodeResolve, type RollupNodeResolveOptions } from "@rollup/plugin-node-resolve";
 export { default as replace, type RollupReplaceOptions } from "@rollup/plugin-replace";
 export { type RollupWasmOptions, default as wasm } from "@rollup/plugin-wasm";
+export { importTrace, patchErrorWithTrace } from "rollup-plugin-import-trace";
 export { default as polyfillNode, type NodePolyfillsOptions as RollupNodePolyfillsOptions } from "rollup-plugin-polyfill-node";
 export { PluginPure as purePlugin, type PureAnnotationsOptions as RollupPureAnnotationsOptions } from "rollup-plugin-pure";
 export type { PluginVisualizerOptions as RollupPluginVisualizerOptions } from "rollup-plugin-visualizer";

@@ -1,17 +1,45 @@
 import { watch as fsWatch } from "node:fs";
 
 import { cyan, gray } from "@visulima/colorize";
+import { isAccessibleSync } from "@visulima/fs";
 import type { FileCache } from "@visulima/packem-share";
 import { enhanceRollupError } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { join, relative } from "@visulima/path";
-import type { RollupCache, RollupWatcher, RollupWatcherEvent } from "rollup";
-import { watch as rollupWatch } from "rollup";
+import type { RollupCache, RollupWatcher, RollupWatcherEvent, WatcherOptions } from "rollup";
 
+import { getRollupOptions } from "../bundler/get-build-options";
+import { getRollupWatch } from "../bundler/get-rollup";
+import { PACKEM_CONFIG_FILES } from "../config/utils/find-packem-file";
 import loadPackageJson from "../config/utils/load-package-json";
 import prepareEntries from "../config/utils/prepare-entries";
 import type { InternalBuildOptions } from "../types";
-import { getRollupDtsOptions, getRollupOptions } from "./get-rollup-options";
+import { getRollupDtsOptions } from "./get-rollup-options";
+
+/**
+ * Minimal structural view of the Pail logger.
+ *
+ * `@visulima/pail`'s `dist/index.server.d.ts` re-exports `Pail` from a
+ * non-existent `./pail.d.ts` (the real file is `./pail.server.d.ts`), so the
+ * upstream `Pail` type used by `BuildContext.logger` resolves to an error type
+ * and every `context.logger.*` access trips `no-unsafe-*`. Until the upstream
+ * package fixes its re-export, narrow the logger to the methods used here; the
+ * runtime object implements them.
+ */
+interface LogPayload {
+    context?: unknown[];
+    message: string;
+    prefix: string;
+}
+
+interface Logger {
+    error: (payload: LogPayload) => void;
+    info: (message: LogPayload | string) => void;
+    raw: (message: string) => void;
+    success: (payload: LogPayload) => void;
+}
+
+const getLogger = (context: BuildContext<InternalBuildOptions>): Logger => context.logger as Logger;
 
 const WATCH_CACHE_KEY = "rollup-watch.json";
 
@@ -35,18 +63,19 @@ const watchHandler = ({
     watcher: RollupWatcher;
 }): void => {
     const prefix = `watcher:${mode}`;
+    const logger = getLogger(context);
 
     watcher.on("change", async (id, { event }) => {
         await doOnSuccessCleanup?.();
 
-        context.logger.info({
+        logger.info({
             message: `${cyan(relative(".", id))} was ${event}d`,
             prefix,
         });
     });
 
     watcher.on("restart", () => {
-        context.logger.info({
+        logger.info({
             message: "Rebuilding ...",
             prefix,
         });
@@ -62,14 +91,14 @@ const watchHandler = ({
                     fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : `dts-${WATCH_CACHE_KEY}`, event.result.cache);
                 }
 
-                context.logger.raw(`\n⚡️ Build run in ${event.duration}ms\n\n`);
+                logger.raw(`\n⚡️ Build run in ${String(event.duration)}ms\n\n`);
 
                 await runBuilder?.(true);
 
                 break;
             }
             case "BUNDLE_START": {
-                context.logger.info({
+                logger.info({
                     message: cyan(`build started...`),
                     prefix,
                 });
@@ -77,7 +106,7 @@ const watchHandler = ({
                 break;
             }
             case "END": {
-                context.logger.success({
+                logger.success({
                     message: "Rebuild finished",
                     prefix,
                 });
@@ -89,7 +118,7 @@ const watchHandler = ({
             case "ERROR": {
                 enhanceRollupError(event.error);
 
-                context.logger.error({
+                logger.error({
                     context: [event.error],
                     message: `Rebuild failed: ${event.error.message}`,
                     prefix,
@@ -119,53 +148,56 @@ const logInputs = (context: BuildContext<InternalBuildOptions>, rollupOptions: {
         infoMessage += gray(`\n  └─ ${relative(process.cwd(), input)}`);
     }
 
-    context.logger.info(infoMessage);
+    getLogger(context).info(infoMessage);
 };
 
-const configureWatchOptions = (
-    context: BuildContext<InternalBuildOptions>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rollupOptions: { watch?: any },
-): void => {
-    if (context.options.rollup.watch && typeof rollupOptions.watch === "object" && (rollupOptions.watch as Record<string, unknown>).include === undefined) {
-        rollupOptions.watch = {
-            ...rollupOptions.watch,
-            ...context.options.rollup.watch,
-        };
+type WatchOptions = WatcherOptions | false | undefined;
 
-        (rollupOptions.watch as Record<string, unknown>).include = [
-            join(context.options.sourceDir, "**", "*"),
-            "package.json",
-            "packem.config.*",
-            "tsconfig.json",
-            "tsconfig.*.json",
-        ];
+const buildMergedWatchOptions = (context: BuildContext<InternalBuildOptions>, currentWatch: WatcherOptions, userWatch: WatcherOptions): WatcherOptions => {
+    const baseInclude: (string | RegExp)[] = [
+        join(context.options.sourceDir, "**", "*"),
+        "package.json",
+        "packem.config.*",
+        "tsconfig.json",
+        "tsconfig.*.json",
+    ];
 
-        if (Array.isArray(context.options.rollup.watch.include)) {
-            ((rollupOptions.watch as Record<string, unknown>).include as (string | RegExp)[]) = [
-                ...((rollupOptions.watch as Record<string, unknown>).include as (string | RegExp)[]),
-                ...context.options.rollup.watch.include,
-            ];
-        } else if (context.options.rollup.watch.include) {
-            ((rollupOptions.watch as Record<string, unknown>).include as string[]).push(context.options.rollup.watch.include as string);
-        }
+    const { include: userInclude } = userWatch;
 
-        (rollupOptions.watch as Record<string, unknown>).chokidar = {
-            cwd: context.options.rootDir,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(rollupOptions.watch as any).chokidar,
-            ignored: [
-                "**/.git/**",
-                "**/node_modules/**",
-                "**/test-results/**", // Playwright
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ...((rollupOptions.watch as any).chokidar?.ignored ?? []),
-            ],
-        };
+    if (Array.isArray(userInclude)) {
+        baseInclude.push(...userInclude);
+    } else if (userInclude !== undefined) {
+        baseInclude.push(userInclude);
     }
+
+    const existingChokidar = currentWatch.chokidar ?? {};
+    const existingIgnored = (existingChokidar.ignored as unknown[] | undefined) ?? [];
+    const ignored = ["**/.git/**", "**/node_modules/**", "**/test-results/**", ...existingIgnored];
+
+    return {
+        ...currentWatch,
+        ...userWatch,
+        chokidar: {
+            cwd: context.options.rootDir,
+
+            ...existingChokidar,
+            ignored,
+        },
+        include: baseInclude,
+    };
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+const configureWatchOptions = (context: BuildContext<InternalBuildOptions>, currentWatch: WatchOptions): WatchOptions => {
+    const userWatch: WatchOptions = context.options.rollup.watch;
+
+    const result: WatchOptions
+        = !userWatch || typeof currentWatch !== "object" || currentWatch.include !== undefined
+            ? currentWatch
+            : buildMergedWatchOptions(context, currentWatch, userWatch);
+
+    return result;
+};
+
 const watch = async (
     context: BuildContext<InternalBuildOptions>,
     fileCache: FileCache,
@@ -189,12 +221,12 @@ const watch = async (
     };
 
     const startWatchers = async (): Promise<void> => {
+        const rollupWatch = await getRollupWatch();
         const rollupOptions = await getRollupOptions(context, fileCache);
 
         await context.hooks.callHook("rollup:options", context, rollupOptions);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (Object.keys(rollupOptions.input as any).length === 0) {
+        if (Object.keys(rollupOptions.input ?? {}).length === 0) {
             return;
         }
 
@@ -202,7 +234,7 @@ const watch = async (
             rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
         }
 
-        configureWatchOptions(context, rollupOptions);
+        rollupOptions.watch = configureWatchOptions(context, rollupOptions.watch);
 
         const bundleWatcher = rollupWatch(rollupOptions);
 
@@ -250,40 +282,67 @@ const watch = async (
 
     await startWatchers();
 
-    // Watch package.json for entry point changes.
-    // Rollup's watcher only rebuilds with the same config — it can't pick up
-    // new entry points. We use fs.watch to close and restart watchers when
-    // package.json changes, re-inferring entries from the updated exports.
+    // Watch package.json and packem.config.* for changes. Rollup's watcher
+    // only rebuilds with the same config — it can't pick up new entry points
+    // or option changes. We close and restart the watchers when either file
+    // changes, re-inferring entries from the updated package.json.
     const packageJsonPath = join(context.options.rootDir, "package.json");
+    const configCandidates = PACKEM_CONFIG_FILES.map((file) => join(context.options.rootDir, file));
+
     let debounceTimer: ReturnType<typeof setTimeout>;
 
-    fsWatch(packageJsonPath, () => {
+    const runRestart = async (changedFile: string): Promise<void> => {
+        const logger = getLogger(context);
+
+        logger.info(`${relative(".", changedFile)} changed, restarting watchers...`);
+
+        try {
+            await closeWatchers();
+
+            const { packageJson } = loadPackageJson(context.options.rootDir);
+
+            context.pkg = packageJson;
+            context.options.entries.length = 0;
+            context.buildEntries.length = 0;
+            await context.hooks.callHook("build:prepare", context);
+            prepareEntries(context);
+
+            await startWatchers();
+        } catch (error) {
+            logger.error({
+                message: `Failed to restart watchers: ${(error as Error).message}`,
+                prefix: "watcher",
+            });
+        }
+    };
+
+    const restart = (changedFile: string): void => {
         clearTimeout(debounceTimer);
 
-        debounceTimer = setTimeout(async () => {
-            context.logger.info("package.json changed, restarting watchers...");
-
-            try {
-                await closeWatchers();
-
-                // Re-read package.json and re-infer entries
-                const { packageJson } = loadPackageJson(context.options.rootDir);
-
-                context.pkg = packageJson;
-                context.options.entries.length = 0;
-                context.buildEntries.length = 0;
-                await context.hooks.callHook("build:prepare", context);
-                await prepareEntries(context);
-
-                await startWatchers();
-            } catch (error) {
-                context.logger.error({
-                    message: `Failed to restart watchers: ${(error as Error).message}`,
-                    prefix: "watcher",
-                });
-            }
+        debounceTimer = setTimeout(() => {
+            runRestart(changedFile).catch(() => {
+                // runRestart already logs failures via its internal try/catch;
+                // this guard only protects against an unexpected rejection.
+            });
         }, 100);
+    };
+
+    // Don't add a SIGINT listener here — Node's default SIGINT behavior is
+    // to terminate the process, and the OS reclaims these fs.watch handles
+    // automatically. Adding a listener would override the default and leave
+    // the rollup watcher + child onSuccess processes holding the event loop.
+    fsWatch(packageJsonPath, () => {
+        restart(packageJsonPath);
     });
+
+    for (const configPath of configCandidates) {
+        if (isAccessibleSync(configPath)) {
+            fsWatch(configPath, () => {
+                restart(configPath);
+            });
+            break;
+        }
+    }
 };
 
 export default watch;

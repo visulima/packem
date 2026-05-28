@@ -20,7 +20,7 @@ const stripPrivateFields: ts.TransformerFactory<ts.SourceFile | ts.Bundle> = (co
         return ts.visitEachChild(node, visitor, context);
     };
 
-    return (sourceFile) => ts.visitNode(sourceFile, visitor, ts.isSourceFile) ?? sourceFile;
+    return (sourceFile) => ts.visitNode(sourceFile, visitor, ts.isSourceFile);
 };
 
 export const formatHost: ts.FormatDiagnosticsHost = {
@@ -52,10 +52,11 @@ export const setSourceMapRoot = (
         return;
     }
 
-    const originalDir = posix.dirname(pathToFileURL(originalFilePath).pathname);
-    const finalDir = posix.dirname(pathToFileURL(finalFilePath).pathname);
+    const originalDirectory = posix.dirname(pathToFileURL(originalFilePath).pathname);
+    const finalDirectory = posix.dirname(pathToFileURL(finalFilePath).pathname);
 
-    if (originalDir !== finalDir) {
-        map.sourceRoot = posix.relative(finalDir, originalDir);
+    if (originalDirectory !== finalDirectory) {
+        // eslint-disable-next-line no-param-reassign -- the function is intentionally mutating the source map
+        map.sourceRoot = posix.relative(finalDirectory, originalDirectory);
     }
 };

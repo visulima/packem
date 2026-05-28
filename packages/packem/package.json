@@ -1,6 +1,6 @@
 {
     "name": "@visulima/packem",
-    "version": "2.0.0-alpha.78",
+    "version": "1.28.3",
     "description": "A fast and modern bundler for Node.js and TypeScript.",
     "keywords": [
         "anolilab",
@@ -99,40 +99,40 @@
             "default": "./dist/config/preset/vue.js"
         },
         "./css/loader/sourcemap": {
-            "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.ts",
-            "default": "./dist/rollup/plugins/css/loaders/sourcemap.js"
+            "types": "./dist/css/loaders/sourcemap.d.ts",
+            "default": "./dist/css/loaders/sourcemap.js"
         },
         "./css/loader/less": {
-            "types": "./dist/rollup/plugins/css/loaders/less.d.ts",
-            "default": "./dist/rollup/plugins/css/loaders/less.js"
+            "types": "./dist/css/loaders/less.d.ts",
+            "default": "./dist/css/loaders/less.js"
         },
         "./css/loader/postcss": {
-            "types": "./dist/rollup/plugins/css/loaders/postcss.d.ts",
-            "default": "./dist/rollup/plugins/css/loaders/postcss.js"
+            "types": "./dist/css/loaders/postcss.d.ts",
+            "default": "./dist/css/loaders/postcss.js"
         },
         "./css/loader/sass": {
-            "types": "./dist/rollup/plugins/css/loaders/sass.d.ts",
-            "default": "./dist/rollup/plugins/css/loaders/sass.js"
+            "types": "./dist/css/loaders/sass.d.ts",
+            "default": "./dist/css/loaders/sass.js"
         },
         "./css/loader/stylus": {
-            "types": "./dist/rollup/plugins/css/loaders/stylus.d.ts",
-            "default": "./dist/rollup/plugins/css/loaders/stylus.js"
+            "types": "./dist/css/loaders/stylus.d.ts",
+            "default": "./dist/css/loaders/stylus.js"
         },
         "./css/loader/lightningcss": {
-            "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.ts",
-            "default": "./dist/rollup/plugins/css/loaders/lightningcss.js"
+            "types": "./dist/css/loaders/lightningcss.d.ts",
+            "default": "./dist/css/loaders/lightningcss.js"
         },
         "./css/loader/tailwindcss": {
-            "types": "./dist/rollup/plugins/css/loaders/tailwindcss.d.ts",
-            "default": "./dist/rollup/plugins/css/loaders/tailwindcss.js"
+            "types": "./dist/css/loaders/tailwindcss.d.ts",
+            "default": "./dist/css/loaders/tailwindcss.js"
         },
         "./css/minifier/cssnano": {
-            "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.ts",
-            "default": "./dist/rollup/plugins/css/minifiers/cssnano.js"
+            "types": "./dist/css/minifiers/cssnano.d.ts",
+            "default": "./dist/css/minifiers/cssnano.js"
         },
         "./css/minifier/lightningcss": {
-            "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.ts",
-            "default": "./dist/rollup/plugins/css/minifiers/lightningcss.js"
+            "types": "./dist/css/minifiers/lightningcss.d.ts",
+            "default": "./dist/css/minifiers/lightningcss.js"
         },
         "./transformer/esbuild": {
             "types": "./dist/rollup/plugins/esbuild/index.d.ts",
@@ -174,7 +174,7 @@
         "build:prod": "cross-env INTERNAL_PACKEM_BUILD=1 JITI_INTEROP_DEFAULT=1 jiti src/cli/index.ts build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build",
-        "lint:attw": "attw --pack",
+        "lint:attw": "attw --pack --profile esm-only",
         "lint:eslint": "eslint ./src",
         "lint:eslint:fix": "eslint . --cache --concurrency auto --fix,",
         "lint:package-json": "publint --strict",
@@ -182,7 +182,10 @@
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
         "lint:types": "tsc --noEmit",
         "test": "vitest run --cache",
+        "test:bundlers": "pnpm run test:rollup && pnpm run test:rolldown",
         "test:coverage": "vitest run --cache --coverage",
+        "test:rolldown": "cross-env PACKEM_TEST_BUNDLER=rolldown vitest run --cache __tests__/intigration",
+        "test:rollup": "cross-env PACKEM_TEST_BUNDLER=rollup vitest run --cache __tests__/intigration",
         "test:ui": "vitest --cache --ui --coverage.enabled=true",
         "test:watch": "vitest"
     },
@@ -191,49 +194,34 @@
         "@clack/prompts": "catalog:node",
         "@rollup/pluginutils": "catalog:build",
         "@visulima/cerebro": "catalog:visulima",
-        "@visulima/colorize": "catalog:visulima",
-        "@visulima/find-cache-dir": "catalog:visulima",
-        "@visulima/fs": "catalog:visulima",
-        "@visulima/humanizer": "catalog:visulima",
-        "@visulima/package": "catalog:visulima",
-        "@visulima/packem-rollup": "1.0.0-alpha.65",
-        "@visulima/packem-share": "1.0.0-alpha.46",
-        "@visulima/pail": "catalog:visulima",
-        "@visulima/path": "catalog:visulima",
-        "@visulima/rollup-plugin-css": "1.0.0-alpha.45",
-        "@visulima/rollup-plugin-dts": "1.0.0-alpha.26",
-        "@visulima/tabular": "catalog:visulima",
+        "@visulima/packem-share": "workspace:*",
+        "@visulima/rollup-plugin-css": "workspace:*",
+        "@visulima/rollup-plugin-dts": "workspace:*",
         "@visulima/tsconfig": "catalog:visulima",
         "browserslist": "catalog:network",
+        "cjs-module-lexer": "catalog:prod",
+        "clean-css": "catalog:style",
         "defu": "catalog:utils",
         "fastest-levenshtein": "catalog:prod",
         "hookable": "catalog:prod",
+        "html-minifier-next": "catalog:prod",
         "jiti": "catalog:script",
         "magic-string": "catalog:utils",
         "mlly": "catalog:prod",
-        "oxc-transform": "0.127.0",
-        "picomatch": "catalog:prod",
-        "rollup": "catalog:build",
-        "rollup-plugin-import-trace": "catalog:build",
-        "semver": "catalog:utils",
-        "tinyexec": "catalog:node",
-        "tinyglobby": "catalog:node"
+        "tinyexec": "catalog:node"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "catalog:lint",
-        "@anolilab/prettier-config": "catalog:lint",
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
-        "@arethetypeswrong/core": "catalog:prod",
         "@babel/core": "catalog:dev",
         "@babel/parser": "catalog:dev",
         "@babel/preset-react": "catalog:frontend",
         "@csstools/css-parser-algorithms": "catalog:style",
         "@csstools/css-tokenizer": "catalog:style",
         "@csstools/postcss-slow-plugins": "catalog:style",
-        "@eslint/css": "1.0.0",
-        "@oxc-transform/binding-linux-x64-gnu": "*",
+        "@eslint/css": "catalog:lint",
         "@rollup/plugin-alias": "catalog:build",
         "@rollup/plugin-commonjs": "catalog:build",
         "@rollup/plugin-dynamic-import-vars": "catalog:build",
@@ -249,17 +237,24 @@
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
         "@total-typescript/ts-reset": "catalog:tsc",
-        "@types/babel__core": "catalog:types",
         "@types/node": "catalog:types",
         "@types/picomatch": "catalog:types",
         "@types/react-dom": "catalog:types",
         "@types/semver": "catalog:types",
+        "@visulima/colorize": "catalog:visulima",
+        "@visulima/find-cache-dir": "catalog:visulima",
+        "@visulima/fs": "catalog:visulima",
+        "@visulima/humanizer": "catalog:visulima",
+        "@visulima/package": "catalog:visulima",
+        "@visulima/packem-plugins": "workspace:*",
+        "@visulima/packem-rollup": "workspace:*",
+        "@visulima/pail": "catalog:visulima",
+        "@visulima/path": "catalog:visulima",
         "@visulima/source-map": "catalog:visulima",
+        "@visulima/tabular": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "babel-plugin-transform-hook-names": "catalog:dev",
-        "cjs-module-lexer": "catalog:prod",
-        "clean-css": "catalog:style",
         "conventional-changelog-conventionalcommits": "catalog:dev",
         "cross-env": "catalog:node",
         "cssnano": "catalog:style",
@@ -268,8 +263,6 @@
         "esbuild": "catalog:build",
         "eslint": "catalog:lint",
         "execa": "catalog:node",
-        "glob-parent": "catalog:node",
-        "html-minifier-next": "catalog:prod",
         "icss-utils": "catalog:style",
         "less": "catalog:style",
         "lightningcss": "catalog:style",
@@ -279,7 +272,7 @@
         "oxc-parser": "catalog:dev",
         "oxc-resolver": "catalog:node",
         "oxc-transform": "catalog:dev",
-        "package-manager-detector": "catalog:dev",
+        "picomatch": "catalog:prod",
         "postcss": "catalog:style",
         "postcss-custom-properties": "catalog:style",
         "postcss-load-config": "catalog:style",
@@ -290,28 +283,27 @@
         "postcss-value-parser": "catalog:style",
         "postgraphile": "catalog:dev",
         "preact": "catalog:frontend",
-        "prettier": "catalog:lint",
-        "publint": "catalog:lint",
         "react": "catalog:frontend",
         "react-dom": "catalog:frontend",
         "rimraf": "catalog:node",
+        "rolldown": "catalog:build",
+        "rollup-plugin-dts": "catalog:build",
         "rollup-plugin-license": "catalog:build",
         "rollup-plugin-lit-css": "catalog:build",
         "rollup-plugin-polyfill-node": "catalog:build",
         "rollup-plugin-pure": "catalog:build",
-        "rollup-plugin-svelte": "catalog:build",
         "rollup-plugin-visualizer": "catalog:build",
         "rs-module-lexer": "catalog:dev",
-        "safe-stable-stringify": "catalog:dev",
         "sass": "catalog:style",
         "sass-embedded": "catalog:style",
         "secretlint": "catalog:lint",
         "semantic-release": "catalog:cli",
+        "semver": "catalog:utils",
         "sort-package-json": "catalog:dev",
         "stylus": "catalog:dev",
         "sucrase": "catalog:dev",
         "sugarss": "catalog:dev",
-        "tailwind-csstree": "0.1.4",
+        "tailwind-csstree": "catalog:lint",
         "tailwindcss": "catalog:style",
         "tempy": "catalog:dev",
         "tree-kill": "catalog:dev",
@@ -319,37 +311,39 @@
         "typedoc-plugin-markdown": "catalog:markdown",
         "typedoc-plugin-rename-defaults": "catalog:dev",
         "typescript": "catalog:tsc",
-        "unplugin-vue": "catalog:build",
         "vitest": "catalog:test"
     },
     "peerDependencies": {
         "@arethetypeswrong/core": ">=0.18.2",
-        "@swc/core": ">=1.11.29",
+        "@swc/core": ">=1.15.40",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
-        "cssnano": ">=7.0.6",
-        "esbuild": ">=0.20.2",
+        "@visulima/packem-rollup": ">=1.0.0-alpha.64",
+        "cssnano": ">=8.0.1",
+        "esbuild": ">=0.28.0",
         "icss-utils": ">=5.1.0",
-        "less": ">=4.2.0",
-        "lightningcss": ">=1.27.0",
+        "less": ">=4.6.4",
+        "lightningcss": ">=1.32.0",
         "package-manager-detector": "catalog:peer",
-        "postcss": ">=8.4.47",
+        "postcss": ">=8.5.15",
         "postcss-load-config": ">=6.0.1",
         "postcss-modules-extract-imports": ">=3.1.0",
-        "postcss-modules-local-by-default": ">=4.0.5",
-        "postcss-modules-scope": ">=3.2.0",
+        "postcss-modules-local-by-default": ">=4.2.0",
+        "postcss-modules-scope": ">=3.2.1",
         "postcss-modules-values": ">=4.0.0",
         "postcss-value-parser": ">=4.2.0",
-        "rollup-plugin-svelte": ">=7",
-        "sass": ">=1.43.4",
-        "sass-embedded": ">=1.79.4",
-        "stylus": ">=0.63.0",
-        "sucrase": ">=3.35.0",
-        "typedoc": ">=0.26.0",
-        "typedoc-plugin-markdown": ">=4.2.0",
-        "typedoc-plugin-rename-defaults": ">=0.7.0",
-        "typescript": ">=5.0.0 || >=6.0.0",
-        "unplugin-vue": ">=7"
+        "rolldown": ">=1.0.3",
+        "rollup": ">=4.60.4",
+        "rollup-plugin-svelte": ">=7.2.3",
+        "sass": ">=1.100.0",
+        "sass-embedded": ">=1.100.0",
+        "stylus": ">=0.64.0",
+        "sucrase": ">=3.35.1",
+        "typedoc": ">=0.28.19",
+        "typedoc-plugin-markdown": ">=4.11.0",
+        "typedoc-plugin-rename-defaults": ">=0.7.3",
+        "typescript": ">=6.0.3",
+        "unplugin-vue": ">=7.2.0"
     },
     "peerDependenciesMeta": {
         "@arethetypeswrong/core": {
@@ -404,6 +398,9 @@
             "optional": true
         },
         "postcss-value-parser": {
+            "optional": true
+        },
+        "rolldown": {
             "optional": true
         },
         "rollup-plugin-svelte": {

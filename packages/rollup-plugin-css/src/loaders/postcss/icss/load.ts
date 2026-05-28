@@ -1,7 +1,6 @@
 import { readFile } from "@visulima/fs";
 import { dirname } from "@visulima/path";
-import type { ProcessOptions } from "postcss";
-import type Processor from "postcss/lib/processor";
+import type { ProcessOptions, Processor } from "postcss";
 
 import { resolve } from "../../../utils/resolve";
 

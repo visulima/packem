@@ -42,10 +42,8 @@ export const cssStyleInject = (
     }
 
     if (typeof document === "undefined") {
-        if (globalThis) {
-            globalThis[SSR_INJECT_ID] = globalThis[SSR_INJECT_ID] || [];
-            globalThis[SSR_INJECT_ID].push({ css, id: options.id });
-        }
+        globalThis[SSR_INJECT_ID] = globalThis[SSR_INJECT_ID] ?? [];
+        globalThis[SSR_INJECT_ID].push({ css, id: options.id });
 
         return;
     }
@@ -111,7 +109,7 @@ export const cssStyleInject = (
             container.append(styleTag);
         }
 
-        return styleTag as HTMLStyleElement;
+        return styleTag;
     };
 
     /** @type {HTMLStyleElement} */
@@ -127,16 +125,13 @@ export const cssStyleInject = (
         }
 
         // Create a key based on insertAt for caching
-        const insertKey = typeof insertAt === "object" ? `before_${insertAt.before}` : insertAt;
+        const insertKey = typeof insertAt === "object" ? `before_${insertAt.before}` : String(insertAt);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (!(styleTags[id] as any)[insertKey]) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (styleTags[id] as any)[insertKey] = createStyleTag();
-        }
+        const tagsForId = styleTags[id] as Record<string, HTMLStyleElement>;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        styleTag = (styleTags[id] as any)[insertKey];
+        tagsForId[insertKey] ??= createStyleTag();
+
+        styleTag = tagsForId[insertKey];
     } else {
         styleTag = createStyleTag();
     }
@@ -145,8 +140,11 @@ export const cssStyleInject = (
         styleTag.setAttribute("nonce", options.nonce);
     }
 
-    if (styleTag.styleSheet && typeof styleTag.styleSheet.cssText === "string") {
-        styleTag.styleSheet.cssText += css;
+    // Legacy IE support: styleSheet is non-standard and not in lib.dom types
+    const legacyStyleSheet = (styleTag as HTMLStyleElement & { styleSheet?: { cssText: string } }).styleSheet;
+
+    if (legacyStyleSheet && typeof legacyStyleSheet.cssText === "string") {
+        legacyStyleSheet.cssText += css;
     } else {
         styleTag.append(document.createTextNode(css));
     }

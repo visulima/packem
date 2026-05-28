@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { svgToCssDataUri, svgToTinyDataUri } from "../../../src/utils/svg-data-uri";
 
+const DATA_URI_PREFIX_REGEX = /^data:image\/svg\+xml;charset=utf-8,/;
+
 describe(svgToTinyDataUri, () => {
     it("should convert simple SVG to tiny data URI", () => {
         expect.assertions(2);
@@ -9,7 +11,7 @@ describe(svgToTinyDataUri, () => {
         const svg = "<svg><path d='M0 0'/></svg>";
         const result = svgToTinyDataUri(svg);
 
-        expect(result).toMatch(/^data:image\/svg\+xml;charset=utf-8,/);
+        expect(result).toMatch(DATA_URI_PREFIX_REGEX);
         expect(result).toContain("M0 0");
     });
 
@@ -38,7 +40,7 @@ describe(svgToTinyDataUri, () => {
         const result = svgToTinyDataUri(svgWithWhitespace);
 
         // Decode the data URI to check the content
-        const decoded = decodeURIComponent(result.replace(/^data:image\/svg\+xml;charset=utf-8,/, ""));
+        const decoded = decodeURIComponent(result.replace(DATA_URI_PREFIX_REGEX, ""));
 
         expect(decoded).toContain("<svg> <path d='M0 0' /> </svg>");
     });
@@ -82,7 +84,7 @@ describe(svgToTinyDataUri, () => {
         const result = svgToTinyDataUri(complexSvg);
 
         // Should remove comments, collapse whitespace, and replace quotes
-        expect(result).toMatch(/^data:image\/svg\+xml;charset=utf-8,/);
+        expect(result).toMatch(DATA_URI_PREFIX_REGEX);
         expect(result).not.toContain("<!--");
         expect(result).not.toContain("-->");
         expect(result).toContain("viewBox='0 0 24 24'");
@@ -113,10 +115,10 @@ describe(svgToCssDataUri, () => {
         const svg = "<svg><path d='M0 0'/></svg>";
         const result = svgToCssDataUri(svg);
 
-        expect(result).toMatch(/^data:image\/svg\+xml;charset=utf-8,/);
+        expect(result).toMatch(DATA_URI_PREFIX_REGEX);
 
         // Decode the data URI to check the content
-        const decoded = decodeURIComponent(result.replace(/^data:image\/svg\+xml;charset=utf-8,/, ""));
+        const decoded = decodeURIComponent(result.replace(DATA_URI_PREFIX_REGEX, ""));
 
         expect(decoded).toContain("M0 0");
     });
@@ -137,7 +139,7 @@ describe(svgToCssDataUri, () => {
         const result = svgToCssDataUri(svgWithWhitespace);
 
         // Decode the data URI to check the content
-        const decoded = decodeURIComponent(result.replace(/^data:image\/svg\+xml;charset=utf-8,/, ""));
+        const decoded = decodeURIComponent(result.replace(DATA_URI_PREFIX_REGEX, ""));
 
         expect(decoded).toContain("<svg> <path d='M0 0' /> </svg>");
     });
@@ -149,7 +151,7 @@ describe(svgToCssDataUri, () => {
         const result = svgToCssDataUri(svgWithQuotes);
 
         // Decode the data URI to check the content
-        const decoded = decodeURIComponent(result.replace(/^data:image\/svg\+xml;charset=utf-8,/, ""));
+        const decoded = decodeURIComponent(result.replace(DATA_URI_PREFIX_REGEX, ""));
 
         expect(decoded).toContain("viewBox=\"0 0 100 100\"");
         expect(decoded).toContain("d=\"M0 0\"");
@@ -174,12 +176,12 @@ describe(svgToCssDataUri, () => {
         const result = svgToCssDataUri(complexSvg);
 
         // Should remove comments and collapse whitespace, but preserve quotes
-        expect(result).toMatch(/^data:image\/svg\+xml;charset=utf-8,/);
+        expect(result).toMatch(DATA_URI_PREFIX_REGEX);
         expect(result).not.toContain("<!--");
         expect(result).not.toContain("-->");
 
         // Decode the data URI to check the content
-        const decoded = decodeURIComponent(result.replace(/^data:image\/svg\+xml;charset=utf-8,/, ""));
+        const decoded = decodeURIComponent(result.replace(DATA_URI_PREFIX_REGEX, ""));
 
         expect(decoded).toContain("viewBox=\"0 0 24 24\"");
         expect(decoded).toContain("d=\"M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z\"");

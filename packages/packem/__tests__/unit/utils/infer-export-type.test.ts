@@ -32,6 +32,6 @@ describe(inferExportType, () => {
     it("should use package.json type if no conditions are met", () => {
         expect.assertions(1);
 
-        expect(inferExportType("unknown", [], "cjs", undefined)).toBe("cjs");
+        expect(inferExportType("unknown", [], "cjs")).toBe("cjs");
     });
 });

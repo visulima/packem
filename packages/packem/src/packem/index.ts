@@ -7,21 +7,22 @@ import { ensureDirSync } from "@visulima/fs";
 import { duration } from "@visulima/humanizer";
 import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
+import { patchErrorWithTrace } from "@visulima/packem-rollup";
 import { enhanceRollupError, FileCache } from "@visulima/packem-share";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "@visulima/packem-share/constants";
-import type { BuildContext } from "@visulima/packem-share/types";
+import type { BuildContext, BuildHooks } from "@visulima/packem-share/types";
 import { getHash } from "@visulima/packem-share/utils";
-import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import browserslist from "browserslist";
 import { createHooks } from "hookable";
 import { createJiti } from "jiti";
-import { VERSION } from "rollup";
-import { patchErrorWithTrace } from "rollup-plugin-import-trace";
+import type { RollupError } from "rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
+import { resolveBundlerName } from "../bundler/build";
+import { ensureBundlerInstalled, ensureTransformerInstalled } from "../bundler/ensure-installed";
 import autoPreset from "../config/preset/auto";
 import loadPackageJson from "../config/utils/load-package-json";
 import loadTsconfig from "../config/utils/load-tsconfig";
@@ -43,6 +44,19 @@ import validateAliasEntries from "../validator/validate-alias-entries";
 import validateBundleSize from "../validator/validate-bundle-size";
 import build from "./build";
 import { node10Compatibility } from "./node10-compatibility";
+
+/**
+ * The `@visulima/pail` logger surface, sourced from `BuildContext`.
+ * @internal
+ */
+type Logger = BuildContext<InternalBuildOptions>["logger"];
+
+/**
+ * Matches raw-loadable asset extensions (markdown, text, html, generic data).
+ * Hoisted to module scope so it is compiled once instead of on every call.
+ * @internal
+ */
+const RAW_ASSET_EXTENSION_REGEX = /\.(md|txt|htm|html|data)$/;
 
 /**
  * Resolves TSConfig JSX option to a standardized JSX runtime value.
@@ -83,7 +97,7 @@ const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX):
  * @internal
  */
 const generateOptions = (
-    logger: Pail,
+    logger: Logger,
     rootDirectory: string,
     environment: Environment,
     debug: boolean,
@@ -146,6 +160,9 @@ const generateOptions = (
             debarrel: {},
             dts: {
                 compilerOptions: {
+                    // `baseUrl` is deprecated in TS tooling but still a valid emit input we
+                    // must forward from the user's tsconfig for path-base resolution.
+                    // eslint-disable-next-line sonarjs/deprecation -- intentional pass-through of a still-functional tsconfig field
                     baseUrl: tsconfig?.config.compilerOptions?.baseUrl ?? ".",
                     // Avoid extra work
                     checkJs: false,
@@ -175,9 +192,6 @@ const generateOptions = (
             },
             esbuild: {
                 charset: "utf8",
-                supported: {
-                    "import-attributes": true,
-                },
                 jsx: jsxRuntime,
                 jsxDev: tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
                 jsxFactory: tsconfig?.config.compilerOptions?.jsxFactory,
@@ -198,6 +212,10 @@ const generateOptions = (
                  * https://esbuild.github.io/api/#sources-content
                  */
                 sourcesContent: false,
+
+                supported: {
+                    "import-attributes": true,
+                },
                 target: tsconfig?.config.compilerOptions?.target,
                 treeShaking: true,
                 // Optionally preserve symbol names during minification
@@ -278,7 +296,7 @@ const generateOptions = (
             nativeModules: {},
             node10Compatibility: false,
             output: {
-                importAttributesKey: Number(splitRuntimeVersion[0] as string) >= 22 ? "with" : "assert",
+                importAttributesKey: Number(splitRuntimeVersion[0]) >= 22 ? "with" : "assert",
             },
             oxc: {
                 jsx:
@@ -303,7 +321,7 @@ const generateOptions = (
             pure: {},
             raw: {
                 exclude: EXCLUDE_REGEXP,
-                include: [/\.(md|txt|htm|html|data)$/],
+                include: [RAW_ASSET_EXTENSION_REGEX],
             },
             replace: {
                 /**
@@ -343,7 +361,7 @@ const generateOptions = (
             sucrase: {
                 disableESTransforms: true,
                 enableLegacyBabel5ModuleInterop: false,
-                enableLegacyTypeScriptModuleInterop: tsconfig?.config.compilerOptions?.esModuleInterop === false,
+                enableLegacyTypeScriptModuleInterop: !tsconfig?.config.compilerOptions?.esModuleInterop,
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
@@ -515,7 +533,7 @@ const generateOptions = (
 
     const dependencies = new Map([...Object.entries(packageJson.dependencies ?? {}), ...Object.entries(packageJson.devDependencies ?? {})]);
 
-    if (options.transformer?.NAME === undefined) {
+    if (options.transformer.NAME === undefined) {
         throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
     }
 
@@ -536,7 +554,10 @@ const generateOptions = (
         prefix: "system",
     });
     logger.info({
-        message: `Using ${cyan("rollup ")}${VERSION} with ${cyan(options.runtime as string)} build runtime`,
+        message:
+            options.bundler === "rolldown"
+                ? `Using ${cyan("rolldown")} with ${cyan(options.runtime as string)} build runtime`
+                : `Using ${cyan("rollup")} with ${cyan(options.runtime as string)} build runtime`,
         prefix: "bundler",
     });
     logger.info({
@@ -570,7 +591,11 @@ const generateOptions = (
 
     validateAliasEntries(options.alias);
 
-    if (options.rollup.alias && options.rollup.alias.entries) {
+    // `options.rollup.alias` is `RollupAliasOptions | false`; optional chaining
+    // only short-circuits on null/undefined, so `alias === false` would fall
+    // through to a `false.entries` access (an error type). Narrow off `false`
+    // explicitly before reading `.entries`.
+    if (options.rollup.alias !== false && options.rollup.alias?.entries) {
         validateAliasEntries(options.rollup.alias.entries);
     }
 
@@ -598,7 +623,7 @@ const generateOptions = (
         }
     }
 
-    if (tsconfig?.config.compilerOptions?.declarationMap === true) {
+    if (tsconfig?.config.compilerOptions?.declarationMap) {
         options.sourcemap = true;
 
         logger.info("Enabling sourcemap because declarationMap is enabled in tsconfig.json");
@@ -622,7 +647,7 @@ const generateOptions = (
  * @internal
  */
 const createContext = async (
-    logger: Pail,
+    logger: Logger,
     rootDirectory: string,
     mode: Mode,
     environment: Environment,
@@ -646,8 +671,10 @@ const createContext = async (
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
         hoistedDependencies: new Set(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        hooks: createHooks<InternalBuildOptions>() as any,
+        // `createHooks` is generic over the hook map; typing it against the
+        // shared `BuildHooks` contract makes it structurally match
+        // `BuildContext.hooks` without an `any` escape.
+        hooks: createHooks<BuildHooks<InternalBuildOptions>>(),
         implicitDependencies: new Set(),
         // Create shared jiti instance for context
         jiti: createJiti(options.rootDir, options.jiti),
@@ -661,68 +688,22 @@ const createContext = async (
     };
 
     if (mergedHooks) {
-        // #region agent log
-        const hooksBefore = (context.hooks as any)._hooks?.get?.("rollup:options");
-        const hooksCountBefore = hooksBefore ? hooksBefore.size : 0;
-
-        fetch("http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e", {
-            body: JSON.stringify({
-                data: { hasRollupOptionsHook: !!mergedHooks?.["rollup:options"], hooksCountBefore, hooksKeys: Object.keys(mergedHooks || {}) },
-                hypothesisId: "B",
-                location: "index.ts:677",
-                message: "Before addHooks",
-                runId: "run1",
-                sessionId: "debug-session",
-                timestamp: Date.now(),
-            }),
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-        }).catch(() => {});
-        // #endregion
         context.hooks.addHooks(mergedHooks);
-        // #region agent log
-        const hooksAfter = (context.hooks as any)._hooks?.get?.("rollup:options");
-        const hooksCountAfter = hooksAfter ? hooksAfter.size : 0;
-
-        fetch("http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e", {
-            body: JSON.stringify({
-                data: { hooksAdded: hooksCountAfter - hooksCountBefore, hooksCountAfter, hooksCountBefore },
-                hypothesisId: "B",
-                location: "index.ts:683",
-                message: "After addHooks",
-                runId: "run1",
-                sessionId: "debug-session",
-                timestamp: Date.now(),
-            }),
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-        }).catch(() => {});
-        // #endregion
     }
 
     // Allow to prepare and extending context
     await context.hooks.callHook("build:prepare", context);
 
     if (context.options.emitESM === undefined) {
-        context.logger.info("Emitting of ESM bundles, is disabled.");
+        logger.info("Emitting of ESM bundles, is disabled.");
     }
 
     if (context.options.emitCJS === undefined) {
-        context.logger.info("Emitting of CJS bundles, is disabled.");
+        logger.info("Emitting of CJS bundles, is disabled.");
     }
 
     if (context.options.minify) {
-        context.logger.info("Minification is enabled, the output will be minified");
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((context.options as any).json && context.options.minify && (context.options as any).json.preferConst === undefined) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (context.options as any).json = {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(context.options as any).json,
-            preferConst: false,
-        };
+        logger.info("Minification is enabled, the output will be minified");
     }
 
     warnLegacyCJS(context);
@@ -736,19 +717,19 @@ const createContext = async (
     if (!hasTypescript) {
         context.options.declaration = false;
 
-        context.logger.info({
+        logger.info({
             message: "Typescript is not installed. Generation of declaration files are disabled.",
             prefix: "dts",
         });
     } else if (context.options.declaration === false) {
-        context.logger.info({
+        logger.info({
             message: "Generation of declaration files are disabled.",
             prefix: "dts",
         });
     }
 
     if (context.options.declaration) {
-        context.logger.info(`Using typescript version: ${cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown")}`);
+        logger.info(`Using typescript version: ${cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown")}`);
     }
 
     if (
@@ -756,12 +737,12 @@ const createContext = async (
         && (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript)
         && !context.tsconfig?.config.compilerOptions?.isolatedModules
     ) {
-        context.logger.warn(
+        logger.warn(
             `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
         );
     }
 
-    await prepareEntries(context);
+    prepareEntries(context);
 
     return context;
 };
@@ -784,7 +765,10 @@ const getMode = (mode: Mode): string => {
             return "Watching";
         }
         default: {
-            throw new Error(`Unknown mode: ${mode}`);
+            // `mode` narrows to `never` here, but untyped JS callers can still
+            // pass an out-of-contract value at runtime — keep the guard and
+            // stringify explicitly.
+            throw new Error(`Unknown mode: ${String(mode)}`);
         }
     }
 };
@@ -813,7 +797,7 @@ const packem = async (
     rootDirectory: string,
     mode: Mode,
     environment: Environment,
-    logger: Pail,
+    logger: Logger,
     debug: boolean,
     config: BuildConfig,
     tsconfigPath?: string,
@@ -843,6 +827,7 @@ const packem = async (
     let onSuccessProcess: ExecChild | undefined;
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type,@typescript-eslint/no-explicit-any
     let onSuccessCleanup: (() => any) | undefined | void;
+    let signalHandler: (() => void) | undefined;
 
     const cacheKey
         = getHash(
@@ -864,7 +849,7 @@ const packem = async (
         ) + getHash(JSON.stringify(config));
 
     if (cachePath) {
-        createOrUpdateKeyStorage(cacheKey, cachePath as string, logger);
+        createOrUpdateKeyStorage(cacheKey, cachePath, logger);
     }
 
     const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
@@ -872,41 +857,64 @@ const packem = async (
     try {
         const context = await createContext(logger, rootDirectory, mode, environment, debug, config, packageJson, tsconfig, nodeVersion);
 
-        fileCache.isEnabled = context.options.fileCache as boolean;
+        fileCache.isEnabled = context.options.fileCache ?? true;
 
-        context.logger.info(cyan(`${getMode(mode)} ${context.options.name}`));
+        // Ensure the bundler runtime and transformer engine are installed before
+        // any build/watch work runs. These prompt-install in interactive
+        // terminals and fail loudly in CI with a package-manager-aware hint.
+        const requestedBundler = resolveBundlerName(context.options.bundler);
 
-        context.logger.debug({
+        await ensureBundlerInstalled(requestedBundler, rootDirectory, logger);
+
+        // Rolldown still depends on rollup for DTS until the dts plugin is
+        // rolldown-compatible. Pull rollup in so the DTS path doesn't crash.
+        if (requestedBundler === "rolldown" && context.options.declaration) {
+            await ensureBundlerInstalled("rollup", rootDirectory, logger);
+        }
+
+        if (context.options.transformerName) {
+            await ensureTransformerInstalled(context.options.transformerName, rootDirectory, logger);
+        }
+
+        logger.info(cyan(`${getMode(mode)} ${context.options.name}`));
+
+        logger.debug({
             context: context.options.entries,
             message: `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}`,
         });
 
         const runBuilder = async (watchMode?: true) => {
-            for await (const [name, builder] of Object.entries(context.options.builder ?? {})) {
-                context.logger.raw("\n");
+            for (const [name, builder] of Object.entries(context.options.builder ?? {})) {
+                logger.raw("\n");
 
+                // Builders run strictly one after another: each mutates the shared
+                // `context`/`fileCache` and reports its own duration, so parallelising
+                // would corrupt state and timing. The sequential awaits are intentional.
+                // eslint-disable-next-line no-await-in-loop -- builders must run sequentially (shared mutable context/cache)
                 await context.hooks.callHook("builder:before", name, context);
 
                 const builderStart = Date.now();
 
                 const getBuilderDuration = () => duration(Math.floor(Date.now() - builderStart));
 
+                // eslint-disable-next-line no-await-in-loop -- builders must run sequentially (shared mutable context/cache)
                 await builder(context, cachePath, fileCache, logged);
 
+                // eslint-disable-next-line no-await-in-loop -- builders must run sequentially (shared mutable context/cache)
                 await context.hooks.callHook("builder:done", name, context);
 
-                context.logger.raw(`\n⚡️ ${name} run in ${getBuilderDuration()}`);
+                logger.raw(`\n⚡️ ${name} run in ${getBuilderDuration()}`);
 
                 if (watchMode) {
-                    context.logger.raw("\n\n");
+                    logger.raw("\n\n");
                 }
             }
         };
 
         const doOnSuccessCleanup = async () => {
-            if (onSuccessProcess !== undefined) {
+            if (onSuccessProcess?.pid !== undefined) {
                 await killProcess({
-                    pid: onSuccessProcess.pid as number,
+                    pid: onSuccessProcess.pid,
                     signal: config.killSignal ?? "SIGTERM",
                 });
             } else if (onSuccessCleanup !== undefined) {
@@ -914,9 +922,8 @@ const packem = async (
                     if (typeof onSuccessCleanup === "function") {
                         await (onSuccessCleanup as () => Promise<void>)();
                     }
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                } catch (error: any) {
-                    throw new Error(`onSuccess function cleanup failed: ${error.message}`, { cause: error });
+                } catch (error: unknown) {
+                    throw new Error(`onSuccess function cleanup failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error });
                 }
             }
 
@@ -929,9 +936,8 @@ const packem = async (
             if (typeof context.options.onSuccess === "function") {
                 try {
                     onSuccessCleanup = await context.options.onSuccess();
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                } catch (error: any) {
-                    throw new Error(`onSuccess function failed: ${error.message}`, { cause: error });
+                } catch (error: unknown) {
+                    throw new Error(`onSuccess function failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error });
                 }
             } else if (typeof context.options.onSuccess === "string") {
                 const timeout = context.options.onSuccessTimeout ?? 30_000; // 30 seconds default
@@ -951,7 +957,7 @@ const packem = async (
                 const { exitCode } = executedProcess;
 
                 if (typeof exitCode === "number" && exitCode !== 0) {
-                    throw new Error(`onSuccess script failed with exit code ${exitCode}. Check the output above for details.`);
+                    throw new Error(`onSuccess script failed with exit code ${String(exitCode)}. Check the output above for details.`);
                 }
             }
         };
@@ -962,6 +968,16 @@ const packem = async (
         if (mode === "watch") {
             if (context.options.rollup.watch === false) {
                 throw new Error("Rollup watch is disabled. You should check your packem config.");
+            }
+
+            // Watch is rollup-only today. Surface the fallback so users on
+            // `bundler: "rolldown"` know what's actually running until a
+            // rolldown watch path lands.
+            if (context.options.bundler === "rolldown") {
+                logger.warn({
+                    message: "Watch mode falls back to rollup; rolldown watch isn't supported yet.",
+                    prefix: "bundler",
+                });
             }
 
             await rollupWatch(context, fileCache, runBuilder, runOnsuccess, doOnSuccessCleanup);
@@ -983,25 +999,18 @@ const packem = async (
 
             if (context.options.emitCJS && context.options.declaration === "compatible") {
                 if (logged) {
-                    context.logger.raw("\n");
+                    logger.raw("\n");
                 }
 
                 let outputMode: "console" | "file" = "console";
                 let typeScriptVersion: string = "*";
 
                 if (context.options.node10Compatibility) {
-                    outputMode = context.options.node10Compatibility?.writeToPackageJson ? "file" : "console";
-                    typeScriptVersion = context.options.node10Compatibility?.typeScriptVersion ?? "*";
+                    outputMode = context.options.node10Compatibility.writeToPackageJson ? "file" : "console";
+                    typeScriptVersion = context.options.node10Compatibility.typeScriptVersion ?? "*";
                 }
 
-                await node10Compatibility(
-                    context.logger,
-                    context.options.entries,
-                    context.options.outDir,
-                    context.options.rootDir,
-                    outputMode,
-                    typeScriptVersion,
-                );
+                await node10Compatibility(logger, context.options.entries, context.options.outDir, context.options.rootDir, outputMode, typeScriptVersion);
             }
 
             await context.hooks.callHook("validate:before", context);
@@ -1028,28 +1037,42 @@ const packem = async (
             logBuildErrors(context, logged);
         }
 
-        context.logger.raw(`\n⚡️ Build run in ${getDuration()}\n`);
+        logger.raw(`\n⚡️ Build run in ${getDuration()}\n`);
+
+        // Register signal handlers as named refs so we can deregister in
+        // finally. Without this, programmatic callers that invoke packem()
+        // multiple times leak listeners and trip Node's MaxListenersExceeded.
+        signalHandler = () => {
+            // Node's signal-listener signature is synchronous `() => void`, so
+            // run the async cleanup as a self-contained task and surface any
+            // rejection instead of returning a floating promise to the emitter.
+            doOnSuccessCleanup().catch((error: unknown) => {
+                logger.raw(`\nonSuccess cleanup failed: ${error instanceof Error ? error.message : String(error)}\n`);
+            });
+        };
+
+        process.once("SIGINT", signalHandler);
+        process.once("SIGTERM", signalHandler);
 
         await runBuilder();
 
         await runOnsuccess();
-
-        process.on("SIGINT", async () => {
-            await doOnSuccessCleanup();
-        });
-
-        process.on("SIGTERM", async () => {
-            await doOnSuccessCleanup();
-        });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+    } catch (error: unknown) {
         logger.raw("\n");
 
         patchErrorWithTrace(error);
-        enhanceRollupError(error);
+        // `enhanceRollupError` mutates a rollup-shaped error in place and guards
+        // internally for non-rollup shapes; the caught value is always an
+        // Error-like object thrown from the build pipeline here.
+        enhanceRollupError(error as RollupError);
 
         throw error;
     } finally {
+        if (signalHandler) {
+            process.off("SIGINT", signalHandler);
+            process.off("SIGTERM", signalHandler);
+        }
+
         // Restore all wrapped console methods
         logger.restoreAll();
 

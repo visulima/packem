@@ -1,6 +1,6 @@
 {
     "name": "@visulima/packem-share",
-    "version": "1.0.0-alpha.46",
+    "version": "1.0.0-alpha.45",
     "description": "Shared types and helpers for packem.",
     "keywords": [
         "visulima",
@@ -61,7 +61,7 @@
         "build:prod": "../../node_modules/.bin/packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
-        "lint:attw": "attw --pack",
+        "lint:attw": "attw --pack --profile esm-only",
         "lint:eslint": "eslint . --cache --concurrency auto",
         "lint:eslint:fix": "eslint . --cache --concurrency auto --fix,",
         "lint:package-json": "publint --strict",
@@ -91,6 +91,7 @@
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",
+        "@visulima/packem": "catalog:visulima",
         "@visulima/pail": "catalog:visulima",
         "@visulima/tsconfig": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",
@@ -106,7 +107,6 @@
         "rollup": "catalog:build",
         "secretlint": "catalog:lint",
         "semantic-release": "catalog:cli",
-        "tempy": "catalog:dev",
         "typescript": "catalog:tsc",
         "vitest": "catalog:test"
     },

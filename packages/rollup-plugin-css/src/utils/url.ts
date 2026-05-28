@@ -1,12 +1,14 @@
 import { isAbsolute, normalize, parse } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 
+const MODULE_SPECIFIER_REGEXP = /^~[\d@A-Z]/i;
+
 /**
- * Checks if the URL starts with a tilde followed by a digit, '@', or a letter (case-insensitive)
- * @param url
- * @returns
+ * Checks if the URL starts with a tilde followed by a digit, '@', or a letter (case-insensitive).
+ * @param url URL string to inspect.
+ * @returns `true` when the URL starts with a module-specifier-style tilde prefix.
  */
-export const hasModuleSpecifier = (url: string): boolean => /^~[\d@A-Z]/i.test(url);
+export const hasModuleSpecifier = (url: string): boolean => MODULE_SPECIFIER_REGEXP.test(url);
 
 // handle importing Sass partials in node_modules
 // @import ~foo/bar/partial where "partial" has the filename "_partial.scss".

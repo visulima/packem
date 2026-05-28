@@ -34,13 +34,13 @@ interface Concatenated {
  * // Result: Combined CSS with properly merged source maps
  * ```
  */
-const concat = async (extracted: Extracted[]): Promise<Concatenated> => {
+const concat = (extracted: Extracted[]): Promise<Concatenated> => {
     const sm = new SourceMapGenerator({ file: "" });
     const content = [];
 
     let offset = 0;
 
-    for await (const { css, map } of extracted) {
+    for (const { css, map } of extracted) {
         content.push(css);
 
         const mapModifier = mm(map);
@@ -72,10 +72,10 @@ const concat = async (extracted: Extracted[]): Promise<Concatenated> => {
         offset += css.split("\n").length;
     }
 
-    return {
+    return Promise.resolve({
         css: content.join("\n"),
         map: sm,
-    };
+    });
 };
 
 export default concat;

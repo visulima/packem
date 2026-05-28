@@ -9,5 +9,6 @@
     },
     "dependencies": {
         "react": "*"
-    }
+    },
+    "devDependencies": {}
 }

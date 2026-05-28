@@ -3,7 +3,7 @@
  * @param x The input to arrayify
  * @returns An array containing the input
  */
-const arrayify = <T>(x: T | T[]): T[] => {
+const arrayify = <T>(x: T | T[] | null | undefined): T[] => {
     if (x === undefined || x === null) {
         return [] as T[];
     }

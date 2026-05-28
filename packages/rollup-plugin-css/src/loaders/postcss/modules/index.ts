@@ -1,5 +1,4 @@
-import type { Plugin } from "postcss";
-import type Processor from "postcss/lib/processor";
+import type { Plugin, Processor } from "postcss";
 import extractImports from "postcss-modules-extract-imports";
 import localByDefault from "postcss-modules-local-by-default";
 import modulesScope from "postcss-modules-scope";

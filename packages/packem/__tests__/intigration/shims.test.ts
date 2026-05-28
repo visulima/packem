@@ -2,10 +2,14 @@ import { readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
+// eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
+
+const GET_FILENAME_SHARED_IMPORT_REGEX = /(?:import|export) \{ getFilename \} from '\.\/packem_shared\/getFilename-[^']+\.js'/;
 
 describe("packem shims", () => {
     let temporaryDirectoryPath: string;
@@ -94,125 +98,35 @@ export const a = 1`,
 
         const mjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.mjs`);
 
-        expect(mjsDirnameContent).toMatchInlineSnapshot(`
-          "import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
-          import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
-          const __filename = __cjs_url__.fileURLToPath(import.meta.url);
-          const __dirname = __cjs_path__.dirname(__filename);
-          function getDirname() {
-            return __dirname;
-          }
-
-          export { getDirname };
-          "
-        `);
+        expect(normalizeBundleOutput(mjsDirnameContent)).toMatchSnapshot("dirname.mjs output");
 
         const cjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.cjs`);
 
-        expect(cjsDirnameContent).toMatchInlineSnapshot(`
-          "'use strict';
-
-          Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-          function getDirname() {
-            return __dirname;
-          }
-
-          exports.getDirname = getDirname;
-          "
-        `);
+        expect(normalizeBundleOutput(cjsDirnameContent)).toMatchSnapshot("dirname.cjs output");
 
         const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.mjs`);
 
-        expect(mjsFilenameContent).toMatchInlineSnapshot(`
-          "import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
-          const __filename = __cjs_url__.fileURLToPath(import.meta.url);
-          function getFilename() {
-            return __filename;
-          }
-
-          export { getFilename };
-          "
-        `);
+        expect(normalizeBundleOutput(mjsFilenameContent)).toMatchSnapshot("filename.mjs output");
 
         const cjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.cjs`);
 
-        expect(cjsFilenameContent).toMatchInlineSnapshot(`
-          "'use strict';
-
-          Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-          function getFilename() {
-            return __filename;
-          }
-
-          exports.getFilename = getFilename;
-          "
-        `);
+        expect(normalizeBundleOutput(cjsFilenameContent)).toMatchSnapshot("filename.cjs output");
 
         const mjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.mjs`);
 
-        expect(mjsRequireContent).toMatchInlineSnapshot(`
-          "import require$$0 from 'node:fs';
-
-          function getRequireModule() {
-            return require$$0;
-          }
-          function esmImport() {
-            return import.meta.url;
-          }
-
-          export { esmImport, getRequireModule };
-          "
-        `);
+        expect(normalizeBundleOutput(mjsRequireContent)).toMatchSnapshot("require.mjs output");
 
         const cjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.cjs`);
 
-        expect(cjsRequireContent).toMatchInlineSnapshot(`
-          "'use strict';
-
-          Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-          const require$$0 = require('node:fs');
-
-          var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
-          const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
-
-          const require$$0__default = /*#__PURE__*/_interopDefaultCompat(require$$0);
-
-          function getRequireModule() {
-            return require$$0__default;
-          }
-          function esmImport() {
-            return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href));
-          }
-
-          exports.esmImport = esmImport;
-          exports.getRequireModule = getRequireModule;
-          "
-        `);
+        expect(normalizeBundleOutput(cjsRequireContent)).toMatchSnapshot("require.cjs output");
 
         const mjsCustomRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/custom-require.mjs`);
 
-        expect(mjsCustomRequireContent).toMatchInlineSnapshot(`
-          "const a = 1;
-
-          export { a };
-          "
-        `);
+        expect(normalizeBundleOutput(mjsCustomRequireContent)).toMatchSnapshot("custom-require.mjs output");
 
         const cjsCustomRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/custom-require.cjs`);
 
-        expect(cjsCustomRequireContent).toMatchInlineSnapshot(`
-          "'use strict';
-
-          Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-          const a = 1;
-
-          exports.a = a;
-          "
-        `);
+        expect(normalizeBundleOutput(cjsCustomRequireContent)).toMatchSnapshot("custom-require.cjs output");
     });
 
     it("should include esm shim for node >20.11, if dirname, filename or require are found", async () => {
@@ -269,99 +183,27 @@ export function esmImport() {
 
         const mjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.mjs`);
 
-        expect(mjsDirnameContent).toMatchInlineSnapshot(`
-          "const __dirname = import.meta.dirname; // -- packem CommonJS __dirname shim --
-          function getDirname() {
-            return __dirname;
-          }
-
-          export { getDirname };
-          "
-        `);
+        expect(normalizeBundleOutput(mjsDirnameContent)).toMatchSnapshot("dirname.mjs output");
 
         const cjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.cjs`);
 
-        expect(cjsDirnameContent).toMatchInlineSnapshot(`
-          "'use strict';
-
-          Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-          function getDirname() {
-            return __dirname;
-          }
-
-          exports.getDirname = getDirname;
-          "
-        `);
+        expect(normalizeBundleOutput(cjsDirnameContent)).toMatchSnapshot("dirname.cjs output");
 
         const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.mjs`);
 
-        expect(mjsFilenameContent).toMatchInlineSnapshot(`
-          "const __filename = import.meta.filename; // -- packem CommonJS __filename shim --
-          function getFilename() {
-            return __filename;
-          }
-
-          export { getFilename };
-          "
-        `);
+        expect(normalizeBundleOutput(mjsFilenameContent)).toMatchSnapshot("filename.mjs output");
 
         const cjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.cjs`);
 
-        expect(cjsFilenameContent).toMatchInlineSnapshot(`
-          "'use strict';
-
-          Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-          function getFilename() {
-            return __filename;
-          }
-
-          exports.getFilename = getFilename;
-          "
-        `);
+        expect(normalizeBundleOutput(cjsFilenameContent)).toMatchSnapshot("filename.cjs output");
 
         const mjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.mjs`);
 
-        expect(mjsRequireContent).toMatchInlineSnapshot(`
-          "import require$$0 from 'node:fs';
-
-          function getRequireModule() {
-            return require$$0;
-          }
-          function esmImport() {
-            return import.meta.url;
-          }
-
-          export { esmImport, getRequireModule };
-          "
-        `);
+        expect(normalizeBundleOutput(mjsRequireContent)).toMatchSnapshot("require.mjs output");
 
         const cjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.cjs`);
 
-        expect(cjsRequireContent).toMatchInlineSnapshot(`
-          "'use strict';
-
-          Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-          const require$$0 = require('node:fs');
-
-          var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
-          const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
-
-          const require$$0__default = /*#__PURE__*/_interopDefaultCompat(require$$0);
-
-          function getRequireModule() {
-            return require$$0__default;
-          }
-          function esmImport() {
-            return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href));
-          }
-
-          exports.esmImport = esmImport;
-          exports.getRequireModule = getRequireModule;
-          "
-        `);
+        expect(normalizeBundleOutput(cjsRequireContent)).toMatchSnapshot("require.cjs output");
     });
 
     it("should not include esm shim, if dirname, filename or require are not found", async () => {
@@ -382,16 +224,11 @@ export function esmImport() {
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mjsContent).toMatchInlineSnapshot(`
-          "const test = "this should be in final bundle";
-
-          export { test as default };
-          "
-        `);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
     });
 
     it("should include esm shim only once per file, if dirname, filename or require are found", async () => {
-        expect.assertions(4);
+        expect.assertions(14);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/filename.js`,
@@ -421,33 +258,29 @@ export { getFilename } from "./filename.js";`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mjsContent).toMatchInlineSnapshot(`
-          "import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
-          import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
-          const __filename = __cjs_url__.fileURLToPath(import.meta.url);
-          const __dirname = __cjs_path__.dirname(__filename);
-          export { getFilename } from './packem_shared/getFilename-CsjQ9lO1.js';
+        // Hash-independent structural check: chunk import + cjs shims + exports.
+        const normalizedMjs = normalizeBundleOutput(mjsContent);
 
-          function getDirname() {
-            return __dirname;
-          }
+        expect(normalizedMjs).toMatch(GET_FILENAME_SHARED_IMPORT_REGEX);
+        expect(normalizedMjs).toContain("import __cjs_url__ from 'node:url'");
+        expect(normalizedMjs).toContain("import __cjs_path__ from 'node:path'");
+        expect(normalizedMjs).toContain("const __filename = __cjs_url__.fileURLToPath(import.meta.url);");
+        expect(normalizedMjs).toContain("const __dirname = __cjs_path__.dirname(__filename);");
+        expect(normalizedMjs).toContain("getDirname");
+        expect(normalizedMjs).toContain("getFilename");
 
-          export { getDirname };
-          "
-        `);
+        const sharedDirectory = `${temporaryDirectoryPath}/dist/packem_shared`;
+        const chunkFile = readdirSync(sharedDirectory).find((f) => f.startsWith("getFilename-"));
 
-        const mjsSharedContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/getFilename-CsjQ9lO1.js`);
+        expect(chunkFile).toBeDefined();
 
-        expect(mjsSharedContent).toMatchInlineSnapshot(`
-          "import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
-          const __filename = __cjs_url__.fileURLToPath(import.meta.url);
-          function getFilename() {
-            return __filename;
-          }
+        const mjsSharedContent = readFileSync(`${sharedDirectory}/${String(chunkFile)}`);
+        const normalizedShared = normalizeBundleOutput(mjsSharedContent);
 
-          export { getFilename };
-          "
-        `);
+        expect(normalizedShared).toContain("import __cjs_url__ from 'node:url'");
+        expect(normalizedShared).toContain("const __filename = __cjs_url__.fileURLToPath(import.meta.url);");
+        expect(normalizedShared).toContain("function getFilename()");
+        expect(normalizedShared).toContain("export { getFilename }");
     });
 
     it("should include esm shim only once per file on the same dir level, if dirname, filename or require are found", async () => {
@@ -479,14 +312,14 @@ export { getFilename } from "./level2/filename.js";`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+        const mjsContent = normalizeBundleOutput(readFileSync(`${temporaryDirectoryPath}/dist/index.js`));
 
         // Verify entry shims are present and the chunk is re-exported (hash-independent check)
-        expect(mjsContent).toContain('import __cjs_url__ from "node:url"');
-        expect(mjsContent).toContain('import __cjs_path__ from "node:path"');
+        expect(mjsContent).toContain("import __cjs_url__ from 'node:url'");
+        expect(mjsContent).toContain("import __cjs_path__ from 'node:path'");
         expect(mjsContent).toContain("const __dirname = __cjs_path__.dirname(__filename);");
-        expect(mjsContent).toContain("export { getFilename }");
-        expect(mjsContent).toContain("export { getDirname }");
+        expect(mjsContent).toContain("getFilename");
+        expect(mjsContent).toContain("getDirname");
 
         // Verify each shim import appears exactly once in the entry file
         const entryUrlShimCount = mjsContent.match(/import __cjs_url__/g);
@@ -496,15 +329,15 @@ export { getFilename } from "./level2/filename.js";`,
         expect(entryPathShimCount).toHaveLength(1);
 
         // Find the chunk file dynamically (hash changes across builds)
-        const sharedDir = `${temporaryDirectoryPath}/dist/packem_shared`;
-        const chunkFile = readdirSync(sharedDir).find((f) => f.startsWith("getFilename-"));
+        const sharedDirectory = `${temporaryDirectoryPath}/dist/packem_shared`;
+        const chunkFile = readdirSync(sharedDirectory).find((f) => f.startsWith("getFilename-"));
 
         expect(chunkFile).toBeDefined();
 
-        const mjsFilenameContent = readFileSync(`${sharedDir}/${chunkFile}`);
+        const mjsFilenameContent = normalizeBundleOutput(readFileSync(`${sharedDirectory}/${String(chunkFile)}`));
 
         // Verify the chunk has its own shim for __filename (not duplicated from entry)
-        expect(mjsFilenameContent).toContain('import __cjs_url__ from "node:url"');
+        expect(mjsFilenameContent).toContain("import __cjs_url__ from 'node:url'");
         expect(mjsFilenameContent).toContain("const __filename = __cjs_url__.fileURLToPath(import.meta.url)");
         expect(mjsFilenameContent).toContain("export { getFilename }");
 

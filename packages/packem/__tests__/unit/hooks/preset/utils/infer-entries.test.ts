@@ -3,11 +3,14 @@ import { rm } from "node:fs/promises";
 import { writeFileSync } from "@visulima/fs";
 import type { BuildContext } from "@visulima/packem-share";
 import { join } from "@visulima/path";
+// eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import inferEntries from "../../../../../src/config/preset/utils/infer-entries";
-import type { InferEntriesResult } from "../../../../../src/types";
+import type { InferEntriesResult, InternalBuildOptions } from "../../../../../src/types";
+
+type DeclarationExtension = "d.cts" | "d.mts" | "d.ts";
 
 const createFiles = (files: string[], directory: string) => {
     for (const file of files) {
@@ -20,9 +23,9 @@ const createFiles = (files: string[], directory: string) => {
 
 describe(inferEntries, () => {
     let temporaryDirectoryPath: string;
-    let defaultContext: BuildContext;
+    let defaultContext: BuildContext<InternalBuildOptions>;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
 
         vi.stubEnv("NODE_ENV", "development");
@@ -30,7 +33,7 @@ describe(inferEntries, () => {
         defaultContext = {
             environment: "development",
             logger: {
-                debug: vi.fn(),
+                debug: vi.fn<(...arguments_: unknown[]) => void>(),
             },
             options: {
                 declaration: false,
@@ -44,7 +47,7 @@ describe(inferEntries, () => {
                     typescript: "*",
                 },
             },
-        } as unknown as BuildContext;
+        } as unknown as BuildContext<InternalBuildOptions>;
     });
 
     afterEach(async () => {
@@ -62,9 +65,9 @@ describe(inferEntries, () => {
             inferEntries(
                 { main: "dist/test.cjs" },
                 ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
-                { ...defaultContext, pkg: {} } as unknown as BuildContext,
+                { ...defaultContext, pkg: {} },
             ),
-        ).rejects.toThrowError("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
+        ).rejects.toThrow("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
     });
 
     it("should recognise main and module outputs", async () => {
@@ -256,7 +259,7 @@ describe(inferEntries, () => {
                 {
                     options: { ...defaultContext.options, declaration: true },
                     pkg: defaultContext.pkg,
-                } as unknown as BuildContext,
+                } as unknown as BuildContext<InternalBuildOptions>,
             ),
         ).resolves.toStrictEqual({
             entries: [
@@ -284,14 +287,14 @@ describe(inferEntries, () => {
                     environment: defaultContext.environment,
                     options: { ...defaultContext.options, declaration: true },
                     pkg: defaultContext.pkg,
-                } as unknown as BuildContext,
+                } as unknown as BuildContext<InternalBuildOptions>,
             ),
         ).resolves.toStrictEqual({
             entries: [
                 {
                     cjs: true,
                     declaration: true,
-                    declarationExtensions: new Set<string>(["d.ts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.ts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(),
@@ -315,14 +318,14 @@ describe(inferEntries, () => {
                     environment: defaultContext.environment,
                     options: { ...defaultContext.options, declaration: true },
                     pkg: defaultContext.pkg,
-                } as unknown as BuildContext,
+                } as unknown as BuildContext<InternalBuildOptions>,
             ),
         ).resolves.toStrictEqual({
             entries: [
                 {
                     cjs: true,
                     declaration: true,
-                    declarationExtensions: new Set<string>(["d.ts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.ts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(),
@@ -358,7 +361,7 @@ describe(inferEntries, () => {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
                 pkg: defaultContext.pkg,
-            } as unknown as BuildContext,
+            } as unknown as BuildContext<InternalBuildOptions>,
         );
 
         expect(result).toStrictEqual({
@@ -366,7 +369,7 @@ describe(inferEntries, () => {
                 {
                     cjs: true,
                     declaration: true,
-                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.cts", "d.mts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(["import", "require"]),
@@ -400,7 +403,7 @@ describe(inferEntries, () => {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
                 pkg: defaultContext.pkg,
-            } as unknown as BuildContext,
+            } as unknown as BuildContext<InternalBuildOptions>,
         );
 
         expect(result).toStrictEqual({
@@ -408,7 +411,7 @@ describe(inferEntries, () => {
                 {
                     cjs: true,
                     declaration: true,
-                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.cts", "d.mts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(["import", "require"]),
@@ -438,7 +441,7 @@ describe(inferEntries, () => {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
                 pkg: defaultContext.pkg,
-            } as unknown as BuildContext,
+            } as unknown as BuildContext<InternalBuildOptions>,
         );
 
         expect(result2).toStrictEqual({
@@ -446,7 +449,7 @@ describe(inferEntries, () => {
                 {
                     cjs: true,
                     declaration: true,
-                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.cts", "d.mts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(["test"]),
@@ -471,14 +474,14 @@ describe(inferEntries, () => {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
                 pkg: defaultContext.pkg,
-            } as unknown as BuildContext,
+            } as unknown as BuildContext<InternalBuildOptions>,
         );
 
         expect(result3).toStrictEqual({
             entries: [
                 {
                     declaration: true,
-                    declarationExtensions: new Set<string>(["d.ts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.ts"]),
                     environment: "development",
                     exportKey: new Set<string>(["test"]),
                     fileAlias: undefined,
@@ -561,14 +564,14 @@ describe(inferEntries, () => {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
                 pkg: defaultContext.pkg,
-            } as unknown as BuildContext,
+            } as unknown as BuildContext<InternalBuildOptions>,
         );
 
         expect(result4).toStrictEqual({
             entries: [
                 {
                     declaration: true,
-                    declarationExtensions: new Set<string>(["d.ts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.ts"]),
                     environment: "development",
                     exportKey: new Set<string>(["types"]),
                     fileAlias: undefined,
@@ -632,7 +635,7 @@ describe(inferEntries, () => {
                 ["src/", "src/gather.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
-        ).resolves.resolves.toStrictEqual({
+        ).resolves.toStrictEqual({
             entries: [],
             warnings: ["Could not find entrypoint for `dist/test.js`"],
         } satisfies InferEntriesResult);
@@ -643,12 +646,13 @@ describe(inferEntries, () => {
 
         createFiles(["src/gather.ts"], temporaryDirectoryPath);
 
+        const debugMock = vi.fn<(...arguments_: unknown[]) => void>();
         const context = {
             ...defaultContext,
             logger: {
-                debug: vi.fn(),
+                debug: debugMock,
             },
-        } as unknown as BuildContext;
+        } as unknown as BuildContext<InternalBuildOptions>;
 
         await expect(
             inferEntries(
@@ -670,7 +674,7 @@ describe(inferEntries, () => {
             ],
             warnings: [],
         } satisfies InferEntriesResult);
-        expect(context.logger.debug).toHaveBeenCalledTimes(1);
+        expect(debugMock).toHaveBeenCalledTimes(1);
     });
 
     it("should handle multiple entries", async () => {
@@ -836,7 +840,7 @@ describe(inferEntries, () => {
                         runtime: "node",
                         sourceDir: join(temporaryDirectoryPath, "src"),
                     },
-                },
+                } as unknown as BuildContext<InternalBuildOptions>,
             ),
         ).resolves.toStrictEqual({
             entries: [
@@ -963,29 +967,29 @@ describe(inferEntries, () => {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
                 pkg: defaultContext.pkg,
-            } as unknown as BuildContext,
+            } as unknown as BuildContext<InternalBuildOptions>,
         );
 
         expect(result).toStrictEqual({
             entries: [
                 {
-                    cjs: true,
                     declaration: true,
-                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.mts"]),
                     environment: "development",
-                    exportKey: new Set<string>(["import", "require"]),
+                    esm: true,
+                    exportKey: new Set<string>(["import"]),
                     fileAlias: undefined,
-                    input: join(temporaryDirectoryPath, "src/test.cts"),
+                    input: join(temporaryDirectoryPath, "src/test.mts"),
                     runtime: "node",
                 },
                 {
+                    cjs: true,
                     declaration: true,
-                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.cts"]),
                     environment: "development",
-                    esm: true,
-                    exportKey: new Set<string>(["import", "require"]),
+                    exportKey: new Set<string>(["require"]),
                     fileAlias: undefined,
-                    input: join(temporaryDirectoryPath, "src/test.mts"),
+                    input: join(temporaryDirectoryPath, "src/test.cts"),
                     runtime: "node",
                 },
             ],
@@ -1028,7 +1032,7 @@ describe(inferEntries, () => {
                     outDir: "dist",
                 },
                 pkg: defaultContext.pkg,
-            } as unknown as BuildContext,
+            } as unknown as BuildContext<InternalBuildOptions>,
         );
 
         expect(result).toStrictEqual({
@@ -1094,7 +1098,7 @@ describe(inferEntries, () => {
                     outDir: "dist",
                 },
                 pkg: defaultContext.pkg,
-            } as unknown as BuildContext,
+            } as unknown as BuildContext<InternalBuildOptions>,
         );
 
         expect(result).toStrictEqual({
@@ -1291,7 +1295,7 @@ describe(inferEntries, () => {
                         },
                     },
                 },
-            },
+            } as unknown as BuildContext<InternalBuildOptions>,
         );
 
         expect(result).toStrictEqual({
@@ -1465,7 +1469,7 @@ describe(inferEntries, () => {
                     ...defaultContext.options,
                     declaration: true,
                 },
-            } as unknown as BuildContext,
+            },
         );
 
         expect(result).toStrictEqual({
@@ -1474,7 +1478,7 @@ describe(inferEntries, () => {
                     declaration: true,
                     declarationCjs: true,
                     declarationEsm: true,
-                    declarationExtensions: new Set<string>(["d.ts"]),
+                    declarationExtensions: new Set<DeclarationExtension>(["d.ts"]),
                     environment: "development",
                     exportKey: new Set<string>(["types/*"]),
                     fileAlias: undefined,

@@ -24,7 +24,7 @@ const createOptions = (options: Partial<FileExtensionOptions> = {}): BuildContex
             outputExtensionMap: undefined,
             ...options,
         },
-        pkg: {} as never,
+        pkg: {},
         usedDependencies: new Set(),
         warnings: new Set(),
     };

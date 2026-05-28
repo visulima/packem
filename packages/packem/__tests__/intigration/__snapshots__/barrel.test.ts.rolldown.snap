@@ -1,0 +1,63 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`barrel > should build a project with barrel re-exports and run output > CommonJS output 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
+const run = () => ({
+	a: "a",
+	b: "b",
+	c: "c",
+	d: "d",
+	nestedA: "b"
+});
+//#endregion
+exports.default = run;
+exports.run = run;
+"
+`;
+
+exports[`barrel > should build a project with barrel re-exports and run output > ESM output 1`] = `
+"//#region src/index.js
+const run = () => ({
+	a: "a",
+	b: "b",
+	c: "c",
+	d: "d",
+	nestedA: "b"
+});
+//#endregion
+export { run as default, run };
+"
+`;
+
+exports[`barrel > should rewrite barrel imports and run output > CommonJS output 1`] = `
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.js
+const run = () => ({
+	Foo: "foo",
+	bar: "bar",
+	baz: "baz"
+});
+//#endregion
+exports.default = run;
+exports.run = run;
+"
+`;
+
+exports[`barrel > should rewrite barrel imports and run output > ESM output 1`] = `
+"//#region src/index.js
+const run = () => ({
+	Foo: "foo",
+	bar: "bar",
+	baz: "baz"
+});
+//#endregion
+export { run as default, run };
+"
+`;

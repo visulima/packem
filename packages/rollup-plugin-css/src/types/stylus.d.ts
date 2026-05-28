@@ -20,12 +20,9 @@ declare namespace stylus {
 
     type StylusPlugin = (renderer: Renderer) => void;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type DefineValue = any;
-
     interface Renderer {
-        // eslint-disable-next-line @typescript-eslint/method-signature-style
-        define(name: string, value: DefineValue, raw?: boolean): this;
+        // eslint-disable-next-line @typescript-eslint/method-signature-style, @typescript-eslint/no-explicit-any
+        define(name: string, value: any, raw?: boolean): this;
         // eslint-disable-next-line @typescript-eslint/method-signature-style
         deps(): string[];
         // eslint-disable-next-line @typescript-eslint/method-signature-style

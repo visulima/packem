@@ -1,10 +1,12 @@
 type SassError = Error & { column?: number; id: string; line?: number };
 
+const ERROR_PREFIX_REGEXP = /^.*?Error:\s*/i;
+
 const errorFactory = (error: Error & { formatted?: string; span?: { start: { column: number; line: number } } }, file: string): SassError => {
     // Keep original error if `sassError.formatted` is unavailable
 
-    const rawMessage = error.formatted ?? error.message ?? String(error);
-    const message = rawMessage.replace(/^.*?Error:\s*/i, "");
+    const rawMessage = error.formatted ?? error.message;
+    const message = rawMessage.replace(ERROR_PREFIX_REGEXP, "");
 
     const newError = new Error(message, { cause: error }) as SassError;
 

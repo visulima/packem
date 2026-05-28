@@ -1,0 +1,314 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > cjs dts output 1`] = `
+"declare const indent: string;
+export { indent };
+"
+`;
+
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/detect-indent@7.0.2/node_modules/detect-indent/index.js
+const INDENT_REGEX = /^(?:( )+|\\t+)/;
+const INDENT_TYPE_SPACE = "space";
+const INDENT_TYPE_TAB = "tab";
+function shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, value) {
+	return ignoreSingleSpaces && indentType === INDENT_TYPE_SPACE && value === 1;
+}
+function makeIndentsMap(string, ignoreSingleSpaces) {
+	const indents = /* @__PURE__ */ new Map();
+	let previousSize = 0;
+	let previousIndentType;
+	let key;
+	for (const line of string.split(/\\n/g)) {
+		if (!line) continue;
+		const matches = line.match(INDENT_REGEX);
+		if (matches === null) {
+			previousSize = 0;
+			previousIndentType = "";
+		} else {
+			const indent = matches[0].length;
+			const indentType = matches[1] ? INDENT_TYPE_SPACE : INDENT_TYPE_TAB;
+			if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, indent)) continue;
+			if (indentType !== previousIndentType) previousSize = 0;
+			previousIndentType = indentType;
+			let use = 1;
+			let weight = 0;
+			const indentDifference = indent - previousSize;
+			previousSize = indent;
+			if (indentDifference === 0) {
+				use = 0;
+				weight = 1;
+			} else {
+				const absoluteIndentDifference = Math.abs(indentDifference);
+				if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, absoluteIndentDifference)) continue;
+				key = encodeIndentsKey(indentType, absoluteIndentDifference);
+			}
+			const entry = indents.get(key);
+			indents.set(key, entry === void 0 ? [1, 0] : [entry[0] + use, entry[1] + weight]);
+		}
+	}
+	return indents;
+}
+function encodeIndentsKey(indentType, indentAmount) {
+	return (indentType === INDENT_TYPE_SPACE ? "s" : "t") + String(indentAmount);
+}
+function decodeIndentsKey(indentsKey) {
+	return {
+		type: indentsKey[0] === "s" ? INDENT_TYPE_SPACE : INDENT_TYPE_TAB,
+		amount: Number(indentsKey.slice(1))
+	};
+}
+function getMostUsedKey(indents) {
+	let result;
+	let maxUsed = 0;
+	let maxWeight = 0;
+	for (const [key, [usedCount, weight]] of indents) if (usedCount > maxUsed || usedCount === maxUsed && weight > maxWeight) {
+		maxUsed = usedCount;
+		maxWeight = weight;
+		result = key;
+	}
+	return result;
+}
+function makeIndentString(type, amount) {
+	return (type === INDENT_TYPE_SPACE ? " " : "	").repeat(amount);
+}
+function detectIndent(string) {
+	if (typeof string !== "string") throw new TypeError("Expected a string");
+	let indents = makeIndentsMap(string, true);
+	if (indents.size === 0) indents = makeIndentsMap(string, false);
+	const keyOfMostUsedIndent = getMostUsedKey(indents);
+	let type;
+	let amount = 0;
+	let indent = "";
+	if (keyOfMostUsedIndent !== void 0) {
+		({type, amount} = decodeIndentsKey(keyOfMostUsedIndent));
+		indent = makeIndentString(type, amount);
+	}
+	return {
+		amount,
+		type,
+		indent
+	};
+}
+//#endregion
+//#region src/index.ts
+const { indent: dIndent } = detectIndent("  file");
+const indent = dIndent;
+//#endregion
+exports.indent = indent;
+"
+`;
+
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > dts output 1`] = `
+"declare const indent: string;
+export { indent };
+"
+`;
+
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > mjs dts output 1`] = `
+"declare const indent: string;
+export { indent };
+"
+`;
+
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > mjs output 1`] = `
+"//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/detect-indent@7.0.2/node_modules/detect-indent/index.js
+const INDENT_REGEX = /^(?:( )+|\\t+)/;
+const INDENT_TYPE_SPACE = "space";
+const INDENT_TYPE_TAB = "tab";
+function shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, value) {
+	return ignoreSingleSpaces && indentType === INDENT_TYPE_SPACE && value === 1;
+}
+function makeIndentsMap(string, ignoreSingleSpaces) {
+	const indents = /* @__PURE__ */ new Map();
+	let previousSize = 0;
+	let previousIndentType;
+	let key;
+	for (const line of string.split(/\\n/g)) {
+		if (!line) continue;
+		const matches = line.match(INDENT_REGEX);
+		if (matches === null) {
+			previousSize = 0;
+			previousIndentType = "";
+		} else {
+			const indent = matches[0].length;
+			const indentType = matches[1] ? INDENT_TYPE_SPACE : INDENT_TYPE_TAB;
+			if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, indent)) continue;
+			if (indentType !== previousIndentType) previousSize = 0;
+			previousIndentType = indentType;
+			let use = 1;
+			let weight = 0;
+			const indentDifference = indent - previousSize;
+			previousSize = indent;
+			if (indentDifference === 0) {
+				use = 0;
+				weight = 1;
+			} else {
+				const absoluteIndentDifference = Math.abs(indentDifference);
+				if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, absoluteIndentDifference)) continue;
+				key = encodeIndentsKey(indentType, absoluteIndentDifference);
+			}
+			const entry = indents.get(key);
+			indents.set(key, entry === void 0 ? [1, 0] : [entry[0] + use, entry[1] + weight]);
+		}
+	}
+	return indents;
+}
+function encodeIndentsKey(indentType, indentAmount) {
+	return (indentType === INDENT_TYPE_SPACE ? "s" : "t") + String(indentAmount);
+}
+function decodeIndentsKey(indentsKey) {
+	return {
+		type: indentsKey[0] === "s" ? INDENT_TYPE_SPACE : INDENT_TYPE_TAB,
+		amount: Number(indentsKey.slice(1))
+	};
+}
+function getMostUsedKey(indents) {
+	let result;
+	let maxUsed = 0;
+	let maxWeight = 0;
+	for (const [key, [usedCount, weight]] of indents) if (usedCount > maxUsed || usedCount === maxUsed && weight > maxWeight) {
+		maxUsed = usedCount;
+		maxWeight = weight;
+		result = key;
+	}
+	return result;
+}
+function makeIndentString(type, amount) {
+	return (type === INDENT_TYPE_SPACE ? " " : "	").repeat(amount);
+}
+function detectIndent(string) {
+	if (typeof string !== "string") throw new TypeError("Expected a string");
+	let indents = makeIndentsMap(string, true);
+	if (indents.size === 0) indents = makeIndentsMap(string, false);
+	const keyOfMostUsedIndent = getMostUsedKey(indents);
+	let type;
+	let amount = 0;
+	let indent = "";
+	if (keyOfMostUsedIndent !== void 0) {
+		({type, amount} = decodeIndentsKey(keyOfMostUsedIndent));
+		indent = makeIndentString(type, amount);
+	}
+	return {
+		amount,
+		type,
+		indent
+	};
+}
+//#endregion
+//#region src/index.ts
+const { indent: dIndent } = detectIndent("  file");
+const indent = dIndent;
+//#endregion
+export { indent };
+"
+`;
+
+exports[`packem externals > should handle externals with peerDependenciesMeta > cjs output 1`] = `
+"//#region \\0rolldown/runtime.js
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+		key = keys[i];
+		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+			get: ((k) => from[k]).bind(null, key),
+			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+		});
+	}
+	return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+	value: mod,
+	enumerable: true
+}) : target, mod));
+//#endregion
+let peer_dep = require("peer-dep");
+peer_dep = __toESM(peer_dep);
+let peer_dep_meta = require("peer-dep-meta");
+peer_dep_meta = __toESM(peer_dep_meta);
+//#region src/index.ts
+var src_default = peer_dep.default + peer_dep_meta.default;
+//#endregion
+module.exports = src_default;
+"
+`;
+
+exports[`packem externals > should handle externals with peerDependenciesMeta > mjs output 1`] = `
+"import a from "peer-dep";
+import b from "peer-dep-meta";
+//#region src/index.ts
+var src_default = a + b;
+//#endregion
+export { src_default as default };
+"
+`;
+
+exports[`packem externals > should inline types from namespaced optional peer dependencies in DTS output automatically > dts output 1`] = `
+"import { Options } from 'prettier';
+import { Config as Config$1 } from 'svgo';
+import { Options as Options$1 } from '@svgr/babel-preset';
+import { TransformOptions } from '@babel/core';
+interface State {
+  filePath?: string;
+  componentName: string;
+  caller?: {
+    name?: string;
+    previousExport?: string | null;
+    defaultPlugins?: ConfigPlugin[];
+  };
+}
+interface Plugin {
+  (code: string, config: Config, state: State): string;
+}
+type ConfigPlugin = string | Plugin;
+interface Config {
+  ref?: boolean;
+  titleProp?: boolean;
+  descProp?: boolean;
+  expandProps?: boolean | 'start' | 'end';
+  dimensions?: boolean;
+  icon?: boolean | string | number;
+  native?: boolean;
+  svgProps?: {
+    [key: string]: string;
+  };
+  replaceAttrValues?: {
+    [key: string]: string;
+  };
+  runtimeConfig?: boolean;
+  typescript?: boolean;
+  prettier?: boolean;
+  prettierConfig?: Options;
+  svgo?: boolean;
+  svgoConfig?: Config$1;
+  configFile?: string;
+  template?: Options$1['template'];
+  memo?: boolean;
+  exportType?: 'named' | 'default';
+  namedExport?: string;
+  jsxRuntime?: 'classic' | 'classic-preact' | 'automatic';
+  jsxRuntimeImport?: {
+    source: string;
+    namespace?: string;
+    specifiers?: string[];
+    defaultSpecifier?: string;
+  };
+  index?: boolean;
+  plugins?: ConfigPlugin[];
+  jsx?: {
+    babelConfig?: TransformOptions;
+  };
+}
+declare const transform: {
+  (code: string, config?: Config, state?: Partial<State>): Promise<string>;
+  sync(code: string, config?: Config, state?: Partial<State>): string;
+};
+export { transform };
+"
+`;

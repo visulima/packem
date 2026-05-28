@@ -4,14 +4,14 @@
  * MIT License
  * Copyright (c) 2021 EGOIST
  */
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import kill from "tree-kill";
 
 import type { KillSignal } from "../types";
 
 /**
- * tree-kill use `taskkill` command on Windows to kill the process,
- * it may return 128 as exit code when the process has already exited.
+ * Detects the benign error `tree-kill` raises when its Windows `taskkill`
+ * command exits with code 128 because the target process is already gone.
  * @see https://github.com/egoist/tsup/issues/976
  */
 const isTaskKillCmdProcessNotFoundError = (error: Error) =>
@@ -30,7 +30,7 @@ const isTaskKillCmdProcessNotFoundError = (error: Error) =>
  * @throws {Error} If pid is invalid or process termination fails
  * @returns Resolves when process is terminated
  */
-const killProcess = async ({ pid, signal }: { pid: number; signal: KillSignal }): Promise<void> =>
+const killProcess = async ({ pid, signal }: { pid: number; signal: KillSignal }): Promise<void> => {
     await new Promise<void>((resolve, reject) => {
         if (!Number.isInteger(pid) || pid <= 0) {
             reject(new Error("Invalid process ID"));
@@ -48,5 +48,6 @@ const killProcess = async ({ pid, signal }: { pid: number; signal: KillSignal })
             resolve();
         });
     });
+};
 
 export default killProcess;

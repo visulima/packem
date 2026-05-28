@@ -1,15 +1,15 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
 
 describe("shebang", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -120,7 +120,7 @@ console.log('Hello, world!');
  * @returns string
  */
 function getNodeSheBang() {
-	return '#!/usr/bin/env node';
+    return '#!/usr/bin/env node';
 }
 
 export { getNodeSheBang };
@@ -167,7 +167,7 @@ export { getNodeSheBang };
  * @returns string
  */
 function getNodeSheBang() {
-	return '#!/usr/bin/env node';
+    return '#!/usr/bin/env node';
 }
 
 export { getNodeSheBang };

@@ -8,29 +8,42 @@ import { createDebug } from "obug";
 
 const debug = createDebug("rollup-plugin-dts:tsgo");
 
-const spawnAsync = (...args: Parameters<typeof spawn>) =>
-    new Promise<void>((resolve, reject) => {
+const spawnAsync = async (...args: Parameters<typeof spawn>): Promise<void> => {
+    await new Promise<void>((resolve, reject) => {
         const child = spawn(...args);
 
-        child.on("close", () => resolve());
-        child.on("error", (error) => reject(error));
+        child.on("close", () => {
+            resolve();
+        });
+        child.on("error", (error) => {
+            reject(error);
+        });
     });
+};
+
+interface GetExePathModule {
+    default?: () => string;
+}
 
 export const getTsgoPathFromNodeModules = (): string => {
-    const _require = createRequire(import.meta.url);
+    const requireFromHere = createRequire(import.meta.url);
     // Use an absolute path to bypass the package exports field restriction
-    const pkgJsonPath = _require.resolve("@typescript/native-preview/package.json");
-    const pkgDir = path.dirname(pkgJsonPath);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const module_ = _require(path.join(pkgDir, "lib", "getExePath.js")) as any;
+    const pkgJsonPath = requireFromHere.resolve("@typescript/native-preview/package.json");
+    const pkgDirectory = path.dirname(pkgJsonPath);
+
+    const loadedModule = requireFromHere(path.join(pkgDirectory, "lib", "getExePath.js")) as (() => string) | GetExePathModule;
     // Handle both CJS and ESM interop (ESM default exports become `mod.default` via CJS require)
-    const getExePath: () => string = typeof module_ === "function" ? module_ : module_.default;
+    const getExePath: (() => string) | undefined = typeof loadedModule === "function" ? loadedModule : loadedModule.default;
+
+    if (!getExePath) {
+        throw new Error("Failed to resolve getExePath from @typescript/native-preview");
+    }
 
     return getExePath();
 };
 
-export const runTsgo = async (rootDir: string, tsconfig?: string, sourcemap?: boolean, tsgoPath?: string): Promise<string> => {
-    debug("[tsgo] rootDir", rootDir);
+export const runTsgo = async (rootDirectory: string, tsconfig?: string, sourcemap?: boolean, tsgoPath?: string): Promise<string> => {
+    debug("[tsgo] rootDir", rootDirectory);
 
     let tsgo: string;
 
@@ -55,7 +68,7 @@ export const runTsgo = async (rootDir: string, tsconfig?: string, sourcemap?: bo
         "--outDir",
         tsgoDist,
         "--rootDir",
-        rootDir,
+        rootDirectory,
         "--noCheck",
         ...sourcemap ? ["--declarationMap"] : [],
     ];

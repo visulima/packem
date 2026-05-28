@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define, sonarjs/cognitive-complexity, no-param-reassign, no-console, unicorn/no-null, jsdoc/match-description, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unnecessary-condition -- this module wraps `tsc --build` orchestration; the helper functions are hoisted as expressions to match the orchestration flow, console.warn is intended user-facing diagnostic output, and `options` is mutated to patch user compiler options before passing to ts.createProgram */
 import { createDebug } from "obug";
 import type { ExistingRawSourceMap } from "rollup";
 import ts from "typescript";
@@ -142,7 +143,7 @@ const patchCompilerOptions = (
 
     const shouldPrintWarning = extraOptions?.tsconfigPath && !extraOptions.force;
 
-    if (noEmit === true) {
+    if (noEmit) {
         options = { ...options, noEmit: false };
 
         if (shouldPrintWarning) {
@@ -150,7 +151,7 @@ const patchCompilerOptions = (
         }
     }
 
-    if (declaration === false) {
+    if (!declaration) {
         options = { ...options, declaration: true };
 
         if (shouldPrintWarning) {
@@ -160,7 +161,7 @@ const patchCompilerOptions = (
         }
     }
 
-    if (declarationMap === false && extraOptions?.sourcemap) {
+    if (!declarationMap && extraOptions?.sourcemap) {
         options = { ...options, declarationMap: true };
 
         if (shouldPrintWarning) {

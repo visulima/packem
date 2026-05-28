@@ -1,15 +1,19 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 
 import { readFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
+
+const SVG_DATA_URI_REGEX = /data:image\/svg\+xml;?charset=utf-8?,/;
+const BASE64_TEXT_DATA_URI_REGEX = /data:text\/plain;.*base64,/;
+const HTML_COMMENT_REGEX = /<!--[\s\S]*?-->/;
 
 describe("data-uri plugin", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory();
     });
 
@@ -49,7 +53,7 @@ export const data = icon;`,
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Should be an SVG data URI; comments must be stripped
-        expect(mjsContent).toMatch(/data:image\/svg\+xml;?charset=utf-8?,/);
+        expect(mjsContent).toMatch(SVG_DATA_URI_REGEX);
         expect(mjsContent).not.toContain("comment to strip");
     });
 
@@ -85,7 +89,7 @@ export const data = file;`,
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Should be a data URI with base64 for text/plain
-        expect(mjsContent).toMatch(/data:text\/plain;.*base64,/);
+        expect(mjsContent).toMatch(BASE64_TEXT_DATA_URI_REGEX);
     });
 
     it("inlines lucide-static svg icons via ?data-uri", { timeout: 30_000 }, async () => {
@@ -123,8 +127,8 @@ export const length = Circle.length;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toMatch(/data:image\/svg\+xml;?charset=utf-8?,/);
+        expect(mjsContent).toMatch(SVG_DATA_URI_REGEX);
         // lucide icons should also not include comments
-        expect(mjsContent).not.toMatch(/<!--[\s\S]*?-->/);
+        expect(mjsContent).not.toMatch(HTML_COMMENT_REGEX);
     });
 });

@@ -1,4 +1,4 @@
-import type { InputOptions, NormalizedInputOptions, NullValue, Plugin, PluginContextMeta, ResolveIdResult, RollupError } from "rollup";
+import type { InputOptions, NullValue, Plugin, PluginContextMeta, ResolveIdResult, RollupError } from "rollup";
 
 class MockPluginContext {
     public readonly warnings: string[];
@@ -37,7 +37,7 @@ class MockPluginContext {
 
         if (typeof buildStart === "function") {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await buildStart.call(this as any, {} as NormalizedInputOptions);
+            await buildStart.call(this as any, {});
 
             return;
         }
@@ -54,10 +54,10 @@ class MockPluginContext {
 
         if (typeof resolveId === "function") {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return await resolveId.call(this as any, specifier, importer, {
+            return (await resolveId.call(this as any, specifier, importer, {
                 attributes: {},
                 isEntry: typeof importer !== "string",
-            });
+            })) as ResolveIdResult;
         }
 
         throw new Error("Ooops");

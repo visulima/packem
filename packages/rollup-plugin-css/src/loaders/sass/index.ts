@@ -8,7 +8,6 @@
 import { fileURLToPath } from "node:url";
 
 import { isAbsolute } from "@visulima/path";
-import type { CompileResult } from "sass";
 import type { RawSourceMap } from "source-map-js";
 
 import type { Loader } from "../types";
@@ -45,28 +44,30 @@ const loader: Loader<SassLoaderOptions> = {
 
         try {
             // The typing resolution is incorrect - @TODO: fix it if possible
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            result = (await compile(options as any)) as CompileResult;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+            result = compile(options as any);
+        } catch (error) {
+            const sassError = error as { span?: { url?: URL | string } };
+
             // There are situations when the `file`/`span.url` property do not exist
             // Modern API
-            if (error.span && error.span.url !== undefined) {
-                this.deps.add(fileURLToPath(error.span.url));
+            if (sassError.span?.url !== undefined) {
+                this.deps.add(fileURLToPath(sassError.span.url));
             }
 
-            throw errorFactory(error, this.id);
+            throw errorFactory(error as Parameters<typeof errorFactory>[0], this.id);
         }
 
-        let resultMap: RawSourceMap | undefined = (result as CompileResult).sourceMap;
+        let resultMap: RawSourceMap | undefined = result.sourceMap;
 
         // Modify source paths only for webpack, otherwise we do nothing
         if (resultMap && this.useSourcemap) {
             resultMap = normalizeSourceMap(resultMap);
         }
 
-        if ((result as CompileResult).loadedUrls) {
-            (result as CompileResult).loadedUrls.filter((loadedUrl) => loadedUrl.protocol === "file:").forEach((includedFile) => {
+        result.loadedUrls
+            .filter((loadedUrl) => loadedUrl.protocol === "file:")
+            .forEach((includedFile) => {
                 const normalizedIncludedFile = fileURLToPath(includedFile);
 
                 // Custom `importer` can return only `contents` so includedFile will be relative
@@ -74,7 +75,6 @@ const loader: Loader<SassLoaderOptions> = {
                     this.deps.add(normalizedIncludedFile);
                 }
             });
-        }
 
         return {
             code: Buffer.from(result.css).toString(),

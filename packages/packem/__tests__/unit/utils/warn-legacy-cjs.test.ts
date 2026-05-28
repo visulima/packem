@@ -1,22 +1,25 @@
 import type { BuildContext } from "@visulima/packem-share/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { InternalBuildOptions } from "../../../src/types";
 import warnLegacyCJS from "../../../src/utils/warn-legacy-cjs";
 
 describe(warnLegacyCJS, () => {
+    type LoggerMethod = (...args: unknown[]) => void;
+
     let logger: {
-        debug: ReturnType<typeof vi.fn>;
-        error: ReturnType<typeof vi.fn>;
-        info: ReturnType<typeof vi.fn>;
-        warn: ReturnType<typeof vi.fn>;
+        debug: ReturnType<typeof vi.fn<LoggerMethod>>;
+        error: ReturnType<typeof vi.fn<LoggerMethod>>;
+        info: ReturnType<typeof vi.fn<LoggerMethod>>;
+        warn: ReturnType<typeof vi.fn<LoggerMethod>>;
     };
 
     beforeEach(() => {
         logger = {
-            debug: vi.fn(),
-            error: vi.fn(),
-            info: vi.fn(),
-            warn: vi.fn(),
+            debug: vi.fn<LoggerMethod>(),
+            error: vi.fn<LoggerMethod>(),
+            info: vi.fn<LoggerMethod>(),
+            warn: vi.fn<LoggerMethod>(),
         };
     });
 
@@ -33,7 +36,7 @@ describe(warnLegacyCJS, () => {
                 runtime: "node",
             },
             pkg: { engines: { node: ">=23" } },
-        } as unknown as BuildContext<any>;
+        } as unknown as BuildContext<InternalBuildOptions>;
 
         warnLegacyCJS(context);
 
@@ -57,7 +60,7 @@ describe(warnLegacyCJS, () => {
                 runtime: "node",
             },
             pkg: { engines: { node: ">=23" } },
-        } as unknown as BuildContext<any>;
+        } as unknown as BuildContext<InternalBuildOptions>;
 
         warnLegacyCJS(context);
 
@@ -77,7 +80,7 @@ describe(warnLegacyCJS, () => {
                 runtime: "browser",
             },
             pkg: { engines: { node: ">=23" } },
-        } as unknown as BuildContext<any>;
+        } as unknown as BuildContext<InternalBuildOptions>;
 
         warnLegacyCJS(context);
 

@@ -2,6 +2,8 @@ import Vue from "unplugin-vue/rollup";
 
 import type { BuildConfig } from "../../types";
 
+const VUE_FILE_REGEX = /\.vue$/;
+
 export interface VuePresetOptions {
     /**
      * Vue plugin options
@@ -68,7 +70,7 @@ export const createVuePreset = (options: VuePresetOptions = {}): BuildConfig => 
                     plugin: Vue({
                         customElement: pluginOptions.customElement ?? false,
                         exclude: pluginOptions.exclude,
-                        include: pluginOptions.include ?? [/\.vue$/],
+                        include: pluginOptions.include ?? [VUE_FILE_REGEX],
                         template: pluginOptions.template,
                     }),
                 },

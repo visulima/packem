@@ -18,6 +18,8 @@ interface PropertyLiteralValue extends Property {
     };
 }
 
+const JSX_FILE_RE = /\.[jt]sx$/;
+
 export type JSXRemoveAttributesPlugin = {
     attributes: string[];
 };
@@ -31,16 +33,16 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
         name: "packem:jsx-remove-attributes",
         transform: {
             filter: {
-                id: /\.[tj]sx$/,
+                id: JSX_FILE_RE,
             },
-            async handler(code: string, id: string) {
+            handler(code: string, id: string) {
                 /**
                  * rollup's built-in parser returns an extended version of ESTree Node.
                  */
                 let ast: Node | undefined;
 
                 try {
-                    ast = this.parse(code, { allowReturnOutsideFunction: true }) as Node;
+                    ast = this.parse(code, { allowReturnOutsideFunction: true });
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
                     this.warn({
@@ -52,9 +54,6 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
 
                     return undefined;
                 }
-
-                // MagicString's `hasChanged()` is slow, so we track the change manually
-                let hasChanged = false;
 
                 const magicString: MagicString = new MagicString(code);
 
@@ -75,7 +74,6 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
                                     ) {
                                         // -2 to remove the comma and the space before the property
                                         magicString.overwrite((property as PropertyLiteralValue).start - 2, (property as PropertyLiteralValue).end, "");
-                                        hasChanged = true;
                                     }
                                 }
                             }
@@ -83,11 +81,13 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
                     },
                 });
 
-                if (!hasChanged) {
+                const transformed = magicString.toString();
+
+                if (transformed === code) {
                     return undefined;
                 }
 
-                return { code: magicString.toString(), map: magicString.generateMap({ hires: true }) };
+                return { code: transformed, map: magicString.generateMap({ hires: true }) };
             },
         },
     };

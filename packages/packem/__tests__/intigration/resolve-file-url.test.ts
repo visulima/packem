@@ -1,15 +1,19 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
+import temporaryDirectory from "../helpers/temporary-directory";
+
+const SHARED_EFFECT_MJS_REGEX = /packem_shared\/effect-[\w-]+\.mjs/;
+const SHARED_EFFECT_CJS_REGEX = /packem_shared\/effect-[\w-]+\.cjs/;
+const EFFECT_WORD_REGEX = /\beffect\b/;
 
 describe("packem resolve-file-url", () => {
     let temporaryDirectoryPath: string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         temporaryDirectoryPath = temporaryDirectory({
             prefix: "packem-resolve-file-url",
         });
@@ -20,7 +24,7 @@ describe("packem resolve-file-url", () => {
     });
 
     it("should resolve import with file:// annotation", async () => {
-        expect.assertions(4);
+        expect.assertions(6);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/importee.mjs`,
@@ -48,20 +52,18 @@ export default log`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.mjs`);
 
-        expect(mjsContent).toBe(`export { default as effect } from './packem_shared/effect-CZsrY87O.mjs';
-`);
+        // Both bundlers re-emit the file:// importee as a packem_shared chunk
+        // and re-export its default as `effect`. Rollup emits a single
+        // `export { default as effect } from './chunk.mjs'` line; rolldown
+        // splits it into `import X from './chunk.mjs'; export { X as effect };`.
+        // Structural checks tolerate either form while still catching plugin
+        // regressions (resolution + chunk emit + re-export wiring).
+        expect(mjsContent).toMatch(SHARED_EFFECT_MJS_REGEX);
+        expect(mjsContent).toMatch(EFFECT_WORD_REGEX);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const effect = require('./packem_shared/effect-C-iR9ClR.cjs');
-
-
-
-exports.effect = effect;
-`);
+        expect(cjsContent).toMatch(SHARED_EFFECT_CJS_REGEX);
+        expect(cjsContent).toMatch(EFFECT_WORD_REGEX);
     });
 });

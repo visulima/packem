@@ -43,4 +43,49 @@ describe("browserslist-to-esbuild", () => {
 
         expect(target).toMatchSnapshot();
     });
+
+    it("should map ios_saf to ios", () => {
+        expect.assertions(1);
+
+        // ios_saf is browserslist's name; esbuild only knows `ios`.
+        expect(browserslistToEsbuild(["ios_saf 15.0"])).toEqual(["ios15"]);
+    });
+
+    it("should map android to chrome", () => {
+        expect.assertions(1);
+
+        expect(browserslistToEsbuild(["android 100"])).toEqual(["chrome100"]);
+    });
+
+    it("should collapse a range like `11.0-12.0` to its lower bound `11`", () => {
+        expect.assertions(1);
+
+        expect(browserslistToEsbuild(["safari 11.0-12.0"])).toEqual(["safari11"]);
+    });
+
+    it("should strip a trailing `.0` so `12.0` becomes `12`", () => {
+        expect.assertions(1);
+
+        expect(browserslistToEsbuild(["safari 12.0"])).toEqual(["safari12"]);
+    });
+
+    it("should drop entries whose version fails the digit/dot regex", () => {
+        expect.assertions(1);
+
+        // `TP` (technology preview) and `all` are not numeric versions.
+        expect(browserslistToEsbuild(["safari TP", "ie all"])).toEqual([]);
+    });
+
+    it("should drop browsers that esbuild does not support", () => {
+        expect.assertions(1);
+
+        // kaios isn't in the SUPPORTED_ESBUILD_TARGETS set.
+        expect(browserslistToEsbuild(["kaios 2.5", "samsung 15.0"])).toEqual([]);
+    });
+
+    it("should drop unsupported entries like `android 4` while keeping supported entries on the same input", () => {
+        expect.assertions(1);
+
+        expect(browserslistToEsbuild(["android 4", "chrome 100"])).toEqual(["chrome100"]);
+    });
 });

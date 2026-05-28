@@ -1,10 +1,22 @@
+import type { CSSModuleExports } from "lightningcss";
 import { browserslistToTargets, transform } from "lightningcss";
-import type { CSSModuleExports, CSSModuleReference } from "lightningcss";
 
 import type { LightningCSSOptions } from "../types";
 import { generateJsExports } from "../utils/generate-js-exports";
 import type { Loader } from "./types";
 import ensureAutoModules from "./utils/ensure-auto-modules";
+
+const compareEntries = ([a]: [string, unknown], [b]: [string, unknown]): number => {
+    if (a < b) {
+        return -1;
+    }
+
+    if (a > b) {
+        return 1;
+    }
+
+    return 0;
+};
 
 /**
  * Flattens a lightningcss `CSSModuleExports` map into a deterministic
@@ -12,24 +24,22 @@ import ensureAutoModules from "./utils/ensure-auto-modules";
  * shape postcss-modules produces via ICSS messages.
  *
  * Composed references are resolved in order:
- *  - `local`  → appended as-is (already-compiled local name)
- *  - `global` → appended as the raw global name
- *  - `dependency` → skipped (cross-file composes; would require an
- *    ICSS-style dependency pipeline, which lightningcss does not expose
- *    synchronously at this stage)
+ * - `local` is appended as-is (already-compiled local name)
+ * - `global` is appended as the raw global name
+ * - `dependency` is skipped (cross-file composes; would require an ICSS-style dependency pipeline, which lightningcss does not expose synchronously at this stage)
  *
  * Entries are sorted alphabetically to work around
- * https://github.com/parcel-bundler/lightningcss/issues/291
+ * https://github.com/parcel-bundler/lightningcss/issues/291.
  */
 const normalizeModulesExports = (exports: CSSModuleExports): Record<string, string> => {
     const normalized: Record<string, string> = {};
 
-    const sortedEntries = Object.entries(exports).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+    const sortedEntries = Object.entries(exports).toSorted(compareEntries);
 
     for (const [name, entry] of sortedEntries) {
         const parts: string[] = [entry.name];
 
-        for (const composed of entry.composes as CSSModuleReference[]) {
+        for (const composed of entry.composes) {
             if (composed.type === "local" || composed.type === "global") {
                 parts.push(composed.name);
             }
@@ -54,8 +64,7 @@ const normalizeModulesExports = (exports: CSSModuleExports): Record<string, stri
 const lightningCSSLoader: Loader<LightningCSSOptions> = {
     name: "lightningcss",
 
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-    async process({ code, map }) {
+    process({ code, map }) {
         let supportModules = false;
 
         if (typeof this.options.modules === "boolean") {
@@ -88,13 +97,11 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
 
         // Extract module exports (if any). Non-module CSS leaves `result.exports`
         // undefined and we fall through with an empty mapping.
-        const modulesExports: Record<string, string> = result.exports
-            ? normalizeModulesExports(result.exports)
-            : {};
+        const modulesExports: Record<string, string> = result.exports ? normalizeModulesExports(result.exports) : {};
 
         const jsExportResult = generateJsExports({
             css,
-            cwd: this.cwd as string,
+            cwd: this.cwd,
             dts: this.dts,
             emit: this.emit,
             extract: this.extract,

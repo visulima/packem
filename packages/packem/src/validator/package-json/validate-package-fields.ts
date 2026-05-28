@@ -1,8 +1,9 @@
+import { globSync } from "@visulima/fs/glob";
+import isGlob from "@visulima/fs/is-glob";
 import { VALID_EXPORT_EXTENSIONS } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getOutputExtension, warn } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
-import { globSync, isDynamicPattern } from "tinyglobby";
 
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
 
@@ -53,7 +54,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
     ]);
 
     // Add extra conditions from validation options
-    const extraConditions = validation.packageJson?.extraConditions || [];
+    const extraConditions = validation.packageJson?.extraConditions ?? [];
     const EXTRA_CONDITIONS = new Set(extraConditions);
 
     const ALL_CONDITIONS = new Set([...COMMUNITY_CONDITIONS, ...EXTRA_CONDITIONS, ...STANDARD_CONDITIONS]);
@@ -80,11 +81,11 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
                 return;
             }
 
-            const allowedExtensions = validation.packageJson?.allowedExportExtensions || [];
+            const allowedExtensions = validation.packageJson?.allowedExportExtensions ?? [];
             const allValidExtensions = [...VALID_EXPORT_EXTENSIONS, ...allowedExtensions];
 
             // Handle dynamic patterns by expanding glob and validating each matched file
-            if (isDynamicPattern(value)) {
+            if (isGlob(value)) {
                 try {
                     // Convert relative path to absolute path for glob expansion
                     const absolutePattern = value.startsWith("./") ? resolve(context.options.rootDir, value.slice(2)) : resolve(context.options.rootDir, value);
@@ -141,13 +142,13 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
             }
 
             value.forEach((item, index) => {
-                validateExportsValue(item, `${path}[${index}]`);
+                validateExportsValue(item, `${path}[${String(index)}]`);
             });
 
             return;
         }
 
-        if (typeof value === "object" && value !== null) {
+        if (typeof value === "object") {
             // Conditional exports object
             const conditions = Object.keys(value);
 
@@ -210,6 +211,64 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
         warn(context, `Invalid exports value type at ${path}. Expected string, array, object, or null`);
     };
 
+    const validateSubpathKey = (key: string, exportsObject: object): void => {
+        if (key.startsWith(".") && !key.startsWith("./") && key !== ".") {
+            warn(context, `Invalid subpath "${key}". Subpaths should start with "./" or be exactly "."`);
+        }
+
+        // Check for wildcard patterns
+        if (key.includes("*")) {
+            const asteriskCount = (key.match(/\*/g) ?? []).length;
+
+            if (asteriskCount > 1) {
+                warn(context, `Invalid subpath pattern "${key}". Only one "*" wildcard is allowed per subpath`);
+            }
+        }
+
+        validateExportsValue(exportsObject[key as keyof typeof exportsObject], `exports["${key}"]`);
+    };
+
+    const validateSubpaths = (subpathKeys: string[], keys: string[], exportsObject: object): void => {
+        // Skip the "." requirement when the package only has bin entries and exports only contains "./package.json"
+        const nonDotKeys = subpathKeys.filter((key) => key !== ".");
+        const isBinOnlyPackage = context.pkg.bin !== undefined && nonDotKeys.length <= 1 && nonDotKeys.every((key) => key === "./package.json");
+
+        if (!keys.includes(".") && !isBinOnlyPackage) {
+            warn(context, "Missing main export \".\". Subpaths exports should include a main export entry");
+        }
+
+        for (const key of keys) {
+            validateSubpathKey(key, exportsObject);
+        }
+    };
+
+    const validateExportsRecord = (exportsObject: object): void => {
+        const keys = Object.keys(exportsObject);
+
+        if (keys.length === 0) {
+            warn(context, "Empty exports object. Define at least one export entry");
+
+            return;
+        }
+
+        // Check if it's a subpaths object (keys start with ".") or conditions object
+        const subpathKeys = keys.filter((key) => key.startsWith("."));
+        const conditionKeys = keys.filter((key) => !key.startsWith("."));
+
+        if (subpathKeys.length > 0 && conditionKeys.length > 0) {
+            warn(context, "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both");
+
+            return;
+        }
+
+        if (subpathKeys.length > 0) {
+            validateSubpaths(subpathKeys, keys, exportsObject);
+        } else {
+            // Conditions object at root level
+            validateExportsValue(exportsObject, "exports");
+        }
+    };
+
     const validateExportsObject = (exportsObject: unknown): void => {
         if (typeof exportsObject === "string") {
             validateExportsValue(exportsObject, "exports");
@@ -219,66 +278,14 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
 
         if (Array.isArray(exportsObject)) {
             exportsObject.forEach((item, index) => {
-                validateExportsValue(item, `exports[${index}]`);
+                validateExportsValue(item, `exports[${String(index)}]`);
             });
 
             return;
         }
 
         if (typeof exportsObject === "object" && exportsObject !== null) {
-            const keys = Object.keys(exportsObject);
-
-            if (keys.length === 0) {
-                warn(context, "Empty exports object. Define at least one export entry");
-
-                return;
-            }
-
-            // Check if it's a subpaths object (keys start with ".") or conditions object
-            const subpathKeys = keys.filter((key) => key.startsWith("."));
-            const conditionKeys = keys.filter((key) => !key.startsWith("."));
-
-            if (subpathKeys.length > 0 && conditionKeys.length > 0) {
-                warn(context, "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both");
-
-                return;
-            }
-
-            if (subpathKeys.length > 0) {
-                // Subpaths exports
-                // Skip the "." requirement when the package only has bin entries and exports only contains "./package.json"
-                const nonDotKeys = subpathKeys.filter((key) => key !== ".");
-                const isBinOnlyPackage = context.pkg.bin !== undefined && nonDotKeys.length <= 1 && nonDotKeys.every((key) => key === "./package.json");
-
-                if (!keys.includes(".") && !isBinOnlyPackage) {
-                    warn(context, "Missing main export \".\". Subpaths exports should include a main export entry");
-                }
-
-                // Validate subpath patterns
-                keys.forEach((key) => {
-                    if (key.startsWith("./")) {
-                        // Valid subpath
-                    } else if (key === ".") {
-                        // Valid main export
-                    } else if (key.startsWith(".") && !key.startsWith("./")) {
-                        warn(context, `Invalid subpath "${key}". Subpaths should start with "./" or be exactly "."`);
-                    }
-
-                    // Check for wildcard patterns
-                    if (key.includes("*")) {
-                        const asteriskCount = (key.match(/\*/g) || []).length;
-
-                        if (asteriskCount > 1) {
-                            warn(context, `Invalid subpath pattern "${key}". Only one "*" wildcard is allowed per subpath`);
-                        }
-                    }
-
-                    validateExportsValue(exportsObject[key as keyof typeof exportsObject], `exports["${key}"]`);
-                });
-            } else {
-                // Conditions object at root level
-                validateExportsValue(exportsObject, "exports");
-            }
+            validateExportsRecord(exportsObject);
 
             return;
         }
@@ -289,12 +296,15 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
     validateExportsObject(exports);
 };
 
-const validatePackageFields = (context: BuildContext<InternalBuildOptions>): void => {
-    const validation = context.options.validation as ValidationOptions;
-    const { pkg } = context;
-    const cjsJSExtension = getOutputExtension(context, "cjs");
-    const esmJSExtension = getOutputExtension(context, "esm");
+interface FieldValidationContext {
+    cjsJSExtension: string;
+    context: BuildContext<InternalBuildOptions>;
+    esmJSExtension: string;
+    pkg: BuildContext<InternalBuildOptions>["pkg"];
+    validation: ValidationOptions;
+}
 
+const validateNameAndFiles = ({ context, pkg, validation }: FieldValidationContext): void => {
     if (pkg.name === undefined && validation.packageJson?.name !== false) {
         warn(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     }
@@ -311,122 +321,160 @@ const validatePackageFields = (context: BuildContext<InternalBuildOptions>): voi
             );
         }
     }
+};
+
+const validateCjsModuleFields = ({ cjsJSExtension, context, esmJSExtension, pkg, validation }: FieldValidationContext): void => {
+    if (validation.packageJson?.main !== false) {
+        if (pkg.main === undefined) {
+            warn(context, "The 'main' field is missing in your package.json. This field should point to your main entry file.");
+        }
+
+        if (pkg.main?.endsWith(`.${esmJSExtension}`)) {
+            warn(context, `The 'main' field in your package.json should not use a '.${esmJSExtension}' extension for CommonJS modules.`);
+        }
+    }
+
+    if (validation.packageJson?.module !== false) {
+        if (pkg.module === undefined && context.options.emitESM) {
+            warn(context, "The 'module' field is missing in your package.json, but you are emitting ES modules.");
+        }
+
+        if (pkg.module && pkg.main && pkg.module === pkg.main) {
+            warn(
+                context,
+                `Conflict detected: The 'module' and 'main' fields both point to '${pkg.module}'. Please ensure they refer to different module types.`,
+            );
+        }
+
+        if (context.options.emitESM && pkg.module?.endsWith(`.${cjsJSExtension}`)) {
+            warn(context, `The 'module' field in your package.json should not use a '.${cjsJSExtension}' extension for ES modules.`);
+        }
+    }
+};
+
+const validateEsmCjsEmitFields = ({ cjsJSExtension, context, pkg, validation }: FieldValidationContext): void => {
+    if (validation.packageJson?.main !== false && pkg.main === undefined) {
+        warn(context, "The 'main' field is missing in your package.json. This field is needed when emitting CommonJS modules.");
+    }
+
+    if (validation.packageJson?.module !== false) {
+        if (pkg.module === undefined) {
+            warn(context, "The 'module' field is missing in your package.json. This field is necessary when emitting ES modules.");
+        }
+
+        if (pkg.module?.endsWith(`.${cjsJSExtension}`)) {
+            warn(context, `The 'module' field should not use a '.${cjsJSExtension}' extension for ES modules.`);
+        }
+
+        if (pkg.module && pkg.main && pkg.module === pkg.main) {
+            warn(
+                context,
+                `Conflict detected: The 'module' and 'main' fields both point to '${pkg.module}'. Please ensure they refer to different module types.`,
+            );
+        }
+    }
+
+    if (validation.packageJson?.exports !== false && pkg.exports === undefined) {
+        warn(context, "The 'exports' field is missing in your package.json. This field is required for defining explicit exports.");
+    }
+};
+
+const validateEsmModuleFields = (fieldContext: FieldValidationContext): void => {
+    const { context, pkg, validation } = fieldContext;
+
+    if (pkg.exports === undefined && !context.options.emitCJS) {
+        if (validation.packageJson?.exports !== false) {
+            warn(context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
+        }
+    } else if (context.options.emitCJS) {
+        validateEsmCjsEmitFields(fieldContext);
+    }
+};
+
+const validateBinExtensionFields = ({ cjsJSExtension, context, esmJSExtension, pkg, validation }: FieldValidationContext, isCjs: boolean): void => {
+    if (validation.packageJson?.bin === false) {
+        return;
+    }
+
+    const forbiddenExtension = isCjs ? esmJSExtension : cjsJSExtension;
+
+    // If both ESM and CJS use the same extension, then no extension is forbidden
+    if (cjsJSExtension === esmJSExtension) {
+        return;
+    }
+
+    const moduleKind = isCjs ? "CommonJS" : "ES modules";
+
+    if (typeof pkg.bin === "string" && pkg.bin.endsWith(`.${forbiddenExtension}`)) {
+        warn(context, `The 'bin' field in your package.json should not use a .${forbiddenExtension} extension for ${moduleKind} binaries.`);
+    } else if (typeof pkg.bin === "object") {
+        for (const [bin, binPath] of Object.entries(pkg.bin)) {
+            if (binPath?.endsWith(`.${forbiddenExtension}`)) {
+                warn(context, `The 'bin.${bin}' field in your package.json should not use a .${forbiddenExtension} extension for ${moduleKind} binaries.`);
+            }
+        }
+    }
+};
+
+const validateDeclarationFields = ({ cjsJSExtension, context, pkg, validation }: FieldValidationContext): void => {
+    if (!context.options.declaration) {
+        return;
+    }
+
+    let showWarning = true;
+
+    if (pkg.type === "module") {
+        showWarning = Boolean(pkg.main?.endsWith(`.${cjsJSExtension}`));
+    }
+
+    if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation.packageJson?.types !== false) {
+        warn(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
+    }
+
+    if (
+        (context.options.declaration === true || context.options.declaration === "compatible")
+        && showWarning
+        && validation.packageJson?.typesVersions !== false
+        && (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
+    ) {
+        warn(
+            context,
+            "No 'typesVersions' field found in your package.json. Consider adding this field, or change the declaration option to 'node16' or 'false'.",
+        );
+    }
+};
+
+const validatePackageFields = (context: BuildContext<InternalBuildOptions>): void => {
+    const validation = context.options.validation as ValidationOptions;
+    const { pkg } = context;
+    const cjsJSExtension = getOutputExtension(context, "cjs");
+    const esmJSExtension = getOutputExtension(context, "esm");
+
+    const fieldContext: FieldValidationContext = {
+        cjsJSExtension,
+        context,
+        esmJSExtension,
+        pkg,
+        validation,
+    };
+
+    validateNameAndFiles(fieldContext);
 
     const isCjs = pkg.type === "commonjs" || pkg.type === undefined;
     const isEsm = pkg.type === "module";
 
     if (isCjs) {
-        if (validation.packageJson?.main !== false) {
-            if (pkg.main === undefined) {
-                warn(context, "The 'main' field is missing in your package.json. This field should point to your main entry file.");
-            }
-
-            if (pkg.main?.endsWith(`.${esmJSExtension}`)) {
-                warn(context, `The 'main' field in your package.json should not use a '.${esmJSExtension}' extension for CommonJS modules.`);
-            }
-        }
-
-        if (validation.packageJson?.module !== false) {
-            if (pkg.module === undefined && context.options.emitESM) {
-                warn(context, "The 'module' field is missing in your package.json, but you are emitting ES modules.");
-            }
-
-            if (pkg.module && pkg.main && pkg.module === pkg.main) {
-                warn(
-                    context,
-                    `Conflict detected: The 'module' and 'main' fields both point to '${pkg.module as string}'. Please ensure they refer to different module types.`,
-                );
-            }
-
-            if (context.options.emitESM && pkg.module?.endsWith(`.${cjsJSExtension}`)) {
-                warn(context, `The 'module' field in your package.json should not use a '.${cjsJSExtension}' extension for ES modules.`);
-            }
-        }
+        validateCjsModuleFields(fieldContext);
     } else if (isEsm) {
-        if (pkg.exports === undefined && !context.options.emitCJS) {
-            if (validation.packageJson?.exports !== false) {
-                warn(context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
-            }
-        } else if (context.options.emitCJS) {
-            if (validation.packageJson?.main !== false && pkg.main === undefined) {
-                warn(context, "The 'main' field is missing in your package.json. This field is needed when emitting CommonJS modules.");
-            }
-
-            if (validation.packageJson?.module !== false) {
-                if (pkg.module === undefined) {
-                    warn(context, "The 'module' field is missing in your package.json. This field is necessary when emitting ES modules.");
-                }
-
-                if (pkg.module?.endsWith(`.${cjsJSExtension}`)) {
-                    warn(context, `The 'module' field should not use a '.${cjsJSExtension}' extension for ES modules.`);
-                }
-
-                if (pkg.module && pkg.main && pkg.module === pkg.main) {
-                    warn(
-                        context,
-                        `Conflict detected: The 'module' and 'main' fields both point to '${pkg.module as string}'. Please ensure they refer to different module types.`,
-                    );
-                }
-            }
-
-            if (validation.packageJson?.exports !== false && pkg.exports === undefined) {
-                warn(context, "The 'exports' field is missing in your package.json. This field is required for defining explicit exports.");
-            }
-        }
+        validateEsmModuleFields(fieldContext);
     }
 
     if (pkg.exports !== undefined) {
         validateExports(context, pkg.exports);
     }
 
-    if (validation.packageJson?.bin !== false) {
-        const forbiddenExtension = isCjs ? esmJSExtension : cjsJSExtension;
-
-        // If both ESM and CJS use the same extension, then no extension is forbidden
-        const shouldValidateBinExtensions = cjsJSExtension !== esmJSExtension;
-
-        if (shouldValidateBinExtensions) {
-            if (typeof pkg.bin === "string" && pkg.bin.endsWith(`.${forbiddenExtension}`)) {
-                warn(
-                    context,
-                    `The 'bin' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
-                );
-            } else if (typeof pkg.bin === "object") {
-                for (const [bin, binPath] of Object.entries(pkg.bin)) {
-                    if (binPath && (binPath as string).endsWith(`.${forbiddenExtension}`)) {
-                        warn(
-                            context,
-                            `The 'bin.${bin}' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
-                        );
-                    }
-                }
-            }
-        }
-    }
-
-    if (context.options.declaration) {
-        let showWarning = true;
-
-        if (pkg.type === "module") {
-            showWarning = Boolean(pkg.main?.endsWith(`.${cjsJSExtension}`));
-        }
-
-        if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation.packageJson?.types !== false) {
-            warn(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
-        }
-
-        if (
-            (context.options.declaration === true || context.options.declaration === "compatible")
-            && showWarning
-            && validation.packageJson?.typesVersions !== false
-            && (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
-        ) {
-            warn(
-                context,
-                "No 'typesVersions' field found in your package.json. Consider adding this field, or change the declaration option to 'node16' or 'false'.",
-            );
-        }
-    }
+    validateBinExtensionFields(fieldContext, isCjs);
+    validateDeclarationFields(fieldContext);
 
     if (validation.packageJson?.sideEffects !== false && pkg.sideEffects === undefined) {
         warn(context, "The 'sideEffects' field is missing in your package.json. Consider adding this field to your package.json.");

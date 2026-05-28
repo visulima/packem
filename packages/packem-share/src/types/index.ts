@@ -35,7 +35,7 @@ export interface BuildHooks<T> {
     "validate:done": (context: BuildContext<T>) => Promise<void> | void;
 }
 
-export type BuildContext<T> = {
+export type BuildContext<T = unknown> = {
     buildEntries: (BuildContextBuildAssetAndChunk | BuildContextBuildEntry)[];
     dependencyGraphMap: Map<string, Set<[string, string]>>;
     environment: Environment;
