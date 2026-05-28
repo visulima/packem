@@ -1,5 +1,5 @@
 import type { Dirent } from "node:fs";
-import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, realpathSync, writeFileSync } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 
@@ -75,7 +75,11 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(() => {
-        temporaryDirectoryPath = mkdtempSync(join(tmpdir(), "packem-css-"));
+        // Resolve the realpath so the temp dir matches the module ids packem/rollup
+        // operate on. On macOS tmpdir() returns /var/folders/... but the resolved id
+        // is /private/var/folders/...; the 'function' inject test strips this prefix
+        // from the id, which only works when both sides use the same (real) path.
+        temporaryDirectoryPath = realpathSync(mkdtempSync(join(tmpdir(), "packem-css-")));
     });
 
     afterEach(async () => {

@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync } from "node:fs";
+import { mkdirSync, mkdtempSync, realpathSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -61,7 +61,10 @@ describe("packem error cases", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        temporaryDirectoryPath = mkdtempSync(join(tmpdir(), "packem-error-cases-"));
+        // Resolve the realpath so the temp dir matches packem's reported path. On
+        // macOS tmpdir() returns /var/folders/... but packem resolves the realpath
+        // /private/var/folders/...; without this the path assertions never match.
+        temporaryDirectoryPath = realpathSync(mkdtempSync(join(tmpdir(), "packem-error-cases-")));
 
         await createPackemConfig(temporaryDirectoryPath);
     });
