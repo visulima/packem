@@ -380,6 +380,7 @@ overrides:
   yaml@>=2.0.0 <2.8.3: ">=2.8.3"
 
 patchedDependencies:
+  '@arethetypeswrong/core@0.18.2': patches/@arethetypeswrong__core@0.18.2.patch
   oxc-parser: patches/oxc-parser.patch
 
 peerDependencyRules:

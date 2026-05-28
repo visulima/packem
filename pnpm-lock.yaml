@@ -661,6 +661,7 @@ overrides:
   yaml@>=2.0.0 <2.8.3: '>=2.8.3'
 
 patchedDependencies:
+  '@arethetypeswrong/core@0.18.2': 620ad4d52a40a73d67b7713cebc331b1b85af2bac3a043e409b3fe1ca07d7771
   oxc-parser: 464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76
 
 importers:
@@ -693,7 +694,7 @@ importers:
         version: 13.0.2
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.78(0e7fe07fac86bb859423019efb1a2508)
+        version: 2.0.0-alpha.78(f547b795d51c927913c51439fcc13033)
       audit-ci:
         specifier: catalog:prod
         version: 7.1.0
@@ -1604,7 +1605,7 @@ importers:
         version: 25.9.1
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.78(504ce758408e59b9b27646450a6a8254)
+        version: 2.0.0-alpha.78(333c0cbbdb933349d97675208dd08464)
       '@vitest/coverage-v8':
         specifier: catalog:test
         version: 4.1.7(vitest@4.1.7)
@@ -1646,7 +1647,7 @@ importers:
         version: 1.1.0
       '@arethetypeswrong/core':
         specifier: '>=0.18.2'
-        version: 0.18.2
+        version: 0.18.2(patch_hash=620ad4d52a40a73d67b7713cebc331b1b85af2bac3a043e409b3fe1ca07d7771)
       '@clack/prompts':
         specifier: catalog:node
         version: 1.4.0
@@ -2134,7 +2135,7 @@ importers:
         version: 7.7.1
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.78(4438d2538c9f8a834c1fe87622e163eb)
+        version: 2.0.0-alpha.78(ce525f8cc3cd07a61513f3ec1adf244e)
       '@visulima/pail':
         specifier: catalog:visulima
         version: 4.0.0-alpha.16(express@5.2.1)(hono@4.12.19)
@@ -2218,7 +2219,7 @@ importers:
         version: 25.9.1
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.78(4438d2538c9f8a834c1fe87622e163eb)
+        version: 2.0.0-alpha.78(ce525f8cc3cd07a61513f3ec1adf244e)
       '@visulima/packem-plugins':
         specifier: workspace:*
         version: link:../packem-plugins
@@ -2396,7 +2397,7 @@ importers:
         version: 7.7.1
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.78(4438d2538c9f8a834c1fe87622e163eb)
+        version: 2.0.0-alpha.78(ce525f8cc3cd07a61513f3ec1adf244e)
       '@visulima/packem-plugins':
         specifier: workspace:*
         version: link:../packem-plugins
@@ -2520,7 +2521,7 @@ importers:
         version: 25.9.1
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.78(4438d2538c9f8a834c1fe87622e163eb)
+        version: 2.0.0-alpha.78(ce525f8cc3cd07a61513f3ec1adf244e)
       '@visulima/pail':
         specifier: catalog:visulima
         version: 4.0.0-alpha.16(express@5.2.1)(hono@4.12.19)
@@ -2751,7 +2752,7 @@ importers:
         version: link:../css-style-inject
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.78(4438d2538c9f8a834c1fe87622e163eb)
+        version: 2.0.0-alpha.78(ce525f8cc3cd07a61513f3ec1adf244e)
       '@vitest/coverage-v8':
         specifier: catalog:test
         version: 4.1.7(vitest@4.1.7)
@@ -2934,7 +2935,7 @@ importers:
         version: 5.0.0-alpha.24(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.6.1)(yaml@2.9.0)
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.78(c528b87bae3d80691cbc193a7c5f3775)
+        version: 2.0.0-alpha.78(78ebdd0afa6522ab5e9c85dd122a474a)
       '@volar/typescript':
         specifier: catalog:tsc
         version: 2.4.28
@@ -15676,7 +15677,7 @@ snapshots:
 
   '@arethetypeswrong/cli@0.18.2':
     dependencies:
-      '@arethetypeswrong/core': 0.18.2
+      '@arethetypeswrong/core': 0.18.2(patch_hash=620ad4d52a40a73d67b7713cebc331b1b85af2bac3a043e409b3fe1ca07d7771)
       chalk: 4.1.2
       cli-table3: 0.6.5
       commander: 10.0.1
@@ -15684,7 +15685,7 @@ snapshots:
       marked-terminal: 7.3.0(marked@9.1.6)
       semver: 7.8.1
 
-  '@arethetypeswrong/core@0.18.2':
+  '@arethetypeswrong/core@0.18.2(patch_hash=620ad4d52a40a73d67b7713cebc331b1b85af2bac3a043e409b3fe1ca07d7771)':
     dependencies:
       '@andrewbranch/untar.js': 1.0.3
       '@loaderkit/resolve': 1.0.6
@@ -20375,7 +20376,7 @@ snapshots:
       - smol-toml
       - yaml
 
-  '@visulima/packem@2.0.0-alpha.78(0e7fe07fac86bb859423019efb1a2508)':
+  '@visulima/packem@2.0.0-alpha.78(333c0cbbdb933349d97675208dd08464)':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 1.2.0
@@ -20386,12 +20387,12 @@ snapshots:
       '@visulima/fs': 5.0.0-alpha.12(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.6.1)(yaml@2.8.3)
       '@visulima/humanizer': 3.0.0-alpha.11
       '@visulima/package': 5.0.0-alpha.11(ini@6.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
-      '@visulima/packem-rollup': 1.0.0-alpha.65(@babel/core@7.29.7)(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@swc/core@1.15.40(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.60.1))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.0)(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(oxc-transform@0.127.0)(picomatch@4.0.4)(rolldown@1.0.3)(rollup@4.60.1)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(yaml@2.8.3)
+      '@visulima/packem-rollup': 1.0.0-alpha.65(@babel/core@7.29.7)(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@swc/core@1.15.40(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.60.4))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.0)(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(oxc-transform@0.127.0)(picomatch@4.0.4)(rolldown@1.0.3)(rollup@4.60.1)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(yaml@2.8.3)
       '@visulima/packem-share': 1.0.0-alpha.46(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(rollup@4.60.1)(smol-toml@1.6.1)(yaml@2.8.3)
       '@visulima/pail': 4.0.0-alpha.11(express@5.2.1)(hono@4.12.19)
       '@visulima/path': 3.0.0-alpha.10
       '@visulima/rollup-plugin-css': 1.0.0-alpha.45(2d862195d90c0545698bb900aaee58fd)
-      '@visulima/rollup-plugin-dts': 1.0.0-alpha.26(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@ts-macro/tsc@0.3.7(rollup@4.60.1))(@typescript/native-preview@7.0.0-dev.20250922.1)(ini@6.0.0)(json5@2.2.3)(rollup@4.60.1)(smol-toml@1.6.1)(typescript@6.0.3)(yaml@2.8.3)
+      '@visulima/rollup-plugin-dts': 1.0.0-alpha.26(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@ts-macro/tsc@0.3.7(rollup@4.60.4))(@typescript/native-preview@7.0.0-dev.20250922.1)(ini@6.0.0)(json5@2.2.3)(rollup@4.60.1)(smol-toml@1.6.1)(typescript@6.0.3)(yaml@2.8.3)
       '@visulima/tabular': 4.0.0-alpha.11
       '@visulima/tsconfig': 3.0.0-alpha.11(ini@6.0.0)(json5@2.2.3)(smol-toml@1.6.1)(yaml@2.8.3)
       browserslist: 4.28.2
@@ -20410,7 +20411,7 @@ snapshots:
       tinyexec: 1.1.1
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@arethetypeswrong/core': 0.18.2
+      '@arethetypeswrong/core': 0.18.2(patch_hash=620ad4d52a40a73d67b7713cebc331b1b85af2bac3a043e409b3fe1ca07d7771)
       '@babel/core': 7.29.7
       '@swc/core': 1.15.40(@swc/helpers@0.5.23)
       cssnano: 8.0.1(postcss@8.5.15)
@@ -20425,7 +20426,7 @@ snapshots:
       postcss-modules-scope: 3.2.1(postcss@8.5.15)
       postcss-modules-values: 4.0.0(postcss@8.5.15)
       postcss-value-parser: 4.2.0
-      rollup-plugin-svelte: 7.2.3(rollup@4.60.1)(svelte@5.55.9(@typescript-eslint/types@8.59.4))
+      rollup-plugin-svelte: 7.2.3(rollup@4.60.4)(svelte@5.55.9(@typescript-eslint/types@8.59.4))
       sass: 1.100.0
       sass-embedded: 1.100.0
       stylus: 0.64.0
@@ -20466,7 +20467,98 @@ snapshots:
       - vue-tsc
       - yaml
 
-  '@visulima/packem@2.0.0-alpha.78(4438d2538c9f8a834c1fe87622e163eb)':
+  '@visulima/packem@2.0.0-alpha.78(78ebdd0afa6522ab5e9c85dd122a474a)':
+    dependencies:
+      '@antfu/install-pkg': 1.1.0
+      '@clack/prompts': 1.2.0
+      '@rollup/pluginutils': 5.3.0(rollup@4.60.1)
+      '@visulima/cerebro': 3.0.0-alpha.11(@visulima/find-cache-dir@3.0.0-alpha.9)(@visulima/pail@4.0.0-alpha.11(express@5.2.1)(hono@4.12.19))(github-slugger@2.0.0)
+      '@visulima/colorize': 2.0.0-alpha.10
+      '@visulima/find-cache-dir': 3.0.0-alpha.9
+      '@visulima/fs': 5.0.0-alpha.12(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.6.1)(yaml@2.9.0)
+      '@visulima/humanizer': 3.0.0-alpha.11
+      '@visulima/package': 5.0.0-alpha.11(ini@6.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
+      '@visulima/packem-rollup': 1.0.0-alpha.65(@babel/core@7.29.7)(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@swc/core@1.15.40(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.60.4))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.0)(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(oxc-transform@0.127.0)(picomatch@4.0.4)(rolldown@1.0.3)(rollup@4.60.1)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(vue-tsc@3.3.2(typescript@6.0.3))(yaml@2.9.0)
+      '@visulima/packem-share': 1.0.0-alpha.46(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(rollup@4.60.1)(smol-toml@1.6.1)(yaml@2.9.0)
+      '@visulima/pail': 4.0.0-alpha.11(express@5.2.1)(hono@4.12.19)
+      '@visulima/path': 3.0.0-alpha.10
+      '@visulima/rollup-plugin-css': 1.0.0-alpha.45(e665791ae1d22e39ab3c186581bafb2e)
+      '@visulima/rollup-plugin-dts': 1.0.0-alpha.26(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@ts-macro/tsc@0.3.7(rollup@4.60.4))(@typescript/native-preview@7.0.0-dev.20250922.1)(ini@6.0.0)(json5@2.2.3)(rollup@4.60.1)(smol-toml@1.6.1)(typescript@6.0.3)(vue-tsc@3.3.2(typescript@6.0.3))(yaml@2.9.0)
+      '@visulima/tabular': 4.0.0-alpha.11
+      '@visulima/tsconfig': 3.0.0-alpha.11(ini@6.0.0)(json5@2.2.3)(smol-toml@1.6.1)(yaml@2.9.0)
+      browserslist: 4.28.2
+      defu: 6.1.7
+      fastest-levenshtein: 1.0.16
+      hookable: 6.1.1
+      jiti: 2.6.1
+      magic-string: 0.30.21
+      mlly: 1.8.2
+      oxc-transform: 0.127.0
+      package-manager-detector: 1.6.0
+      picomatch: 4.0.4
+      rollup: 4.60.1
+      rollup-plugin-import-trace: 1.0.1(rollup@4.60.1)
+      semver: 7.7.4
+      tinyexec: 1.1.1
+      tinyglobby: 0.2.16
+    optionalDependencies:
+      '@arethetypeswrong/core': 0.18.2(patch_hash=620ad4d52a40a73d67b7713cebc331b1b85af2bac3a043e409b3fe1ca07d7771)
+      '@babel/core': 7.29.7
+      '@swc/core': 1.15.40(@swc/helpers@0.5.23)
+      cssnano: 8.0.1(postcss@8.5.15)
+      esbuild: 0.28.0
+      icss-utils: 5.1.0(postcss@8.5.15)
+      less: 4.6.4
+      lightningcss: 1.32.0
+      postcss: 8.5.15
+      postcss-load-config: 6.0.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.3)(yaml@2.9.0)
+      postcss-modules-extract-imports: 3.1.0(postcss@8.5.15)
+      postcss-modules-local-by-default: 4.2.0(postcss@8.5.15)
+      postcss-modules-scope: 3.2.1(postcss@8.5.15)
+      postcss-modules-values: 4.0.0(postcss@8.5.15)
+      postcss-value-parser: 4.2.0
+      rollup-plugin-svelte: 7.2.3(rollup@4.60.4)(svelte@5.55.9(@typescript-eslint/types@8.59.4))
+      sass: 1.100.0
+      sass-embedded: 1.100.0
+      stylus: 0.64.0
+      sucrase: 3.35.1
+      typedoc: 0.28.19(typescript@6.0.3)
+      typedoc-plugin-markdown: 4.11.0(typedoc@0.28.19(typescript@6.0.3))
+      typedoc-plugin-rename-defaults: 0.7.3(typedoc@0.28.19(typescript@6.0.3))
+      typescript: 6.0.3
+      unplugin-vue: 7.2.0(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(less@4.6.4)(sass-embedded@1.100.0)(sass@1.100.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.15))(terser@5.47.1)(tsx@4.22.3)(vue@3.5.35(typescript@6.0.3))(yaml@2.9.0)
+    transitivePeerDependencies:
+      - '@bomb.sh/tab'
+      - '@csstools/css-parser-algorithms'
+      - '@csstools/css-tokenizer'
+      - '@csstools/postcss-slow-plugins'
+      - '@emnapi/core'
+      - '@emnapi/runtime'
+      - '@opentelemetry/api'
+      - '@sveltejs/kit'
+      - '@ts-macro/tsc'
+      - '@typescript/native-preview'
+      - '@visulima/boxen'
+      - '@visulima/css-style-inject'
+      - '@visulima/redact'
+      - elysia
+      - express
+      - fastify
+      - github-slugger
+      - hono
+      - ini
+      - json5
+      - jsonc-parser
+      - next
+      - p-queue
+      - rolldown
+      - rotating-file-stream
+      - smol-toml
+      - vite
+      - vue-tsc
+      - yaml
+
+  '@visulima/packem@2.0.0-alpha.78(ce525f8cc3cd07a61513f3ec1adf244e)':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 1.2.0
@@ -20501,7 +20593,7 @@ snapshots:
       tinyexec: 1.1.1
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@arethetypeswrong/core': 0.18.2
+      '@arethetypeswrong/core': 0.18.2(patch_hash=620ad4d52a40a73d67b7713cebc331b1b85af2bac3a043e409b3fe1ca07d7771)
       '@babel/core': 7.29.7
       '@swc/core': 1.15.40(@swc/helpers@0.5.23)
       '@tailwindcss/node': 4.3.0
@@ -20559,7 +20651,7 @@ snapshots:
       - vue-tsc
       - yaml
 
-  '@visulima/packem@2.0.0-alpha.78(504ce758408e59b9b27646450a6a8254)':
+  '@visulima/packem@2.0.0-alpha.78(f547b795d51c927913c51439fcc13033)':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 1.2.0
@@ -20570,12 +20662,12 @@ snapshots:
       '@visulima/fs': 5.0.0-alpha.12(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.6.1)(yaml@2.8.3)
       '@visulima/humanizer': 3.0.0-alpha.11
       '@visulima/package': 5.0.0-alpha.11(ini@6.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
-      '@visulima/packem-rollup': 1.0.0-alpha.65(@babel/core@7.29.7)(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@swc/core@1.15.40(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.60.4))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.0)(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(oxc-transform@0.127.0)(picomatch@4.0.4)(rolldown@1.0.3)(rollup@4.60.1)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(yaml@2.8.3)
+      '@visulima/packem-rollup': 1.0.0-alpha.65(@babel/core@7.29.7)(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@swc/core@1.15.40(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.60.1))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.0)(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(oxc-transform@0.127.0)(picomatch@4.0.4)(rolldown@1.0.3)(rollup@4.60.1)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(yaml@2.8.3)
       '@visulima/packem-share': 1.0.0-alpha.46(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(rollup@4.60.1)(smol-toml@1.6.1)(yaml@2.8.3)
       '@visulima/pail': 4.0.0-alpha.11(express@5.2.1)(hono@4.12.19)
       '@visulima/path': 3.0.0-alpha.10
       '@visulima/rollup-plugin-css': 1.0.0-alpha.45(2d862195d90c0545698bb900aaee58fd)
-      '@visulima/rollup-plugin-dts': 1.0.0-alpha.26(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@ts-macro/tsc@0.3.7(rollup@4.60.4))(@typescript/native-preview@7.0.0-dev.20250922.1)(ini@6.0.0)(json5@2.2.3)(rollup@4.60.1)(smol-toml@1.6.1)(typescript@6.0.3)(yaml@2.8.3)
+      '@visulima/rollup-plugin-dts': 1.0.0-alpha.26(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@ts-macro/tsc@0.3.7(rollup@4.60.1))(@typescript/native-preview@7.0.0-dev.20250922.1)(ini@6.0.0)(json5@2.2.3)(rollup@4.60.1)(smol-toml@1.6.1)(typescript@6.0.3)(yaml@2.8.3)
       '@visulima/tabular': 4.0.0-alpha.11
       '@visulima/tsconfig': 3.0.0-alpha.11(ini@6.0.0)(json5@2.2.3)(smol-toml@1.6.1)(yaml@2.8.3)
       browserslist: 4.28.2
@@ -20594,7 +20686,7 @@ snapshots:
       tinyexec: 1.1.1
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@arethetypeswrong/core': 0.18.2
+      '@arethetypeswrong/core': 0.18.2(patch_hash=620ad4d52a40a73d67b7713cebc331b1b85af2bac3a043e409b3fe1ca07d7771)
       '@babel/core': 7.29.7
       '@swc/core': 1.15.40(@swc/helpers@0.5.23)
       cssnano: 8.0.1(postcss@8.5.15)
@@ -20609,7 +20701,7 @@ snapshots:
       postcss-modules-scope: 3.2.1(postcss@8.5.15)
       postcss-modules-values: 4.0.0(postcss@8.5.15)
       postcss-value-parser: 4.2.0
-      rollup-plugin-svelte: 7.2.3(rollup@4.60.4)(svelte@5.55.9(@typescript-eslint/types@8.59.4))
+      rollup-plugin-svelte: 7.2.3(rollup@4.60.1)(svelte@5.55.9(@typescript-eslint/types@8.59.4))
       sass: 1.100.0
       sass-embedded: 1.100.0
       stylus: 0.64.0
@@ -20619,97 +20711,6 @@ snapshots:
       typedoc-plugin-rename-defaults: 0.7.3(typedoc@0.28.19(typescript@6.0.3))
       typescript: 6.0.3
       unplugin-vue: 7.2.0(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(less@4.6.4)(sass-embedded@1.100.0)(sass@1.100.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.15))(terser@5.47.1)(tsx@4.22.3)(vue@3.5.35(typescript@6.0.3))(yaml@2.8.3)
-    transitivePeerDependencies:
-      - '@bomb.sh/tab'
-      - '@csstools/css-parser-algorithms'
-      - '@csstools/css-tokenizer'
-      - '@csstools/postcss-slow-plugins'
-      - '@emnapi/core'
-      - '@emnapi/runtime'
-      - '@opentelemetry/api'
-      - '@sveltejs/kit'
-      - '@ts-macro/tsc'
-      - '@typescript/native-preview'
-      - '@visulima/boxen'
-      - '@visulima/css-style-inject'
-      - '@visulima/redact'
-      - elysia
-      - express
-      - fastify
-      - github-slugger
-      - hono
-      - ini
-      - json5
-      - jsonc-parser
-      - next
-      - p-queue
-      - rolldown
-      - rotating-file-stream
-      - smol-toml
-      - vite
-      - vue-tsc
-      - yaml
-
-  '@visulima/packem@2.0.0-alpha.78(c528b87bae3d80691cbc193a7c5f3775)':
-    dependencies:
-      '@antfu/install-pkg': 1.1.0
-      '@clack/prompts': 1.2.0
-      '@rollup/pluginutils': 5.3.0(rollup@4.60.1)
-      '@visulima/cerebro': 3.0.0-alpha.11(@visulima/find-cache-dir@3.0.0-alpha.9)(@visulima/pail@4.0.0-alpha.11(express@5.2.1)(hono@4.12.19))(github-slugger@2.0.0)
-      '@visulima/colorize': 2.0.0-alpha.10
-      '@visulima/find-cache-dir': 3.0.0-alpha.9
-      '@visulima/fs': 5.0.0-alpha.12(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.6.1)(yaml@2.9.0)
-      '@visulima/humanizer': 3.0.0-alpha.11
-      '@visulima/package': 5.0.0-alpha.11(ini@6.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
-      '@visulima/packem-rollup': 1.0.0-alpha.65(@babel/core@7.29.7)(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@swc/core@1.15.40(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.60.4))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.0)(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(oxc-transform@0.127.0)(picomatch@4.0.4)(rolldown@1.0.3)(rollup@4.60.1)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(vue-tsc@3.3.2(typescript@6.0.3))(yaml@2.9.0)
-      '@visulima/packem-share': 1.0.0-alpha.46(ini@6.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(rollup@4.60.1)(smol-toml@1.6.1)(yaml@2.9.0)
-      '@visulima/pail': 4.0.0-alpha.11(express@5.2.1)(hono@4.12.19)
-      '@visulima/path': 3.0.0-alpha.10
-      '@visulima/rollup-plugin-css': 1.0.0-alpha.45(e665791ae1d22e39ab3c186581bafb2e)
-      '@visulima/rollup-plugin-dts': 1.0.0-alpha.26(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@ts-macro/tsc@0.3.7(rollup@4.60.4))(@typescript/native-preview@7.0.0-dev.20250922.1)(ini@6.0.0)(json5@2.2.3)(rollup@4.60.1)(smol-toml@1.6.1)(typescript@6.0.3)(vue-tsc@3.3.2(typescript@6.0.3))(yaml@2.9.0)
-      '@visulima/tabular': 4.0.0-alpha.11
-      '@visulima/tsconfig': 3.0.0-alpha.11(ini@6.0.0)(json5@2.2.3)(smol-toml@1.6.1)(yaml@2.9.0)
-      browserslist: 4.28.2
-      defu: 6.1.7
-      fastest-levenshtein: 1.0.16
-      hookable: 6.1.1
-      jiti: 2.6.1
-      magic-string: 0.30.21
-      mlly: 1.8.2
-      oxc-transform: 0.127.0
-      package-manager-detector: 1.6.0
-      picomatch: 4.0.4
-      rollup: 4.60.1
-      rollup-plugin-import-trace: 1.0.1(rollup@4.60.1)
-      semver: 7.7.4
-      tinyexec: 1.1.1
-      tinyglobby: 0.2.16
-    optionalDependencies:
-      '@arethetypeswrong/core': 0.18.2
-      '@babel/core': 7.29.7
-      '@swc/core': 1.15.40(@swc/helpers@0.5.23)
-      cssnano: 8.0.1(postcss@8.5.15)
-      esbuild: 0.28.0
-      icss-utils: 5.1.0(postcss@8.5.15)
-      less: 4.6.4
-      lightningcss: 1.32.0
-      postcss: 8.5.15
-      postcss-load-config: 6.0.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.3)(yaml@2.9.0)
-      postcss-modules-extract-imports: 3.1.0(postcss@8.5.15)
-      postcss-modules-local-by-default: 4.2.0(postcss@8.5.15)
-      postcss-modules-scope: 3.2.1(postcss@8.5.15)
-      postcss-modules-values: 4.0.0(postcss@8.5.15)
-      postcss-value-parser: 4.2.0
-      rollup-plugin-svelte: 7.2.3(rollup@4.60.4)(svelte@5.55.9(@typescript-eslint/types@8.59.4))
-      sass: 1.100.0
-      sass-embedded: 1.100.0
-      stylus: 0.64.0
-      sucrase: 3.35.1
-      typedoc: 0.28.19(typescript@6.0.3)
-      typedoc-plugin-markdown: 4.11.0(typedoc@0.28.19(typescript@6.0.3))
-      typedoc-plugin-rename-defaults: 0.7.3(typedoc@0.28.19(typescript@6.0.3))
-      typescript: 6.0.3
-      unplugin-vue: 7.2.0(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(less@4.6.4)(sass-embedded@1.100.0)(sass@1.100.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.15))(terser@5.47.1)(tsx@4.22.3)(vue@3.5.35(typescript@6.0.3))(yaml@2.9.0)
     transitivePeerDependencies:
       - '@bomb.sh/tab'
       - '@csstools/css-parser-algorithms'

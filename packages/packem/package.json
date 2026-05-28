@@ -174,7 +174,7 @@
         "build:prod": "cross-env INTERNAL_PACKEM_BUILD=1 JITI_INTEROP_DEFAULT=1 jiti src/cli/index.ts build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build",
-        "lint:attw": "attw --pack",
+        "lint:attw": "attw --pack --profile esm-only",
         "lint:eslint": "eslint ./src",
         "lint:eslint:fix": "eslint . --cache --concurrency auto --fix,",
         "lint:package-json": "publint --strict",

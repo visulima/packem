@@ -56,7 +56,7 @@
         "build:prod": "../../node_modules/.bin/packem build --production || exit 0",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build",
-        "lint:attw": "attw --pack",
+        "lint:attw": "attw --pack --profile esm-only",
         "lint:eslint": "eslint ./src",
         "lint:eslint:fix": "eslint . --cache --concurrency auto --fix,",
         "lint:fix": "pnpm run lint:eslint:fix",
