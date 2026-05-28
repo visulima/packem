@@ -205,7 +205,20 @@ export const createGeneratePlugin = ({
                             const mapPath = `${dtsPath}.map`;
 
                             if (existsSync(mapPath)) {
-                                map = JSON.parse(await readFile(mapPath, "utf8"));
+                                const tsgoMap = JSON.parse(await readFile(mapPath, "utf8")) as SourceMapInput & { sources?: string[] };
+
+                                // tsgo writes the map into an OS temp dir, so its `sources` are
+                                // relative to that dir whose depth varies by platform (/tmp vs
+                                // /var/folders/...). Resolve them against the map's real location
+                                // to recover absolute source paths; rollup then rebases them to a
+                                // stable output-relative form, matching the oxc/tsc backends.
+                                if (Array.isArray(tsgoMap.sources)) {
+                                    const mapDirectory = path.dirname(mapPath);
+
+                                    tsgoMap.sources = tsgoMap.sources.map((source) => (source == null ? source : path.resolve(mapDirectory, source)));
+                                }
+
+                                map = tsgoMap;
                             }
                         }
                     } else {
