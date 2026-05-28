@@ -4,6 +4,9 @@ import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "v
 import type { PatchTypesOptions } from "../../../../src/plugins/typescript/patch-typescript-types";
 import { patchTypescriptTypes } from "../../../../src/plugins/typescript/patch-typescript-types";
 
+const UNHANDLED_INTERNAL_REGEX = /has unhandled @internal declarations/;
+const MISSING_IMPORT_REGEX = /does not import "Bar\$1" from "\.\/types\.js"/;
+
 type RenderChunkHook = NonNullable<Plugin["renderChunk"]>;
 type RenderChunkHandler = RenderChunkHook extends ObjectHook<infer Handler> ? Handler : RenderChunkHook;
 
@@ -56,17 +59,17 @@ describe(patchTypescriptTypes, () => {
     ): string => {
         const plugin = patchTypescriptTypes(options, mockLogger as unknown as Console);
         const handler = getRenderChunkHandler(plugin);
-        const ctx = { warn: mockWarn } as unknown as ThisParameterType<RenderChunkHandler>;
+        const context = { warn: mockWarn } as unknown as ThisParameterType<RenderChunkHandler>;
         const fullChunk = {
             fileName: "test.d.ts",
             ...chunk,
         } as RenderedChunk;
         const result = handler.call(
-            ctx,
+            context,
             code,
             fullChunk,
             {} as NormalizedOutputOptions,
-            { chunks: {} as Record<string, RenderedChunk> },
+            { chunks: {} },
         );
 
         return asString(result);
@@ -206,7 +209,7 @@ describe(patchTypescriptTypes, () => {
             // only targets `Block` comments. The line comment survives, so the
             // post-walk invariant check finds `@internal` still in the output and throws.
             expect(() => runRenderChunk(code, { fileName: "line-comment.d.ts" })).toThrow(
-                /has unhandled @internal declarations/,
+                UNHANDLED_INTERNAL_REGEX,
             );
         });
 
@@ -216,7 +219,7 @@ describe(patchTypescriptTypes, () => {
             const code = `declare const x: "@internal value";\n`;
 
             expect(() => runRenderChunk(code, { fileName: "string-literal.d.ts" })).toThrow(
-                /has unhandled @internal declarations/,
+                UNHANDLED_INTERNAL_REGEX,
             );
         });
 
@@ -306,6 +309,7 @@ describe(patchTypescriptTypes, () => {
         });
     });
 
+    // eslint-disable-next-line no-secrets/no-secrets -- describe block label, not a credential
     describe("replaceConfusingTypeNames", () => {
         it("rewrites `Foo$1` identifiers using identifierReplacements", () => {
             expect.assertions(1);
@@ -373,7 +377,7 @@ describe(patchTypescriptTypes, () => {
                     { fileName: "missing-identifier.d.ts" },
                     { identifierReplacements: { "./types.js": { Bar$1: "Bar" } } },
                 ),
-            ).toThrow(/does not import "Bar\$1" from "\.\/types\.js"/);
+            ).toThrow(MISSING_IMPORT_REGEX);
         });
 
         it("logs a warning for unreplaced `$N` identifiers", () => {
@@ -391,6 +395,7 @@ describe(patchTypescriptTypes, () => {
 
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 expect.objectContaining({
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- expect.stringContaining returns `any` from vitest's matcher typings
                     message: expect.stringContaining("contains confusing identifier names"),
                     prefix: "plugin:patch-types",
                 }),

@@ -2008,6 +2008,9 @@ importers:
 
   packages/packem-plugins:
     dependencies:
+      '@babel/core':
+        specifier: catalog:dev
+        version: 7.29.7
       '@rollup/plugin-alias':
         specifier: catalog:build
         version: 6.0.0(rollup@4.60.4)
@@ -2053,6 +2056,9 @@ importers:
       oxc-resolver:
         specifier: catalog:node
         version: 11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      oxc-transform:
+        specifier: catalog:dev
+        version: 0.133.0
       rolldown:
         specifier: catalog:build
         version: 1.0.3
@@ -2065,6 +2071,9 @@ importers:
       semver:
         specifier: catalog:utils
         version: 7.8.1
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
@@ -2081,9 +2090,6 @@ importers:
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.2
-      '@babel/core':
-        specifier: catalog:dev
-        version: 7.29.7
       '@oxc-parser/binding-linux-x64-gnu':
         specifier: catalog:dev
         version: 0.133.0
@@ -2150,9 +2156,6 @@ importers:
       mime:
         specifier: catalog:dev
         version: 4.1.0
-      oxc-transform:
-        specifier: catalog:dev
-        version: 0.133.0
       prettier:
         specifier: catalog:lint
         version: 3.8.3
@@ -2171,9 +2174,6 @@ importers:
       semantic-release:
         specifier: catalog:cli
         version: 25.0.3(typescript@6.0.3)
-      typescript:
-        specifier: 6.0.3
-        version: 6.0.3
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(@vitest/ui@4.1.7)(happy-dom@20.9.0)(vite@8.0.14(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(less@4.6.4)(sass-embedded@1.100.0)(sass@1.100.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.15))(terser@5.47.1)(tsx@4.22.3)(yaml@2.9.0))

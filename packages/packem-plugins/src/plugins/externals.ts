@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- Pail type from @visulima/pail alpha references a broken `./pail.d.ts` path; the underlying logger is functional at runtime */
 import fs from "node:fs";
 
 import { cyan } from "@visulima/colorize";

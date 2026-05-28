@@ -141,6 +141,7 @@
         "test:watch": "vitest"
     },
     "dependencies": {
+        "@babel/core": "catalog:dev",
         "@rollup/plugin-alias": "catalog:build",
         "@rollup/pluginutils": "catalog:build",
         "@visulima/colorize": "catalog:visulima",
@@ -156,9 +157,11 @@
         "mlly": "catalog:prod",
         "oxc-parser": "catalog:prod",
         "oxc-resolver": "catalog:node",
+        "oxc-transform": "catalog:dev",
         "rollup-plugin-license": "catalog:build",
         "rs-module-lexer": "catalog:prod",
-        "semver": "catalog:utils"
+        "semver": "catalog:utils",
+        "typescript": "catalog:tsc"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "catalog:lint",
@@ -166,7 +169,6 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
-        "@babel/core": "catalog:dev",
         "@oxc-parser/binding-linux-x64-gnu": "catalog:dev",
         "@oxc-project/types": "catalog:dev",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
@@ -189,14 +191,12 @@
         "hookable": "catalog:dev",
         "jiti": "catalog:script",
         "mime": "catalog:dev",
-        "oxc-transform": "catalog:dev",
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
         "rimraf": "catalog:node",
         "rollup": "catalog:build",
         "secretlint": "catalog:lint",
         "semantic-release": "catalog:cli",
-        "typescript": "catalog:tsc",
         "vitest": "catalog:test"
     },
     "peerDependencies": {
