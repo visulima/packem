@@ -9,4 +9,5 @@
 // When a plugin lands that is needed only by rolldown — typically a
 // rolldown-native rewrite of one of those rollup-only plugins — add it under
 // `src/plugins/<name>/` and export it here.
+// eslint-disable-next-line unicorn/require-module-specifiers -- placeholder barrel: empty export marks this file as a module until rolldown-only plugins land
 export {};
