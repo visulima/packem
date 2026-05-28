@@ -56,4 +56,16 @@ export default createConfig(
             "perfectionist/sort-objects": "off",
         },
     },
+    {
+        // packem is a bundler that inlines most of its `@visulima/*` and `semver`
+        // helpers into `dist` (everything not listed in `externals` of
+        // packem.config.ts is bundled), so they live in devDependencies by design.
+        // Importing them from `src` is intentional — promoting them to runtime
+        // `dependencies` would force consumers to install code that is already
+        // bundled, so allow devDependency imports here instead.
+        files: ["**/src/**"],
+        rules: {
+            "import/no-extraneous-dependencies": ["error", { devDependencies: true }],
+        },
+    },
 );

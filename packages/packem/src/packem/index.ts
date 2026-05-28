@@ -7,6 +7,7 @@ import { ensureDirSync } from "@visulima/fs";
 import { duration } from "@visulima/humanizer";
 import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
+import { patchErrorWithTrace } from "@visulima/packem-rollup";
 import { enhanceRollupError, FileCache } from "@visulima/packem-share";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "@visulima/packem-share/constants";
 import type { BuildContext, BuildHooks } from "@visulima/packem-share/types";
@@ -17,7 +18,6 @@ import browserslist from "browserslist";
 import { createHooks } from "hookable";
 import { createJiti } from "jiti";
 import type { RollupError } from "rollup";
-import { patchErrorWithTrace } from "@visulima/packem-rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
@@ -46,34 +46,10 @@ import build from "./build";
 import { node10Compatibility } from "./node10-compatibility";
 
 /**
- * Structured payload accepted by the Pail logger methods.
+ * The `@visulima/pail` logger surface, sourced from `BuildContext`.
  * @internal
  */
-interface LoggerMessage {
-    context?: unknown[];
-    message: unknown;
-    prefix?: string;
-    suffix?: string;
-}
-
-/**
- * Minimal, precisely-typed view of the `@visulima/pail` logger surface used here.
- *
- * The published `@visulima/pail` types re-export `Pail` from a non-existent
- * `./pail.d.ts` (the real declaration is `./pail.server.d.ts`), so the upstream
- * `Pail` type resolves to an unresolved/`any`-like type. Modelling only the
- * methods we call keeps the call sites strictly typed without an `any` escape.
- * @internal
- */
-interface Logger {
-    debug: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
-    error: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
-    info: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
-    raw: (message: string, ...arguments_: unknown[]) => void;
-    restoreAll: () => void;
-    warn: (message: LoggerMessage | string, ...arguments_: unknown[]) => void;
-    wrapAll: () => void;
-}
+type Logger = BuildContext<InternalBuildOptions>["logger"];
 
 /**
  * Matches raw-loadable asset extensions (markdown, text, html, generic data).

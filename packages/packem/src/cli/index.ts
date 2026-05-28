@@ -1,5 +1,6 @@
 import { createCerebro } from "@visulima/cerebro";
 import createPailLogger from "@visulima/cerebro/logger/pail";
+import type { Pail } from "@visulima/pail";
 import { SimpleReporter } from "@visulima/pail/reporter/simple";
 
 import { name, version } from "../../package.json";
@@ -41,9 +42,12 @@ try {
  * await cli.run(['build', '--watch']);
  * ```
  */
-const index = createCerebro("packem", {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- @visulima/pail's shipped d.ts re-exports from a non-existent ./pail.d.ts, so createPailLogger/SimpleReporter resolve to an error type; the runtime value is correct and cannot be fixed from here.
-    logger: await createPailLogger({
+const index = createCerebro<Pail>("packem", {
+    // `createPailLogger` returns @visulima/cerebro's bundled copy of `PailServerType`,
+    // which is structurally identical to `@visulima/pail`'s `Pail` but a distinct
+    // declaration. Their self-referential `new (...)` constructor signature defeats
+    // structural assignability between the two copies, so bridge them here.
+    logger: createPailLogger({
         reporters: [
             new SimpleReporter({
                 error: {
@@ -54,7 +58,7 @@ const index = createCerebro("packem", {
             }),
         ],
         scope: "packem",
-    }),
+    }) as unknown as Pail,
     packageName: name,
     packageVersion: version,
 });

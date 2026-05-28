@@ -5,6 +5,7 @@ import { platform as processPlatform, versions as processVersions } from "node:p
 import { bold, dim, gray, red } from "@visulima/colorize";
 import { isAccessible } from "@visulima/fs";
 import { formatBytes } from "@visulima/humanizer";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { basename, extname, join, relative, resolve } from "@visulima/path";
 import satisfies from "semver/functions/satisfies.js";
 import { x } from "tinyexec";
@@ -19,11 +20,7 @@ const debug = createDebug();
 
 const DTS_REGEX = /\.d\.[mc]?ts$/;
 
-interface Logger {
-    info: (message: string) => void;
-    success: (message: string) => void;
-    warn: (message: string) => void;
-}
+type Logger = BuildContext<InternalBuildOptions>["logger"];
 
 interface ExeBuildInput {
     buildEntries: ReadonlyArray<ExeChunk>;
