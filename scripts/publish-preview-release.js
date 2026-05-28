@@ -1,11 +1,11 @@
 // This tool is used by the pr ci to determine the packages that need to be published to the pkg-pr-new registry.
 
 // @ts-check
-import { execSync } from "node:child_process";
-import { join, dirname } from "node:path";
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import { env, exit } from "node:process";
+import { fileURLToPath } from "node:url";
 
 if (!env.CHANGED_FILES) {
     console.log("No changed files found");
@@ -13,29 +13,37 @@ if (!env.CHANGED_FILES) {
     exit(0);
 }
 
-const json = execSync(`pnpm exec nx show projects --affected --exclude=*-bench --exclude=examples_* --files=${process.env.CHANGED_FILES} --json`).toString(
-    "utf8",
-);
-
-/** @type {Array<{ path: string, private: boolean, peerDependencies?: Record<string, string> }>} */
-const affectedRepoPackages = JSON.parse(json);
-
 // eslint-disable-next-line @typescript-eslint/naming-convention,no-underscore-dangle
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const packagesPath = join(__dirname, "..", "packages");
+const rootDirectory = join(__dirname, "..");
 
-const packages = affectedRepoPackages.map((path) => {
-    const packageJsonPath = join(packagesPath, path, "package.json");
+// Call the nx binary directly instead of through `pnpm exec`: pnpm prepends a
+// workspace banner and a deps-verification/prepare prelude to stdout, which
+// corrupts the JSON parsed below. Passing the args as an array also avoids the
+// shell, so the `*-bench` glob reaches nx literally instead of being expanded.
+const json = execFileSync(
+    join(rootDirectory, "node_modules", ".bin", "nx"),
+    ["show", "projects", "--affected", "--exclude=*-bench", "--exclude=examples_*", `--files=${env.CHANGED_FILES}`, "--json"],
+    { encoding: "utf8" },
+);
+
+/** @type {string[]} */
+const affectedRepoPackages = JSON.parse(json);
+
+const packagesPath = join(rootDirectory, "packages");
+
+const packages = affectedRepoPackages.map((projectName) => {
+    const packageJsonPath = join(packagesPath, projectName, "package.json");
 
     if (!existsSync(packageJsonPath)) {
         throw new Error(`package.json not found at ${packageJsonPath}`);
     }
 
-    return join(packagesPath, path);
+    return join(packagesPath, projectName);
 });
 
 if (packages.length > 0) {
-    execSync(`pnpm exec pkg-pr-new publish --comment="update" --pnpm ${packages.join(" ")}`, { stdio: "inherit" });
+    execFileSync("pnpm", ["exec", "pkg-pr-new", "publish", "--comment=update", "--pnpm", ...packages], { stdio: "inherit" });
 } else {
     console.log("No packages to publish");
 }
