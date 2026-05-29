@@ -569,7 +569,12 @@ export const resolveOptions = ({
     let resolvedEntry: string[] | undefined;
 
     if (entry !== undefined) {
-        resolvedEntry = Array.isArray(entry) ? entry : [entry];
+        const entryList = Array.isArray(entry) ? entry : [entry];
+
+        // An empty pattern list can never match anything; treat it as "unset" so the
+        // build falls back to rollup's entry detection instead of silently emitting
+        // zero declaration files.
+        resolvedEntry = entryList.length > 0 ? entryList : undefined;
     }
 
     const tsconfigRaw = {

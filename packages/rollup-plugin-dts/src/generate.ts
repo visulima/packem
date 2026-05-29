@@ -79,12 +79,17 @@ export const createGeneratePlugin = ({
 
     // `entry` lets the user restrict which entry files emit `.d.ts` chunks via globs,
     // with `!`-prefixed negation patterns. Patterns are matched against paths relative
-    // to `cwd`. When unset, rollup's own entry detection is used.
+    // to `cwd`, normalized to forward slashes so a `src/index.ts`-style glob works on
+    // Windows too. When unset, rollup's own entry detection is used.
     const entryIncludes = entry?.filter((p) => p[0] !== "!");
     const entryIgnores = entry?.filter((p) => p[0] === "!").map((p) => p.slice(1));
     const entryMatcher = entry
-        // eslint-disable-next-line n/no-unsupported-features/node-builtins -- path.matchesGlob is available on all supported Node versions (>=22.14)
-        ? (file: string): boolean => entryIncludes!.some((p) => path.matchesGlob(file, p)) && !entryIgnores!.some((p) => path.matchesGlob(file, p))
+        ? (file: string): boolean => {
+            const normalized = file.split(path.sep).join("/");
+
+            // eslint-disable-next-line n/no-unsupported-features/node-builtins -- path.posix.matchesGlob is available on all supported Node versions (>=22.14)
+            return entryIncludes!.some((p) => path.posix.matchesGlob(normalized, p)) && !entryIgnores!.some((p) => path.posix.matchesGlob(normalized, p));
+        }
         : undefined;
     const dtsMap: DtsMap = new Map<string, TsModule>();
 

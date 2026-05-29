@@ -777,6 +777,36 @@ describe("dts plugin", () => {
         expect(dtsNames).toStrictEqual(["input1.d.ts"]);
     });
 
+    it("empty entry array falls back to emitting all entries", async () => {
+        expect.assertions(2);
+
+        const { chunks } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/alias/input1.ts"), path.resolve(dirname, "fixtures/alias/input2.ts")],
+            [dts({ emitDtsOnly: true, entry: [] })],
+        );
+
+        const dtsNames = chunks.map((chunk) => chunk.fileName).filter((name) => name.endsWith(".d.ts"));
+
+        // `entry: []` must not silently suppress all output — it falls back to rollup's
+        // entry detection, emitting a declaration for every entry.
+        expect(dtsNames).toContain("input1.d.ts");
+        expect(dtsNames).toContain("input2.d.ts");
+    });
+
+    it("warns when entry is set in dtsInput mode", async () => {
+        expect.assertions(1);
+
+        const warnings: string[] = [];
+
+        await rolldownBuild([path.resolve(dirname, "fixtures/dts-input.d.ts")], [dts({ dtsInput: true, entry: ["**"] })], {
+            onwarn(warning) {
+                warnings.push(warning.message);
+            },
+        });
+
+        expect(warnings.some((warning) => warning.includes("`entry` option has no effect in `dtsInput` mode"))).toBe(true);
+    });
+
     // https://github.com/sxzz/rolldown-plugin-dts/pull/242 — type-only-ness must
     // propagate across a multi-hop re-export chain regardless of module order.
     it("preserves type modifier across a multi-hop re-export chain", async () => {

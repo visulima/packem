@@ -3,8 +3,16 @@ import type { Plugin } from "rollup";
 import { RE_DTS, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
 
-const createDtsInputPlugin = ({ sideEffects }: Pick<OptionsResolved, "sideEffects">): Plugin => {
+const createDtsInputPlugin = ({ entry, sideEffects }: Pick<OptionsResolved, "entry" | "sideEffects">): Plugin => {
     return {
+        buildStart() {
+            // The `entry` filter is implemented in the generate plugin, which is not
+            // active in dtsInput mode. Warn rather than silently ignore it.
+            if (entry) {
+                this.warn("The `entry` option has no effect in `dtsInput` mode; control which declaration files are emitted via the plugin's input list instead.");
+            }
+        },
+
         name: "rollup-plugin-dts:dts-input",
 
         options: sideEffects

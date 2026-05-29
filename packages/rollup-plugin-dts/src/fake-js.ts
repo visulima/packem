@@ -6,7 +6,7 @@ import { isIdentifierName } from "@babel/helper-validator-identifier";
 import type { ParseResult } from "@babel/parser";
 import { parse } from "@babel/parser";
 import t from "@babel/types";
-import { isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST, walkASTAsync } from "ast-kit";
+import { extractIdentifiers, isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST, walkASTAsync } from "ast-kit";
 import type { Plugin, RenderedChunk, TransformPluginContext, TransformResult } from "rollup";
 
 import { filenameDtsTo, filenameJsToDts, filenameToDts, RE_DTS, RE_DTS_MAP, RE_NODE_MODULES, replaceTemplateName, resolveTemplateFunction } from "./filename";
@@ -93,6 +93,10 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
     const commentsMap = new Map<string /* filename */, t.Comment[]>();
     const moduleExportsMap = new Map<string /* filename */, ModuleExports>();
     const warnedCjsDtsInputs = new Set<string>();
+    // Cross-module type-only propagation depends only on `moduleExportsMap`, not on
+    // the chunk, so it is computed once per render and shared across all chunks
+    // (reset in `renderStart` to stay correct in watch mode).
+    let resolvedExportsByModule: Map<string, Map<string, boolean>> | undefined;
 
     return {
         generateBundle(_options, bundle) {
@@ -188,6 +192,12 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             };
         },
         renderChunk,
+
+        renderStart() {
+            // Invalidate the per-render type-only propagation cache so watch-mode
+            // rebuilds recompute it from the freshly-populated moduleExportsMap.
+            resolvedExportsByModule = undefined;
+        },
 
         async transform(code: string, id: string) {
             if (!RE_DTS.test(id))
@@ -470,7 +480,9 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             return;
         }
 
-        const exportInfo = collectChunkExportInfo(chunk, moduleExportsMap);
+        resolvedExportsByModule ??= resolveAllModuleExports(moduleExportsMap);
+
+        const exportInfo = collectChunkExportInfo(chunk, moduleExportsMap, resolvedExportsByModule);
 
         let file: ParseResult;
 
@@ -1019,36 +1031,11 @@ const collectTypeOnlyLocals = (node: t.Statement, typeOnlyLocals: Set<string>): 
     }
 };
 
-const collectPatternNames = (node: t.Node | null | undefined): string[] => {
-    if (!node) {
-        return [];
-    }
-
-    switch (node.type) {
-        case "ArrayPattern": {
-            return node.elements.flatMap((element) => collectPatternNames(element));
-        }
-        case "AssignmentPattern": {
-            return collectPatternNames(node.left);
-        }
-        case "Identifier": {
-            return [node.name];
-        }
-        case "ObjectPattern": {
-            return node.properties.flatMap((property) => collectPatternNames(property.type === "RestElement" ? property.argument : property.value));
-        }
-        case "RestElement": {
-            return collectPatternNames(node.argument);
-        }
-        default: {
-            return [];
-        }
-    }
-};
-
 const collectDeclarationNames = (node: t.Node): string[] => {
     if (node.type === "VariableDeclaration") {
-        return node.declarations.flatMap((decl) => collectPatternNames(decl.id));
+        // ast-kit's extractIdentifiers walks binding patterns (array/object/rest/
+        // default) and returns the bound Identifiers.
+        return node.declarations.flatMap((decl) => extractIdentifiers(decl.id).map((id) => id.name));
     }
 
     if ("id" in node && node.id) {
@@ -1249,8 +1236,11 @@ const resolveAllModuleExports = (moduleExportsMap: Map<string, ModuleExports>): 
     return exportsByModule;
 };
 
-const collectChunkExportInfo = (chunk: RenderedChunk, moduleExportsMap: Map<string, ModuleExports>): ChunkExportInfo => {
-    const exportsByModule = resolveAllModuleExports(moduleExportsMap);
+const collectChunkExportInfo = (
+    chunk: RenderedChunk,
+    moduleExportsMap: Map<string, ModuleExports>,
+    exportsByModule: Map<string, Map<string, boolean>>,
+): ChunkExportInfo => {
     const roots = chunk.facadeModuleId && moduleExportsMap.has(chunk.facadeModuleId) ? [chunk.facadeModuleId] : chunk.moduleIds;
     const mergedExports = new Map<string, boolean>();
     const typeOnlyExportAllSources = new Set<string>();
