@@ -447,7 +447,11 @@ export { __json_default_export as default }`;
                 const shouldEmit = !RE_JS.test(id) || emitJs;
 
                 if (shouldEmit) {
-                    const isEntry = entryMatcher ? entryMatcher(path.relative(cwd, id)) : !!this.getModuleInfo(id)?.isEntry;
+                    // `entry` only *filters* rollup's detected entry points — it never
+                    // promotes a non-entry module to an entry (a broad glob like `**`
+                    // must not turn internal/transitive modules into emitted chunks).
+                    const rollupIsEntry = !!this.getModuleInfo(id)?.isEntry;
+                    const isEntry = entryMatcher ? rollupIsEntry && entryMatcher(path.relative(cwd, id)) : rollupIsEntry;
                     const dtsId = filenameToDts(id);
 
                     dtsMap.set(dtsId, { code, id, isEntry });

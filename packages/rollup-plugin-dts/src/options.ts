@@ -65,11 +65,19 @@ export interface GeneralOptions {
     /**
      * Glob pattern(s) to filter which entry files get `.d.ts` generation.
      *
-     * When specified, only entry files matching these patterns will emit `.d.ts` chunks.
-     * When not specified, all entries get `.d.ts` generation.
+     * When specified, only rollup-detected entry points matching these patterns
+     * will emit `.d.ts` chunks. When not specified, all entries get `.d.ts`
+     * generation. This *filters* the existing entry set — it never promotes a
+     * non-entry (internal/transitive) module to an entry, so a broad pattern
+     * like `'**'` still only affects real entry points.
      *
      * Supports negation patterns (e.g. `['**', '!src/icons/**']`) for exclusion.
-     * Patterns are matched against file paths relative to `cwd`.
+     * Patterns are matched against file paths relative to `cwd` (use forward
+     * slashes).
+     *
+     * **Note:** this option has no effect in `dtsInput` mode, and when using the
+     * `tsc`/`vue-tsc` backend it also narrows the set of root files passed to the
+     * compiler.
      * @example
      * entry: 'src/index.ts'
      * entry: ['src/*.ts', '!src/internal/**']

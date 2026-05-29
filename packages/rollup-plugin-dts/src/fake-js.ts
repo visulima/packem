@@ -1170,9 +1170,31 @@ const setExportTypeOnly = (target: Map<string, boolean>, name: string, typeOnly:
     return false;
 };
 
+const exportsEqual = (a: Map<string, boolean>, b: Map<string, boolean>): boolean => {
+    if (a.size !== b.size) {
+        return false;
+    }
+
+    for (const [key, value] of a) {
+        if (b.get(key) !== value) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
 // Propagate type-only-ness across re-exports (`export { X } from`) and
 // `export *` chains until a fixpoint is reached, so a name that is type-only at
 // its origin stays type-only through every barrel that re-exports it.
+//
+// Each pass recomputes a module's exports from scratch (its genuine direct
+// exports plus the *current* propagated values of its sources) rather than
+// mutating an accumulator in place. The in-place approach was order-dependent:
+// a re-export whose source had not been resolved yet would be seeded as a value
+// export and then locked there, because `setExportTypeOnly` never upgrades
+// `false → true`. Recomputing lets the value settle correctly regardless of the
+// order modules are visited, while still letting a genuine value export win.
 const resolveAllModuleExports = (moduleExportsMap: Map<string, ModuleExports>): Map<string, Map<string, boolean>> => {
     const exportsByModule = new Map<string, Map<string, boolean>>();
 
@@ -1186,15 +1208,15 @@ const resolveAllModuleExports = (moduleExportsMap: Map<string, ModuleExports>): 
         changed = false;
 
         for (const [id, info] of moduleExportsMap) {
-            const currentExports = exportsByModule.get(id)!;
+            // Start from the module's genuine direct exports each pass so a
+            // re-export's flag can be revised upward as its source resolves.
+            const next = new Map(info.exports);
 
             for (const reExport of info.reExports) {
                 const sourceExports = reExport.source ? exportsByModule.get(reExport.source) : undefined;
                 const sourceTypeOnly = sourceExports?.get(reExport.local) ?? false;
 
-                if (setExportTypeOnly(currentExports, reExport.exported, reExport.typeOnly || sourceTypeOnly)) {
-                    changed = true;
-                }
+                setExportTypeOnly(next, reExport.exported, reExport.typeOnly || sourceTypeOnly);
             }
 
             for (const exportAll of info.exportAlls) {
@@ -1213,10 +1235,13 @@ const resolveAllModuleExports = (moduleExportsMap: Map<string, ModuleExports>): 
                         continue;
                     }
 
-                    if (setExportTypeOnly(currentExports, name, exportAll.typeOnly || typeOnly)) {
-                        changed = true;
-                    }
+                    setExportTypeOnly(next, name, exportAll.typeOnly || typeOnly);
                 }
+            }
+
+            if (!exportsEqual(exportsByModule.get(id)!, next)) {
+                exportsByModule.set(id, next);
+                changed = true;
             }
         }
     }

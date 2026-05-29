@@ -18,6 +18,7 @@ const STUB_LIB_IMPORT_RE = /import\(['"]stub_lib['"]\)\.LibType/u;
 // normalized (`export type { X }`); both are accepted.
 const TYPE_TASK_WRAPPER_RE = /export\s+type\s*\{[^}]*\bTaskWrapper\b|export\s*\{[^}]*\btype\s+TaskWrapper\b/u;
 const TYPE_TASK_RE = /export\s+type\s*\{[^}]*\bTask\b|export\s*\{[^}]*\btype\s+Task\b/u;
+const TYPE_FOO_RE = /export\s+type\s*\{[^}]*\bFoo\b|export\s*\{[^}]*\btype\s+Foo\b/u;
 const EXPORT_BRACE_RE = /export\s*\{/u;
 const TRIPLE_SLASH_NODE_RE = /\/\/\/ <reference types="node" \/>/g;
 
@@ -758,18 +759,35 @@ describe("dts plugin", () => {
     });
 
     it("entry option filters which entries emit dts", async () => {
-        expect.assertions(2);
+        expect.assertions(1);
 
         const { chunks } = await rolldownBuild(
             [path.resolve(dirname, "fixtures/alias/input1.ts"), path.resolve(dirname, "fixtures/alias/input2.ts")],
             [dts({ emitDtsOnly: true, entry: ["**", "!**/input2.ts"] })],
         );
 
-        const dtsNames = chunks.map((chunk) => chunk.fileName).filter((name) => name.endsWith(".d.ts"));
+        const dtsNames = chunks
+            .map((chunk) => chunk.fileName)
+            .filter((name) => name.endsWith(".d.ts"))
+            .toSorted((a, b) => a.localeCompare(b));
 
-        // input1 matches the entry globs and emits a declaration; input2 is excluded.
-        expect(dtsNames).toContain("input1.d.ts");
-        expect(dtsNames).not.toContain("input2.d.ts");
+        // input1 (a rollup entry) matches the globs → emitted. input2 is a rollup
+        // entry but is excluded by `!**/input2.ts`. shared.ts matches `**` but is an
+        // internal transitive module, NOT a rollup entry, so it must NOT be promoted.
+        expect(dtsNames).toStrictEqual(["input1.d.ts"]);
+    });
+
+    // https://github.com/sxzz/rolldown-plugin-dts/pull/242 — type-only-ness must
+    // propagate across a multi-hop re-export chain regardless of module order.
+    it("preserves type modifier across a multi-hop re-export chain", async () => {
+        expect.assertions(1);
+
+        const root = path.resolve(dirname, "fixtures/type-only-reexport-chain");
+        const { snapshot } = await rolldownBuild(path.resolve(root, "barrel.ts"), [dts({ emitDtsOnly: true })]);
+
+        // barrel re-exports Foo from mid, which `export type`s it from types. The
+        // final re-export must keep the `type` modifier.
+        expect(snapshot).toMatch(TYPE_FOO_RE);
     });
 
     // https://github.com/sxzz/rolldown-plugin-dts/pull/246
