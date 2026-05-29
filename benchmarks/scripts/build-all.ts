@@ -9,7 +9,7 @@ import { rspackBuilder } from "../builders/rspack";
 import { tsupBuilder } from "../builders/tsup";
 import { viteBuilder } from "../builders/vite";
 import { webpackBuilder } from "../builders/webpack";
-import { errorToString, getFileMetrics } from "./utils";
+import { errorToString, getArguments, getFileMetrics } from "./utils";
 import { displayBenchmarkResults } from "./utils";
 import type { Builder, BuilderOptions } from "../builders/types";
 import { readdir } from "node:fs/promises";
@@ -135,7 +135,26 @@ const runBenchmark = async (project: string): Promise<void> => {
 
 (async () => {
     try {
-        const projects = await getProjects();
+        const { project, projects: projectsArg } = getArguments();
+
+        // Optional filter: --project <name> or --projects <a,b,c>
+        const filter = [
+            ...(typeof project === "string" ? [project] : []),
+            ...(typeof projectsArg === "string" ? projectsArg.split(",").map((p) => p.trim()).filter(Boolean) : []),
+        ];
+
+        let projects = await getProjects();
+
+        if (filter.length > 0) {
+            const unknown = filter.filter((p) => !projects.includes(p));
+
+            if (unknown.length > 0) {
+                throw new Error(`Unknown project(s): ${unknown.join(", ")}. Available: ${projects.join(", ")}`);
+            }
+
+            projects = projects.filter((p) => filter.includes(p));
+        }
+
         console.log(`Found ${projects.length} projects: ${projects.join(", ")}\n`);
 
         // Run benchmarks for each project sequentially
