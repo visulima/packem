@@ -7,10 +7,14 @@ packages:
   - "packages/packem/__fixtures__/ecosystem/**"
   - "packages/**"
   - "examples/**"
+  - "benchmarks/**"
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
+  bun: false
   esbuild: true
+  lmdb: true
+  msgpackr-extract: true
   nodehun: true
   nx: true
   rs-module-lexer: true

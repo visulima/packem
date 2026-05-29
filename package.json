@@ -40,10 +40,12 @@
         "nx": "nx",
         "plop": "plop",
         "prepare": "is-ci || husky || exit 0",
-        "sort-package-json": "sort-package-json packages/**/package.json examples/**/package.json ./package.json",
+        "sort-package-json": "sort-package-json packages/**/package.json examples/**/package.json benchmarks/package.json ./package.json",
         "test": "nx run-many --target=test --all --parallel",
         "test:affected": "nx affected --target=test --parallel --exclude=*-bench,docs,examples_* --nxBail",
+        "test:affected:bench": "nx affected --target=test:bench --parallel --exclude=*-bench,docs,examples_* --nxBail",
         "test:affected:coverage": "nx affected --target=test:coverage --parallel --exclude=*-bench,docs,examples_* --nxBail",
+        "test:bench": "nx run-many --target=test:bench --all --parallel",
         "test:coverage": "nx run-many --target=test:coverage --all --parallel --exclude=*-bench,docs,examples_* --nxBail"
     },
     "browserslist": [
