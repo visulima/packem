@@ -4,16 +4,20 @@ import { fileURLToPath } from "node:url";
 import { rollupBuild as rolldownBuild } from "@sxzz/test-utils";
 import { describe, expect, it } from "vitest";
 
-import { dts } from "../src/index.js";
+import { dts, resolveOptions } from "../src/index.js";
 import { getTsgoPathFromNodeModules } from "../src/tsgo.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const EXPORT_BLOCK_RE = /export\s*\{[^}]*\}/g;
 const MISSING_FILE_RE = /Could not resolve ['"]\.\/missing-file['"]/u;
-const STUB_LIB_IMPORT_RE = /import \* as _\$stub_lib from ['"]stub_lib['"]/u;
-const TYPE_TASK_WRAPPER_RE = /export\s*\{[^}]*type\s+TaskWrapper/u;
-const TYPE_TASK_RE = /export\s*\{[^}]*type\s+Task\b/u;
+// External (unresolvable) `import("pkg").Type` references are preserved inline
+// rather than hoisted into a namespace import.
+const STUB_LIB_IMPORT_RE = /import\(['"]stub_lib['"]\)\.LibType/u;
+// Type-only exports may be emitted either inline (`export { type X }`) or
+// normalized (`export type { X }`); both are accepted.
+const TYPE_TASK_WRAPPER_RE = /export\s+type\s*\{[^}]*\bTaskWrapper\b|export\s*\{[^}]*\btype\s+TaskWrapper\b/u;
+const TYPE_TASK_RE = /export\s+type\s*\{[^}]*\bTask\b|export\s*\{[^}]*\btype\s+Task\b/u;
 const EXPORT_BRACE_RE = /export\s*\{/u;
 const TRIPLE_SLASH_NODE_RE = /\/\/\/ <reference types="node" \/>/g;
 
@@ -751,6 +755,62 @@ describe("dts plugin", () => {
         expect(snapshot).toMatchSnapshot();
         expect(snapshot).toMatch(TYPE_TASK_WRAPPER_RE);
         expect(snapshot).toMatch(TYPE_TASK_RE);
+    });
+
+    it("entry option filters which entries emit dts", async () => {
+        expect.assertions(2);
+
+        const { chunks } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/alias/input1.ts"), path.resolve(dirname, "fixtures/alias/input2.ts")],
+            [dts({ emitDtsOnly: true, entry: ["**", "!**/input2.ts"] })],
+        );
+
+        const dtsNames = chunks.map((chunk) => chunk.fileName).filter((name) => name.endsWith(".d.ts"));
+
+        // input1 matches the entry globs and emits a declaration; input2 is excluded.
+        expect(dtsNames).toContain("input1.d.ts");
+        expect(dtsNames).not.toContain("input2.d.ts");
+    });
+
+    // https://github.com/sxzz/rolldown-plugin-dts/pull/246
+    it("tracks dependencies in computed keys of method signatures", async () => {
+        expect.assertions(2);
+
+        const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/method-signature/index.ts"), [
+            dts({ compilerOptions: { isolatedDeclarations: false }, emitDtsOnly: true }),
+        ]);
+
+        // The const used in the computed method-signature key (`[mod.b](): string`)
+        // must be tracked as a dependency so it survives tree-shaking. Without the
+        // fix, `b` would be dropped and the `[b]()` key would dangle.
+        expect(snapshot).toContain("[b](): string");
+        expect(snapshot).toContain("declare const b = \"bb\"");
+    });
+
+    it("warns for CommonJS dts input syntax", async () => {
+        expect.assertions(2);
+
+        const warnings: string[] = [];
+
+        await rolldownBuild(
+            [path.resolve(dirname, "__fixtures__/rollup-plugin-dts/issue-89-import-equals/index.d.ts")],
+            [dts({ dtsInput: true })],
+            {
+                onwarn(warning) {
+                    warnings.push(warning.message);
+                },
+            },
+        );
+
+        expect(warnings.some((warning) => warning.includes("uses CommonJS dts syntax"))).toBe(true);
+        expect(warnings.join("\n")).toContain("does not support reliably bundling CommonJS dts input");
+    });
+
+    it("tsgo `enabled: false` disables tsgo", () => {
+        expect.assertions(2);
+
+        expect(resolveOptions({ tsgo: { enabled: false } }).tsgo).toBe(false);
+        expect(resolveOptions({ tsgo: { enabled: true, path: "custom-tsgo" } }).tsgo).toStrictEqual({ path: "custom-tsgo" });
     });
 
     it("jSDoc comments in types are preserved when tsc emits them", async () => {

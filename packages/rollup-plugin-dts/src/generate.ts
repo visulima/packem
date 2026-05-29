@@ -1,4 +1,4 @@
-/* eslint-disable consistent-return, sonarjs/cognitive-complexity, import/exports-last, @typescript-eslint/no-non-null-assertion, @typescript-eslint/prefer-nullish-coalescing, no-await-in-loop, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-dynamic-delete, unicorn/prevent-abbreviations, unicorn/no-await-expression-member, unicorn/no-null, no-underscore-dangle, @typescript-eslint/naming-convention, @typescript-eslint/restrict-template-expressions, no-plusplus, @stylistic/no-extra-parens, jsdoc/check-indentation, jsdoc/match-description, import/no-commonjs, prefer-const -- this file orchestrates the dts generation pipeline; rule-by-rule refactoring would obscure the control flow and many `any` usages stem from JSON.parse / rollup internal types */
+/* eslint-disable consistent-return, sonarjs/cognitive-complexity, import/exports-last, @typescript-eslint/no-non-null-assertion, @typescript-eslint/prefer-nullish-coalescing, no-await-in-loop, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-dynamic-delete, unicorn/prevent-abbreviations, unicorn/no-await-expression-member, unicorn/no-null, @typescript-eslint/restrict-template-expressions, no-plusplus, @stylistic/no-extra-parens, jsdoc/check-indentation, jsdoc/match-description, import/no-commonjs, prefer-const -- this file orchestrates the dts generation pipeline; rule-by-rule refactoring would obscure the control flow and many `any` usages stem from JSON.parse / rollup internal types */
 import type { ChildProcess } from "node:child_process";
 import { fork } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -41,6 +41,7 @@ export const createGeneratePlugin = ({
     eager,
     emitDtsOnly,
     emitJs,
+    entry,
     exclude,
     include,
     incremental,
@@ -72,8 +73,19 @@ export const createGeneratePlugin = ({
     | "sourcemap"
     | "include"
     | "exclude"
+    | "entry"
 >): Plugin => {
     const filter = include || exclude ? createFilter(include, exclude) : null;
+
+    // `entry` lets the user restrict which entry files emit `.d.ts` chunks via globs,
+    // with `!`-prefixed negation patterns. Patterns are matched against paths relative
+    // to `cwd`. When unset, rollup's own entry detection is used.
+    const entryIncludes = entry?.filter((p) => p[0] !== "!");
+    const entryIgnores = entry?.filter((p) => p[0] === "!").map((p) => p.slice(1));
+    const entryMatcher = entry
+        // eslint-disable-next-line n/no-unsupported-features/node-builtins -- path.matchesGlob is available on all supported Node versions (>=22.14)
+        ? (file: string): boolean => entryIncludes!.some((p) => path.matchesGlob(file, p)) && !entryIgnores!.some((p) => path.matchesGlob(file, p))
+        : undefined;
     const dtsMap: DtsMap = new Map<string, TsModule>();
 
     /**
@@ -412,7 +424,7 @@ export { __json_default_export as default }`;
 
         shouldTransformCachedModule({ id }) {
             // Force re-transformation for ALL .d.ts modules so the fake-js plugin's
-            // internal `declarationMap` / `typeOnlyMap` is re-populated on every
+            // internal `declarationMap` / `moduleExportsMap` is re-populated on every
             // build. fake-js's `renderChunk` reads state that only its `transform`
             // populates; if rollup serves a cached transform result, the state is
             // empty and renderChunk crashes with `Cannot read properties of
@@ -435,8 +447,7 @@ export { __json_default_export as default }`;
                 const shouldEmit = !RE_JS.test(id) || emitJs;
 
                 if (shouldEmit) {
-                    const module_ = this.getModuleInfo(id);
-                    const isEntry = !!module_?.isEntry;
+                    const isEntry = entryMatcher ? entryMatcher(path.relative(cwd, id)) : !!this.getModuleInfo(id)?.isEntry;
                     const dtsId = filenameToDts(id);
 
                     dtsMap.set(dtsId, { code, id, isEntry });

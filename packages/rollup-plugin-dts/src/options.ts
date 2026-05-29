@@ -14,6 +14,18 @@ type AddonFunction = (chunk: RenderedChunk) => string | Promise<string>;
 
 export type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | undefined;
 
+export interface TsgoOptions {
+    /**
+     * Enable or disable DTS generation using `tsgo`.
+     */
+    enabled?: boolean;
+
+    /**
+     * Custom path to the `tsgo` binary.
+     */
+    path?: string;
+}
+
 // #region General Options
 export interface GeneralOptions {
     /**
@@ -49,6 +61,20 @@ export interface GeneralOptions {
      * This is especially useful when generating `.d.ts` files for the CommonJS format as part of a separate build step.
      */
     emitDtsOnly?: boolean;
+
+    /**
+     * Glob pattern(s) to filter which entry files get `.d.ts` generation.
+     *
+     * When specified, only entry files matching these patterns will emit `.d.ts` chunks.
+     * When not specified, all entries get `.d.ts` generation.
+     *
+     * Supports negation patterns (e.g. `['**', '!src/icons/**']`) for exclusion.
+     * Patterns are matched against file paths relative to `cwd`.
+     * @example
+     * entry: 'src/index.ts'
+     * entry: ['src/*.ts', '!src/internal/**']
+     */
+    entry?: string | string[];
 
     /**
      * A pattern (or array of patterns) specifying files to exclude from DTS generation.
@@ -237,7 +263,7 @@ export interface Options extends GeneralOptions, TscOptions {
      *
      * Pass `true` to use the bundled tsgo binary, or an object with `path` to specify a custom binary path.
      */
-    tsgo?: boolean | { path?: string };
+    tsgo?: boolean | TsgoOptions;
 }
 
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
@@ -246,6 +272,7 @@ type MarkPartial<T, K extends keyof T> = Omit<Required<T>, K> & Partial<Pick<T, 
 export type OptionsResolved = Overwrite<
     MarkPartial<Omit<Options, "compilerOptions">, "banner" | "footer">,
     {
+        entry?: string[];
         exclude: FilterPattern;
         include: FilterPattern;
         oxc: IsolatedDeclarationsOptions | false;
@@ -416,12 +443,21 @@ const validateOxcCompatibility = (oxc: IsolatedDeclarationsOptions | false, vue:
 };
 
 // eslint-disable-next-line sonarjs/function-return-type -- the union return is the documented public contract
-const normalizeTsgo = (tsgoOption: boolean | { path?: string }): false | { path?: string } => {
+const normalizeTsgo = (tsgoOption: boolean | TsgoOptions): false | { path?: string } => {
     if (tsgoOption === false) {
         return false;
     }
 
-    return tsgoOption === true ? {} : tsgoOption;
+    if (tsgoOption === true) {
+        return {};
+    }
+
+    // Object form: an explicit `enabled: false` disables tsgo entirely.
+    if (tsgoOption.enabled === false) {
+        return false;
+    }
+
+    return { path: tsgoOption.path };
 };
 
 const normalizeOxc = (
@@ -470,6 +506,7 @@ export const resolveOptions = ({
     eager = false,
     emitDtsOnly = false,
     emitJs: emitJsOption,
+    entry,
     exclude,
     footer,
     include,
@@ -521,6 +558,12 @@ export const resolveOptions = ({
 
     compilerOptions.declarationMap = sourcemap;
 
+    let resolvedEntry: string[] | undefined;
+
+    if (entry !== undefined) {
+        resolvedEntry = Array.isArray(entry) ? entry : [entry];
+    }
+
     const tsconfigRaw = {
         ...resolvedTsconfig,
         ...overriddenTsconfigRaw,
@@ -558,6 +601,7 @@ export const resolveOptions = ({
         eager,
         emitDtsOnly,
         emitJs,
+        entry: resolvedEntry,
         exclude,
         footer,
         include,

@@ -336,54 +336,45 @@ export { Product };
 
 exports[`dts plugin > deterministic namespace import index 1`] = `
 "// a.d.ts
-import * as _$stub_lib from 'stub_lib';
-type MyTypeA = _$stub_lib.LibType;
+type MyTypeA = import('stub_lib').LibType;
 export { MyTypeA };
 
 // b.d.ts
-import * as _$stub_lib from 'stub_lib';
-type MyTypeB = _$stub_lib.LibType;
+type MyTypeB = import('stub_lib').LibType;
 export { MyTypeB };
 
 // c.d.ts
-import * as _$stub_lib from 'stub_lib';
-type MyTypeC = _$stub_lib.LibType;
+type MyTypeC = import('stub_lib').LibType;
 export { MyTypeC };
 "
 `;
 
 exports[`dts plugin > deterministic namespace import index 2`] = `
 "// a.d.ts
-import * as _$stub_lib from 'stub_lib';
-type MyTypeA = _$stub_lib.LibType;
+type MyTypeA = import('stub_lib').LibType;
 export { MyTypeA };
 
 // b.d.ts
-import * as _$stub_lib from 'stub_lib';
-type MyTypeB = _$stub_lib.LibType;
+type MyTypeB = import('stub_lib').LibType;
 export { MyTypeB };
 
 // c.d.ts
-import * as _$stub_lib from 'stub_lib';
-type MyTypeC = _$stub_lib.LibType;
+type MyTypeC = import('stub_lib').LibType;
 export { MyTypeC };
 "
 `;
 
 exports[`dts plugin > deterministic namespace import index 3`] = `
 "// a.d.ts
-import * as _$stub_lib from 'stub_lib';
-type MyTypeA = _$stub_lib.LibType;
+type MyTypeA = import('stub_lib').LibType;
 export { MyTypeA };
 
 // b.d.ts
-import * as _$stub_lib from 'stub_lib';
-type MyTypeB = _$stub_lib.LibType;
+type MyTypeB = import('stub_lib').LibType;
 export { MyTypeB };
 
 // c.d.ts
-import * as _$stub_lib from 'stub_lib';
-type MyTypeC = _$stub_lib.LibType;
+type MyTypeC = import('stub_lib').LibType;
 export { MyTypeC };
 "
 `;
@@ -504,7 +495,7 @@ declare class TaskWrapper {
 interface Task {
   title: string;
 }
-export { type Task, type TaskWrapper };
+export type { Task, TaskWrapper };
 "
 `;
 
@@ -516,7 +507,7 @@ declare class TaskWrapper {
 interface Task {
   title: string;
 }
-export { type Task, type TaskWrapper };
+export type { Task, TaskWrapper };
 "
 `;
 
@@ -668,7 +659,7 @@ export * from 'stub-lib';
 
 // b.d.ts
 import "./a.js";
-export { type LibType } from 'stub-lib';
+export type { LibType } from 'stub-lib';
 "
 `;
 
@@ -680,7 +671,7 @@ export * from 'stub-lib';
 
 exports[`dts plugin > re-export from lib > onlyB 1`] = `
 "// b.d.ts
-export { type LibType } from 'stub-lib';
+export type { LibType } from 'stub-lib';
 "
 `;
 
@@ -695,7 +686,7 @@ export { foo };
 exports[`dts plugin > resolve dts 1`] = `
 "// index.d.ts
 type Foo = string;
-export { Foo };
+export type { Foo };
 
 // index.js
 
@@ -731,7 +722,7 @@ export { Foo };
 exports[`dts plugin > tree-shaking 1`] = `
 "// index.d.ts
 type A = string;
-export { type A };
+export type { A };
 
 // index.js
 
@@ -807,7 +798,7 @@ declare const all = 42;
 declare class A {}
 declare class B {}
 declare const ns$1 = 42;
-export { A as RuntimeA, type A as TypeA, type B as TypeB, type A as TypeC, all, type namespace_d as ns };
+export { A as RuntimeA, type A as TypeA, type B as TypeB, type A as TypeC, type all, type namespace_d as ns };
 "
 `;
 
