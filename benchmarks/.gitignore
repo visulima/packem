@@ -1,2 +1,10 @@
 # Benchmark build outputs
 builds/
+
+# Per-builder runtime artifacts generated inside projects/* (e.g. by the parcel builder)
+.parcel-cache/
+projects/*/.parcel-cache/
+projects/*/.babelrc
+projects/*/.parcelrc
+projects/*/.terserrc
+projects/*/.env
