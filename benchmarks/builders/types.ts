@@ -23,6 +23,13 @@ export interface BuilderOptions {
     preset?: string;
 
     /**
+     * Bundler backend to use, for builders that support more than one.
+     * Currently only consumed by packem ("rollup" vs "rolldown").
+     * @default "rollup"
+     */
+    bundler?: "rollup" | "rolldown";
+
+    /**
      * Additional builder-specific options
      */
     options?: Record<string, unknown>;
@@ -38,6 +45,11 @@ export interface Builder {
      * Supported presets for this builder
      */
     supportedPresets?: string[];
+
+    /**
+     * Supported bundler backends for this builder (e.g. packem: "rollup" | "rolldown")
+     */
+    supportedBundlers?: string[];
 
     /**
      * Build function that processes the project

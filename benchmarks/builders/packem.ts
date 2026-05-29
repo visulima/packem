@@ -21,18 +21,38 @@ const isSupportedPreset = (preset: unknown): preset is SupportedPreset => {
     return typeof preset === "string" && Object.values<string>(SUPPORTED_PRESETS).includes(preset);
 };
 
+const SUPPORTED_BUNDLERS = ["rollup", "rolldown"] as const;
+
+type SupportedBundler = (typeof SUPPORTED_BUNDLERS)[number];
+
+const isSupportedBundler = (bundler: unknown): bundler is SupportedBundler => {
+    return typeof bundler === "string" && (SUPPORTED_BUNDLERS as readonly string[]).includes(bundler);
+};
+
+/**
+ * Unique output directory per (bundler, preset) so concurrent packem variants
+ * in build-all don't clobber a shared directory.
+ */
+const buildDir = (outDir: string, bundler: SupportedBundler, preset: string): string =>
+    join(outDir, `build-packem-${bundler}-${preset}`);
+
 export const packemBuilder: Builder = {
     name: "packem",
     supportedPresets: Object.values(SUPPORTED_PRESETS),
+    supportedBundlers: [...SUPPORTED_BUNDLERS],
 
-    async build({ project, entrypoint = "src/index.tsx", outDir = "./builds", preset = SUPPORTED_PRESETS.esbuild }: BuilderOptions) {
+    async build({ project, entrypoint = "src/index.tsx", outDir = "./builds", preset = SUPPORTED_PRESETS.esbuild, bundler = "rollup" }: BuilderOptions) {
         if (!isSupportedPreset(preset)) {
             throw new Error("Unsupported preset");
         }
 
+        if (!isSupportedBundler(bundler)) {
+            throw new Error("Unsupported bundler");
+        }
+
         const buildPaths = {
             appEntrypoint: `./${entrypoint}`,
-            appBuild: join(outDir, "build-packem"),
+            appBuild: buildDir(outDir, bundler, preset),
         };
 
         let transformer;
@@ -50,6 +70,7 @@ export const packemBuilder: Builder = {
         await packem(`./projects/${project}/`, {
             runtime: "browser",
             environment: "production",
+            bundler,
             outDir: "../../" + buildPaths.appBuild,
             transformer,
             clean: false,
@@ -71,8 +92,12 @@ export const packemBuilder: Builder = {
         return buildPaths.appBuild;
     },
 
-    async cleanup({ outDir = "./builds" }: BuilderOptions) {
-        const buildPath = join(outDir, "build-packem");
+    async cleanup({ outDir = "./builds", preset = SUPPORTED_PRESETS.esbuild, bundler = "rollup" }: BuilderOptions) {
+        if (!isSupportedBundler(bundler)) {
+            return;
+        }
+
+        const buildPath = buildDir(outDir, bundler, preset);
 
         await rm(buildPath, { force: true, recursive: true });
     },

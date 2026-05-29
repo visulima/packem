@@ -27,6 +27,7 @@ interface BuilderResult {
 interface BuilderWithPreset {
     builder: Builder;
     preset?: string;
+    bundler?: "rollup" | "rolldown";
 }
 
 // Create separate builder instances for each preset
@@ -54,9 +55,11 @@ const getBuilderInstances = (): BuilderWithPreset[] => {
         builders.push({ builder: rollupBuilder, preset });
     });
 
-    // Add Packem with its presets
-    ['esbuild', 'swc', 'sucrase', 'oxc'].forEach(preset => {
-        builders.push({ builder: packemBuilder, preset });
+    // Add Packem across both bundler backends (rollup + rolldown) and its transformer presets
+    (['rollup', 'rolldown'] as const).forEach(bundler => {
+        ['esbuild', 'swc', 'sucrase', 'oxc'].forEach(preset => {
+            builders.push({ builder: packemBuilder, preset, bundler });
+        });
     });
 
     // Add Webpack (currently no presets)
@@ -66,9 +69,9 @@ const getBuilderInstances = (): BuilderWithPreset[] => {
 };
 
 const runBuilder = async (builderWithPreset: BuilderWithPreset, baseOptions: BuilderOptions): Promise<BuilderResult | null> => {
-    const { builder, preset } = builderWithPreset;
-    const options = { ...baseOptions, preset };
-    const builderName = preset ? `${builder.name}-${preset}` : builder.name;
+    const { builder, preset, bundler } = builderWithPreset;
+    const options = { ...baseOptions, preset, bundler };
+    const builderName = [builder.name, bundler, preset].filter(Boolean).join("-");
 
     try {
         await builder.cleanup?.(options);
@@ -118,7 +121,7 @@ const runBenchmark = async (project: string): Promise<void> => {
 
     const builders = getBuilderInstances();
     console.log(`Running ${builders.length} builders...`);
-    console.log(builders.map(b => b.preset ? `${b.builder.name}-${b.preset}` : b.builder.name).join(", ") + "\n");
+    console.log(builders.map(b => [b.builder.name, b.bundler, b.preset].filter(Boolean).join("-")).join(", ") + "\n");
 
     // Run all builders in parallel
     const results = await Promise.all(

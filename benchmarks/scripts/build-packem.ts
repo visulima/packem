@@ -5,12 +5,14 @@ import { performance } from "node:perf_hooks";
 
 (async () => {
     try {
-        const { project, preset = "esbuild", entrypoint = "src/index.tsx" } = getArguments();
+        const { project, preset = "esbuild", entrypoint = "src/index.tsx", bundler = "rollup" } = getArguments();
 
         if (!project || !existsSync(`./projects/${project}`)) {
             throw new Error("Invalid project");
         } else if (!packemBuilder.supportedPresets?.includes(preset)) {
             throw new Error("Unsupported preset");
+        } else if (!packemBuilder.supportedBundlers?.includes(bundler)) {
+            throw new Error(`Unsupported bundler "${bundler}". Supported: ${packemBuilder.supportedBundlers?.join(", ")}`);
         } else if (!existsSync(`./projects/${project}/${entrypoint}`)) {
             throw new Error(`Invalid entrypoint ${entrypoint}`);
         }
@@ -19,6 +21,7 @@ import { performance } from "node:perf_hooks";
             project,
             entrypoint,
             preset,
+            bundler: bundler as "rollup" | "rolldown",
         };
 
         await packemBuilder.cleanup?.(options);
@@ -28,7 +31,7 @@ import { performance } from "node:perf_hooks";
         const end = performance.now();
 
         console.log("\n");
-        await getMetrics(`${packemBuilder.name}-${preset}`, end - start, buildPath, project);
+        await getMetrics(`${packemBuilder.name}-${bundler}-${preset}`, end - start, buildPath, project);
 
         process.exit(0);
     } catch (error) {
