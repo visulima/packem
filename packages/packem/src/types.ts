@@ -134,7 +134,14 @@ export interface BuildOptions {
     browserTargets?: string[];
     /** Custom builder functions for different build types */
     builder?: Record<string, (context: BuildContext<BuildOptions>, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
-    /** Bundler to use for building source files */
+    /**
+     * Bundler to use for building source files.
+     *
+     * Note: when set to `"rolldown"` the {@link transformer} option is ignored.
+     * Rolldown ships its own oxc-based transform and always uses it, so the
+     * esbuild/swc/sucrase/oxc transformer adapters only take effect under the
+     * default `"rollup"` bundler.
+     */
     bundler?: "rollup" | "rolldown";
     /** Whether to enable CommonJS interop for ESM modules */
     cjsInterop?: boolean;
