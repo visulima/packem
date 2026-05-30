@@ -12,6 +12,7 @@
         "test:bench:parcel": "jiti ./scripts/build-parcel.ts",
         "test:bench:rollup": "jiti ./scripts/build-rollup.ts",
         "test:bench:rspack": "jiti ./scripts/build-rspack.ts",
+        "test:bench:tsdown": "jiti ./scripts/build-tsdown.ts",
         "test:bench:tsup": "jiti ./scripts/build-tsup.ts",
         "test:bench:vite": "jiti ./scripts/build-vite.ts",
         "test:bench:webpack": "jiti ./scripts/build-webpack.ts",
@@ -67,6 +68,7 @@
         "table": "^6.9.0",
         "terser-webpack-plugin": "^5.3.12",
         "tsup": "^8.4.0",
+        "tsdown": "^0.22.1",
         "typescript": "^5.8.2",
         "vite": "^6.2.0",
         "webpack": "^5.98.0"

@@ -6,6 +6,7 @@ import { packemBuilder } from "../builders/packem";
 import { parcelBuilder } from "../builders/parcel";
 import { rollupBuilder } from "../builders/rollup";
 import { rspackBuilder } from "../builders/rspack";
+import { tsdownBuilder } from "../builders/tsdown";
 import { tsupBuilder } from "../builders/tsup";
 import { viteBuilder } from "../builders/vite";
 import { webpackBuilder } from "../builders/webpack";
@@ -44,6 +45,7 @@ const getBuilderInstances = (): BuilderWithPreset[] => {
         esbuildBuilder,
         parcelBuilder,
         //rspackBuilder,
+        tsdownBuilder,
         tsupBuilder,
         viteBuilder,
     ].forEach(builder => {
