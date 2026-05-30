@@ -366,16 +366,23 @@ const generateOptions = (
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
                 production: environment === PRODUCTION_ENV,
+                // The sucrase "imports" transform rewrites ESM `import`/`export` into
+                // CommonJS `require`/`exports`. Rollup does not follow `require()` in its
+                // native module graph, so enabling it leaves relative imports (e.g.
+                // `require("./App")`) as unresolved external runtime requires — the rest of
+                // the module graph is never bundled, yielding a near-empty output while the
+                // build still succeeds. Keep sucrase emitting ESM (matching the
+                // esbuild/swc/oxc transformers) and let rollup link the graph itself.
                 ...tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
                     ? {
                         jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
                         jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
                         jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
                         jsxRuntime,
-                        transforms: ["typescript", "jsx", ...tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : []],
+                        transforms: ["typescript", "jsx"],
                     }
                     : {
-                        transforms: ["typescript", ...tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : []],
+                        transforms: ["typescript"],
                     },
             },
             swc: {

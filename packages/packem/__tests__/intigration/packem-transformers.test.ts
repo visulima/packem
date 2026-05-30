@@ -131,4 +131,49 @@ export { index as default };
         expect(readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toBe(expectedCjs);
         expect(readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(expectedMjs);
     });
+
+    // Regression: the sucrase transformer used to enable the "imports" transform when the
+    // project's tsconfig set `esModuleInterop`, rewriting ESM `import`/`export` into CommonJS
+    // `require`/`exports`. Rollup does not follow `require()` in its module graph, so a
+    // relative import such as `require("./other")` was left as an unresolved runtime require
+    // and the imported module was never bundled — producing a near-empty bundle while the
+    // build still succeeded. This asserts the imported module's content survives in the output.
+    it.each(["esbuild", "swc", "sucrase", "oxc"] as const)(
+        "should bundle imported modules with the '%s' transformer when esModuleInterop is enabled",
+        async (transformer) => {
+            expect.assertions(4);
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+
+            writeFileSync(`${temporaryDirectoryPath}/src/other.ts`, `export const marker = () => "BUNDLED_MARKER";`);
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import { marker } from "./other";\n\nexport default () => marker();`,
+            );
+
+            await createTsConfig(temporaryDirectoryPath, { compilerOptions: { esModuleInterop: true } });
+            await createPackageJson(
+                temporaryDirectoryPath,
+                {
+                    devDependencies: { typescript: "*" },
+                    main: "./dist/index.cjs",
+                    module: "./dist/index.mjs",
+                },
+                transformer,
+            );
+            await createPackemConfig(temporaryDirectoryPath, { transformer });
+
+            const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+            expect(binProcess.exitCode).toBe(0);
+
+            const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+            const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+            // The imported module's body must be inlined, not left as an unresolved require("./other").
+            expect(cjs).toContain("BUNDLED_MARKER");
+            expect(mjs).toContain("BUNDLED_MARKER");
+            expect(cjs).not.toMatch(/require\(["']\.\/other["']\)/);
+        },
+    );
 });
