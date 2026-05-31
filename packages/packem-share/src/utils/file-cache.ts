@@ -90,7 +90,17 @@ class FileCache {
             return false;
         }
 
-        return isAccessibleSync(this.getFilePath(name, subDirectory));
+        const filePath = this.getFilePath(name, subDirectory);
+
+        // The memory cache is populated by `get()` after the first hit, so once
+        // we've read a file we can skip the disk stat entirely. cache-plugin's
+        // pattern is `has(k) ? get(k) : compute()`, so warming the path through
+        // `has` shaves a syscall per cache hit after the first one.
+        if (this.#memoryCache.has(filePath)) {
+            return true;
+        }
+
+        return isAccessibleSync(filePath);
     }
 
     /**
