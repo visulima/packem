@@ -379,16 +379,18 @@ const generateOptions = (
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
                 production: environment === PRODUCTION_ENV,
+                // Sucrase feeds rollup, which requires ESM input. The "imports" transform
+                // rewrites ESM to CJS require() and breaks rollup's static module graph.
                 ...tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx as string)
                     ? {
                         jsxFragmentPragma: extras(tsconfig.config.compilerOptions).jsxFragmentFactory,
                         jsxImportSource: extras(tsconfig.config.compilerOptions).jsxImportSource,
                         jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
                         jsxRuntime,
-                        transforms: ["typescript", "jsx", ...tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : []],
+                        transforms: ["typescript", "jsx"],
                     }
                     : {
-                        transforms: ["typescript", ...tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : []],
+                        transforms: ["typescript"],
                     },
             },
             swc: {
