@@ -93,8 +93,14 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
 
             const cacheKey = join("load", getHash(id), contentHash);
 
-            if (cache.has(cacheKey, pluginPath)) {
-                return unwrapCachedValue(await cache.get(cacheKey, pluginPath));
+            // `cache.get()` returns `undefined` only on a true miss — every
+            // hit is wrapped (either as a code-object, WrappedCacheValue, or
+            // WatchFilesCacheValue), so a single `get` saves the redundant
+            // `isAccessibleSync` syscall that `has()` would do before `get`.
+            const cached = await cache.get(cacheKey, pluginPath);
+
+            if (cached !== undefined) {
+                return unwrapCachedValue(cached) as HookReturn<Plugin["load"]>;
             }
 
             const result: unknown = await getHandler(plugin.load).call(this, id);
@@ -120,8 +126,10 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             const pluginPath = join(subDirectory, plugin.name);
             const cacheKey = join("resolveId", getHash(id), importer ? getHash(importer) : "", getHash(JSON.stringify(options)));
 
-            if (cache.has(cacheKey, pluginPath)) {
-                return unwrapCachedValue(await cache.get(cacheKey, pluginPath)) as HookReturn<Plugin["resolveId"]>;
+            const cached = await cache.get(cacheKey, pluginPath);
+
+            if (cached !== undefined) {
+                return unwrapCachedValue(cached) as HookReturn<Plugin["resolveId"]>;
             }
 
             const result: unknown = await getHandler(plugin.resolveId).call(this, id, importer, options);
@@ -139,8 +147,10 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             const pluginPath = join(subDirectory, plugin.name);
             const cacheKey = join("transform", getHash(id), getHash(code));
 
-            if (cache.has(cacheKey, pluginPath)) {
-                const cached: unknown = unwrapCachedValue(await cache.get(cacheKey, pluginPath));
+            const cachedRaw = await cache.get(cacheKey, pluginPath);
+
+            if (cachedRaw !== undefined) {
+                const cached: unknown = unwrapCachedValue(cachedRaw);
 
                 // Replay any addWatchFile calls that were captured during the original transform.
                 // This ensures rollup knows to invalidate this cached result when source
