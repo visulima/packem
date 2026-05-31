@@ -53,8 +53,13 @@ const unwrapCachedValue = (value: unknown): unknown => {
  * @param subDirectory
  * @returns
  */
-const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin =>
-    <Plugin>{
+const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin => {
+    // `pluginPath` is invariant for the lifetime of the wrapper — `subDirectory`
+    // and `plugin.name` don't change between hook calls — so compute it once
+    // instead of re-joining on every load/resolveId/transform invocation.
+    const pluginPath = join(subDirectory, plugin.name);
+
+    return <Plugin>{
         ...plugin,
 
         async buildEnd(error) {
@@ -74,7 +79,6 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return undefined;
             }
 
-            const pluginPath = join(subDirectory, plugin.name);
             // Support query params in id (e.g., ?raw). Keep the query as part of the cache key,
             // but compute file fingerprint using the clean path (without query) when possible.
             const cleanId = id.includes("?") ? (id.split("?")[0] as string) : id;
@@ -123,7 +127,6 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return undefined;
             }
 
-            const pluginPath = join(subDirectory, plugin.name);
             const cacheKey = join("resolveId", getHash(id), importer ? getHash(importer) : "", getHash(JSON.stringify(options)));
 
             const cached = await cache.get(cacheKey, pluginPath);
@@ -144,7 +147,6 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return undefined;
             }
 
-            const pluginPath = join(subDirectory, plugin.name);
             const cacheKey = join("transform", getHash(id), getHash(code));
 
             const cachedRaw = await cache.get(cacheKey, pluginPath);
@@ -196,5 +198,6 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             return result as HookReturn<Plugin["transform"]>;
         },
     };
+};
 
 export default cachePlugin;
