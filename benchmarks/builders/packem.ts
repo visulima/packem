@@ -67,14 +67,18 @@ export const packemBuilder: Builder = {
             transformer = sucraseTransformer;
         }
 
+        // Rolldown has its own oxc transform and rejects an explicit `transformer`.
+        const transformerOption = bundler === "rolldown" ? undefined : transformer;
+
         await packem(`./projects/${project}/`, {
             runtime: "browser",
             environment: "production",
             bundler,
             outDir: "../../" + buildPaths.appBuild,
-            transformer,
+            transformer: transformerOption,
             clean: false,
-            emitCJS: true,
+            // Match competitors (tsdown/tsup/rollup/bunchee) which emit a single format.
+            emitESM: true,
             entries: [buildPaths.appEntrypoint],
             validation: false,
             rollup: {

@@ -125,10 +125,14 @@ const runBenchmark = async (project: string): Promise<void> => {
     console.log(`Running ${builders.length} builders...`);
     console.log(builders.map(b => [b.builder.name, b.bundler, b.preset].filter(Boolean).join("-")).join(", ") + "\n");
 
-    // Run all builders in parallel
-    const results = await Promise.all(
-        builders.map(builder => runBuilder(builder, options))
-    );
+    // Run builders sequentially so each gets a clean CPU/IO budget. Parallel runs
+    // (Promise.all) saturate resources and amplify each builder's runtime by ~10x,
+    // distorting the comparison toward whoever finishes first and frees capacity.
+    const results: (BuilderResult | null)[] = [];
+
+    for (const builder of builders) {
+        results.push(await runBuilder(builder, options));
+    }
 
     // Filter out failed builds and sort by runtime
     const successfulResults = results.filter((result): result is BuilderResult => result !== null);
