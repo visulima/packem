@@ -1,6 +1,6 @@
 import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
-import type { RollupOptions } from "rollup";
+import type { OutputOptions, RollupOptions } from "rollup";
 
 import { createJsBuildOptions } from "../bundler/get-build-options";
 import { getOxcTransformerConfig, resolveNodeTarget } from "../rollup/get-rollup-options";
@@ -49,6 +49,20 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
     const options = await createJsBuildOptions(context, fileCache, "rolldown");
 
     (options as Record<string, unknown>).transform = getRolldownTransformOptions(context);
+
+    // Rolldown's `output.minify` defaults to `'dce-only'` (no identifier/whitespace
+    // compression), while the rollup backend gets real minification through the
+    // esbuild/swc transformer adapter's renderChunk hook. Without this forward,
+    // a rolldown build with `minify: true` would emit 2x-larger code than the
+    // equivalent rollup build. The shared output array carries `compact:
+    // context.options.minify` for rollup parity; rolldown ignores `compact` and
+    // wants `minify` instead.
+    if (context.options.minify && Array.isArray(options.output)) {
+        options.output = options.output.map((output: OutputOptions) => ({
+            ...output,
+            minify: true,
+        })) as OutputOptions[];
+    }
 
     return options;
 };
