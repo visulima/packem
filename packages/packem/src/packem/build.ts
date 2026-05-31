@@ -842,13 +842,16 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     // Remove duplicated build entries
     context.buildEntries = context.buildEntries.filter((entry, index, self) => self.findIndex((bEntry) => bEntry.path === entry.path) === index);
 
-    // Find all dist files and add missing entries as chunks
-    for await (const file of walk(join(context.options.rootDir, context.options.outDir), {
+    // Walk dist, then compute size metrics in parallel. The previous shape ran
+    // stat → brotli → gzip serially per file (brotli at quality 11 alone was
+    // the single largest non-rollup phase for small projects).
+    const distributionPath = join(context.options.rootDir, context.options.outDir);
+    const sizingTasks: Promise<void>[] = [];
+
+    for await (const file of walk(distributionPath, {
         includeDirs: false,
         includeFiles: true,
     })) {
-        const distributionPath = join(context.options.rootDir, context.options.outDir);
-
         let entry = context.buildEntries.find((bEntry) => join(distributionPath, bEntry.path) === file.path);
 
         if (!entry) {
@@ -863,18 +866,32 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
         entry.size ??= {};
 
         const filePath = resolve(distributionPath, file.path);
+        const capturedEntry = entry;
 
-        if (!entry.size.bytes) {
-            const awaitedStat = await stat(filePath);
+        sizingTasks.push(
+            (async () => {
+                if (!capturedEntry.size!.bytes) {
+                    const awaitedStat = await stat(filePath);
 
-            entry.size.bytes = awaitedStat.size;
-        }
+                    capturedEntry.size!.bytes = awaitedStat.size;
+                }
 
-        // brotli/gzip sizes of file contents are always > 0, so a nullish
-        // assignment is equivalent to the prior falsy check.
-        entry.size.brotli ??= await brotliSize(filePath);
-        entry.size.gzip ??= await gzipSize(filePath);
+                // brotli/gzip never produce 0-byte output, so `??=` matches
+                // the prior falsy guard semantics. Run them in parallel —
+                // they each pipe the same file through zlib and don't share
+                // state.
+                const [brotli, gzip] = await Promise.all([
+                    capturedEntry.size!.brotli ?? brotliSize(filePath),
+                    capturedEntry.size!.gzip ?? gzipSize(filePath),
+                ]);
+
+                capturedEntry.size!.brotli = brotli;
+                capturedEntry.size!.gzip = gzip;
+            })(),
+        );
     }
+
+    await Promise.all(sizingTasks);
 
     if (context.options.exe) {
         await buildExe(context);
