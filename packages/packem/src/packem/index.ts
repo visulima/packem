@@ -11,7 +11,7 @@ import { patchErrorWithTrace } from "@visulima/packem-rollup";
 import { enhanceRollupError, FileCache } from "@visulima/packem-share";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "@visulima/packem-share/constants";
 import type { BuildContext, BuildHooks } from "@visulima/packem-share/types";
-import { getHash } from "@visulima/packem-share/utils";
+import { getCacheHash } from "@visulima/packem-share/utils";
 import { join, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import browserslist from "browserslist";
@@ -862,7 +862,7 @@ const packem = async (
     let signalHandler: (() => void) | undefined;
 
     const cacheKey
-        = getHash(
+        = getCacheHash(
             JSON.stringify({
                 version: packageJson.version,
                 ...packageJson.dependencies,
@@ -878,7 +878,7 @@ const packem = async (
                 type: packageJson.type,
                 types: packageJson.types,
             }),
-        ) + getHash(JSON.stringify(config));
+        ) + getCacheHash(JSON.stringify(config));
 
     if (cachePath) {
         createOrUpdateKeyStorage(cacheKey, cachePath, logger);

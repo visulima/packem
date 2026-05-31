@@ -9,6 +9,7 @@ export {
     arrayify,
     enhanceRollupError,
     FileCache,
+    getCacheHash,
     getChunkFilename,
     getEntryFileNames,
     getHash,

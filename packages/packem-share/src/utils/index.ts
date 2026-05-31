@@ -6,6 +6,7 @@ export { default as FileCache } from "./file-cache";
 export { default as getChunkFilename } from "./get-chunk-filename";
 export { default as getEntryFileNames } from "./get-entry-file-names";
 export { getDtsExtension, getOutputExtension } from "./get-file-extensions";
+export { default as getCacheHash } from "./get-cache-hash";
 export { default as getHash } from "./get-hash";
 export { default as getPackageName } from "./get-package-name";
 export { default as getRegexMatches } from "./get-regex-matches";

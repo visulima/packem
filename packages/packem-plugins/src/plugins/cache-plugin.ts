@@ -4,7 +4,7 @@ import type { FileCache } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 import type { ObjectHook, Plugin } from "rollup";
 
-import { getHash } from "../utils";
+import { getCacheHash } from "../utils";
 
 type AnyFunction = (...arguments_: any[]) => any;
 
@@ -89,13 +89,13 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 if (cleanId && isAccessibleSync(cleanId)) {
                     const fileContent = readFileSync(cleanId);
 
-                    contentHash = getHash(fileContent);
+                    contentHash = getCacheHash(fileContent);
                 }
             } catch {
                 // Ignore fingerprint errors; fall back to id-only based caching
             }
 
-            const cacheKey = join("load", getHash(id), contentHash);
+            const cacheKey = join("load", getCacheHash(id), contentHash);
 
             // `cache.get()` returns `undefined` only on a true miss — every
             // hit is wrapped (either as a code-object, WrappedCacheValue, or
@@ -127,7 +127,7 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return undefined;
             }
 
-            const cacheKey = join("resolveId", getHash(id), importer ? getHash(importer) : "", getHash(JSON.stringify(options)));
+            const cacheKey = join("resolveId", getCacheHash(id), importer ? getCacheHash(importer) : "", getCacheHash(JSON.stringify(options)));
 
             const cached = await cache.get(cacheKey, pluginPath);
 
@@ -147,7 +147,7 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return undefined;
             }
 
-            const cacheKey = join("transform", getHash(id), getHash(code));
+            const cacheKey = join("transform", getCacheHash(id), getCacheHash(code));
 
             const cachedRaw = await cache.get(cacheKey, pluginPath);
 
