@@ -34,14 +34,14 @@ autoInstallPeers: true
 catalogs:
   build:
     "@rollup/plugin-alias": 6.0.0
-    "@rollup/plugin-commonjs": 29.0.2
+    "@rollup/plugin-commonjs": 29.0.3
     "@rollup/plugin-dynamic-import-vars": 2.1.5
     "@rollup/plugin-inject": 5.0.5
     "@rollup/plugin-json": 6.1.0
     "@rollup/plugin-node-resolve": 16.0.3
     "@rollup/plugin-replace": 6.0.3
     "@rollup/plugin-wasm": 6.2.2
-    "@rollup/pluginutils": 5.3.0
+    "@rollup/pluginutils": 5.4.0
     "@visulima/packem-rollup": 1.0.0-alpha.65
     "@visulima/rollup-plugin-css": 1.0.0-alpha.45
     esbuild: 0.28.0
@@ -64,7 +64,7 @@ catalogs:
     commitizen: ^4.3.1
     semantic-release: 25.0.3
   dev:
-    "@arethetypeswrong/cli": ^0.18.2
+    "@arethetypeswrong/cli": ^0.18.3
     "@babel/core": 7.29.7
     "@babel/parser": 7.29.7
     "@mozilla/readability": ^0.6.0
@@ -104,56 +104,56 @@ catalogs:
   frontend:
     "@babel/preset-react": ^7.29.7
     "@radix-ui/react-tooltip": ^1.2.8
-    "@vue/language-core": 3.3.2
+    "@vue/language-core": 3.3.3
     babel-plugin-react-compiler: 1.0.0
     preact: 10.29.2
     react: 19.2.6
     react-dom: 19.2.6
-    svelte: 5.55.9
+    svelte: 5.56.0
     vue: 3.5.35
   icons:
-    lucide-static: 1.16.0
+    lucide-static: 1.17.0
   lint:
     "@anolilab/commitlint-config": 10.0.1
     "@anolilab/eslint-config": 27.0.2
     "@anolilab/lint-staged-config": 11.0.1
     "@anolilab/prettier-config": 10.0.1
     "@anolilab/textlint-config": 13.0.1
-    "@commitlint/cli": 21.0.1
-    "@commitlint/config-conventional": 21.0.1
-    "@eslint/css": 1.2.0
+    "@commitlint/cli": 21.0.2
+    "@commitlint/config-conventional": 21.0.2
+    "@eslint/css": 1.3.0
     "@secretlint/secretlint-rule-preset-recommend": 13.0.2
-    eslint: 10.4.0
+    eslint: 10.4.1
     husky: ^9.1.7
-    lint-staged: 17.0.5
+    lint-staged: 17.0.7
     prettier: 3.8.3
     publint: 0.3.21
     secretlint: 13.0.2
-    tailwind-csstree: 0.3.1
+    tailwind-csstree: 0.3.2
     textlint: 15.7.1
   markdown:
     turndown: 7.2.4
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.11.0
   monorepo:
-    nx: 22.7.4
+    nx: 22.7.5
   network:
     browserslist: 4.28.2
     browserslist-config-anolilab: 9.0.0
   node:
     "@antfu/install-pkg": 1.1.0
     "@babel/preset-env": 7.29.7
-    "@clack/prompts": 1.4.0
+    "@clack/prompts": 1.5.0
     cac: 7.0.0
     cross-env: ^10.1.0
     dts-resolver: 3.0.0
     execa: ^9.6.1
     glob-parent: 6.0.2
-    oxc-resolver: 11.19.1
+    oxc-resolver: 11.20.0
     pkg-pr-new: 0.0.75
     rimraf: 6.1.3
-    tinyexec: 1.2.2
-    tinyglobby: 0.2.16
+    tinyexec: 1.2.4
+    tinyglobby: 0.2.17
   peer:
     package-manager-detector: ^1.6.0
   prod:
@@ -191,7 +191,7 @@ catalogs:
     tailwind-merge: 3.6.0
   script:
     jiti: 2.7.0
-    tsx: 4.22.3
+    tsx: 4.22.4
   style:
     "@csstools/css-parser-algorithms": 4.0.0
     "@csstools/css-tokenizer": 4.0.0
@@ -232,7 +232,7 @@ catalogs:
     "@ts-macro/tsc": 0.3.7
     "@volar/typescript": 2.4.28
     typescript: 6.0.3
-    vue-tsc: 3.3.2
+    vue-tsc: 3.3.3
   types:
     "@types/babel__core": ^7.20.5
     "@types/babel__generator": ^7.27.0
@@ -310,6 +310,9 @@ minimumReleaseAgeExclude:
   - rolldown@1.0.3
   - vue@3.5.35
   - tmp@0.2.6
+  - lint-staged@17.0.7
+  - tinyexec@1.2.4
+  - tsx@4.22.4
 
 onlyBuiltDependencies:
   - "@parcel/watcher"
@@ -384,7 +387,6 @@ overrides:
   yaml@>=2.0.0 <2.8.3: ">=2.8.3"
 
 patchedDependencies:
-  '@arethetypeswrong/core@0.18.2': patches/@arethetypeswrong__core@0.18.2.patch
   oxc-parser: patches/oxc-parser.patch
 
 peerDependencyRules:
