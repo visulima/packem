@@ -5,18 +5,16 @@ import stringify from "safe-stable-stringify";
 import type { RollupLogger } from "./create-rollup-logger";
 
 /**
- * Checks if a string is valid JSON.
- * @param value The string to validate
- * @returns True if the string is valid JSON, false otherwise
+ * Attempts to parse a string as JSON. Returns `{ ok: true, value }` on success
+ * so callers can avoid the previous test-then-parse pattern that ran
+ * `JSON.parse` twice per cache read.
  */
-const isJson = (value: string): boolean => {
+const tryParseJson = (value: string): { ok: false } | { ok: true; value: unknown } => {
     try {
-        JSON.parse(value);
+        return { ok: true, value: JSON.parse(value) as unknown };
     } catch {
-        return false;
+        return { ok: false };
     }
-
-    return true;
 };
 
 /**
@@ -132,12 +130,12 @@ class FileCache {
 
         const fileData = readFileSync(filePath);
 
-        if (isJson(fileData)) {
-            const value = JSON.parse(fileData);
+        const parsed = tryParseJson(fileData);
 
-            this.#memoryCache.set(filePath, value);
+        if (parsed.ok) {
+            this.#memoryCache.set(filePath, parsed.value);
 
-            return value as R;
+            return parsed.value as R;
         }
 
         this.#memoryCache.set(filePath, fileData);
