@@ -7,6 +7,6 @@ on: # yamllint disable-line rule:truthy
 
 jobs:
     lock-closed:
-        uses: "anolilab/workflows/.github/workflows/lock-closed.yml@94b27723e80256ce9bcace59884a051aca8fef22" # v18.0.1
+        uses: "anolilab/workflows/.github/workflows/lock-closed.yml@0a43f1373be806fe25f390a7119dfd7292c6850f" # v18.0.2
         with:
             target-repo: "visulima/packem"
