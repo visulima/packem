@@ -56,7 +56,8 @@ const { packem } = await import("@visulima/packem");
 const esbuildTransformer = (await import("@visulima/packem/transformer/esbuild")).default;
 
 const PROJECT = process.argv[2] ?? "react-empty";
-const OUT_DIR = `./builds/profile-packem-${PROJECT}`;
+const BUNDLER = (process.argv[3] as "rollup" | "rolldown" | undefined) ?? "rollup";
+const OUT_DIR = `./builds/profile-packem-${BUNDLER}-${PROJECT}`;
 
 await rm(OUT_DIR, { force: true, recursive: true });
 
@@ -71,9 +72,11 @@ for (let i = 0; i < RUNS; i++) {
     await packem(`./projects/${PROJECT}/`, {
         runtime: "browser",
         environment: "production",
-        bundler: "rollup",
+        bundler: BUNDLER,
         outDir: "../../" + OUT_DIR,
-        transformer: esbuildTransformer,
+        // Rolldown rejects the `transformer` option (it ships its own oxc
+        // pipeline). Only the rollup backend needs the esbuild transformer.
+        ...(BUNDLER === "rollup" ? { transformer: esbuildTransformer } : {}),
         clean: true,
         emitESM: true,
         entries: [`./src/index.tsx`],
