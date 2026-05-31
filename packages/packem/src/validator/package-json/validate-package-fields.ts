@@ -435,7 +435,12 @@ const validateDeclarationFields = ({ cjsJSExtension, context, pkg, validation }:
         (context.options.declaration === true || context.options.declaration === "compatible")
         && showWarning
         && validation.packageJson?.typesVersions !== false
-        && (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
+        && (() => {
+            // typesVersions is missing from the stale type-fest@0.20.2 transitively
+            // resolved by @visulima/package — peek through a string index.
+            const typesVersions = (pkg as Record<string, unknown>).typesVersions as Record<string, unknown> | undefined;
+            return typesVersions === undefined || Object.keys(typesVersions).length === 0;
+        })()
     ) {
         warn(
             context,

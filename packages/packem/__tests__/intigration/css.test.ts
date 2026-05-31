@@ -125,6 +125,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
 
         await createPackageJson(temporaryDirectoryPath, {
             dependencies: data.dependencies ?? {},
+            // type-fest@0.20.2's `Exports` predates the array fallback form.
             exports: input.map((file) => {
                 const splitFile = file.split("/");
                 const combinedFile = splitFile.slice(1).join("/");
@@ -133,7 +134,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                     import: `./src/${combinedFile}`.replace(".js", ".mjs"),
                     require: `./src/${combinedFile}`.replace(".js", ".cjs"),
                 };
-            }),
+            }) as unknown as Record<string, never>,
         });
 
         const binProcess = await execPackem("build", [], {

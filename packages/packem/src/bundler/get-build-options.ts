@@ -344,6 +344,7 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             !isRolldown && purePluginInstance,
 
             !isRolldown
+            && context.options.transformer
             && cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
 
             // preserve-directives parses module source via this.parse() in its

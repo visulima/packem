@@ -51,6 +51,19 @@ import { node10Compatibility } from "./node10-compatibility";
  */
 type Logger = BuildContext<InternalBuildOptions>["logger"];
 
+// type-fest@0.20.2 (resolved transitively by @visulima/tsconfig) predates these
+// CompilerOptions fields — read them through this alias so the source compiles
+// without per-access casts.
+type CompilerOptionsExtras = {
+    allowImportingTsExtensions?: boolean;
+    jsxFragmentFactory?: string;
+    jsxImportSource?: string;
+};
+
+const extras = (
+    compilerOptions: TsConfigJson["compilerOptions"] | undefined,
+): CompilerOptionsExtras => (compilerOptions ?? {}) as CompilerOptionsExtras;
+
 /**
  * Matches raw-loadable asset extensions (markdown, text, html, generic data).
  * Hoisted to module scope so it is compiled once instead of on every call.
@@ -64,7 +77,7 @@ const RAW_ASSET_EXTENSION_REGEX = /\.(md|txt|htm|html|data)$/;
  * @returns Standardized JSX runtime value ('automatic', 'preserve', or 'transform')
  * @internal
  */
-const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX): "automatic" | "preserve" | "transform" | undefined => {
+const resolveTsconfigJsxToJsxRuntime = (jsx?: string): "automatic" | "preserve" | "transform" | undefined => {
     switch (jsx) {
         case "preserve":
         case "react-native": {
@@ -193,10 +206,10 @@ const generateOptions = (
             esbuild: {
                 charset: "utf8",
                 jsx: jsxRuntime,
-                jsxDev: tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
+                jsxDev: (tsconfig?.config.compilerOptions?.jsx as string | undefined) === "react-jsxdev",
                 jsxFactory: tsconfig?.config.compilerOptions?.jsxFactory,
-                jsxFragment: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
-                jsxImportSource: tsconfig?.config.compilerOptions?.jsxImportSource,
+                jsxFragment: extras(tsconfig?.config.compilerOptions).jsxFragmentFactory,
+                jsxImportSource: extras(tsconfig?.config.compilerOptions).jsxImportSource,
                 jsxSideEffects: true,
 
                 /**
@@ -305,7 +318,7 @@ const generateOptions = (
                         : {
                             development: environment !== "production",
                             pragma: tsconfig?.config.compilerOptions?.jsxFactory,
-                            pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                            pragmaFrag: extras(tsconfig?.config.compilerOptions).jsxFragmentFactory,
                             pure: true,
                             runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
                             useBuiltIns: true,
@@ -366,10 +379,10 @@ const generateOptions = (
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
                 production: environment === PRODUCTION_ENV,
-                ...tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
+                ...tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx as string)
                     ? {
-                        jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
-                        jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
+                        jsxFragmentPragma: extras(tsconfig.config.compilerOptions).jsxFragmentFactory,
+                        jsxImportSource: extras(tsconfig.config.compilerOptions).jsxImportSource,
                         jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
                         jsxRuntime,
                         transforms: ["typescript", "jsx", ...tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : []],
@@ -403,7 +416,7 @@ const generateOptions = (
                         react: {
                             development: environment !== PRODUCTION_ENV,
                             pragma: tsconfig?.config.compilerOptions?.jsxFactory,
-                            pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                            pragmaFrag: extras(tsconfig?.config.compilerOptions).jsxFragmentFactory,
                             runtime: jsxRuntime,
                             throwIfNamespace: true,
                         },
@@ -533,37 +546,54 @@ const generateOptions = (
 
     const dependencies = new Map([...Object.entries(packageJson.dependencies ?? {}), ...Object.entries(packageJson.devDependencies ?? {})]);
 
-    if (options.transformer.NAME === undefined) {
-        throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
+    const isRolldown = options.bundler === "rolldown";
+
+    // Rolldown ships its own oxc-based transform and never invokes packem's
+    // transformer adapter plugin. Setting `transformer` together with
+    // `bundler: "rolldown"` is a configuration mistake — refuse to build rather
+    // than silently ignoring the option.
+    if (isRolldown && buildConfig.transformer !== undefined) {
+        throw new Error(
+            "The `transformer` option is not supported when `bundler: \"rolldown\"`. "
+            + "Rolldown uses its own oxc-based transform — remove `transformer` from your packem config.",
+        );
     }
 
-    options.transformerName = options.transformer.NAME;
+    if (!isRolldown) {
+        if (options.transformer?.NAME === undefined) {
+            throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
+        }
 
-    let dependencyName: string = options.transformerName;
-
-    if (options.transformerName === "oxc") {
-        dependencyName = "oxc-transform";
-    } else if (options.transformerName === "swc") {
-        dependencyName = "@swc/core";
+        options.transformerName = options.transformer.NAME;
     }
-
-    const version = dependencies.get(dependencyName) ?? "0.0.0";
 
     logger.info({
         message: `Using ${cyan("node ")}${runtimeVersion}`,
         prefix: "system",
     });
     logger.info({
-        message:
-            options.bundler === "rolldown"
-                ? `Using ${cyan("rolldown")} with ${cyan(options.runtime as string)} build runtime`
-                : `Using ${cyan("rollup")} with ${cyan(options.runtime as string)} build runtime`,
+        message: isRolldown
+            ? `Using ${cyan("rolldown")} with ${cyan(options.runtime as string)} build runtime`
+            : `Using ${cyan("rollup")} with ${cyan(options.runtime as string)} build runtime`,
         prefix: "bundler",
     });
-    logger.info({
-        message: `Using ${cyan(options.transformerName)} ${version}`,
-        prefix: "transformer",
-    });
+
+    if (!isRolldown && options.transformerName) {
+        let dependencyName: string = options.transformerName;
+
+        if (options.transformerName === "oxc") {
+            dependencyName = "oxc-transform";
+        } else if (options.transformerName === "swc") {
+            dependencyName = "@swc/core";
+        }
+
+        const version = dependencies.get(dependencyName) ?? "0.0.0";
+
+        logger.info({
+            message: `Using ${cyan(options.transformerName)} ${version}`,
+            prefix: "transformer",
+        });
+    }
 
     if (options.rollup.resolve) {
         options.rollup.resolve.preferBuiltins = options.runtime === "node";

@@ -116,10 +116,19 @@ export const createPackemConfig = async (
         rollupConfig += "\n},";
     }
 
+    // Rolldown ships its own oxc-based transform and rejects a user-set
+    // `transformer`. Omit both the import and the option so the generated
+    // config is valid regardless of which bundler the suite runs under.
+    const isRolldown = bundler === "rolldown";
+    const transformerImport = isRolldown
+        ? ""
+        : `import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : transformer === "oxc" ? "oxc-transformer" : "index"}";`;
+    const transformerField = isRolldown ? "" : "transformer,";
+
     await writeFile(
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
-import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : transformer === "oxc" ? "oxc-transformer" : "index"}";
+${transformerImport}
 ${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/css/loaders/${loader}";`).join("\n")}
 ${minimizer ? `import ${minimizer} from "${distributionPath}/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}
 // eslint-disable-next-line import/no-unused-modules
@@ -127,7 +136,7 @@ export default defineConfig({
     ${bundler ? `bundler: "${bundler}",` : ""}
     runtime: "${runtime}",
     experimental: ${JSON.stringify(experimental, undefined, 4)},
-    transformer,${config as string}${rollupConfig}
+    ${transformerField}${config as string}${rollupConfig}
 });
 `,
         {

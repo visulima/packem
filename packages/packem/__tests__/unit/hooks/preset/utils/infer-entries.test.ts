@@ -1499,7 +1499,8 @@ describe(inferEntries, () => {
         const result = await inferEntries(
             {
                 exports: {
-                    "./tools/*": ["./dist/tools/*.mjs", "./dist/tools/*.cjs"],
+                    // Array fallback form is missing from type-fest@0.20.2's Exports.
+                    "./tools/*": ["./dist/tools/*.mjs", "./dist/tools/*.cjs"] as unknown as string,
                 },
             },
             ["src/", "src/tools/logger.ts"].map((file) => join(temporaryDirectoryPath, file)),

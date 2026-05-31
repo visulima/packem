@@ -316,7 +316,9 @@ export const getOxcTransformerConfig = (context: BuildContext<InternalBuildOptio
                 allowNamespaces: true,
                 declaration: undefined,
                 jsxPragma: context.tsconfig.config.compilerOptions?.jsxFactory,
-                jsxPragmaFrag: context.tsconfig.config.compilerOptions?.jsxFragmentFactory,
+                // jsxFragmentFactory is missing from type-fest@0.20.2 transitively
+                // resolved by @visulima/tsconfig — access through a string index.
+                jsxPragmaFrag: (context.tsconfig.config.compilerOptions as Record<string, unknown> | undefined)?.["jsxFragmentFactory"] as string | undefined,
                 onlyRemoveTypeImports: true,
                 // Declaration generation is handled by @visulima/rollup-plugin-dts
                 rewriteImportExtensions: false,

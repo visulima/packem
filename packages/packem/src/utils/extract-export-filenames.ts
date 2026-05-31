@@ -133,7 +133,13 @@ export const extractExportFilenames: (
                             = isIgnored || ignoreExportKeys.some((ignoredKey) => nestedKey === ignoredKey || nestedKey.startsWith(`${ignoredKey}/`));
 
                         const nestedResults = extractExportFilenames(
-                            { [key]: entryExport },
+                            // type-fest@0.20.2's `Exports` union is too narrow:
+                            // its record branch keys on `ExportCondition` only
+                            // — a generic `{[key: string]: ...}` shape (used
+                            // for subpath exports) isn't assignable. Round-trip
+                            // through `unknown` so the recursive call sees a
+                            // parent-compatible value.
+                            { [key]: entryExport } as unknown as PackageJson["exports"],
                             packageType,
                             declaration,
                             [...conditions, condition],

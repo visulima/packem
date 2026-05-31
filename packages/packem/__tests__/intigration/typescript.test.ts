@@ -2036,7 +2036,8 @@ export { test as default };
             expect(binProcess.stdout).toContain(`Your package.json "typesVersions" field has been updated.`);
 
             const fileContent = await readFile(`${temporaryDirectoryPath}/package.json`);
-            const packageJson = JSON.parse(fileContent) as PackageJson;
+            // typesVersions missing from type-fest@0.20.2 — narrow as record.
+            const packageJson = JSON.parse(fileContent) as PackageJson & { typesVersions?: Record<string, Record<string, string[]>> };
 
             expect(packageJson.typesVersions).toMatchSnapshot("typesVersions");
         });
@@ -2139,7 +2140,8 @@ export const test = "this should be in final bundle, test2 string";`,
                 devDependencies: {
                     typescript: "*",
                 },
-                exports: ["./dist/index.mjs", "./dist/index.cjs", "./dist/deep/index.cjs", "./dist/deep/index.mjs"],
+                // String[] (fallback) form is missing from type-fest@0.20.2's Exports.
+                exports: ["./dist/index.mjs", "./dist/index.cjs", "./dist/deep/index.cjs", "./dist/deep/index.mjs"] as unknown as string,
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 types: "./dist/index.d.ts",
