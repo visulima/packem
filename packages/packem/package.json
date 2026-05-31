@@ -314,7 +314,7 @@
         "vitest": "catalog:test"
     },
     "peerDependencies": {
-        "@arethetypeswrong/core": ">=0.18.2",
+        "@arethetypeswrong/core": ">=0.18.3",
         "@swc/core": ">=1.15.40",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
