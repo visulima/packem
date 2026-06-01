@@ -1,7 +1,7 @@
 import { Parcel } from "@parcel/core";
-import { writeFile, writeJson } from "@visulima/fs";
+import { writeJson } from "@visulima/fs";
 import { rm } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import type { Builder, BuilderOptions } from "./types";
 
 export const parcelBuilder: Builder = {
@@ -13,48 +13,23 @@ export const parcelBuilder: Builder = {
             appBuild: join(outDir, "build-parcel"),
         };
 
-        await writeFile(`./projects/${project}/.env`, "NODE_ENV=production");
+        // Parcel locates `.parcelrc` by searching from the *project root* (the
+        // nearest lockfile/.git — here the monorepo root) and never descends into
+        // projects/<name>/, so a per-project config is never auto-found. Write a
+        // minimal config that extends the bundled default pipeline (swc transform +
+        // standard packagers — the previous hand-rolled config referenced the
+        // uninstalled @parcel/transformer-raw and failed to resolve), and pass its
+        // absolute path via `config` so Parcel uses it directly instead of searching.
+        // `extends` resolves @parcel/config-default relative to this file's dir,
+        // where it is installed.
+        const configPath = resolve(`./projects/${project}/.parcelrc`);
 
-        const configFiles = {
-            [`./projects/${project}/.babelrc`]: {
-                compact: true,
-            },
-            [`./projects/${project}/.parcelrc`]: {
-                bundler: "@parcel/bundler-default",
-                transformers: {
-                    "*.{js,jsx,mjs,ts,tsx}": ["@parcel/transformer-babel", "@parcel/transformer-js"],
-                    "url:*": ["...", "@parcel/transformer-raw"],
-                },
-                namers: ["@parcel/namer-default"],
-                runtimes: ["@parcel/runtime-js"],
-                optimizers: {
-                    "*.{js,mjs,cjs}": ["@parcel/optimizer-terser"],
-                },
-                packagers: {
-                    "*.{js,mjs,cjs}": "@parcel/packager-js",
-                    "*.ts": "@parcel/packager-ts",
-                    "*": "@parcel/packager-raw",
-                },
-                compressors: {
-                    "*": ["@parcel/compressor-raw"],
-                },
-                resolvers: ["@parcel/resolver-default"],
-                reporters: [],
-            },
-            [`./projects/${project}/.terserrc`]: {
-                format: {
-                    comments: false,
-                },
-            },
-        };
-
-        for await (const [configFile, contents] of Object.entries(configFiles)) {
-            await writeJson(configFile, contents, { indent: 2 });
-        }
+        await writeJson(configPath, { extends: "@parcel/config-default" }, { indent: 2 });
 
         const bundler = new Parcel({
             mode: "production",
             entries: buildPaths.appEntrypoint,
+            config: configPath,
             cacheDir: `./projects/${project}/.parcel-cache`,
             targets: {
                 default: {
@@ -77,10 +52,7 @@ export const parcelBuilder: Builder = {
         const buildPath = join(outDir, "build-parcel");
 
         await rm(buildPath, { force: true, recursive: true });
-        await rm(`./projects/${project}/.env`, { force: true });
         await rm(`./projects/${project}/.parcel-cache`, { force: true, recursive: true });
-        await rm(`./projects/${project}/.babelrc`, { force: true });
         await rm(`./projects/${project}/.parcelrc`, { force: true });
-        await rm(`./projects/${project}/.terserrc`, { force: true });
     },
 };
