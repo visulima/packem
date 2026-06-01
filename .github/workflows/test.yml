@@ -117,25 +117,20 @@ jobs:
                   base_sha: "${{ steps.setSHAs.outputs.base }}"
                   separator: ","
 
+            # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
+            # Passing the whole changed-file list via --files overflows the OS arg limit
+            # (spawn E2BIG) on large diffs and fails the job before anything runs.
             - name: "Build"
               shell: "bash"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
-              run: |
-                  files="${ALL_CHANGED_FILES}";
-                  pnpm run build:affected:packages --files="${files//\\/\/}"
+              run: "pnpm run build:affected:packages"
 
             - name: "Run tests"
               shell: "bash"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               run: |
-                  files="${ALL_CHANGED_FILES}";
-
                   if [[ "${{ matrix.os }}" == "ubuntu-latest" && "${{ matrix.node_version }}" == 22 ]]; then
-                      pnpm run test:affected:coverage --files="${files//\\/\/}"
+                      pnpm run test:affected:coverage
                   else
-                      pnpm run test:affected --files="${files//\\/\/}"
+                      pnpm run test:affected
                   fi
 
             - name: "Prepare nx cache"
