@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.67](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.66...@visulima/packem-rollup@1.0.0-alpha.67) (2026-06-01)
+
+### Miscellaneous Chores
+
+* **benchmarks:** port build-tool benchmark suite onto the 2.0 codebase ([#201](https://github.com/visulima/packem/issues/201)) ([8abdf09](https://github.com/visulima/packem/commit/8abdf0938bb7c5b2b7baabbb6d2698c73dba5d55))
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.28
+
 ## @visulima/packem-rollup [1.0.0-alpha.66](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.65...@visulima/packem-rollup@1.0.0-alpha.66) (2026-05-28)
 
 ### Features
