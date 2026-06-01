@@ -169,23 +169,19 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             }
 
             // Intercept addWatchFile calls so we can store them alongside the cached result.
+            // Rollup's plugin-context methods are closures that don't read `this`, so a
+            // prototype-delegating object inherits them safely while overriding just
+            // `addWatchFile` — far cheaper than a Proxy (which rebinds every method on
+            // every property access) on each transform cache miss. The override arrow's
+            // `this` is lexically the original context, so `this.addWatchFile` resolves up
+            // the prototype chain to the real implementation without recursing.
             const watchFiles: string[] = [];
-            // eslint-disable-next-line @typescript-eslint/no-this-alias, unicorn/no-this-assignment -- need stable reference for the Proxy handler below.
-            const pluginContext = this;
-            const contextWithWatcher = new Proxy(this, {
-                get(target, prop, receiver) {
-                    if (prop === "addWatchFile") {
-                        return (file: string) => {
-                            watchFiles.push(file);
-                            pluginContext.addWatchFile(file);
-                        };
-                    }
+            const contextWithWatcher = Object.create(this) as typeof this;
 
-                    const value: unknown = Reflect.get(target, prop, receiver);
-
-                    return typeof value === "function" ? (value as AnyFunction).bind(target) : value;
-                },
-            });
+            contextWithWatcher.addWatchFile = (file: string): void => {
+                watchFiles.push(file);
+                this.addWatchFile(file);
+            };
 
             const result: unknown = await getHandler(plugin.transform).call(contextWithWatcher, code, id);
 
