@@ -1,3 +1,18 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.28](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.27...@visulima/rollup-plugin-dts@1.0.0-alpha.28) (2026-06-01)
+
+### Features
+
+* **rollup-plugin-dts:** port missing features from rolldown-plugin-dts (≤ v0.25.2) ([f5185a4](https://github.com/visulima/packem/commit/f5185a4cb6f13ef8612cbcf3b520be66a25d144e)), closes [#242](https://github.com/visulima/packem/issues/242) [#243](https://github.com/visulima/packem/issues/243) [#246](https://github.com/visulima/packem/issues/246)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** address code-review findings on the dts feature port ([64e4dab](https://github.com/visulima/packem/commit/64e4dabefba939d6a16067e4e3706ff7e5790373))
+* **rollup-plugin-dts:** resolve remaining review findings ([7b60046](https://github.com/visulima/packem/commit/7b600469721655181677157e2c81d89910d7fb0a))
+
+### Miscellaneous Chores
+
+* **benchmarks:** port build-tool benchmark suite onto the 2.0 codebase ([#201](https://github.com/visulima/packem/issues/201)) ([8abdf09](https://github.com/visulima/packem/commit/8abdf0938bb7c5b2b7baabbb6d2698c73dba5d55))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.27](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.26...@visulima/rollup-plugin-dts@1.0.0-alpha.27) (2026-05-28)
 
 ### Features
