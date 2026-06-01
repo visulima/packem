@@ -77,6 +77,12 @@ export const packemBuilder: Builder = {
             outDir: "../../" + buildPaths.appBuild,
             transformer: transformerOption,
             clean: false,
+            // The suite measures cold builds (each builder is cleaned before it
+            // runs), where packem's persistent file cache is pure overhead — it
+            // writes its entries to disk but never gets to read them back. Disable
+            // it so the benchmark reflects packem's actual build work, comparable to
+            // the other (cacheless) builders, instead of cache-population I/O.
+            fileCache: false,
             // Match competitors (tsdown/tsup/rollup/bunchee) which emit a single format.
             emitESM: true,
             entries: [buildPaths.appEntrypoint],
