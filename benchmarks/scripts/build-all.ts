@@ -57,12 +57,15 @@ const getBuilderInstances = (): BuilderWithPreset[] => {
         builders.push({ builder: rollupBuilder, preset });
     });
 
-    // Add Packem across both bundler backends (rollup + rolldown) and its transformer presets
-    (['rollup', 'rolldown'] as const).forEach(bundler => {
-        ['esbuild', 'swc', 'sucrase', 'oxc'].forEach(preset => {
-            builders.push({ builder: packemBuilder, preset, bundler });
-        });
+    // Add Packem. The rollup backend runs the full transformer matrix.
+    ['esbuild', 'swc', 'sucrase', 'oxc'].forEach(preset => {
+        builders.push({ builder: packemBuilder, preset, bundler: 'rollup' });
     });
+
+    // The rolldown backend transforms natively (oxc) and rejects an explicit
+    // transformer, so the per-transformer presets produce byte-identical output —
+    // run it once instead of as a redundant matrix.
+    builders.push({ builder: packemBuilder, bundler: 'rolldown' });
 
     // Add Webpack (currently no presets)
     builders.push({ builder: webpackBuilder });
