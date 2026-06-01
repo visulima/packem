@@ -156,6 +156,11 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
         await context.hooks.callHook("rollup:dts:done", context);
     } finally {
         await typesBuild.close();
+
+        // FileCache.set() writes asynchronously; flush the DTS cache (rollup-dts.json)
+        // here — mirroring bundler/build.ts for the JS build — so it persists to disk
+        // before the process can exit and is available to the next, warm DTS build.
+        await fileCache.flush();
     }
 };
 
