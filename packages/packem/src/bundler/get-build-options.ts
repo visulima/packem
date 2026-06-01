@@ -43,7 +43,6 @@ import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getOutputExtension, sortUserPlugins } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
-import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-plugin-css";
 import type { OutputOptions, Plugin, RollupOptions } from "rollup";
 
 import {
@@ -83,13 +82,12 @@ import cloneReplaceOptions from "../utils/clone-replace-options";
 // rolldown path never even instantiates the rollup-only plugins.
 export type Backend = "rolldown" | "rollup";
 
-// createJsBuildOptions currently performs no await (its only one was a spurious
-// await of the synchronous rollupCssPlugin, since removed), but it is kept as
-// an async function returning a promise on purpose: it is the symmetric
-// counterpart of the genuinely-async getRollupDtsOptions, and both are
-// consumed via await in bundler/build.ts and rollup/watch.ts. Demoting only
-// one of the pair to sync would split that shared call contract.
-// eslint-disable-next-line sonarjs/cognitive-complexity, @typescript-eslint/require-await -- residual complexity is the deliberate order-sensitive Rollup plugin/output array construction (HARD constraint forbids reordering it); the async signature is an intentional API-contract symmetry with getRollupDtsOptions, not accidental
+// createJsBuildOptions is async both for its own work (it lazily `await import`s
+// the heavy CSS plugin only when stylesheets are configured) and as the symmetric
+// counterpart of the genuinely-async getRollupDtsOptions — both are consumed via
+// await in bundler/build.ts and rollup/watch.ts, so the shared call contract stays
+// uniform.
+// eslint-disable-next-line sonarjs/cognitive-complexity -- residual complexity is the deliberate order-sensitive Rollup plugin/output array construction (HARD constraint forbids reordering it)
 export const createJsBuildOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, backend: Backend): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
     // When the backend is rolldown, several rollup plugins are skipped because
@@ -106,6 +104,18 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
     // central gate would still need per-plugin glue.
     const isRolldown = backend === "rolldown";
     const nodeResolver = isRolldown ? undefined : createNodeResolver(context);
+
+    // `@visulima/rollup-plugin-css` pulls in PostCSS / LightningCSS and the full
+    // loader chain — a heavy import that's pointless for the many builds with no
+    // stylesheets. Load it lazily, only when CSS loaders are actually configured,
+    // so a JS/TS-only build never pays the cold-start cost. The plugin array below
+    // is still gated by the same `css.loaders.length > 0` checks, so when those
+    // terms are reached `cssPluginModule` is guaranteed defined (the `?.` only
+    // exists to satisfy the type — it can never short-circuit on a reached term).
+    const cssPluginModule
+        = context.options.rollup.css && context.options.rollup.css.loaders && context.options.rollup.css.loaders.length > 0
+            ? await import("@visulima/rollup-plugin-css")
+            : undefined;
 
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean OR is intended: a falsy `unbundle` must still fall through to the preserveModules check
     const usePreserveModules = Boolean(context.options.unbundle || context.options.rollup.output?.preserveModules);
@@ -267,11 +277,12 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
 
             context.options.rollup.url && urlPlugin(context.options.rollup.url),
 
-            context.options.rollup.css
-            && context.options.rollup.css.loaders
-            && context.options.rollup.css.loaders.length > 0
+            // `cssPluginModule` is truthy iff css.loaders is non-empty (it's loaded under
+            // that exact condition above), so gating on it both selects the slot and lets
+            // the type narrow to the loaded module — no non-null assertion needed.
+            cssPluginModule
             && cachingPlugin(
-                rollupCssPlugin(
+                cssPluginModule.rollupCssPlugin(
                     {
                         dts: Boolean(context.options.declaration),
                         sourceMap: context.options.sourcemap,
@@ -294,7 +305,7 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             && context.options.rollup.css.loaders.length > 0
             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean OR is intended: a falsy `declaration` must still fall through to the css.dts check
             && (context.options.declaration || context.options.rollup.css.dts)
-            && cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir),
+            && cssPluginModule?.cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir),
 
             context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
 
