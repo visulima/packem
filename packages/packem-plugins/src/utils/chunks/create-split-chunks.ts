@@ -32,9 +32,27 @@ const hashTo3Char = memoize((input: string): string => {
 /**
  * Get the effective layer of a module by walking up the importer chain.
  * A module inherits the layer of its importer if it doesn't have its own layer.
+ *
+ * Results are memoized in `cache` (keyed by module id) for the lifetime of a
+ * single build. A module's effective layer is a stable property of the module
+ * graph, but without memoization this is called for every importer of every
+ * module and re-walks the full importer ancestry each time — O(n²) on large
+ * graphs, and pure waste on the common build that uses no layers at all (every
+ * walk returns `undefined`). Caching collapses it to O(n).
  */
-const getEffectiveModuleLayer = (id: string, getModuleInfo: GetModuleInfo, visited: Set<string> = new Set()): string | undefined => {
+const getEffectiveModuleLayer = (
+    id: string,
+    getModuleInfo: GetModuleInfo,
+    cache: Map<string, string | undefined>,
+    visited: Set<string> = new Set(),
+): string | undefined => {
+    if (cache.has(id)) {
+        return cache.get(id);
+    }
+
     if (visited.has(id)) {
+        // Cycle guard: a back-edge can't determine the layer. Return without
+        // caching — the true result for `id` is computed by its own top-level walk.
         return undefined;
     }
 
@@ -50,26 +68,34 @@ const getEffectiveModuleLayer = (id: string, getModuleInfo: GetModuleInfo, visit
     const ownLayer = getModuleLayer(moduleInfo.meta);
 
     if (ownLayer) {
+        cache.set(id, ownLayer);
+
         return ownLayer;
     }
 
     // Otherwise, inherit layer from importers
+    let result: string | undefined;
+
     for (const importerId of moduleInfo.importers) {
-        const importerLayer = getEffectiveModuleLayer(importerId, getModuleInfo, visited);
+        const importerLayer = getEffectiveModuleLayer(importerId, getModuleInfo, cache, visited);
 
         if (importerLayer) {
-            return importerLayer;
+            result = importerLayer;
+
+            break;
         }
     }
 
-    return undefined;
+    cache.set(id, result);
+
+    return result;
 };
 
 /**
  * Check if a module is imported by modules with different boundary layers.
  * Returns the set of unique layers if there are multiple, otherwise undefined.
  */
-const getImporterLayers = (id: string, getModuleInfo: GetModuleInfo): Set<string> => {
+const getImporterLayers = (id: string, getModuleInfo: GetModuleInfo, layerCache: Map<string, string | undefined>): Set<string> => {
     const moduleInfo = getModuleInfo(id);
 
     if (!moduleInfo) {
@@ -92,7 +118,7 @@ const getImporterLayers = (id: string, getModuleInfo: GetModuleInfo): Set<string
             layers.add(importerOwnLayer);
         } else {
             // If the importer doesn't have a layer, get its effective layer
-            const effectiveLayer = getEffectiveModuleLayer(importerId, getModuleInfo, new Set([id]));
+            const effectiveLayer = getEffectiveModuleLayer(importerId, getModuleInfo, layerCache, new Set([id]));
 
             if (effectiveLayer) {
                 layers.add(effectiveLayer);
@@ -106,9 +132,19 @@ const getImporterLayers = (id: string, getModuleInfo: GetModuleInfo): Set<string
 const createSplitChunks = (
     dependencyGraphMap: Map<string, Set<[string, string]>>,
     entryFiles: (BuildContextBuildAssetAndChunk | BuildContextBuildEntry)[],
+    // Whether directive-based module layers can exist in this build (the
+    // preserve-directives plugin is active). When false, `getModuleLayer` always
+    // returns undefined, so every layer-driven branch below is dead work — most
+    // importantly the per-module `getImporterLayers` importer-graph walk.
+    layersEnabled = true,
 ): GetManualChunk => {
     // If there's existing chunk being separated, and contains a layer { <id>: <chunkGroup> }
     const splitChunksGroupMap = new Map<string, string>();
+
+    // Memoizes each module's effective layer for this build, shared across every
+    // `getImporterLayers` call so the importer-ancestry walk runs once per module
+    // (O(n)) instead of once per importer-edge (O(n²)).
+    const effectiveLayerCache = new Map<string, string | undefined>();
 
     // eslint-disable-next-line sonarjs/cognitive-complexity
     return function splitChunks(id, context) {
@@ -147,7 +183,11 @@ const createSplitChunks = (
         }
 
         // Collect the sub modules of the entry, if they're having layer, and the same layer with the entry, push them to the dependencyGraphMap.
-        if (isEntry) {
+        // This only ever records anything when the entry itself has a layer (the
+        // inner guard requires `moduleLayer && subModuleLayer === moduleLayer`), so
+        // skip the whole-graph walk and per-submodule `getModuleInfo` scan — by far
+        // the bulk of the remaining cost — for layerless entries (the common case).
+        if (isEntry && moduleLayer) {
             const subModuleIds: Iterable<string>
                 // Rollup exposes `getModuleIds()` returning every module in the build.
                 // Rolldown's `manualChunks` context only exposes `getModuleInfo`, so we
@@ -192,7 +232,9 @@ const createSplitChunks = (
 
                 const subModuleLayer = getModuleLayer(subModuleInfo.meta);
 
-                if (moduleLayer && subModuleLayer === moduleLayer) {
+                // `moduleLayer` is guaranteed truthy here (the enclosing `isEntry`
+                // block is only entered when it is set).
+                if (subModuleLayer === moduleLayer) {
                     if (!dependencyGraphMap.has(subId)) {
                         dependencyGraphMap.set(subId, new Set());
                     }
@@ -204,8 +246,10 @@ const createSplitChunks = (
 
         // Check if this module (without its own directive) is imported by multiple boundaries.
         // If so, split it into a separate shared chunk to prevent boundary crossing issues.
-        if (!moduleLayer && !isEntry) {
-            const importerLayers = getImporterLayers(id, context.getModuleInfo);
+        // Skipped entirely when layers can't exist: `getImporterLayers` would walk the
+        // importer graph (a per-edge `getModuleInfo` scan) only to find no layers.
+        if (layersEnabled && !moduleLayer && !isEntry) {
+            const importerLayers = getImporterLayers(id, context.getModuleInfo, effectiveLayerCache);
 
             // If this module is imported by modules with different layers (e.g., both client and server),
             // split it into a separate chunk that can be safely imported by both boundaries.

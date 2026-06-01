@@ -126,7 +126,11 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
         }
         : {
-            manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries),
+            // Directive-based layers ("use client"/"use server") only exist when the
+            // preserve-directives plugin runs, which is rollup-only and gated on the
+            // option. When it can't run, `getModuleLayer` always returns undefined, so
+            // createSplitChunks can skip its expensive importer-layer graph walks.
+            manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries, !isRolldown && Boolean(context.options.rollup.preserveDirectives)),
             preserveModules: false,
         };
 
