@@ -58,10 +58,12 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
     // context.options.minify` for rollup parity; rolldown ignores `compact` and
     // wants `minify` instead.
     if (context.options.minify && Array.isArray(options.output)) {
-        options.output = options.output.map((output: OutputOptions) => ({
-            ...output,
-            minify: true,
-        })) as OutputOptions[];
+        options.output = options.output.map((output: OutputOptions) => {
+            return {
+                ...output,
+                minify: true,
+            };
+        });
     }
 
     return options;
