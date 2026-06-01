@@ -1,4 +1,4 @@
-import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
+import { isAccessibleSync, readFileSync, writeFile } from "@visulima/fs";
 import { join, toNamespacedPath } from "@visulima/path";
 import stringify from "safe-stable-stringify";
 
@@ -35,6 +35,12 @@ class FileCache {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     readonly #memoryCache = new Map<string, any>();
+
+    // In-flight async disk writes from `set()`. The build doesn't await individual
+    // writes (it would block on tens of thousands of files on a large cold build);
+    // instead `flush()` awaits the whole set once the build has stopped issuing
+    // writes, guaranteeing persistence before the process exits.
+    readonly #pendingWrites = new Set<Promise<void>>();
 
     /**
      * Creates a new FileCache instance.
@@ -163,24 +169,63 @@ class FileCache {
 
         const filePath = this.getFilePath(name, subDirectory);
 
+        let payload: ArrayBuffer | ArrayBufferView | string = data as ArrayBuffer | ArrayBufferView | string;
+
         if (typeof data === "object" || typeof data === "number" || typeof data === "boolean") {
             // Native JSON.stringify is ~3x faster than safe-stable-stringify on
             // the rollup/dependencies cache payloads, which are JSON-safe by
             // construction. Fall back to stable stringify when the payload
             // contains circular references or BigInt — both rare but possible
             // in arbitrary plugin caches.
-            // eslint-disable-next-line no-param-reassign
             try {
-                data = JSON.stringify(data);
+                payload = JSON.stringify(data);
             } catch {
-                // eslint-disable-next-line no-param-reassign
-                data = stringify(data) as string;
+                payload = stringify(data) as string;
             }
         }
 
-        writeFileSync(filePath, data, {
-            overwrite: true,
-        });
+        // Populate the memory cache with the value a later `get()` would produce,
+        // NOT the original object. The disk path round-trips through JSON
+        // (write string → read string → parse), and same-process consumers depend
+        // on that: e.g. the JS build sets the dependencies cache and the dts build
+        // reads it back in the same run, and the dts resolver's output differs if it
+        // sees the original (richer, by-reference) object instead of the normalized
+        // copy. Deriving the memory value from `payload` keeps same-process reads
+        // identical to cross-process reads, while the disk write below can stay async.
+        if (typeof payload === "string") {
+            const parsed = tryParseJson(payload);
+
+            this.#memoryCache.set(filePath, parsed.ok ? parsed.value : payload);
+        } else {
+            // Binary payloads aren't JSON round-tripped; same-process re-reads of
+            // these are not a real pattern, so store the original buffer as-is.
+            this.#memoryCache.set(filePath, data);
+        }
+
+        // Write asynchronously and don't await it here: a large cold build issues
+        // tens of thousands of writes, and blocking on each `writeFileSync` was a
+        // dominant share of build time. `flush()` awaits the queue at build end so
+        // the cache still lands on disk for warm rebuilds. A failed cache write must
+        // never fail the build, so errors are swallowed.
+        const write = writeFile(filePath, payload, { overwrite: true })
+            .catch(() => {})
+            .finally(() => {
+                this.#pendingWrites.delete(write);
+            });
+
+        this.#pendingWrites.add(write);
+    }
+
+    /**
+     * Awaits all in-flight disk writes queued by `set()`. Call once a build has
+     * finished issuing cache writes (and before the process may exit) so the
+     * on-disk cache is complete for the next, warm build.
+     */
+    public async flush(): Promise<void> {
+        while (this.#pendingWrites.size > 0) {
+            // eslint-disable-next-line no-await-in-loop -- drain in waves; new writes may queue while awaiting the current batch.
+            await Promise.all([...this.#pendingWrites]);
+        }
     }
 
     /**

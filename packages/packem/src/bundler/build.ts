@@ -188,11 +188,15 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     if (isRolldown) {
         await buildWithRolldown(context, fileCache, subDirectory, rollupOptions);
-
-        return;
+    } else {
+        await buildWithRollup(context, fileCache, subDirectory, rollupOptions);
     }
 
-    await buildWithRollup(context, fileCache, subDirectory, rollupOptions);
+    // Cache writes are fire-and-forget (FileCache.set queues an async write and
+    // serves same-process reads from memory), so flush the queue here — once the
+    // build has finished issuing writes — to guarantee the cache is fully on disk
+    // before the process can exit and is available to the next (warm) build.
+    await fileCache.flush();
 };
 
 export type { BundlerName };
