@@ -79,45 +79,56 @@ const tryRewrites = async (
 const resolveTypescriptMjsCts = (): Plugin => {
     return {
         name: "packem:resolve-typescript-mjs-cjs",
-        async resolveId(id, importer, options) {
-            if (!importer) {
-                return undefined;
-            }
+        resolveId: {
+            // Only ids ending in .js/.mjs/.cjs/.jsx are ever rewritten here, and the
+            // handler re-enters the whole resolveId chain via `this.resolve()` for
+            // each match — so a native id filter is high value: it skips this hook
+            // (and its nested resolution cascade) for the thousands of bare/.ts/.css
+            // specifiers it would only `return undefined` for, without crossing the
+            // native↔JS boundary at all on rolldown.
+            filter: {
+                id: jsExtensionRegex,
+            },
+            async handler(id, importer, options) {
+                if (!importer) {
+                    return undefined;
+                }
 
-            const match = jsExtensionRegex.exec(id);
+                const match = jsExtensionRegex.exec(id);
 
-            if (!match) {
-                return undefined;
-            }
+                if (!match) {
+                    return undefined;
+                }
 
-            const extension = match[0];
-            const rewrites = tsExtensions[extension];
+                const extension = match[0];
+                const rewrites = tsExtensions[extension];
 
-            if (!rewrites) {
-                return undefined;
-            }
+                if (!rewrites) {
+                    return undefined;
+                }
 
-            const base = id.slice(0, -extension.length);
-            const resolveOptions = {
-                ...options,
-                skipSelf: true,
-            };
+                const base = id.slice(0, -extension.length);
+                const resolveOptions = {
+                    ...options,
+                    skipSelf: true,
+                };
 
-            // For source code relative imports: try TS extensions in order
-            // In TypeScript convention, ./file.js means ./file.ts
-            if (!isBareSpecifier(id) && !importer.includes("/node_modules/")) {
-                return tryRewrites(this, rewrites, base, importer, resolveOptions, false);
-            }
+                // For source code relative imports: try TS extensions in order
+                // In TypeScript convention, ./file.js means ./file.ts
+                if (!isBareSpecifier(id) && !importer.includes("/node_modules/")) {
+                    return tryRewrites(this, rewrites, base, importer, resolveOptions, false);
+                }
 
-            // For bare specifiers and node_modules imports:
-            // try .js first, only use TS extensions if .js doesn't resolve
-            const jsResolved = await this.resolve(id, importer, resolveOptions);
+                // For bare specifiers and node_modules imports:
+                // try .js first, only use TS extensions if .js doesn't resolve
+                const jsResolved = await this.resolve(id, importer, resolveOptions);
 
-            if (jsResolved) {
-                return jsResolved;
-            }
+                if (jsResolved) {
+                    return jsResolved;
+                }
 
-            return tryRewrites(this, rewrites, base, importer, resolveOptions, true);
+                return tryRewrites(this, rewrites, base, importer, resolveOptions, true);
+            },
         },
     };
 };
