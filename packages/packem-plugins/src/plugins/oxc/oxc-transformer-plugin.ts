@@ -6,7 +6,11 @@ import type { Plugin } from "rollup";
 import type { TransformerFn as TransformerFunction } from "../../types";
 import type { InternalOXCTransformPluginConfig } from "./types";
 
-const oxcTransformPlugin: TransformerFunction<InternalOXCTransformPluginConfig> = ({ exclude, include, ...transformOptions }: InternalOXCTransformPluginConfig): Plugin => {
+const oxcTransformPlugin: TransformerFunction<InternalOXCTransformPluginConfig> = ({
+    exclude,
+    include,
+    ...transformOptions
+}: InternalOXCTransformPluginConfig): Plugin => {
     const filter = createFilter(include, exclude ?? EXCLUDE_REGEXP);
 
     return <Plugin>{

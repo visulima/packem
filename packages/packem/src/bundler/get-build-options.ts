@@ -1,11 +1,4 @@
-import {
-    cachingPlugin,
-    createSplitChunks,
-    fixDynamicImportExtension,
-    metafilePlugin,
-    resolveAliases,
-    resolveFileUrlPlugin,
-} from "@visulima/packem-plugins";
+import { cachingPlugin, createSplitChunks, fixDynamicImportExtension, metafilePlugin, resolveAliases, resolveFileUrlPlugin } from "@visulima/packem-plugins";
 import { babelTransformPlugin } from "@visulima/packem-plugins/babel";
 import { copyPlugin } from "@visulima/packem-plugins/plugin/copy";
 import { dataUriPlugin } from "@visulima/packem-plugins/plugin/data-uri";
@@ -130,7 +123,11 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             // preserve-directives plugin runs, which is rollup-only and gated on the
             // option. When it can't run, `getModuleLayer` always returns undefined, so
             // createSplitChunks can skip its expensive importer-layer graph walks.
-            manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries, !isRolldown && Boolean(context.options.rollup.preserveDirectives)),
+            manualChunks: createSplitChunks(
+                context.dependencyGraphMap,
+                context.buildEntries,
+                !isRolldown && Boolean(context.options.rollup.preserveDirectives),
+            ),
             preserveModules: false,
         };
 

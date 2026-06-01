@@ -840,15 +840,11 @@ describe("dts plugin", () => {
 
         const warnings: string[] = [];
 
-        await rolldownBuild(
-            [path.resolve(dirname, "__fixtures__/rollup-plugin-dts/issue-89-import-equals/index.d.ts")],
-            [dts({ dtsInput: true })],
-            {
-                onwarn(warning) {
-                    warnings.push(warning.message);
-                },
+        await rolldownBuild([path.resolve(dirname, "__fixtures__/rollup-plugin-dts/issue-89-import-equals/index.d.ts")], [dts({ dtsInput: true })], {
+            onwarn(warning) {
+                warnings.push(warning.message);
             },
-        );
+        });
 
         expect(warnings.some((warning) => warning.includes("uses CommonJS dts syntax"))).toBe(true);
         expect(warnings.join("\n")).toContain("does not support reliably bundling CommonJS dts input");

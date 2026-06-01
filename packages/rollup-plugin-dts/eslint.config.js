@@ -7,6 +7,10 @@ export default createConfig(
             "dist",
             "node_modules",
             "coverage",
+            // Recursive so nested fixture trees (e.g. __tests__/__fixtures__/**) are
+            // ignored too — they hold .js/.ts test inputs that aren't in any tsconfig,
+            // so typed rules (e.g. vitest/unbound-method) crash trying to type them.
+            "**/__fixtures__/**",
             "__fixtures__",
             "__docs__",
             "__tests__/fixtures/**",

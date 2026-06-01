@@ -6,7 +6,11 @@ import type { PackageJson } from "@visulima/package";
 // shape here so tests can author fixtures with those keys without per-call casts.
 type PackageJsonInput = PackageJson & Record<string, unknown>;
 
-const createPackageJson = async (fixturePAth: string, data: PackageJsonInput, transformer: "esbuild" | "oxc" | "sucrase" | "swc" = "esbuild"): Promise<void> => {
+const createPackageJson = async (
+    fixturePAth: string,
+    data: PackageJsonInput,
+    transformer: "esbuild" | "oxc" | "sucrase" | "swc" = "esbuild",
+): Promise<void> => {
     // Generate default exports if module is provided but exports is not
     // Use .mjs/.cjs only if both ESM and CJS are supported (both main and module, or both require and import in exports)
     const defaultExports

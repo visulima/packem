@@ -11,11 +11,7 @@ const callRenderChunk = (
     chunk: Partial<RenderedChunk>,
     options: Partial<NormalizedOutputOptions>,
 ) => {
-    const handler = plugin.renderChunk as (
-        code: string,
-        chunk: RenderedChunk,
-        options: NormalizedOutputOptions,
-    ) => { code: string; map: unknown } | undefined;
+    const handler = plugin.renderChunk as (code: string, chunk: RenderedChunk, options: NormalizedOutputOptions) => { code: string; map: unknown } | undefined;
 
     return handler(code, chunk as RenderedChunk, options as NormalizedOutputOptions);
 };
@@ -70,11 +66,7 @@ describe("cjsInteropPlugin", () => {
         expect.assertions(2);
 
         const plugin = cjsInteropPlugin({ logger: createLogger() });
-        const input = [
-            "Object.defineProperty(exports, '__esModule', { value: true });",
-            "exports.named = 2;",
-            "exports.default = 1;",
-        ].join("\n");
+        const input = ["Object.defineProperty(exports, '__esModule', { value: true });", "exports.named = 2;", "exports.default = 1;"].join("\n");
         const result = callRenderChunk(plugin, input, { fileName: "out.cjs", isEntry: true }, { exports: "auto", format: "cjs" });
 
         expect(result?.code).not.toContain("__esModule");

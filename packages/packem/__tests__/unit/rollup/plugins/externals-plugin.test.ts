@@ -71,7 +71,6 @@ describe("externals-plugin", () => {
         tsconfig?: TsConfigResult;
     }) =>
         new MockPluginContext(
-
             externalsPlugin({
                 externals: [],
                 hoistedDependencies: new Set(),

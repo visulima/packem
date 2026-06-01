@@ -439,6 +439,7 @@ const validateDeclarationFields = ({ cjsJSExtension, context, pkg, validation }:
             // typesVersions is missing from the stale type-fest@0.20.2 transitively
             // resolved by @visulima/package — peek through a string index.
             const typesVersions = (pkg as Record<string, unknown>).typesVersions as Record<string, unknown> | undefined;
+
             return typesVersions === undefined || Object.keys(typesVersions).length === 0;
         })()
     ) {

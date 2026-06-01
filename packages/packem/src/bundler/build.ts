@@ -186,11 +186,7 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
         return;
     }
 
-    if (isRolldown) {
-        await buildWithRolldown(context, fileCache, subDirectory, rollupOptions);
-    } else {
-        await buildWithRollup(context, fileCache, subDirectory, rollupOptions);
-    }
+    await (isRolldown ? buildWithRolldown(context, fileCache, subDirectory, rollupOptions) : buildWithRollup(context, fileCache, subDirectory, rollupOptions));
 
     // Cache writes are fire-and-forget (FileCache.set queues an async write and
     // serves same-process reads from memory), so flush the queue here — once the

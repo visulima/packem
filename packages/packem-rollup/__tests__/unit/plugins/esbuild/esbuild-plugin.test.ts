@@ -19,12 +19,7 @@ const baseConfig = (overrides: Partial<EsbuildPluginConfig> = {}): EsbuildPlugin
     return { logger: makeLogger(), ...overrides };
 };
 
-const callTransform = async (
-    plugin: ReturnType<typeof esbuildPlugin>,
-    code: string,
-    id: string,
-    context_: Partial<PluginContext> = {},
-) => {
+const callTransform = async (plugin: ReturnType<typeof esbuildPlugin>, code: string, id: string, context_: Partial<PluginContext> = {}) => {
     const transform = plugin.transform as {
         filter: { id: RegExp };
         handler: (this: PluginContext, code: string, id: string) => Promise<{ code: string; map?: unknown } | undefined>;

@@ -3,8 +3,8 @@ import path from "node:path";
 import process from "node:process";
 
 import { rollupBuild as rolldownBuild, rollupBuild, testFixtures } from "@sxzz/test-utils";
-import { createPatch } from "diff";
 import { glob } from "@visulima/fs/glob";
+import { createPatch } from "diff";
 import { dts as rollupDts } from "rollup-plugin-dts";
 import { expect } from "vitest";
 

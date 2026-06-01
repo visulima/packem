@@ -86,9 +86,7 @@ describe("chunk-splitter parseExports", () => {
     it("should skip non-export statements", () => {
         expect.assertions(1);
 
-        const exported = [
-            ...parseExports(buildContext(), buildModule("/a.js", "const x = 1; function y() {} export const z = 3;")),
-        ];
+        const exported = [...parseExports(buildContext(), buildModule("/a.js", "const x = 1; function y() {} export const z = 3;"))];
 
         expect(exported).toEqual([{ exportedName: "z", from: "self", type: "named" }]);
     });

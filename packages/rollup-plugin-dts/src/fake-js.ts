@@ -887,7 +887,16 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                             seen.add(node);
                             const source = node.argument;
                             const imported = node.qualifier;
-                            const dep = await importNamespace(context, importer, node, imported, source, namespaceStmts, identifierMap, preserveImportTypeCache);
+                            const dep = await importNamespace(
+                                context,
+                                importer,
+                                node,
+                                imported,
+                                source,
+                                namespaceStmts,
+                                identifierMap,
+                                preserveImportTypeCache,
+                            );
 
                             if (dep)
                                 addDependency(dep);
@@ -1014,8 +1023,7 @@ const collectReferenceDirectives = (comment: t.Comment[], negative = false) => c
 // CommonJS declaration syntax (`export = X`, `import X = require("y")`) cannot be
 // represented in a bundled ESM `.d.ts`. Used to emit a one-time warning per input.
 const isCjsDtsInputSyntax = (node: t.Statement): boolean =>
-    node.type === "TSExportAssignment"
-    || (node.type === "TSImportEqualsDeclaration" && node.moduleReference.type === "TSExternalModuleReference");
+    node.type === "TSExportAssignment" || (node.type === "TSImportEqualsDeclaration" && node.moduleReference.type === "TSExternalModuleReference");
 
 // #region Export metadata
 
@@ -1053,12 +1061,14 @@ const collectDeclarationNames = (node: t.Node): string[] => {
     return [];
 };
 
-const isTypeOnlyExport = (
-    node: t.ExportNamedDeclaration,
-    specifier: t.ExportDefaultSpecifier | t.ExportNamespaceSpecifier | t.ExportSpecifier,
-): boolean => node.exportKind === "type" || ("exportKind" in specifier && specifier.exportKind === "type");
+const isTypeOnlyExport = (node: t.ExportNamedDeclaration, specifier: t.ExportDefaultSpecifier | t.ExportNamespaceSpecifier | t.ExportSpecifier): boolean =>
+    node.exportKind === "type" || ("exportKind" in specifier && specifier.exportKind === "type");
 
-const resolveExportSource = async (context: TransformPluginContext, source: t.StringLiteral | null | undefined, importer: string): Promise<string | undefined> => {
+const resolveExportSource = async (
+    context: TransformPluginContext,
+    source: t.StringLiteral | null | undefined,
+    importer: string,
+): Promise<string | undefined> => {
     if (!source) {
         return undefined;
     }

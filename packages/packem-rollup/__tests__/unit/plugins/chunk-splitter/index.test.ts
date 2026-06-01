@@ -4,11 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import chunkSplitter from "../../../../src/plugins/chunk-splitter";
 
-const callModuleParsed = (
-    plugin: ReturnType<typeof chunkSplitter>,
-    info: Partial<ModuleInfo>,
-    context_: Record<string, unknown>,
-) => {
+const callModuleParsed = (plugin: ReturnType<typeof chunkSplitter>, info: Partial<ModuleInfo>, context_: Record<string, unknown>) => {
     const { moduleParsed } = plugin;
     const handler = (typeof moduleParsed === "function" ? moduleParsed : moduleParsed?.handler) as (
         this: PluginContext,
@@ -62,11 +58,7 @@ describe("chunkSplitter", () => {
             };
         });
 
-        await callModuleParsed(
-            chunkSplitter(),
-            { code: "export { foo, bar } from './y.js';", id: "/a.js", isEntry: true },
-            { emitFile, load, resolve },
-        );
+        await callModuleParsed(chunkSplitter(), { code: "export { foo, bar } from './y.js';", id: "/a.js", isEntry: true }, { emitFile, load, resolve });
 
         expect(emitFile).toHaveBeenCalledTimes(2);
         expect(emitFile).toHaveBeenCalledWith(expect.objectContaining({ preserveSignature: "exports-only", type: "chunk" }));
@@ -77,11 +69,7 @@ describe("chunkSplitter", () => {
 
         const emitFile = vi.fn();
 
-        await callModuleParsed(
-            chunkSplitter(),
-            { code: "export const foo = 1; export const bar = 2;", id: "/a.js", isEntry: true },
-            { emitFile },
-        );
+        await callModuleParsed(chunkSplitter(), { code: "export const foo = 1; export const bar = 2;", id: "/a.js", isEntry: true }, { emitFile });
 
         expect(emitFile).not.toHaveBeenCalled();
     });

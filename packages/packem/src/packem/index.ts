@@ -60,9 +60,7 @@ type CompilerOptionsExtras = {
     jsxImportSource?: string;
 };
 
-const extras = (
-    compilerOptions: TsConfigJson["compilerOptions"] | undefined,
-): CompilerOptionsExtras => (compilerOptions ?? {}) as CompilerOptionsExtras;
+const extras = (compilerOptions: TsConfigJson["compilerOptions"] | undefined): CompilerOptionsExtras => compilerOptions ?? {};
 
 /**
  * Matches raw-loadable asset extensions (markdown, text, html, generic data).

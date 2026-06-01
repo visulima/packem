@@ -866,27 +866,27 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
         entry.size ??= {};
 
         const filePath = resolve(distributionPath, file.path);
-        const capturedEntry = entry;
+        // `entry.size` is defined by the `??=` above; capture the object so the async
+        // closure has a non-null reference (TS can't carry the property narrowing in)
+        // and mutations still write through to the entry.
+        const capturedSize = entry.size;
 
         sizingTasks.push(
             (async () => {
-                if (!capturedEntry.size!.bytes) {
+                if (!capturedSize.bytes) {
                     const awaitedStat = await stat(filePath);
 
-                    capturedEntry.size!.bytes = awaitedStat.size;
+                    capturedSize.bytes = awaitedStat.size;
                 }
 
                 // brotli/gzip never produce 0-byte output, so `??=` matches
                 // the prior falsy guard semantics. Run them in parallel —
                 // they each pipe the same file through zlib and don't share
                 // state.
-                const [brotli, gzip] = await Promise.all([
-                    capturedEntry.size!.brotli ?? brotliSize(filePath),
-                    capturedEntry.size!.gzip ?? gzipSize(filePath),
-                ]);
+                const [brotli, gzip] = await Promise.all([capturedSize.brotli ?? brotliSize(filePath), capturedSize.gzip ?? gzipSize(filePath)]);
 
-                capturedEntry.size!.brotli = brotli;
-                capturedEntry.size!.gzip = gzip;
+                capturedSize.brotli = brotli;
+                capturedSize.gzip = gzip;
             })(),
         );
     }

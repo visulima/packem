@@ -35,8 +35,7 @@ const lazyCacheValue = (raw: string): LazyCacheValue => {
     return { [LAZY_CACHE_VALUE]: raw };
 };
 
-const isLazyCacheValue = (value: unknown): value is LazyCacheValue =>
-    typeof value === "object" && value !== null && LAZY_CACHE_VALUE in value;
+const isLazyCacheValue = (value: unknown): value is LazyCacheValue => typeof value === "object" && value !== null && LAZY_CACHE_VALUE in value;
 
 /**
  * A file-based cache implementation with memory caching for improved performance.

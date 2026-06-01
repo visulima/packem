@@ -6,16 +6,14 @@ import type { TsConfigJson } from "@visulima/tsconfig";
 // "ES2022", allowImportingTsExtensions, etc. Drop those strict union fields
 // and re-declare them as `string` so tests can use modern TS values without a
 // cast at every call site. The fixture is JSON anyway — no runtime checking.
-type LooseCompilerOptions = Omit<
-    NonNullable<TsConfigJson["compilerOptions"]>,
-    "jsx" | "lib" | "module" | "moduleResolution" | "target"
-> & {
-    jsx?: string;
-    lib?: string[];
-    module?: string;
-    moduleResolution?: string;
-    target?: string;
-} & Record<string, unknown>;
+type LooseCompilerOptions = Omit<NonNullable<TsConfigJson["compilerOptions"]>, "jsx" | "lib" | "module" | "moduleResolution" | "target">
+    & Record<string, unknown> & {
+        jsx?: string;
+        lib?: string[];
+        module?: string;
+        moduleResolution?: string;
+        target?: string;
+    };
 
 type TsConfigJsonInput = Omit<TsConfigJson, "compilerOptions"> & {
     compilerOptions?: LooseCompilerOptions;

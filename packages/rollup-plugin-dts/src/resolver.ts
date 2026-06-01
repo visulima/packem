@@ -1,4 +1,4 @@
-/* eslint-disable consistent-return, sonarjs/cognitive-complexity, @typescript-eslint/no-use-before-define, unicorn/no-null, func-style, no-confusing-arrow -- this resolver uses rollup's handler conventions where falsy returns mean "fall through"; helper functions are intentionally hoisted as expressions for readability */
+/* eslint-disable consistent-return, sonarjs/cognitive-complexity, @typescript-eslint/no-use-before-define, unicorn/no-null, func-style -- this resolver uses rollup's handler conventions where falsy returns mean "fall through"; helper functions are intentionally hoisted as expressions for readability */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -129,7 +129,13 @@ const createDtsResolvePlugin = ({
         if (typeof resolve === "boolean")
             return resolve;
 
-        return resolve.some((pattern) => typeof pattern === "string" ? id === pattern : pattern.test(id));
+        return resolve.some((pattern) => {
+            if (typeof pattern === "string") {
+                return id === pattern;
+            }
+
+            return pattern.test(id);
+        });
     }
 
     // Given a node_modules importer path, extract its npm package name and check whether

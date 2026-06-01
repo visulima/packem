@@ -139,7 +139,7 @@ export const extractExportFilenames: (
                             // for subpath exports) isn't assignable. Round-trip
                             // through `unknown` so the recursive call sees a
                             // parent-compatible value.
-                            { [key]: entryExport } as unknown as PackageJson["exports"],
+                            { [key]: entryExport },
                             packageType,
                             declaration,
                             [...conditions, condition],
