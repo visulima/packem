@@ -32,6 +32,27 @@ const getHandler = (plugin: ObjectHook<AnyFunction> | AnyFunction): AnyFunction 
     return (plugin as { handler: AnyFunction }).handler;
 };
 
+// `resolveId` is called once per import edge, but the `options` object only ever
+// takes a handful of distinct shapes across a whole build (isEntry true/false plus
+// the occasional `custom`/`attributes` variant). Hashing it fresh every call means a
+// SHA-1 digest per edge; memoizing by the stringified options collapses that to one
+// digest per distinct shape. The key space is tiny and bounded, so an unbounded Map
+// is fine for a per-process build cache.
+const resolveOptionsHashCache = new Map<string, string>();
+
+const hashResolveOptions = (options: unknown): string => {
+    const key = JSON.stringify(options);
+
+    let hash = resolveOptionsHashCache.get(key);
+
+    if (hash === undefined) {
+        hash = getCacheHash(key);
+        resolveOptionsHashCache.set(key, hash);
+    }
+
+    return hash;
+};
+
 const isWrappedCacheValue = (value: unknown): value is WrappedCacheValue =>
     value !== null && typeof value === "object" && (value as Partial<WrappedCacheValue>)[PACKEM_CACHE_WRAPPED] === true;
 
@@ -127,7 +148,7 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return undefined;
             }
 
-            const cacheKey = join("resolveId", getCacheHash(id), importer ? getCacheHash(importer) : "", getCacheHash(JSON.stringify(options)));
+            const cacheKey = join("resolveId", getCacheHash(id), importer ? getCacheHash(importer) : "", hashResolveOptions(options));
 
             const cached = await cache.get(cacheKey, pluginPath);
 
