@@ -130,9 +130,19 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
 
             const result: unknown = await getHandler(plugin.load).call(this, id);
 
+            // A null/undefined return means the plugin didn't handle this id (Rollup
+            // falls through to the next loader). Caching that "miss" wrote one file
+            // per module for every load-only plugin — e.g. the raw plugin emitted
+            // ~10k useless entries on a many-module build — for no payoff, since
+            // re-running a no-op load on a warm build is just a cheap early return.
+            // Skip the write entirely.
+            if (result == null) {
+                return result as HookReturn<Plugin["load"]>;
+            }
+
             // Store raw plugin results in a wrapped form to avoid type coercion issues
             const toStore: unknown
-                = result && typeof result === "object" && "code" in (result as Record<string, unknown>)
+                = typeof result === "object" && "code" in (result as Record<string, unknown>)
                     ? result
                     : ({ data: result, [PACKEM_CACHE_WRAPPED]: true } satisfies WrappedCacheValue);
 
