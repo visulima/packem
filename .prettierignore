@@ -11,4 +11,4 @@ node_modules
 **/tsconfig.json
 **/jsconfig.json
 
-pnpm-lock.yml
+pnpm-lock.yaml
