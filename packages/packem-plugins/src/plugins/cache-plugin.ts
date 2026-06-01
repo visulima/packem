@@ -87,6 +87,15 @@ const unwrapCachedValue = (value: unknown): unknown => {
  * @returns
  */
 const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin => {
+    // When the cache is disabled, the wrapper would still hash every module's id and
+    // full source on each hook (to build a cache key) only for `cache.get()` to
+    // return undefined immediately. Skip wrapping entirely and return the plugin
+    // as-is so it runs natively — keeping its own hook filters. `isEnabled` is set
+    // before build options are constructed, so it's stable for the wrapper's lifetime.
+    if (!cache.isEnabled) {
+        return plugin;
+    }
+
     // `pluginPath` is invariant for the lifetime of the wrapper — `subDirectory`
     // and `plugin.name` don't change between hook calls — so compute it once
     // instead of re-joining on every load/resolveId/transform invocation.
