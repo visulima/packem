@@ -1135,8 +1135,7 @@ export declare function fn(a: data): data;
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dMtsContent).toBe(`import * as _$dep_a0 from 'dep-a';
-declare const _default: _$dep_a0.data;
+        expect(dMtsContent).toBe(`declare const _default: import("dep-a").data;
 export { _default as default };
 `);
     });
