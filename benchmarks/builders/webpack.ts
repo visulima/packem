@@ -19,6 +19,36 @@ export const webpackBuilder: Builder = {
                 filename: "[name].js",
             },
             mode: "production",
+            // Default webpack has no loader for TS/JSX, so a .tsx entry fails to parse.
+            // Use swc-loader so the transform matches the rspack builder
+            // (builtin:swc-loader) — the comparison then isolates the bundler engine
+            // rather than the transformer.
+            resolve: {
+                extensions: [".js", ".jsx", ".ts", ".tsx"],
+            },
+            module: {
+                rules: [
+                    {
+                        test: /\.(js|jsx|ts|tsx)$/,
+                        exclude: /node_modules/,
+                        loader: "swc-loader",
+                        options: {
+                            jsc: {
+                                target: "es2015",
+                                parser: {
+                                    syntax: "typescript",
+                                    tsx: true,
+                                },
+                                transform: {
+                                    react: {
+                                        runtime: "automatic",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                ],
+            },
         });
 
         await new Promise((resolve, reject) => {
