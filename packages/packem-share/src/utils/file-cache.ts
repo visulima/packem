@@ -22,7 +22,10 @@ const tryParseJson = (value: string): { ok: false } | { ok: true; value: unknown
  * Provides methods to store, retrieve, and check the existence of cached data.
  */
 class FileCache {
-    readonly #cwd: string;
+    // The namespaced form of `cwd`, precomputed once. `getFilePath` runs on every
+    // has/get/set, and `cwd` never changes, so caching `toNamespacedPath(cwd)` here
+    // avoids redoing that call (and its Windows `\\?\` prefixing) per cache access.
+    readonly #namespacedCwd: string;
 
     readonly #cachePath: string | undefined;
 
@@ -41,7 +44,7 @@ class FileCache {
      * @param logger Logger instance for debug messages
      */
     public constructor(cwd: string, cachePath: string | undefined, hashKey: string, logger: RollupLogger) {
-        this.#cwd = cwd;
+        this.#namespacedCwd = toNamespacedPath(cwd);
         this.#hashKey = hashKey;
 
         if (cachePath === undefined) {
@@ -187,7 +190,7 @@ class FileCache {
      * @returns The complete file path for the cache entry
      */
     private getFilePath(name: string, subDirectory?: string): string {
-        let optimizedName = name.replaceAll(toNamespacedPath(this.#cwd), "");
+        let optimizedName = name.replaceAll(this.#namespacedCwd, "");
 
         optimizedName = optimizedName.replaceAll(":", "-");
 
