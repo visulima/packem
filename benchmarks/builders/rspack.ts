@@ -10,6 +10,12 @@ const performBuild = (compiler: Compiler) => {
                 return reject(err);
             }
 
+            // Mirror the webpack builder: a build that emits errors must not be
+            // reported as a successful (and misleadingly fast) run.
+            if (stats?.hasErrors()) {
+                return reject(stats.toString());
+            }
+
             return resolve(stats);
         });
     });
@@ -26,6 +32,13 @@ export const rspackBuilder: Builder = {
 
         const compiler = rspack({
             mode: "production",
+            // Pin an explicit target so rspack doesn't resolve the project's
+            // `browserslist` query through browserslist-rs, whose bundled
+            // caniuse database is older than the JS browserslist webpack uses and
+            // rejects the query ("cannot parse the browserslist query"). The swc
+            // loader below already fixes the JS syntax level, so this only sets the
+            // output environment.
+            target: ["web", "es2015"],
             entry: {
                 index: buildPaths.appEntrypoint,
             },

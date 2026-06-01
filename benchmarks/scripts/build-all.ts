@@ -44,7 +44,7 @@ const getBuilderInstances = (): BuilderWithPreset[] => {
         buncheeBuilder,
         esbuildBuilder,
         parcelBuilder,
-        //rspackBuilder,
+        rspackBuilder,
         tsdownBuilder,
         tsupBuilder,
         viteBuilder,
