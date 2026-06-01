@@ -227,6 +227,11 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
 
             externalsPlugin(context),
+            // Runs on both backends: rolldown's native `extensionAlias` was prototyped
+            // as a replacement, but a global alias can't match esbuild's context-sensitive
+            // ordering (prefer .ts source, but prefer the shipped .js in node_modules), so
+            // it mis-resolved packages shipping both .ts and .js. The plugin's resolveId is
+            // already filtered to JS-extension ids, so the per-import cost is minimal.
             resolveTypescriptMjsCtsPlugin(),
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, getLogger(context), context.tsconfig), fileCache),
