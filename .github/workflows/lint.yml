@@ -97,16 +97,12 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
-              # Passing the whole changed-file list via --files overflows the OS arg
-              # limit (spawn E2BIG) on large diffs and fails the job before it runs.
+              # Keep the changed-file list out of BOTH args and env — a large value in
+              # either place overflows execve (spawn E2BIG) and kills the job before it runs.
               run: "pnpm run build:affected:packages"
 
             - name: "lint eslint"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               run: "pnpm run lint:affected:eslint"
 
             - name: "Prepare nx cache"
@@ -158,16 +154,12 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
-              # Passing the whole changed-file list via --files overflows the OS arg
-              # limit (spawn E2BIG) on large diffs and fails the job before it runs.
+              # Keep the changed-file list out of BOTH args and env — a large value in
+              # either place overflows execve (spawn E2BIG) and kills the job before it runs.
               run: "pnpm run build:affected:packages"
 
             - name: "lint attw"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               run: "pnpm run lint:affected:attw"
 
             - name: "Prepare nx cache"
@@ -218,16 +210,12 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
-              # Passing the whole changed-file list via --files overflows the OS arg
-              # limit (spawn E2BIG) on large diffs and fails the job before it runs.
+              # Keep the changed-file list out of BOTH args and env — a large value in
+              # either place overflows execve (spawn E2BIG) and kills the job before it runs.
               run: "pnpm run build:affected:packages"
 
             - name: "lint package.json"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               run: "pnpm run lint:affected:package-json"
 
             - name: "Prepare nx cache"
@@ -278,16 +266,12 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
-              # Passing the whole changed-file list via --files overflows the OS arg
-              # limit (spawn E2BIG) on large diffs and fails the job before it runs.
+              # Keep the changed-file list out of BOTH args and env — a large value in
+              # either place overflows execve (spawn E2BIG) and kills the job before it runs.
               run: "pnpm run build:affected:packages"
 
             - name: "lint typescript files"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
               run: "pnpm run lint:affected:types"
 
             - name: "Prepare nx cache"
