@@ -2,6 +2,9 @@ import { join, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Plugin } from "rollup";
 
+// Relative ids (`./`, `../`) — the only specifiers this resolver rewrites.
+const RELATIVE_ID_RE = /^\./;
+
 const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | undefined => {
     if (!tsconfig) {
         return undefined;
@@ -61,30 +64,37 @@ const resolveTsconfigRootDirectories = (cwd: string, logger: Console, tsconfig: 
 
     return {
         name: "packem:resolve-tsconfig-root-dirs",
-        async resolveId(id, importer, options) {
-            if (rootDirectories === undefined || rootDirectories.length === 0) {
-                return undefined;
-            }
+        resolveId: {
+            // Only relative ids (`./`, `../`) are rewritten against rootDirs; a native
+            // filter skips every bare/absolute/virtual specifier (forwarded by cachePlugin).
+            filter: {
+                id: RELATIVE_ID_RE,
+            },
+            async handler(id, importer, options) {
+                if (rootDirectories === undefined || rootDirectories.length === 0) {
+                    return undefined;
+                }
 
-            if (id.startsWith(".")) {
-                for (const rootDirectory of rootDirectories) {
-                    const updatedId = join(rootDirectory, id);
+                if (id.startsWith(".")) {
+                    for (const rootDirectory of rootDirectories) {
+                        const updatedId = join(rootDirectory, id);
 
-                    // eslint-disable-next-line no-await-in-loop
-                    const resolved = await this.resolve(updatedId, importer, { skipSelf: true, ...options });
+                        // eslint-disable-next-line no-await-in-loop
+                        const resolved = await this.resolve(updatedId, importer, { skipSelf: true, ...options });
 
-                    if (resolved) {
-                        logger.debug({
-                            message: `Resolved ${id} to ${resolved.id} using rootDirs from tsconfig.json.`,
-                            prefix: "plugin:resolve-tsconfig-root-dirs",
-                        });
+                        if (resolved) {
+                            logger.debug({
+                                message: `Resolved ${id} to ${resolved.id} using rootDirs from tsconfig.json.`,
+                                prefix: "plugin:resolve-tsconfig-root-dirs",
+                            });
 
-                        return resolved.id;
+                            return resolved.id;
+                        }
                     }
                 }
-            }
 
-            return undefined;
+                return undefined;
+            },
         },
     };
 };

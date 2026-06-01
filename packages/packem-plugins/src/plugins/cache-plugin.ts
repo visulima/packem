@@ -32,6 +32,18 @@ const getHandler = (plugin: ObjectHook<AnyFunction> | AnyFunction): AnyFunction 
     return (plugin as { handler: AnyFunction }).handler;
 };
 
+// When a wrapped plugin declares a native hook `filter` (object-hook form), forward
+// it onto the cache wrapper's hook so rolldown/rollup can skip both the cache lookup
+// AND the inner handler for non-matching ids — without forwarding, the wrapper hook
+// has no filter and is invoked for every module, defeating the inner plugin's filter.
+const getHookFilter = (hook: ObjectHook<AnyFunction> | AnyFunction | undefined): unknown => {
+    if (hook && typeof hook === "object" && "filter" in hook) {
+        return (hook as { filter?: unknown }).filter;
+    }
+
+    return undefined;
+};
+
 // `resolveId` is called once per import edge, but the `options` object only ever
 // takes a handful of distinct shapes across a whole build (isEntry true/false plus
 // the occasional `custom`/`attributes` variant). Hashing it fresh every call means a
@@ -80,7 +92,7 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
     // instead of re-joining on every load/resolveId/transform invocation.
     const pluginPath = join(subDirectory, plugin.name);
 
-    return <Plugin>{
+    const wrapped = <Plugin>{
         ...plugin,
 
         async buildEnd(error) {
@@ -136,8 +148,8 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             // ~10k useless entries on a many-module build — for no payoff, since
             // re-running a no-op load on a warm build is just a cheap early return.
             // Skip the write entirely.
-            if (result == null) {
-                return result as HookReturn<Plugin["load"]>;
+            if (result === undefined || result === null) {
+                return result;
             }
 
             // Store raw plugin results in a wrapped form to avoid type coercion issues
@@ -225,6 +237,29 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             return result as HookReturn<Plugin["transform"]>;
         },
     };
+
+    // Forward any native hook `filter` the wrapped plugin declared onto the cache
+    // wrapper's hook (object-hook form), so rolldown/rollup skip both the cache
+    // lookup and the inner handler for non-matching ids. Done as a post-step so the
+    // handler bodies above stay plain methods. The wrapper hooks are always defined
+    // here (as functions), so getHandler unwraps the method into the new handler.
+    const loadFilter = getHookFilter(plugin.load);
+    const resolveIdFilter = getHookFilter(plugin.resolveId);
+    const transformFilter = getHookFilter(plugin.transform);
+
+    if (loadFilter && wrapped.load) {
+        wrapped.load = { filter: loadFilter, handler: getHandler(wrapped.load) };
+    }
+
+    if (resolveIdFilter && wrapped.resolveId) {
+        wrapped.resolveId = { filter: resolveIdFilter, handler: getHandler(wrapped.resolveId) };
+    }
+
+    if (transformFilter && wrapped.transform) {
+        wrapped.transform = { filter: transformFilter, handler: getHandler(wrapped.transform) };
+    }
+
+    return wrapped;
 };
 
 export default cachePlugin;
