@@ -11,11 +11,32 @@ import type { RollupLogger } from "./create-rollup-logger";
  */
 const tryParseJson = (value: string): { ok: false } | { ok: true; value: unknown } => {
     try {
-        return { ok: true, value: JSON.parse(value) as unknown };
+        return { ok: true, value: JSON.parse(value) };
     } catch {
         return { ok: false };
     }
 };
+
+/**
+ * Tags a serialized cache payload that `set()` put in the memory cache without
+ * parsing it. The parse is deferred to the first `get()` that actually reads the
+ * entry in the same process (and memoized there), so a large rollup/dts cache
+ * object that is only ever read back by a *later* process is never parsed here.
+ * The symbol is module-private, so a tagged holder can never collide with a real
+ * cached value.
+ */
+const LAZY_CACHE_VALUE = Symbol("packem.lazyCacheValue");
+
+interface LazyCacheValue {
+    [LAZY_CACHE_VALUE]: string;
+}
+
+const lazyCacheValue = (raw: string): LazyCacheValue => {
+    return { [LAZY_CACHE_VALUE]: raw };
+};
+
+const isLazyCacheValue = (value: unknown): value is LazyCacheValue =>
+    typeof value === "object" && value !== null && LAZY_CACHE_VALUE in value;
 
 /**
  * A file-based cache implementation with memory caching for improved performance.
@@ -130,7 +151,22 @@ class FileCache {
         const filePath = this.getFilePath(name, subDirectory);
 
         if (this.#memoryCache.has(filePath)) {
-            return this.#memoryCache.get(filePath) as R;
+            const cached: unknown = this.#memoryCache.get(filePath);
+
+            // `set()` stores serialized payloads as a LazyCacheValue; parse on first
+            // read and replace the entry with the resolved value so subsequent reads
+            // are free and the result matches a disk round-trip.
+            if (isLazyCacheValue(cached)) {
+                const raw = cached[LAZY_CACHE_VALUE];
+                const parsed = tryParseJson(raw);
+                const value = parsed.ok ? parsed.value : raw;
+
+                this.#memoryCache.set(filePath, value);
+
+                return value as R;
+            }
+
+            return cached as R;
         }
 
         if (!isAccessibleSync(filePath)) {
@@ -180,7 +216,7 @@ class FileCache {
             try {
                 payload = JSON.stringify(data);
             } catch {
-                payload = stringify(data) as string;
+                payload = stringify(data);
             }
         }
 
@@ -190,12 +226,12 @@ class FileCache {
         // on that: e.g. the JS build sets the dependencies cache and the dts build
         // reads it back in the same run, and the dts resolver's output differs if it
         // sees the original (richer, by-reference) object instead of the normalized
-        // copy. Deriving the memory value from `payload` keeps same-process reads
-        // identical to cross-process reads, while the disk write below can stay async.
+        // copy. Store the serialized payload as a LazyCacheValue so the JSON parse is
+        // deferred to (and memoized at) the first same-process read — the large
+        // rollup/dts cache objects are only read back by a later process, so they are
+        // never parsed here. The disk write below can stay async.
         if (typeof payload === "string") {
-            const parsed = tryParseJson(payload);
-
-            this.#memoryCache.set(filePath, parsed.ok ? parsed.value : payload);
+            this.#memoryCache.set(filePath, lazyCacheValue(payload));
         } else {
             // Binary payloads aren't JSON round-tripped; same-process re-reads of
             // these are not a real pattern, so store the original buffer as-is.
@@ -224,7 +260,7 @@ class FileCache {
     public async flush(): Promise<void> {
         while (this.#pendingWrites.size > 0) {
             // eslint-disable-next-line no-await-in-loop -- drain in waves; new writes may queue while awaiting the current batch.
-            await Promise.all([...this.#pendingWrites]);
+            await Promise.all(this.#pendingWrites);
         }
     }
 

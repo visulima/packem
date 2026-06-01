@@ -61,6 +61,8 @@ const getEffectiveModuleLayer = (
     const moduleInfo = getModuleInfo(id);
 
     if (!moduleInfo) {
+        cache.set(id, undefined);
+
         return undefined;
     }
 
