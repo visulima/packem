@@ -11,6 +11,11 @@ import { isRelative } from "@visulima/path/utils";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Plugin } from "rollup";
 
+// tsconfig `paths` only match bare specifiers, so relative imports (`./`, `../`)
+// and virtual modules (`\0`) are always skipped — excluded via the native hook filter.
+const RELATIVE_ID_RE = /^\./;
+const VIRTUAL_MODULE_RE = /\0/;
+
 interface Pattern {
     prefix: string;
     suffix: string;
@@ -170,92 +175,102 @@ export const resolveTsconfigPathsPlugin = (
 
     return {
         name: "plugin:resolve-tsconfig-paths",
-        // eslint-disable-next-line sonarjs/cognitive-complexity
-        async resolveId(id, importer, options) {
-            if (pathsKeys.length === 0) {
-                return undefined;
-            }
-
-            if (id.includes("\0")) {
-                logger.debug({
-                    message: `Skipping resolution of ${id} as it is a virtual module`,
-                    prefix: "plugin:resolve-tsconfig-paths",
-                });
-
-                return undefined;
-            }
-
-            // Exclude node_modules from paths support (speeds up resolving)
-            if (id.includes("node_modules")) {
-                logger.debug({
-                    message: `Skipping request as it is inside node_modules ${id}`,
-                    prefix: "plugin:resolve-tsconfig-paths",
-                });
-
-                return undefined;
-            }
-
-            if (!pluginOptions.resolveAbsolutePath && isAbsolute(id)) {
-                logger.debug({
-                    message: `Skipping request as it is an absolute path ${id}`,
-                    prefix: "plugin:resolve-tsconfig-paths",
-                });
-
-                return undefined;
-            }
-
-            if (isRelative(id)) {
-                logger.debug({
-                    message: `Skipping request as it is a relative path ${id}`,
-                    prefix: "plugin:resolve-tsconfig-paths",
-                });
-
-                return undefined;
-            }
-
-            // If the module name does not match any of the patterns in `paths` we hand off resolving to webpack
-            const matchedPattern = matchPatternOrExact(pathsKeys, id);
-
-            if (!matchedPattern) {
-                logger.debug({
-                    message: `moduleName did not match any paths pattern ${id}`,
-                    prefix: "plugin:resolve-tsconfig-paths",
-                });
-
-                return undefined;
-            }
-
-            const matchedStar = typeof matchedPattern === "string" ? undefined : matchedText(matchedPattern, id);
-            const matchedPatternText = typeof matchedPattern === "string" ? matchedPattern : patternText(matchedPattern);
-
-            for (const tsPath of paths[matchedPatternText] as string[]) {
-                const currentPath = matchedStar ? tsPath.replace("*", matchedStar) : tsPath;
-
-                // Ensure .d.ts is not matched
-                if (currentPath.endsWith(".d.ts") || currentPath.endsWith(".d.cts") || currentPath.endsWith(".d.mts")) {
-                    continue;
+        resolveId: {
+            // tsconfig `paths` only ever match bare specifiers, so relative imports
+            // and virtual modules are always skipped — exclude them natively
+            // (forwarded by cachePlugin) so the hook isn't invoked for them at all.
+            filter: {
+                id: {
+                    exclude: [RELATIVE_ID_RE, VIRTUAL_MODULE_RE],
+                },
+            },
+            // eslint-disable-next-line sonarjs/cognitive-complexity
+            async handler(id, importer, options) {
+                if (pathsKeys.length === 0) {
+                    return undefined;
                 }
 
-                const candidate = join(resolvedBaseUrl, currentPath);
-
-                try {
-                    // Sequentially try each candidate path; return the first successful resolution.
-                    // eslint-disable-next-line no-await-in-loop
-                    const resolved = await this.resolve(candidate, importer, { skipSelf: true, ...options });
-
-                    if (resolved) {
-                        return resolved;
-                    }
-                } catch (error) {
+                if (id.includes("\0")) {
                     logger.debug({
-                        context: [error],
-                        message: `Failed to resolve ${candidate} from ${id}`,
+                        message: `Skipping resolution of ${id} as it is a virtual module`,
                         prefix: "plugin:resolve-tsconfig-paths",
                     });
-                }
-            }
 
-            return undefined;
+                    return undefined;
+                }
+
+                // Exclude node_modules from paths support (speeds up resolving)
+                if (id.includes("node_modules")) {
+                    logger.debug({
+                        message: `Skipping request as it is inside node_modules ${id}`,
+                        prefix: "plugin:resolve-tsconfig-paths",
+                    });
+
+                    return undefined;
+                }
+
+                if (!pluginOptions.resolveAbsolutePath && isAbsolute(id)) {
+                    logger.debug({
+                        message: `Skipping request as it is an absolute path ${id}`,
+                        prefix: "plugin:resolve-tsconfig-paths",
+                    });
+
+                    return undefined;
+                }
+
+                if (isRelative(id)) {
+                    logger.debug({
+                        message: `Skipping request as it is a relative path ${id}`,
+                        prefix: "plugin:resolve-tsconfig-paths",
+                    });
+
+                    return undefined;
+                }
+
+                // If the module name does not match any of the patterns in `paths` we hand off resolving to webpack
+                const matchedPattern = matchPatternOrExact(pathsKeys, id);
+
+                if (!matchedPattern) {
+                    logger.debug({
+                        message: `moduleName did not match any paths pattern ${id}`,
+                        prefix: "plugin:resolve-tsconfig-paths",
+                    });
+
+                    return undefined;
+                }
+
+                const matchedStar = typeof matchedPattern === "string" ? undefined : matchedText(matchedPattern, id);
+                const matchedPatternText = typeof matchedPattern === "string" ? matchedPattern : patternText(matchedPattern);
+
+                for (const tsPath of paths[matchedPatternText] as string[]) {
+                    const currentPath = matchedStar ? tsPath.replace("*", matchedStar) : tsPath;
+
+                    // Ensure .d.ts is not matched
+                    if (currentPath.endsWith(".d.ts") || currentPath.endsWith(".d.cts") || currentPath.endsWith(".d.mts")) {
+                        continue;
+                    }
+
+                    const candidate = join(resolvedBaseUrl, currentPath);
+
+                    try {
+                        // Sequentially try each candidate path; return the first successful resolution.
+                        // eslint-disable-next-line no-await-in-loop
+                        const resolved = await this.resolve(candidate, importer, { skipSelf: true, ...options });
+
+                        if (resolved) {
+                            return resolved;
+                        }
+                    } catch (error) {
+                        logger.debug({
+                            context: [error],
+                            message: `Failed to resolve ${candidate} from ${id}`,
+                            prefix: "plugin:resolve-tsconfig-paths",
+                        });
+                    }
+                }
+
+                return undefined;
+            },
         },
     };
 };

@@ -1,0 +1,21 @@
+{
+    "name": "benchmark-react-synthetic",
+    "version": "0.1.0",
+    "private": true,
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+    ],
+    "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "react": "^19.2.6",
+        "react-dom": "^19.2.6"
+    },
+    "devDependencies": {
+        "@types/react": "^19.2.15",
+        "@types/react-dom": "^19.2.3",
+        "typescript": "^6.0.3"
+    }
+}

@@ -46,9 +46,7 @@ describe("esbuild optimizeDeps", () => {
 
         vi.mocked(findCacheDirSync).mockReturnValueOnce(undefined);
 
-        await expect(
-            optimizeDeps({ cwd: "/virtual/project", include: ["react"], sourceMap: false }),
-        ).rejects.toThrow(CACHE_DIR_ERROR_REGEX);
+        await expect(optimizeDeps({ cwd: "/virtual/project", include: ["react"], sourceMap: false })).rejects.toThrow(CACHE_DIR_ERROR_REGEX);
     });
 
     it("should build the optimized Map keyed by each include entry, pointing at <cacheDir>/<id>.js", async () => {
@@ -121,10 +119,19 @@ describe("esbuild optimizeDeps", () => {
 });
 
 // Helper that captures the inner plugin's `setup(build)` callbacks so we can drive them directly.
-type ResolveHandler = (args: { path: string; pluginData?: unknown; resolveDir: string }) => Promise<{ errors?: unknown[]; external?: boolean; namespace?: string; path?: string; pluginData?: unknown; warnings?: unknown[] } | null | undefined>;
+type ResolveHandler = (args: {
+    path: string;
+    pluginData?: unknown;
+    resolveDir: string;
+}) => Promise<{ errors?: unknown[]; external?: boolean; namespace?: string; path?: string; pluginData?: unknown; warnings?: unknown[] } | null | undefined>;
 type LoadHandler = (args: { path: string; pluginData?: unknown }) => Promise<{ contents: string; resolveDir: string } | undefined>;
 
-const captureInnerPluginHandlers = async (options: { cwd: string; exclude?: string[]; include: string[]; sourceMap: boolean }): Promise<{
+const captureInnerPluginHandlers = async (options: {
+    cwd: string;
+    exclude?: string[];
+    include: string[];
+    sourceMap: boolean;
+}): Promise<{
     onLoad: LoadHandler;
     onResolve: ResolveHandler;
     resolveSpy: ReturnType<typeof vi.fn>;
@@ -212,10 +219,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
 
         const result = await onResolve({ path: "react", resolveDir: "/virtual/src" });
 
-        expect(resolveSpy).toHaveBeenCalledWith(
-            "react",
-            expect.objectContaining({ kind: "import-statement", resolveDir: "/virtual/src" }),
-        );
+        expect(resolveSpy).toHaveBeenCalledWith("react", expect.objectContaining({ kind: "import-statement", resolveDir: "/virtual/src" }));
         expect(result?.namespace).toBe("optimize-deps");
         expect(result?.pluginData).toEqual({ absolute: "/resolved/file.js", resolveDir: "/virtual/src" });
     });
@@ -318,7 +322,9 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
         });
 
         vi.mocked(readFileSync).mockReturnValueOnce("export const a = 1;");
-        vi.mocked(rsModuleLexer.parseAsync).mockResolvedValueOnce({ output: [{ exports: ["a"], filename: String.raw`C:\abs\react.js`, imports: [] }] } as never);
+        vi.mocked(rsModuleLexer.parseAsync).mockResolvedValueOnce({
+            output: [{ exports: ["a"], filename: String.raw`C:\abs\react.js`, imports: [] }],
+        } as never);
 
         const result = await onLoad({
             path: "react",

@@ -88,7 +88,15 @@ export const node10Compatibility = async (
     }
 
     const rootPackageJsonPath = join(rootDirectory, "package.json");
-    const packageJson = await readJson<PackageJson>(rootPackageJsonPath);
+    // PackageJson's intersection shape (from type-fest@0.20.2) doesn't satisfy
+    // readJson's `JsonValue` constraint (no string index). `typesVersions` is
+    // also absent from that stale definition, so we read as the loose JSON
+    // shape and then cast.
+    // The cast is load-bearing despite the "unnecessary assertion" lint: without it
+    // `packageJson` is the loose JsonValue, and the spread + `.typesVersions` access
+    // below then trip no-misused-spread / no-unsafe-argument.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- see above; narrows JsonValue to the typed package shape for the spread below
+    const packageJson = (await readJson(rootPackageJsonPath)) as PackageJson & { typesVersions?: Record<string, Record<string, string[]>> };
 
     if (mode === "file" && Object.keys(typesVersions).length > 0) {
         // This needs to be done in a synchronous manner

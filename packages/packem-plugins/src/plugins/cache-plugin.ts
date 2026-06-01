@@ -4,7 +4,7 @@ import type { FileCache } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 import type { ObjectHook, Plugin } from "rollup";
 
-import { getHash } from "../utils";
+import { getCacheHash } from "../utils";
 
 type AnyFunction = (...arguments_: any[]) => any;
 
@@ -32,6 +32,39 @@ const getHandler = (plugin: ObjectHook<AnyFunction> | AnyFunction): AnyFunction 
     return (plugin as { handler: AnyFunction }).handler;
 };
 
+// When a wrapped plugin declares a native hook `filter` (object-hook form), forward
+// it onto the cache wrapper's hook so rolldown/rollup can skip both the cache lookup
+// AND the inner handler for non-matching ids — without forwarding, the wrapper hook
+// has no filter and is invoked for every module, defeating the inner plugin's filter.
+const getHookFilter = (hook: ObjectHook<AnyFunction> | AnyFunction | undefined): unknown => {
+    if (hook && typeof hook === "object" && "filter" in hook) {
+        return (hook as { filter?: unknown }).filter;
+    }
+
+    return undefined;
+};
+
+// `resolveId` is called once per import edge, but the `options` object only ever
+// takes a handful of distinct shapes across a whole build (isEntry true/false plus
+// the occasional `custom`/`attributes` variant). Hashing it fresh every call means a
+// SHA-1 digest per edge; memoizing by the stringified options collapses that to one
+// digest per distinct shape. The key space is tiny and bounded, so an unbounded Map
+// is fine for a per-process build cache.
+const resolveOptionsHashCache = new Map<string, string>();
+
+const hashResolveOptions = (options: unknown): string => {
+    const key = JSON.stringify(options);
+
+    let hash = resolveOptionsHashCache.get(key);
+
+    if (hash === undefined) {
+        hash = getCacheHash(key);
+        resolveOptionsHashCache.set(key, hash);
+    }
+
+    return hash;
+};
+
 const isWrappedCacheValue = (value: unknown): value is WrappedCacheValue =>
     value !== null && typeof value === "object" && (value as Partial<WrappedCacheValue>)[PACKEM_CACHE_WRAPPED] === true;
 
@@ -53,8 +86,22 @@ const unwrapCachedValue = (value: unknown): unknown => {
  * @param subDirectory
  * @returns
  */
-const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin =>
-    <Plugin>{
+const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin => {
+    // When the cache is disabled, the wrapper would still hash every module's id and
+    // full source on each hook (to build a cache key) only for `cache.get()` to
+    // return undefined immediately. Skip wrapping entirely and return the plugin
+    // as-is so it runs natively — keeping its own hook filters. `isEnabled` is set
+    // before build options are constructed, so it's stable for the wrapper's lifetime.
+    if (!cache.isEnabled) {
+        return plugin;
+    }
+
+    // `pluginPath` is invariant for the lifetime of the wrapper — `subDirectory`
+    // and `plugin.name` don't change between hook calls — so compute it once
+    // instead of re-joining on every load/resolveId/transform invocation.
+    const pluginPath = join(subDirectory, plugin.name);
+
+    const wrapped = <Plugin>{
         ...plugin,
 
         async buildEnd(error) {
@@ -74,7 +121,6 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return undefined;
             }
 
-            const pluginPath = join(subDirectory, plugin.name);
             // Support query params in id (e.g., ?raw). Keep the query as part of the cache key,
             // but compute file fingerprint using the clean path (without query) when possible.
             const cleanId = id.includes("?") ? (id.split("?")[0] as string) : id;
@@ -85,23 +131,39 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 if (cleanId && isAccessibleSync(cleanId)) {
                     const fileContent = readFileSync(cleanId);
 
-                    contentHash = getHash(fileContent);
+                    contentHash = getCacheHash(fileContent);
                 }
             } catch {
                 // Ignore fingerprint errors; fall back to id-only based caching
             }
 
-            const cacheKey = join("load", getHash(id), contentHash);
+            const cacheKey = join("load", getCacheHash(id), contentHash);
 
-            if (cache.has(cacheKey, pluginPath)) {
-                return unwrapCachedValue(await cache.get(cacheKey, pluginPath));
+            // `cache.get()` returns `undefined` only on a true miss — every
+            // hit is wrapped (either as a code-object, WrappedCacheValue, or
+            // WatchFilesCacheValue), so a single `get` saves the redundant
+            // `isAccessibleSync` syscall that `has()` would do before `get`.
+            const cached = await cache.get(cacheKey, pluginPath);
+
+            if (cached !== undefined) {
+                return unwrapCachedValue(cached) as HookReturn<Plugin["load"]>;
             }
 
             const result: unknown = await getHandler(plugin.load).call(this, id);
 
+            // A null/undefined return means the plugin didn't handle this id (Rollup
+            // falls through to the next loader). Caching that "miss" wrote one file
+            // per module for every load-only plugin — e.g. the raw plugin emitted
+            // ~10k useless entries on a many-module build — for no payoff, since
+            // re-running a no-op load on a warm build is just a cheap early return.
+            // Skip the write entirely.
+            if (result === undefined || result === null) {
+                return result;
+            }
+
             // Store raw plugin results in a wrapped form to avoid type coercion issues
             const toStore: unknown
-                = result && typeof result === "object" && "code" in (result as Record<string, unknown>)
+                = typeof result === "object" && "code" in (result as Record<string, unknown>)
                     ? result
                     : ({ data: result, [PACKEM_CACHE_WRAPPED]: true } satisfies WrappedCacheValue);
 
@@ -117,11 +179,12 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return undefined;
             }
 
-            const pluginPath = join(subDirectory, plugin.name);
-            const cacheKey = join("resolveId", getHash(id), importer ? getHash(importer) : "", getHash(JSON.stringify(options)));
+            const cacheKey = join("resolveId", getCacheHash(id), importer ? getCacheHash(importer) : "", hashResolveOptions(options));
 
-            if (cache.has(cacheKey, pluginPath)) {
-                return unwrapCachedValue(await cache.get(cacheKey, pluginPath)) as HookReturn<Plugin["resolveId"]>;
+            const cached = await cache.get(cacheKey, pluginPath);
+
+            if (cached !== undefined) {
+                return unwrapCachedValue(cached) as HookReturn<Plugin["resolveId"]>;
             }
 
             const result: unknown = await getHandler(plugin.resolveId).call(this, id, importer, options);
@@ -136,11 +199,12 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
                 return undefined;
             }
 
-            const pluginPath = join(subDirectory, plugin.name);
-            const cacheKey = join("transform", getHash(id), getHash(code));
+            const cacheKey = join("transform", getCacheHash(id), getCacheHash(code));
 
-            if (cache.has(cacheKey, pluginPath)) {
-                const cached: unknown = unwrapCachedValue(await cache.get(cacheKey, pluginPath));
+            const cachedRaw = await cache.get(cacheKey, pluginPath);
+
+            if (cachedRaw !== undefined) {
+                const cached: unknown = unwrapCachedValue(cachedRaw);
 
                 // Replay any addWatchFile calls that were captured during the original transform.
                 // This ensures rollup knows to invalidate this cached result when source
@@ -157,23 +221,19 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             }
 
             // Intercept addWatchFile calls so we can store them alongside the cached result.
+            // Rollup's plugin-context methods are closures that don't read `this`, so a
+            // prototype-delegating object inherits them safely while overriding just
+            // `addWatchFile` — far cheaper than a Proxy (which rebinds every method on
+            // every property access) on each transform cache miss. The override arrow's
+            // `this` is lexically the original context, so `this.addWatchFile` resolves up
+            // the prototype chain to the real implementation without recursing.
             const watchFiles: string[] = [];
-            // eslint-disable-next-line @typescript-eslint/no-this-alias, unicorn/no-this-assignment -- need stable reference for the Proxy handler below.
-            const pluginContext = this;
-            const contextWithWatcher = new Proxy(this, {
-                get(target, prop, receiver) {
-                    if (prop === "addWatchFile") {
-                        return (file: string) => {
-                            watchFiles.push(file);
-                            pluginContext.addWatchFile(file);
-                        };
-                    }
+            const contextWithWatcher = Object.create(this) as typeof this;
 
-                    const value: unknown = Reflect.get(target, prop, receiver);
-
-                    return typeof value === "function" ? (value as AnyFunction).bind(target) : value;
-                },
-            });
+            contextWithWatcher.addWatchFile = (file: string): void => {
+                watchFiles.push(file);
+                this.addWatchFile(file);
+            };
 
             const result: unknown = await getHandler(plugin.transform).call(contextWithWatcher, code, id);
 
@@ -186,5 +246,29 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             return result as HookReturn<Plugin["transform"]>;
         },
     };
+
+    // Forward any native hook `filter` the wrapped plugin declared onto the cache
+    // wrapper's hook (object-hook form), so rolldown/rollup skip both the cache
+    // lookup and the inner handler for non-matching ids. Done as a post-step so the
+    // handler bodies above stay plain methods. The wrapper hooks are always defined
+    // here (as functions), so getHandler unwraps the method into the new handler.
+    const loadFilter = getHookFilter(plugin.load);
+    const resolveIdFilter = getHookFilter(plugin.resolveId);
+    const transformFilter = getHookFilter(plugin.transform);
+
+    if (loadFilter && wrapped.load) {
+        wrapped.load = { filter: loadFilter, handler: getHandler(wrapped.load) };
+    }
+
+    if (resolveIdFilter && wrapped.resolveId) {
+        wrapped.resolveId = { filter: resolveIdFilter, handler: getHandler(wrapped.resolveId) };
+    }
+
+    if (transformFilter && wrapped.transform) {
+        wrapped.transform = { filter: transformFilter, handler: getHandler(wrapped.transform) };
+    }
+
+    return wrapped;
+};
 
 export default cachePlugin;

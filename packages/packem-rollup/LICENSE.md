@@ -23,11 +23,14 @@ SOFTWARE.
 <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
+
 The published @visulima/packem-rollup artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
+
 ## estree-walker
+
 License: MIT
 By: Rich Harris
 Repository: https://github.com/Rich-Harris/estree-walker
@@ -45,11 +48,14 @@ Repository: https://github.com/Rich-Harris/estree-walker
 <!-- TYPE_DEPENDENCIES -->
 
 # Licenses of bundled types
+
 The published @visulima/packem-rollup artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled types:
+
 ## esbuild
+
 License: MIT
 Repository: git+https://github.com/evanw/esbuild.git
 
@@ -75,9 +81,10 @@ Repository: git+https://github.com/evanw/esbuild.git
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
----------------------------------------
+---
 
 ## sucrase
+
 License: MIT
 By: Alan Pierce
 Repository: https://github.com/alangpierce/sucrase.git

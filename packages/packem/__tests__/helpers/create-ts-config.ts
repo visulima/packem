@@ -1,7 +1,25 @@
 import { writeJson } from "@visulima/fs";
 import type { TsConfigJson } from "@visulima/tsconfig";
 
-const createTsConfig = async (fixturePath: string, config: TsConfigJson = {}, name = ""): Promise<void> => {
+// type-fest@0.20.2 (transitively hoisted) is missing modern CompilerOptions
+// values like moduleResolution: "bundler", jsx: "react-jsx", target/lib:
+// "ES2022", allowImportingTsExtensions, etc. Drop those strict union fields
+// and re-declare them as `string` so tests can use modern TS values without a
+// cast at every call site. The fixture is JSON anyway — no runtime checking.
+type LooseCompilerOptions = Omit<NonNullable<TsConfigJson["compilerOptions"]>, "jsx" | "lib" | "module" | "moduleResolution" | "target">
+    & Record<string, unknown> & {
+        jsx?: string;
+        lib?: string[];
+        module?: string;
+        moduleResolution?: string;
+        target?: string;
+    };
+
+type TsConfigJsonInput = Omit<TsConfigJson, "compilerOptions"> & {
+    compilerOptions?: LooseCompilerOptions;
+};
+
+const createTsConfig = async (fixturePath: string, config: TsConfigJsonInput = {}, name = ""): Promise<void> => {
     await writeJson(
         `${fixturePath}/tsconfig${name}.json`,
         {
@@ -10,7 +28,7 @@ const createTsConfig = async (fixturePath: string, config: TsConfigJson = {}, na
                 isolatedModules: true,
                 ...config.compilerOptions,
             },
-        } satisfies TsConfigJson,
+        } satisfies TsConfigJsonInput,
         {
             overwrite: true,
         },

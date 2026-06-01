@@ -1,0 +1,13 @@
+# Benchmark build outputs
+builds/
+
+# Per-project build outputs (parcel/tsup/etc. emit into projects/*/dist)
+projects/*/dist/
+
+# Per-builder runtime artifacts generated inside projects/* (e.g. by the parcel builder)
+.parcel-cache/
+projects/*/.parcel-cache/
+projects/*/.babelrc
+projects/*/.parcelrc
+projects/*/.terserrc
+projects/*/.env

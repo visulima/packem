@@ -2,11 +2,7 @@ import { existsSync } from "node:fs";
 import { versions } from "node:process";
 
 import { cyan } from "@visulima/colorize";
-import {
-    cachingPlugin,
-    resolveAliases,
-    resolveFileUrlPlugin,
-} from "@visulima/packem-plugins";
+import { cachingPlugin, resolveAliases, resolveFileUrlPlugin } from "@visulima/packem-plugins";
 import type { InternalOXCTransformPluginConfig } from "@visulima/packem-plugins/oxc";
 import { oxcResolvePlugin } from "@visulima/packem-plugins/oxc";
 import { externalsPlugin } from "@visulima/packem-plugins/plugin/externals";
@@ -316,7 +312,9 @@ export const getOxcTransformerConfig = (context: BuildContext<InternalBuildOptio
                 allowNamespaces: true,
                 declaration: undefined,
                 jsxPragma: context.tsconfig.config.compilerOptions?.jsxFactory,
-                jsxPragmaFrag: context.tsconfig.config.compilerOptions?.jsxFragmentFactory,
+                // jsxFragmentFactory is missing from type-fest@0.20.2 transitively
+                // resolved by @visulima/tsconfig — access through a string index.
+                jsxPragmaFrag: context.tsconfig.config.compilerOptions?.["jsxFragmentFactory"],
                 onlyRemoveTypeImports: true,
                 // Declaration generation is handled by @visulima/rollup-plugin-dts
                 rewriteImportExtensions: false,
@@ -868,7 +866,7 @@ const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsR
     // type whose `SourceDescription.ast` (`ProgramNode`) differs structurally
     // from rollup 4's; the runtime objects are interchangeable but TS rejects
     // the assignment without a cast to bridge the two declarations.
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- the cast is required; tsc fails without it. The rule's heuristic misfires on the `as unknown as` double-assertion.
+
     return dts({
         ...userDtsOptions,
         compilerOptions: {
@@ -888,7 +886,7 @@ const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsR
         // This overrides any userDtsOptions.resolve from the spread above.
         resolve: dtsResolve,
         tsconfig: context.tsconfig?.path,
-    }) as unknown as Plugin[];
+    });
 };
 
 // Avoid create multiple dts plugins instance and parsing the same tsconfig multi times,

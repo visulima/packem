@@ -3,6 +3,7 @@ export { default as arrayify } from "./arrayify";
 export { createRollupLogger, type RollupLogger } from "./create-rollup-logger";
 export { default as enhanceRollupError } from "./enhance-rollup-error";
 export { default as FileCache } from "./file-cache";
+export { default as getCacheHash } from "./get-cache-hash";
 export { default as getChunkFilename } from "./get-chunk-filename";
 export { default as getEntryFileNames } from "./get-entry-file-names";
 export { getDtsExtension, getOutputExtension } from "./get-file-extensions";

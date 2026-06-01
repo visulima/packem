@@ -134,7 +134,15 @@ export interface BuildOptions {
     browserTargets?: string[];
     /** Custom builder functions for different build types */
     builder?: Record<string, (context: BuildContext<BuildOptions>, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
-    /** Bundler to use for building source files */
+
+    /**
+     * Bundler to use for building source files.
+     *
+     * When set to `"rolldown"` the `transformer` option must be omitted —
+     * rolldown ships its own oxc-based transform and always uses it. The
+     * esbuild/swc/sucrase/oxc transformer adapters only apply under the default
+     * `"rollup"` bundler.
+     */
     bundler?: "rollup" | "rolldown";
     /** Whether to enable CommonJS interop for ESM modules */
     cjsInterop?: boolean;
@@ -232,8 +240,16 @@ export interface BuildOptions {
     sourceDir: string;
     /** Whether to generate source maps */
     sourcemap: boolean;
-    /** Transformer function for processing source files */
-    transformer: TransformerFn;
+
+    /**
+     * Transformer function for processing source files.
+     *
+     * Required when `bundler` is `"rollup"` (the default). Must be omitted
+     * when `bundler` is `"rolldown"` — rolldown bundles its own oxc-based
+     * transform natively and never invokes packem's transformer adapter, so
+     * passing one is a configuration mistake and packem will refuse to build.
+     */
+    transformer?: TransformerFn;
     /** TypeDoc configuration for generating documentation */
     typedoc: TypeDocumentOptions | false;
 

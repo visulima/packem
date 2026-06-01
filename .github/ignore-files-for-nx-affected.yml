@@ -3,6 +3,13 @@ plop/**
 .husky/**
 .nx/**
 examples/**
+# benchmarks/projects/react-synthetic alone is ~5k committed files. nx computes
+# affected projects from NX_BASE/NX_HEAD, not from this list, so the benchmark
+# files only ever feed the changed-files output we interpolate downstream
+# (codecov affected-files, preview-release CHANGED_FILES). Including them there
+# overflows the OS arg/env limit (spawn E2BIG: "/usr/bin/bash ... Argument list
+# too long"). The bench project is excluded from build/test/lint anyway.
+benchmarks/**
 .czrc
 .editorconfig
 .gitattributes

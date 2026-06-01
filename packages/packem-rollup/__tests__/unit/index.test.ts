@@ -1,6 +1,24 @@
 import { describe, expect, it } from "vitest";
 
-import { alias, browserslistToEsbuild, chunkSplitter, commonjs, dynamicImportVars as dynamicImportVariables, importTrace, inject, jsxRemoveAttributes, nodeResolve, patchErrorWithTrace, polyfillNode, preserveDirectivesPlugin, pureNewExpressionPlugin, purePlugin, replace, visualizer, wasm } from "../../src/index";
+import {
+    alias,
+    browserslistToEsbuild,
+    chunkSplitter,
+    commonjs,
+    dynamicImportVars as dynamicImportVariables,
+    importTrace,
+    inject,
+    jsxRemoveAttributes,
+    nodeResolve,
+    patchErrorWithTrace,
+    polyfillNode,
+    preserveDirectivesPlugin,
+    pureNewExpressionPlugin,
+    purePlugin,
+    replace,
+    visualizer,
+    wasm,
+} from "../../src/index";
 
 describe("@visulima/packem-rollup public barrel", () => {
     it("should re-export packem-owned plugins", () => {

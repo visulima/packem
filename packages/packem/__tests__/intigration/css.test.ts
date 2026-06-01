@@ -25,8 +25,7 @@ const AUTO_MODULES_STYL_REGEX = /(?<!\.module\.)\.styl/;
 // that realpath, so the climbed-out store path leaks into the snapshot. Rewrite
 // it to the stable project-local form the `~minireset.css/…` import resolves to,
 // matching how the local `node_modules/foo/bar/*` sources already appear.
-const MINIRESET_STORE_PATH_REGEX
-    = /(?:\.\.\/)+[^"]*?\/node_modules\/\.pnpm\/minireset\.css@[^"/]+\/node_modules\/minireset\.css\/minireset\.min\.css/g;
+const MINIRESET_STORE_PATH_REGEX = /(?:\.\.\/)+[^"]*?\/node_modules\/\.pnpm\/minireset\.css@[^"/]+\/node_modules\/minireset\.css\/minireset\.min\.css/g;
 
 const normalizeSourceMap = (content: string): string => content.replaceAll(MINIRESET_STORE_PATH_REGEX, "../node_modules/minireset.css/minireset.min.css");
 
@@ -125,6 +124,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
 
         await createPackageJson(temporaryDirectoryPath, {
             dependencies: data.dependencies ?? {},
+            // type-fest@0.20.2's `Exports` predates the array fallback form.
             exports: input.map((file) => {
                 const splitFile = file.split("/");
                 const combinedFile = splitFile.slice(1).join("/");

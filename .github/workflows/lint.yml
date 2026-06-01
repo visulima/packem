@@ -81,7 +81,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@94b27723e80256ce9bcace59884a051aca8fef22" # v18.0.1
+              uses: "anolilab/workflows/step/setup@0a43f1373be806fe25f390a7119dfd7292c6850f" # v18.0.2
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
@@ -97,14 +97,13 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
-              run: "pnpm run build:affected:packages --files=\"$ALL_CHANGED_FILES\""
+              # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
+              # Keep the changed-file list out of BOTH args and env — a large value in
+              # either place overflows execve (spawn E2BIG) and kills the job before it runs.
+              run: "pnpm run build:affected:packages"
 
             - name: "lint eslint"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
-              run: "pnpm run lint:affected:eslint --files=\"$ALL_CHANGED_FILES\""
+              run: "pnpm run lint:affected:eslint"
 
             - name: "Prepare nx cache"
               shell: "bash"
@@ -138,7 +137,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@94b27723e80256ce9bcace59884a051aca8fef22" # v18.0.1
+              uses: "anolilab/workflows/step/setup@0a43f1373be806fe25f390a7119dfd7292c6850f" # v18.0.2
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
@@ -155,14 +154,13 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
-              run: "pnpm run build:affected:packages --files=\"$ALL_CHANGED_FILES\""
+              # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
+              # Keep the changed-file list out of BOTH args and env — a large value in
+              # either place overflows execve (spawn E2BIG) and kills the job before it runs.
+              run: "pnpm run build:affected:packages"
 
             - name: "lint attw"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
-              run: "pnpm run lint:affected:attw --files=\"$ALL_CHANGED_FILES\""
+              run: "pnpm run lint:affected:attw"
 
             - name: "Prepare nx cache"
               shell: "bash"
@@ -196,7 +194,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@94b27723e80256ce9bcace59884a051aca8fef22" # v18.0.1
+              uses: "anolilab/workflows/step/setup@0a43f1373be806fe25f390a7119dfd7292c6850f" # v18.0.2
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
@@ -212,14 +210,13 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
-              run: "pnpm run build:affected:packages --files=\"$ALL_CHANGED_FILES\""
+              # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
+              # Keep the changed-file list out of BOTH args and env — a large value in
+              # either place overflows execve (spawn E2BIG) and kills the job before it runs.
+              run: "pnpm run build:affected:packages"
 
             - name: "lint package.json"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
-              run: "pnpm run lint:affected:package-json --files=\"$ALL_CHANGED_FILES\""
+              run: "pnpm run lint:affected:package-json"
 
             - name: "Prepare nx cache"
               shell: "bash"
@@ -253,7 +250,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@94b27723e80256ce9bcace59884a051aca8fef22" # v18.0.1
+              uses: "anolilab/workflows/step/setup@0a43f1373be806fe25f390a7119dfd7292c6850f" # v18.0.2
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
@@ -269,14 +266,13 @@ jobs:
                   separator: ","
 
             - name: "Build"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
-              run: "pnpm run build:affected:packages --files=\"$ALL_CHANGED_FILES\""
+              # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
+              # Keep the changed-file list out of BOTH args and env — a large value in
+              # either place overflows execve (spawn E2BIG) and kills the job before it runs.
+              run: "pnpm run build:affected:packages"
 
             - name: "lint typescript files"
-              env:
-                  ALL_CHANGED_FILES: "${{ steps.files.outputs.all_changed_files }}"
-              run: "pnpm run lint:affected:types --files=\"$ALL_CHANGED_FILES\""
+              run: "pnpm run lint:affected:types"
 
             - name: "Prepare nx cache"
               shell: "bash"

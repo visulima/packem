@@ -910,7 +910,8 @@ export { IString };`,
                         typescript: "*",
                     },
                     exports: {
-                        "./tools/*": ["./dist/tools/*.mjs", "./dist/tools/*.cjs"],
+                        // Array fallback form is missing from type-fest@0.20.2's Exports.
+                        "./tools/*": ["./dist/tools/*.mjs", "./dist/tools/*.cjs"] as unknown as string,
                     },
                 });
 

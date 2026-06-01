@@ -9,7 +9,9 @@ const createDtsInputPlugin = ({ entry, sideEffects }: Pick<OptionsResolved, "ent
             // The `entry` filter is implemented in the generate plugin, which is not
             // active in dtsInput mode. Warn rather than silently ignore it.
             if (entry) {
-                this.warn("The `entry` option has no effect in `dtsInput` mode; control which declaration files are emitted via the plugin's input list instead.");
+                this.warn(
+                    "The `entry` option has no effect in `dtsInput` mode; control which declaration files are emitted via the plugin's input list instead.",
+                );
             }
         },
 
