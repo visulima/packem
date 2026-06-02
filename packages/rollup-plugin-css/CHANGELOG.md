@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.49](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.48...@visulima/rollup-plugin-css@1.0.0-alpha.49) (2026-06-02)
+
+### Features
+
+* **babel:** add parallel worker-pool transforms ([#204](https://github.com/visulima/packem/issues/204)) ([7a5444c](https://github.com/visulima/packem/commit/7a5444c4a17c464b4809323374b1244701425f4b))
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.48](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.47...@visulima/rollup-plugin-css@1.0.0-alpha.48) (2026-06-02)
 
 
