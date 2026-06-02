@@ -44,6 +44,10 @@
             "types": "./dist/plugins/babel/index.d.ts",
             "default": "./dist/plugins/babel/index.js"
         },
+        "./babel/worker": {
+            "types": "./dist/plugins/babel/worker.d.ts",
+            "default": "./dist/plugins/babel/worker.js"
+        },
         "./typescript": {
             "types": "./dist/plugins/typescript/index.d.ts",
             "default": "./dist/plugins/typescript/index.js"
@@ -165,7 +169,8 @@
         "rollup-plugin-license": "catalog:build",
         "rs-module-lexer": "catalog:prod",
         "semver": "catalog:utils",
-        "typescript": "catalog:tsc"
+        "typescript": "catalog:tsc",
+        "workerpool": "catalog:prod"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "catalog:lint",

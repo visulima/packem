@@ -289,6 +289,34 @@ describe(validatePackageFields, () => {
         expect(mockedWarn).not.toHaveBeenCalled();
     });
 
+    it("should not warn about typesVersions if a module package uses the classic 'main' and 'types' keys", () => {
+        expect.assertions(1);
+
+        const context = {
+            options: {
+                declaration: true,
+                outDir: "dist",
+                validation: { packageJson: { exports: false, module: false, typesVersions: true } },
+            },
+            pkg: {
+                files: ["dist"],
+                main: "./dist/index.cjs",
+                module: "./dist/index.mjs",
+                name: "test",
+                sideEffects: false,
+                type: "module",
+                types: "./dist/index.d.ts",
+            },
+        };
+
+        validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
+
+        expect(mockedWarn).not.toHaveBeenCalledWith(
+            context,
+            "No 'typesVersions' field found in your package.json. Consider adding this field, or change the declaration option to 'node16' or 'false'.",
+        );
+    });
+
     // New tests for exports validation
     describe("exports validation", () => {
         it("should accept valid string exports", () => {

@@ -30,20 +30,29 @@ const callTransform = (plugin: ReturnType<typeof preserveDirectivesPlugin>, code
     return handler.call(context, code, id);
 };
 
+type RenderChunkContext = {
+    getModuleInfo: (id: string) => { meta?: Record<string, unknown> } | undefined;
+};
+
 const callRenderChunk = (
     plugin: ReturnType<typeof preserveDirectivesPlugin>,
     code: string,
     chunk: Partial<RenderedChunk>,
     options: Partial<NormalizedOutputOptions>,
+    getModuleInfo: RenderChunkContext["getModuleInfo"] = () => undefined,
 ) => {
     const { renderChunk } = plugin;
     const handler = (typeof renderChunk === "function" ? renderChunk : renderChunk?.handler) as (
+        this: RenderChunkContext,
         code: string,
         chunk: RenderedChunk,
         options: NormalizedOutputOptions,
     ) => { code: string; map: unknown } | undefined;
 
-    return handler(code, chunk as RenderedChunk, options as NormalizedOutputOptions);
+    // Real rollup binds the plugin context (which exposes `getModuleInfo`) as
+    // `this` on renderChunk; the handler reads `this.getModuleInfo(id)?.meta`
+    // to recover directives on cache-hit rebuilds. Simulate that context here.
+    return handler.call({ getModuleInfo }, code, chunk as RenderedChunk, options as NormalizedOutputOptions);
 };
 
 describe("preserveDirectivesPlugin", () => {
@@ -86,7 +95,7 @@ describe("preserveDirectivesPlugin", () => {
 
         expect(result?.code).not.toContain("#!");
         expect(result?.meta.preserveDirectives.shebang).toBe("#!/usr/bin/env node");
-        expect(result?.meta.preserveDirectives.directives).toEqual([]);
+        expect(result?.meta.preserveDirectives.directives).toStrictEqual([]);
     });
 
     it("should return undefined when neither shebang nor directive is present", () => {
@@ -150,7 +159,7 @@ describe("preserveDirectivesPlugin", () => {
         const result = callTransform(plugin, code, "/path/a.js");
 
         // Both directives end up in the per-module set; renderChunk emits both prepended to the chunk.
-        expect(result?.meta.preserveDirectives.directives).toEqual(expect.arrayContaining(["use client", "use server"]));
+        expect(result?.meta.preserveDirectives.directives).toStrictEqual(expect.arrayContaining(["use client", "use server"]));
 
         const chunk = callRenderChunk(plugin, "export const x = 1;\n", { fileName: "out.js", moduleIds: ["/path/a.js"] }, { sourcemap: false });
 
@@ -193,5 +202,22 @@ describe("preserveDirectivesPlugin", () => {
         const result = callRenderChunk(plugin, "export const x = 1;\n", { fileName: "out.js", moduleIds: ["/path/clean.js"] }, { sourcemap: false });
 
         expect(result).toBeUndefined();
+    });
+
+    it("should recover directives from persisted meta on a transform cache hit (empty side-channel)", () => {
+        expect.assertions(1);
+
+        // No callTransform → the in-memory side-channel stays empty, simulating a
+        // warm rebuild where transform was served from cache. Directives must be
+        // recovered from `meta.preserveDirectives` via getModuleInfo.
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
+        const moduleInfo: Record<string, { meta: Record<string, unknown> }> = {
+            "/path/a.js": { meta: { preserveDirectives: { directives: ["use client"] } } },
+        };
+        const getModuleInfo = (id: string) => moduleInfo[id];
+
+        const result = callRenderChunk(plugin, "export const x = 1;\n", { fileName: "out.js", moduleIds: ["/path/a.js"] }, { sourcemap: false }, getModuleInfo);
+
+        expect(result?.code).toMatch(LEADING_USE_CLIENT_REGEX);
     });
 });

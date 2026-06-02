@@ -1,3 +1,4 @@
+import { readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
@@ -410,5 +411,88 @@ const bar = "bar";
 
 exports.bar = bar;
 `);
+    });
+
+    // Regression guard against stale-cache directive output across incremental
+    // rebuilds. The directive metadata is recorded by this plugin's `transform`
+    // hook; when the build cache serves a `transform` cache hit (an unchanged
+    // module on a warm rebuild), the real handler is skipped — so `renderChunk`
+    // must recover the directives from the module's persisted `meta`, not from an
+    // in-memory side-channel that the cache hit never repopulated.
+    //
+    // The trigger is multi-file: build A's directive, then (a later rebuild)
+    // build B's directive. The second rebuild leaves A's module unchanged, so A's
+    // `transform` is a cache hit — and a side-channel-only `renderChunk` would
+    // resurrect A's pre-directive chunk, silently dropping its `"use client";`.
+    // All builds reuse the same project dir (and therefore the same on-disk
+    // cache); only the edited file changes between them.
+    //
+    // Skipped under rolldown for the same reason as "should chunk directives in
+    // separated files": rolldown's chunk-splitting (and native directive
+    // handling) diverge from rollup, so this rollup-plugin-level cache assertion
+    // doesn't map onto rolldown's output shape. The fix lives in packem's
+    // preserve-directives renderChunk hook, which is the rollup path.
+    it.skipIf(isRolldown)("should keep directives on cache-hit chunks across incremental rebuilds", async () => {
+        expect.assertions(5);
+
+        const chunkDirectory = `${temporaryDirectoryPath}/dist/packem_shared`;
+
+        // True when the (hash-named) chunk for `prefix` begins with `"use client";`.
+        const chunkBounded = (prefix: string): boolean => {
+            const file = readdirSync(chunkDirectory).find((name) => name.startsWith(prefix) && name.endsWith(".mjs"));
+
+            return file === undefined ? false : readFileSync(`${chunkDirectory}/${file}`).startsWith("'use client';");
+        };
+
+        const withoutDirective = (name: string, body: string): string =>
+            `import { shared } from "./shared.js";\n\nexport const ${name} = (): number => ${body};\n`;
+        const withDirective = (name: string, body: string): string => `"use client";\n\n${withoutDirective(name, body)}`;
+
+        writeFileSync(`${temporaryDirectoryPath}/src/shared.ts`, `export const shared = 1;\n`);
+        writeFileSync(`${temporaryDirectoryPath}/src/alpha.ts`, withoutDirective("alpha", "shared"));
+        writeFileSync(`${temporaryDirectoryPath}/src/beta.ts`, withoutDirective("beta", "shared + 1"));
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export { alpha } from "./alpha.js";\nexport { beta } from "./beta.js";\nexport { shared } from "./shared.js";\n`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "./dist/index.mjs",
+            type: "module",
+            types: "./dist/index.d.ts",
+        });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
+        await createPackemConfig(temporaryDirectoryPath, { runtime: "browser" });
+
+        // Build 0: no directives — primes the cache for every module.
+        const build0 = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(build0.exitCode).toBe(0);
+
+        // Build 1: add the directive to `alpha` only (warm cache).
+        writeFileSync(`${temporaryDirectoryPath}/src/alpha.ts`, withDirective("alpha", "shared"));
+
+        const build1 = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(build1.exitCode).toBe(0);
+
+        // Build 2: add the directive to `beta` (warm cache). `alpha` is unchanged
+        // now, so its `transform` is a cache hit — the regression resurrected
+        // `alpha`'s pre-directive chunk here.
+        writeFileSync(`${temporaryDirectoryPath}/src/beta.ts`, withDirective("beta", "shared + 1"));
+
+        const build2 = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(build2.exitCode).toBe(0);
+
+        // Both chunks must carry the directive after the final rebuild.
+        expect(chunkBounded("alpha")).toBe(true);
+        expect(chunkBounded("beta")).toBe(true);
     });
 });

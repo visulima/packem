@@ -83,8 +83,8 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "react": "^19.2.6",
-        "react-dom": "^19.2.6"
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7"
     },
     "devDependencies": {
         "@types/node": "25.9.1",

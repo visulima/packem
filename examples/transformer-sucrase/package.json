@@ -33,11 +33,11 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "react": "^19.2.6",
-        "react-dom": "^19.2.6"
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7"
     },
     "devDependencies": {
-        "@types/react": "^19.2.15",
+        "@types/react": "^19.2.16",
         "@types/react-dom": "^19.2.3",
         "@visulima/packem": "workspace:*",
         "sucrase": "^3.35.1",

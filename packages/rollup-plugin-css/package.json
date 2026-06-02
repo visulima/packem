@@ -192,7 +192,7 @@
         "postcss-modules-scope": ">=3.2.1",
         "postcss-modules-values": ">=4.0.0",
         "postcss-value-parser": ">=4.2.0",
-        "rollup": ">=4.60.4",
+        "rollup": ">=4.61.0",
         "sass": ">=1.100.0",
         "sass-embedded": ">=1.100.0",
         "stylus": ">=0.64.0"

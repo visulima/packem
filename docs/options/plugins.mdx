@@ -191,6 +191,15 @@ export default defineConfig({
 
 **Note:** When using Babel with React, Babel runs **before** your main transformer (esbuild/SWC/etc.), transforming JSX into JavaScript. TypeScript is handled by the transformer via parser plugins, not by Babel. This ensures that Rollup plugins can properly parse the code.
 
+**Parallel transforms:** Babel transforms can run across a pool of worker threads to speed up larger builds. This is enabled automatically — transforms run in-process for small builds and spin up workers once enough files match (so small builds and tests don't pay the worker startup cost). You can tune it via `rollup.babel`:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `parallel` | `true` | `false` always transforms in-process; `true` auto-enables workers above the threshold; a number caps the worker count (default `min(cpus, 4)`). |
+| `parallelThreshold` | `20` | Number of matched files required before the worker pool is created. |
+
+Parallel mode requires fully serializable Babel options. If a non-serializable option is present (for example a plugin passed as a live function, or a `babel` option supplied as a function as in the Solid preset), Packem silently falls back to in-process transforms.
+
 ### SolidJS
 
 **Quick Setup (Recommended):**

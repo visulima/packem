@@ -37,14 +37,28 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
 
         renderChunk: {
             handler(code, chunk, { sourcemap }) {
-                const outputDirectives = chunk.moduleIds
-                    .map((id) => {
-                        if (directives[id]) {
-                            return directives[id];
-                        }
+                // Resolve a module's directives, preferring the persisted `meta`
+                // over the in-memory `directives` side-channel. The side-channel
+                // is only populated when this plugin's `transform` actually runs;
+                // on a warm rebuild where the build cache serves a `transform`
+                // cache hit, the real handler is skipped and the side-channel
+                // stays empty — but `meta.preserveDirectives` is restored from the
+                // cached transform result and is available via `getModuleInfo`.
+                // Reading `meta` first keeps directive hoisting correct across
+                // incremental, cache-hit rebuilds (otherwise an unchanged module
+                // silently loses its `"use client"`/`"use server"` banner).
+                const directivesForId = (id: string): Set<string> | undefined => {
+                    const metaDirectives = (this.getModuleInfo(id)?.meta as { preserveDirectives?: { directives?: string[] } } | undefined)?.preserveDirectives?.directives;
 
-                        return undefined;
-                    })
+                    if (metaDirectives && metaDirectives.length > 0) {
+                        return new Set<string>(metaDirectives);
+                    }
+
+                    return directives[id];
+                };
+
+                const outputDirectives = chunk.moduleIds
+                    .map((id) => directivesForId(id))
                     // eslint-disable-next-line unicorn/no-array-reduce
                     .reduce<Set<string>>((accumulator, currentDirectives) => {
                         if (currentDirectives) {
@@ -69,8 +83,18 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
 
                 let shebang: string | undefined;
 
-                if (chunk.facadeModuleId && typeof shebangs[chunk.facadeModuleId] === "string") {
-                    shebang = shebangs[chunk.facadeModuleId];
+                if (chunk.facadeModuleId) {
+                    // Same cache-hit concern as directives above: prefer the
+                    // persisted `meta` shebang, fall back to the side-channel.
+                    const metaShebang = (this.getModuleInfo(chunk.facadeModuleId)?.meta as { preserveDirectives?: { shebang?: string } } | undefined)
+                        ?.preserveDirectives
+                        ?.shebang;
+
+                    if (typeof metaShebang === "string") {
+                        shebang = metaShebang;
+                    } else if (typeof shebangs[chunk.facadeModuleId] === "string") {
+                        shebang = shebangs[chunk.facadeModuleId];
+                    }
                 }
 
                 if (shebang) {

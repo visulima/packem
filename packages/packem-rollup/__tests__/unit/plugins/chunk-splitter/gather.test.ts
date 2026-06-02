@@ -35,7 +35,7 @@ describe("chunk-splitter gatherExports", () => {
 
         const exported = await drain(gatherExports(context, moduleInfo));
 
-        expect(exported).toEqual([
+        expect(exported).toStrictEqual([
             { exportedName: "foo", id: "/a.js", sourceName: "foo" },
             { exportedName: "bar", id: "/a.js", sourceName: "bar" },
         ]);
@@ -55,7 +55,7 @@ describe("chunk-splitter gatherExports", () => {
 
         const exported = await drain(gatherExports(context, moduleInfo));
 
-        expect(exported).toEqual([
+        expect(exported).toStrictEqual([
             { exportedName: "foo", id: "/resolved/y.js", sourceName: "foo" },
             { exportedName: "baz", id: "/resolved/y.js", sourceName: "bar" },
         ]);
@@ -76,7 +76,7 @@ describe("chunk-splitter gatherExports", () => {
 
         const exported = await drain(gatherExports(context, moduleInfo));
 
-        expect(exported).toEqual([
+        expect(exported).toStrictEqual([
             { exportedName: "foo", id: "/resolved/y.js", sourceName: "foo" },
             { exportedName: "bar", id: "/resolved/y.js", sourceName: "bar" },
         ]);
@@ -96,7 +96,7 @@ describe("chunk-splitter gatherExports", () => {
 
         const exported = await drain(gatherExports(context, moduleInfo));
 
-        expect(exported).toEqual([]);
+        expect(exported).toStrictEqual([]);
     });
 
     it("should skip external re-exports and yield nothing for that source", async () => {
@@ -113,7 +113,7 @@ describe("chunk-splitter gatherExports", () => {
 
         const exported = await drain(gatherExports(context, moduleInfo));
 
-        expect(exported).toEqual([]);
+        expect(exported).toStrictEqual([]);
         expect(load).not.toHaveBeenCalled();
     });
 
@@ -131,7 +131,7 @@ describe("chunk-splitter gatherExports", () => {
 
         const exported = await drain(gatherExports(context, moduleInfo));
 
-        expect(exported).toEqual([]);
+        expect(exported).toStrictEqual([]);
         expect(load).not.toHaveBeenCalled();
     });
 

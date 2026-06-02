@@ -46,7 +46,7 @@ jobs:
                   ignore-checks: "lock-closed / lock-closed, Socket Security: Pull Request Alerts, Dependabot"
 
             - name: "Git checkout"
-              uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6.0.2
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
                   fetch-depth: 0
                   token: "${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}"
@@ -57,7 +57,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@0a43f1373be806fe25f390a7119dfd7292c6850f" # v18.0.2
+              uses: "anolilab/workflows/step/setup@802f3b1d00b0ab47c3102b4f4ebd866b9f7f8fcf" # v18.0.3
               with:
                   node-version: "22.x"
                   cache-prefix: "semantic-release"

@@ -11,7 +11,7 @@ export default defineConfig({
     // so they stay `import` declarations in the emitted JS rather than being
     // bundled in. The adapter packages (which DO publish) carry the matching
     // peerDeps so end users install them.
-    externals: ["@babel/core", "oxc-transform", "rollup", "typescript"],
+    externals: ["@babel/core", "oxc-transform", "rollup", "typescript", "workerpool"],
     rollup: {
         dts: {
             oxc: true,

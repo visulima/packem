@@ -6,6 +6,6 @@ on: # yamllint disable-line rule:truthy
 
 jobs:
     stale-issues:
-        uses: "anolilab/workflows/.github/workflows/stale-issues.yml@0a43f1373be806fe25f390a7119dfd7292c6850f" # v18.0.2
+        uses: "anolilab/workflows/.github/workflows/stale-issues.yml@802f3b1d00b0ab47c3102b4f4ebd866b9f7f8fcf" # v18.0.3
         with:
             target-repo: "visulima/packem"

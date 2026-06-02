@@ -631,6 +631,32 @@ export default defineConfig({
 })
 ```
 
+#### Parallel Babel transforms
+
+Babel transforms can run across a pool of worker threads to speed up larger builds.
+This is enabled automatically: Packem runs transforms in-process for small builds and
+spins up workers once enough files match (so small builds and tests don't pay the
+worker startup cost).
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    babel: {
+      presets: [['@babel/preset-react', { runtime: 'automatic' }]],
+      // Defaults shown — usually you don't need to set these:
+      parallel: true,        // `false` to always transform in-process,
+                             // or a number to cap the worker count (default: min(cpus, 4))
+      parallelThreshold: 20, // matched files required before workers kick in
+    },
+  },
+})
+```
+
+Parallel mode requires fully serializable Babel options. If a non-serializable option
+is present (for example a plugin passed as a live function, or a `babel` option supplied
+as a function), Packem silently falls back to in-process transforms.
+
 ### TypeScript Configuration
 
 **tsconfig.json**
