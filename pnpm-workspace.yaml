@@ -1,475 +1,475 @@
 packages:
-  - "!**/__test__/**"
-  - "!**/__tests__/**"
-  - "!packages/packem/__fixtures__/css/**"
-  - "!packages/packem/__fixtures__/package/**"
-  - "!packages/packem/__fixtures__/url/**"
-  - "packages/packem/__fixtures__/ecosystem/**"
-  - "packages/**"
-  - "examples/**"
-  - "benchmarks/**"
+    - "!**/__test__/**"
+    - "!**/__tests__/**"
+    - "!packages/packem/__fixtures__/css/**"
+    - "!packages/packem/__fixtures__/package/**"
+    - "!packages/packem/__fixtures__/url/**"
+    - "packages/packem/__fixtures__/ecosystem/**"
+    - "packages/**"
+    - "examples/**"
+    - "benchmarks/**"
 allowBuilds:
-  "@parcel/watcher": true
-  "@swc/core": true
-  bun: false
-  esbuild: true
-  lmdb: true
-  msgpackr-extract: true
-  nodehun: true
-  nx: true
-  rs-module-lexer: true
-  unrs-resolver: true
+    "@parcel/watcher": true
+    "@swc/core": true
+    bun: false
+    esbuild: true
+    lmdb: true
+    msgpackr-extract: true
+    nodehun: true
+    nx: true
+    rs-module-lexer: true
+    unrs-resolver: true
 auditConfig:
-  ignoreGhsas:
-    - GHSA-9vqf-7f2p-gf9v
-    - GHSA-69xw-7hcm-h432
-    - GHSA-23c5-xmqv-rm74
-    - GHSA-7r86-cg39-jmmj
-    - GHSA-v8w9-8mx6-g223
+    ignoreGhsas:
+        - GHSA-9vqf-7f2p-gf9v
+        - GHSA-69xw-7hcm-h432
+        - GHSA-23c5-xmqv-rm74
+        - GHSA-7r86-cg39-jmmj
+        - GHSA-v8w9-8mx6-g223
 
 # --- Workspace settings ---
 
 autoInstallPeers: true
 
 catalogs:
-  build:
-    "@rollup/plugin-alias": 6.0.0
-    "@rollup/plugin-commonjs": 29.0.3
-    "@rollup/plugin-dynamic-import-vars": 2.1.5
-    "@rollup/plugin-inject": 5.0.5
-    "@rollup/plugin-json": 6.1.0
-    "@rollup/plugin-node-resolve": 16.0.3
-    "@rollup/plugin-replace": 6.0.3
-    "@rollup/plugin-wasm": 6.2.2
-    "@rollup/pluginutils": 5.4.0
-    "@visulima/packem-rollup": 1.0.0-alpha.65
-    "@visulima/rollup-plugin-css": 1.0.0-alpha.45
-    esbuild: 0.28.0
-    rolldown: 1.0.3
-    rollup: 4.60.4
-    rollup-plugin-dts: 6.4.1
-    rollup-plugin-import-trace: 1.0.1
-    rollup-plugin-license: 3.7.1
-    rollup-plugin-lit-css: 6.0.1
-    rollup-plugin-polyfill-node: 0.13.0
-    rollup-plugin-pure: ^0.4.0
-    rollup-plugin-svelte: ^7.2.3
-    rollup-plugin-visualizer: 7.0.1
-    unplugin-vue: 7.2.0
-    vite: 8.0.14
-  cli:
-    "@anolilab/multi-semantic-release": 4.4.4
-    "@anolilab/semantic-release-pnpm": 8.1.15
-    "@anolilab/semantic-release-preset": 13.4.16
-    commitizen: ^4.3.1
-    semantic-release: 25.0.3
-  dev:
-    "@arethetypeswrong/cli": ^0.18.3
-    "@babel/core": 7.29.7
-    "@babel/parser": 7.29.7
-    "@mozilla/readability": ^0.6.0
-    "@oxc-parser/binding-linux-x64-gnu": 0.133.0
-    "@oxc-project/types": 0.133.0
-    "@svgr/core": ^8.1.0
-    "@swc/core": 1.15.40
-    "@swc/helpers": 0.5.23
-    "@swc/types": 0.1.26
-    babel-plugin-transform-hook-names: ^1.0.2
-    babel-preset-solid: 1.9.12
-    conventional-changelog-conventionalcommits: 9.3.1
-    deeks: ^3.2.1
-    detect-indent: ^7.0.2
-    diff: 9.0.0
-    estree-walker: ^3.0.3
-    hookable: 6.1.1
-    lit: 3.3.3
-    mime: ^4.1.0
-    nodehun: ^3.0.2
-    oxc-parser: 0.133.0
-    oxc-transform: 0.133.0
-    p-queue: 9.3.0
-    package-manager-detector: ^1.6.0
-    picocolors: ^1.1.1
-    postgraphile: 5.0.3
-    rs-module-lexer: 2.8.0
-    safe-stable-stringify: ^2.5.0
-    sort-package-json: 3.6.1
-    stylus: ^0.64.0
-    sucrase: ^3.35.1
-    sugarss: 5.0.1
-    tempy: 3.2.0
-    tree-kill: ^1.2.2
-    typedoc: 0.28.19
-    typedoc-plugin-rename-defaults: 0.7.3
-  frontend:
-    "@babel/preset-react": ^7.29.7
-    "@radix-ui/react-tooltip": ^1.2.8
-    "@vue/language-core": 3.3.3
-    babel-plugin-react-compiler: 1.0.0
-    preact: 10.29.2
-    react: 19.2.6
-    react-dom: 19.2.6
-    svelte: 5.56.0
-    vue: 3.5.35
-  icons:
-    lucide-static: 1.17.0
-  lint:
-    "@anolilab/commitlint-config": 10.0.1
-    "@anolilab/eslint-config": 27.0.2
-    "@anolilab/lint-staged-config": 11.0.1
-    "@anolilab/prettier-config": 10.0.1
-    "@anolilab/textlint-config": 13.0.1
-    "@commitlint/cli": 21.0.2
-    "@commitlint/config-conventional": 21.0.2
-    "@eslint/css": 1.3.0
-    "@secretlint/secretlint-rule-preset-recommend": 13.0.2
-    eslint: 10.4.1
-    husky: ^9.1.7
-    lint-staged: 17.0.7
-    prettier: 3.8.3
-    publint: 0.3.21
-    secretlint: 13.0.2
-    tailwind-csstree: 0.3.2
-    textlint: 15.7.1
-  markdown:
-    turndown: 7.2.4
-    turndown-plugin-gfm: ^1.0.2
-    typedoc-plugin-markdown: 4.11.0
-  monorepo:
-    nx: 22.7.5
-  network:
-    browserslist: 4.28.2
-    browserslist-config-anolilab: 9.0.0
-  node:
-    "@antfu/install-pkg": 1.1.0
-    "@babel/preset-env": 7.29.7
-    "@clack/prompts": 1.5.0
-    cac: 7.0.0
-    cross-env: ^10.1.0
-    dts-resolver: 3.0.0
-    execa: ^9.6.1
-    glob-parent: 6.0.2
-    oxc-resolver: 11.20.0
-    pkg-pr-new: 0.0.75
-    rimraf: 6.1.3
-    tinyexec: 1.2.4
-    tinyglobby: 0.2.17
-  peer:
-    package-manager-detector: ^1.6.0
-  prod:
-    "@arethetypeswrong/core": ^0.18.2
-    "@babel/generator": 7.29.7
-    "@babel/helper-validator-identifier": 7.29.7
-    "@babel/parser": 7.29.7
-    "@babel/types": 7.29.7
-    "@visulima/packem-share": 1.0.0-alpha.46
-    ast-kit: ^2.2.0
-    audit-ci: ^7.1.0
-    birpc: ^4.0.0
-    cjs-module-lexer: 2.2.0
-    clsx: ^2.1.1
-    fastest-levenshtein: 1.0.16
-    get-tsconfig: 4.14.0
-    gpt-tokenizer: ^3.4.0
-    happy-dom: 20.9.0
-    hookable: 6.1.1
-    html-minifier-next: 6.2.7
-    is-ci: ^4.1.0
-    micromatch: ^4.0.8
-    mlly: 1.8.2
-    obug: 2.1.1
-    oxc-parser: 0.133.0
-    p-queue: 9.3.0
-    picomatch: 4.0.4
-    plop: 4.0.5
-    preline: 4.2.0
-    rs-module-lexer: 2.8.0
-    safe-stable-stringify: ^2.5.0
-    solid-js: 1.9.13
-    sort-package-json: 3.6.1
-    source-map-js: ^1.2.1
-    tailwind-merge: 3.6.0
-    workerpool: 10.0.2
-  script:
-    jiti: 2.7.0
-    tsx: 4.22.4
-  style:
-    "@csstools/css-parser-algorithms": 4.0.0
-    "@csstools/css-tokenizer": 4.0.0
-    "@csstools/postcss-slow-plugins": 3.0.0
-    "@tailwindcss/forms": 0.5.11
-    "@tailwindcss/node": 4.3.0
-    "@tailwindcss/oxide": 4.3.0
-    "@tailwindcss/postcss": 4.3.0
-    "@tailwindcss/typography": ^0.5.19
-    "@visulima/css-style-inject": 1.0.0-alpha.15
-    clean-css: ^5.3.3
-    cssnano: 8.0.1
-    icss-utils: ^5.1.0
-    less: 4.6.4
-    lightningcss: 1.32.0
-    minireset.css: 0.0.7
-    postcss: 8.5.15
-    postcss-custom-properties: 15.0.1
-    postcss-load-config: ^6.0.1
-    postcss-modules: 6.0.1
-    postcss-modules-extract-imports: ^3.1.0
-    postcss-modules-local-by-default: ^4.2.0
-    postcss-modules-scope: ^3.2.1
-    postcss-modules-values: ^4.0.0
-    postcss-value-parser: ^4.2.0
-    sass: 1.100.0
-    sass-embedded: 1.100.0
-    tailwindcss: 4.3.0
-  test:
-    "@jridgewell/source-map": ^0.3.11
-    "@sxzz/test-utils": 0.5.18
-    "@vitest/coverage-v8": 4.1.7
-    "@vitest/ui": 4.1.7
-    vitest: 4.1.7
-  tsc:
-    "@babel/preset-typescript": ^7.29.7
-    "@total-typescript/ts-reset": ^0.6.1
-    "@ts-macro/tsc": 0.3.7
-    "@volar/typescript": 2.4.28
-    typescript: 6.0.3
-    vue-tsc: 3.3.3
-  types:
-    "@types/babel__core": ^7.20.5
-    "@types/babel__generator": ^7.27.0
-    "@types/bun": 1.3.14
-    "@types/clean-css": 4.2.11
-    "@types/debug": 4.1.13
-    "@types/estree": 1.0.9
-    "@types/glob-parent": ^5.1.3
-    "@types/html-minifier-next": 4.1.0
-    "@types/icss-utils": ^5.1.2
-    "@types/is-glob": ^4.0.4
-    "@types/less": 3.0.8
-    "@types/micromatch": ^4.0.10
-    "@types/node": 25.9.1
-    "@types/picomatch": ^4.0.3
-    "@types/postcss-modules-local-by-default": ^4.0.2
-    "@types/postcss-modules-scope": ^3.0.4
-    "@types/react": 19.2.15
-    "@types/react-dom": ^19.2.3
-    "@types/semver": ^7.7.1
-    "@types/stylus": ^0.48.43
-    "@types/turndown": ^5.0.6
-    "@types/uglifycss": ^0.0.11
-    "@typescript/native-preview": 7.0.0-dev.20250922.1
-  utils:
-    cheerio: 1.2.0
-    defu: 6.1.7
-    magic-string: 0.30.21
-    semver: 7.8.1
-  visulima:
-    "@visulima/cerebro": 3.0.0-alpha.25
-    "@visulima/colorize": 2.0.0-alpha.11
-    "@visulima/find-cache-dir": 3.0.0-alpha.9
-    "@visulima/fs": 5.0.0-alpha.24
-    "@visulima/humanizer": 3.0.0-alpha.11
-    "@visulima/package": 5.0.0-alpha.23
-    "@visulima/packem": 2.0.0-alpha.78
-    "@visulima/pail": 4.0.0-alpha.16
-    "@visulima/path": 3.0.0-alpha.10
-    "@visulima/source-map": 3.0.0-alpha.9
-    "@visulima/tabular": 4.0.0-alpha.11
-    "@visulima/tsconfig": 3.0.0-alpha.24
+    build:
+        "@rollup/plugin-alias": 6.0.0
+        "@rollup/plugin-commonjs": 29.0.3
+        "@rollup/plugin-dynamic-import-vars": 2.1.5
+        "@rollup/plugin-inject": 5.0.5
+        "@rollup/plugin-json": 6.1.0
+        "@rollup/plugin-node-resolve": 16.0.3
+        "@rollup/plugin-replace": 6.0.3
+        "@rollup/plugin-wasm": 6.2.2
+        "@rollup/pluginutils": 5.4.0
+        "@visulima/packem-rollup": 1.0.0-alpha.65
+        "@visulima/rollup-plugin-css": 1.0.0-alpha.45
+        esbuild: 0.28.0
+        rolldown: 1.0.3
+        rollup: 4.60.4
+        rollup-plugin-dts: 6.4.1
+        rollup-plugin-import-trace: 1.0.1
+        rollup-plugin-license: 3.7.1
+        rollup-plugin-lit-css: 6.0.1
+        rollup-plugin-polyfill-node: 0.13.0
+        rollup-plugin-pure: ^0.4.0
+        rollup-plugin-svelte: ^7.2.3
+        rollup-plugin-visualizer: 7.0.1
+        unplugin-vue: 7.2.0
+        vite: 8.0.14
+    cli:
+        "@anolilab/multi-semantic-release": 4.4.4
+        "@anolilab/semantic-release-pnpm": 8.1.15
+        "@anolilab/semantic-release-preset": 13.4.16
+        commitizen: ^4.3.1
+        semantic-release: 25.0.3
+    dev:
+        "@arethetypeswrong/cli": ^0.18.3
+        "@babel/core": 7.29.7
+        "@babel/parser": 7.29.7
+        "@mozilla/readability": ^0.6.0
+        "@oxc-parser/binding-linux-x64-gnu": 0.133.0
+        "@oxc-project/types": 0.133.0
+        "@svgr/core": ^8.1.0
+        "@swc/core": 1.15.40
+        "@swc/helpers": 0.5.23
+        "@swc/types": 0.1.26
+        babel-plugin-transform-hook-names: ^1.0.2
+        babel-preset-solid: 1.9.12
+        conventional-changelog-conventionalcommits: 9.3.1
+        deeks: ^3.2.1
+        detect-indent: ^7.0.2
+        diff: 9.0.0
+        estree-walker: ^3.0.3
+        hookable: 6.1.1
+        lit: 3.3.3
+        mime: ^4.1.0
+        nodehun: ^3.0.2
+        oxc-parser: 0.133.0
+        oxc-transform: 0.133.0
+        p-queue: 9.3.0
+        package-manager-detector: ^1.6.0
+        picocolors: ^1.1.1
+        postgraphile: 5.0.3
+        rs-module-lexer: 2.8.0
+        safe-stable-stringify: ^2.5.0
+        sort-package-json: 3.6.1
+        stylus: ^0.64.0
+        sucrase: ^3.35.1
+        sugarss: 5.0.1
+        tempy: 3.2.0
+        tree-kill: ^1.2.2
+        typedoc: 0.28.19
+        typedoc-plugin-rename-defaults: 0.7.3
+    frontend:
+        "@babel/preset-react": ^7.29.7
+        "@radix-ui/react-tooltip": ^1.2.8
+        "@vue/language-core": 3.3.3
+        babel-plugin-react-compiler: 1.0.0
+        preact: 10.29.2
+        react: 19.2.6
+        react-dom: 19.2.6
+        svelte: 5.56.0
+        vue: 3.5.35
+    icons:
+        lucide-static: 1.17.0
+    lint:
+        "@anolilab/commitlint-config": 10.0.1
+        "@anolilab/eslint-config": 27.0.2
+        "@anolilab/lint-staged-config": 11.0.1
+        "@anolilab/prettier-config": 10.0.1
+        "@anolilab/textlint-config": 13.0.1
+        "@commitlint/cli": 21.0.2
+        "@commitlint/config-conventional": 21.0.2
+        "@eslint/css": 1.3.0
+        "@secretlint/secretlint-rule-preset-recommend": 13.0.2
+        eslint: 10.4.1
+        husky: ^9.1.7
+        lint-staged: 17.0.7
+        prettier: 3.8.3
+        publint: 0.3.21
+        secretlint: 13.0.2
+        tailwind-csstree: 0.3.2
+        textlint: 15.7.1
+    markdown:
+        turndown: 7.2.4
+        turndown-plugin-gfm: ^1.0.2
+        typedoc-plugin-markdown: 4.11.0
+    monorepo:
+        nx: 22.7.5
+    network:
+        browserslist: 4.28.2
+        browserslist-config-anolilab: 9.0.0
+    node:
+        "@antfu/install-pkg": 1.1.0
+        "@babel/preset-env": 7.29.7
+        "@clack/prompts": 1.5.0
+        cac: 7.0.0
+        cross-env: ^10.1.0
+        dts-resolver: 3.0.0
+        execa: ^9.6.1
+        glob-parent: 6.0.2
+        oxc-resolver: 11.20.0
+        pkg-pr-new: 0.0.75
+        rimraf: 6.1.3
+        tinyexec: 1.2.4
+        tinyglobby: 0.2.17
+    peer:
+        package-manager-detector: ^1.6.0
+    prod:
+        "@arethetypeswrong/core": ^0.18.2
+        "@babel/generator": 7.29.7
+        "@babel/helper-validator-identifier": 7.29.7
+        "@babel/parser": 7.29.7
+        "@babel/types": 7.29.7
+        "@visulima/packem-share": 1.0.0-alpha.46
+        ast-kit: ^2.2.0
+        audit-ci: ^7.1.0
+        birpc: ^4.0.0
+        cjs-module-lexer: 2.2.0
+        clsx: ^2.1.1
+        fastest-levenshtein: 1.0.16
+        get-tsconfig: 4.14.0
+        gpt-tokenizer: ^3.4.0
+        happy-dom: 20.9.0
+        hookable: 6.1.1
+        html-minifier-next: 6.2.7
+        is-ci: ^4.1.0
+        micromatch: ^4.0.8
+        mlly: 1.8.2
+        obug: 2.1.1
+        oxc-parser: 0.133.0
+        p-queue: 9.3.0
+        picomatch: 4.0.4
+        plop: 4.0.5
+        preline: 4.2.0
+        rs-module-lexer: 2.8.0
+        safe-stable-stringify: ^2.5.0
+        solid-js: 1.9.13
+        sort-package-json: 3.6.1
+        source-map-js: ^1.2.1
+        tailwind-merge: 3.6.0
+        workerpool: 10.0.2
+    script:
+        jiti: 2.7.0
+        tsx: 4.22.4
+    style:
+        "@csstools/css-parser-algorithms": 4.0.0
+        "@csstools/css-tokenizer": 4.0.0
+        "@csstools/postcss-slow-plugins": 3.0.0
+        "@tailwindcss/forms": 0.5.11
+        "@tailwindcss/node": 4.3.0
+        "@tailwindcss/oxide": 4.3.0
+        "@tailwindcss/postcss": 4.3.0
+        "@tailwindcss/typography": ^0.5.19
+        "@visulima/css-style-inject": 1.0.0-alpha.15
+        clean-css: ^5.3.3
+        cssnano: 8.0.1
+        icss-utils: ^5.1.0
+        less: 4.6.4
+        lightningcss: 1.32.0
+        minireset.css: 0.0.7
+        postcss: 8.5.15
+        postcss-custom-properties: 15.0.1
+        postcss-load-config: ^6.0.1
+        postcss-modules: 6.0.1
+        postcss-modules-extract-imports: ^3.1.0
+        postcss-modules-local-by-default: ^4.2.0
+        postcss-modules-scope: ^3.2.1
+        postcss-modules-values: ^4.0.0
+        postcss-value-parser: ^4.2.0
+        sass: 1.100.0
+        sass-embedded: 1.100.0
+        tailwindcss: 4.3.0
+    test:
+        "@jridgewell/source-map": ^0.3.11
+        "@sxzz/test-utils": 0.5.18
+        "@vitest/coverage-v8": 4.1.7
+        "@vitest/ui": 4.1.7
+        vitest: 4.1.7
+    tsc:
+        "@babel/preset-typescript": ^7.29.7
+        "@total-typescript/ts-reset": ^0.6.1
+        "@ts-macro/tsc": 0.3.7
+        "@volar/typescript": 2.4.28
+        typescript: 6.0.3
+        vue-tsc: 3.3.3
+    types:
+        "@types/babel__core": ^7.20.5
+        "@types/babel__generator": ^7.27.0
+        "@types/bun": 1.3.14
+        "@types/clean-css": 4.2.11
+        "@types/debug": 4.1.13
+        "@types/estree": 1.0.9
+        "@types/glob-parent": ^5.1.3
+        "@types/html-minifier-next": 4.1.0
+        "@types/icss-utils": ^5.1.2
+        "@types/is-glob": ^4.0.4
+        "@types/less": 3.0.8
+        "@types/micromatch": ^4.0.10
+        "@types/node": 25.9.1
+        "@types/picomatch": ^4.0.3
+        "@types/postcss-modules-local-by-default": ^4.0.2
+        "@types/postcss-modules-scope": ^3.0.4
+        "@types/react": 19.2.15
+        "@types/react-dom": ^19.2.3
+        "@types/semver": ^7.7.1
+        "@types/stylus": ^0.48.43
+        "@types/turndown": ^5.0.6
+        "@types/uglifycss": ^0.0.11
+        "@typescript/native-preview": 7.0.0-dev.20250922.1
+    utils:
+        cheerio: 1.2.0
+        defu: 6.1.7
+        magic-string: 0.30.21
+        semver: 7.8.1
+    visulima:
+        "@visulima/cerebro": 3.0.0-alpha.25
+        "@visulima/colorize": 2.0.0-alpha.11
+        "@visulima/find-cache-dir": 3.0.0-alpha.9
+        "@visulima/fs": 5.0.0-alpha.24
+        "@visulima/humanizer": 3.0.0-alpha.11
+        "@visulima/package": 5.0.0-alpha.23
+        "@visulima/packem": 2.0.0-alpha.78
+        "@visulima/pail": 4.0.0-alpha.16
+        "@visulima/path": 3.0.0-alpha.10
+        "@visulima/source-map": 3.0.0-alpha.9
+        "@visulima/tabular": 4.0.0-alpha.11
+        "@visulima/tsconfig": 3.0.0-alpha.24
 dedupeInjectedDeps: true
 dedupePeerDependents: true
 disallowWorkspaceCycles: false
 
 ignoredOptionalDependencies:
-  - fsevents
-  - dtrace-provider
+    - fsevents
+    - dtrace-provider
 linkWorkspacePackages: true
 
 minimumReleaseAgeExclude:
-  - vitest
-  - "@vitest/*"
-  - typescript
-  - "@types/*"
-  - "@visulima/cerebro@3.0.0-alpha.25"
-  - "@visulima/fs@5.0.0-alpha.24"
-  - "@visulima/package@5.0.0-alpha.23"
-  - "@visulima/tsconfig@3.0.0-alpha.24"
-  - "@rolldown/*"
-  - "@vue/language-core@3.3.1"
-  - vue-tsc@3.3.1
-  - brace-expansion@5.0.6
-  - "@swc/helpers@0.5.23"
-  - "@vue/compiler-core@3.5.35"
-  - "@vue/compiler-dom@3.5.35"
-  - "@vue/compiler-sfc@3.5.35"
-  - "@vue/compiler-ssr@3.5.35"
-  - "@vue/reactivity@3.5.35"
-  - "@vue/runtime-core@3.5.35"
-  - "@vue/runtime-dom@3.5.35"
-  - "@vue/server-renderer@3.5.35"
-  - "@vue/shared@3.5.35"
-  - rolldown@1.0.3
-  - vue@3.5.35
-  - tmp@0.2.6
-  - lint-staged@17.0.7
-  - tinyexec@1.2.4
-  - tsx@4.22.4
-  - "@rollup/rollup-android-arm-eabi@4.61.0"
-  - "@rollup/rollup-android-arm64@4.61.0"
-  - "@rollup/rollup-darwin-arm64@4.61.0"
-  - "@rollup/rollup-darwin-x64@4.61.0"
-  - "@rollup/rollup-freebsd-arm64@4.61.0"
-  - "@rollup/rollup-freebsd-x64@4.61.0"
-  - "@rollup/rollup-linux-arm-gnueabihf@4.61.0"
-  - "@rollup/rollup-linux-arm-musleabihf@4.61.0"
-  - "@rollup/rollup-linux-arm64-gnu@4.61.0"
-  - "@rollup/rollup-linux-arm64-musl@4.61.0"
-  - "@rollup/rollup-linux-loong64-gnu@4.61.0"
-  - "@rollup/rollup-linux-loong64-musl@4.61.0"
-  - "@rollup/rollup-linux-ppc64-gnu@4.61.0"
-  - "@rollup/rollup-linux-ppc64-musl@4.61.0"
-  - "@rollup/rollup-linux-riscv64-gnu@4.61.0"
-  - "@rollup/rollup-linux-riscv64-musl@4.61.0"
-  - "@rollup/rollup-linux-s390x-gnu@4.61.0"
-  - "@rollup/rollup-linux-x64-gnu@4.61.0"
-  - "@rollup/rollup-linux-x64-musl@4.61.0"
-  - "@rollup/rollup-openbsd-x64@4.61.0"
-  - "@rollup/rollup-openharmony-arm64@4.61.0"
-  - "@rollup/rollup-win32-arm64-msvc@4.61.0"
-  - "@rollup/rollup-win32-ia32-msvc@4.61.0"
-  - "@rollup/rollup-win32-x64-gnu@4.61.0"
-  - "@rollup/rollup-win32-x64-msvc@4.61.0"
-  - rollup@4.61.0
-  - vite@8.0.15
-  - svelte@5.56.1
-  - typedoc-plugin-markdown@4.12.0
+    - vitest
+    - "@vitest/*"
+    - typescript
+    - "@types/*"
+    - "@visulima/cerebro@3.0.0-alpha.25"
+    - "@visulima/fs@5.0.0-alpha.24"
+    - "@visulima/package@5.0.0-alpha.23"
+    - "@visulima/tsconfig@3.0.0-alpha.24"
+    - "@rolldown/*"
+    - "@vue/language-core@3.3.1"
+    - vue-tsc@3.3.1
+    - brace-expansion@5.0.6
+    - "@swc/helpers@0.5.23"
+    - "@vue/compiler-core@3.5.35"
+    - "@vue/compiler-dom@3.5.35"
+    - "@vue/compiler-sfc@3.5.35"
+    - "@vue/compiler-ssr@3.5.35"
+    - "@vue/reactivity@3.5.35"
+    - "@vue/runtime-core@3.5.35"
+    - "@vue/runtime-dom@3.5.35"
+    - "@vue/server-renderer@3.5.35"
+    - "@vue/shared@3.5.35"
+    - rolldown@1.0.3
+    - vue@3.5.35
+    - tmp@0.2.6
+    - lint-staged@17.0.7
+    - tinyexec@1.2.4
+    - tsx@4.22.4
+    - "@rollup/rollup-android-arm-eabi@4.61.0"
+    - "@rollup/rollup-android-arm64@4.61.0"
+    - "@rollup/rollup-darwin-arm64@4.61.0"
+    - "@rollup/rollup-darwin-x64@4.61.0"
+    - "@rollup/rollup-freebsd-arm64@4.61.0"
+    - "@rollup/rollup-freebsd-x64@4.61.0"
+    - "@rollup/rollup-linux-arm-gnueabihf@4.61.0"
+    - "@rollup/rollup-linux-arm-musleabihf@4.61.0"
+    - "@rollup/rollup-linux-arm64-gnu@4.61.0"
+    - "@rollup/rollup-linux-arm64-musl@4.61.0"
+    - "@rollup/rollup-linux-loong64-gnu@4.61.0"
+    - "@rollup/rollup-linux-loong64-musl@4.61.0"
+    - "@rollup/rollup-linux-ppc64-gnu@4.61.0"
+    - "@rollup/rollup-linux-ppc64-musl@4.61.0"
+    - "@rollup/rollup-linux-riscv64-gnu@4.61.0"
+    - "@rollup/rollup-linux-riscv64-musl@4.61.0"
+    - "@rollup/rollup-linux-s390x-gnu@4.61.0"
+    - "@rollup/rollup-linux-x64-gnu@4.61.0"
+    - "@rollup/rollup-linux-x64-musl@4.61.0"
+    - "@rollup/rollup-openbsd-x64@4.61.0"
+    - "@rollup/rollup-openharmony-arm64@4.61.0"
+    - "@rollup/rollup-win32-arm64-msvc@4.61.0"
+    - "@rollup/rollup-win32-ia32-msvc@4.61.0"
+    - "@rollup/rollup-win32-x64-gnu@4.61.0"
+    - "@rollup/rollup-win32-x64-msvc@4.61.0"
+    - rollup@4.61.0
+    - vite@8.0.15
+    - svelte@5.56.1
+    - typedoc-plugin-markdown@4.12.0
 
 onlyBuiltDependencies:
-  - "@parcel/watcher"
-  - "@swc/core"
-  - "@tailwindcss/oxide"
-  - esbuild
-  - less
-  - node-sass
-  - nodehun
-  - nx
-  - oxc-resolver
-  - rs-module-lexer
-  - unrs-resolver
+    - "@parcel/watcher"
+    - "@swc/core"
+    - "@tailwindcss/oxide"
+    - esbuild
+    - less
+    - node-sass
+    - nodehun
+    - nx
+    - oxc-resolver
+    - rs-module-lexer
+    - unrs-resolver
 overrides:
-  "@hono/node-server@<1.19.13": ">=1.19.13"
-  ajv@>=7.0.0-alpha.0 <8.18.0: ">=8.18.0"
-  axios@>=1.0.0 <1.15.0: ">=1.15.0"
-  axios@>=1.0.0 <1.15.1: ">=1.15.1"
-  axios@>=1.0.0 <1.15.2: ">=1.15.2"
-  brace-expansion@<1.1.13: ">=1.1.13"
-  brace-expansion@>=2.0.0 <2.0.3: ">=2.0.3"
-  brace-expansion@>=4.0.0 <5.0.5: ">=5.0.5"
-  brace-expansion@>=5.0.0 <5.0.6: ^5.0.6
-  chrono-node@<2.2.4: ">=2.2.4"
-  defu@<=6.1.4: ">=6.1.5"
-  devalue@>=5.6.3 <=5.8.0: ">=5.8.1"
-  diff@>=5.0.0 <5.2.2: ">=5.2.2"
-  fast-uri@<=3.1.0: ">=3.1.1"
-  fast-uri@<=3.1.1: ">=3.1.2"
-  flatted@<=3.4.1: ">=3.4.2"
-  follow-redirects@<=1.15.11: ">=1.16.0"
-  glob@>=10.2.0 <10.5.0: ">=10.5.0"
-  handlebars@>=4.0.0 <4.7.9: ">=4.7.9"
-  handlebars@>=4.0.0 <=4.7.8: ">=4.7.9"
-  happy-dom@>=15.10.0 <=20.8.7: ">=20.8.8"
-  hono: ">=4.12.16"
-  hono@<4.12.12: ">=4.12.12"
-  hono@<4.12.16: ">=4.12.16"
-  hono@<4.12.7: ">=4.12.7"
-  hono@>=4.0.0 <=4.12.11: ">=4.12.12"
-  ip-address@<=10.1.0: ">=10.1.1"
-  js-yaml@>=4.0.0 <4.1.1: ">=4.1.1"
-  lodash-es@<=4.17.23: ">=4.18.0"
-  lodash-es@>=4.0.0 <=4.17.23: ">=4.18.0"
-  lodash@<=4.17.23: ">=4.18.0"
-  lodash@>=4.0.0 <=4.17.22: ">=4.17.23"
-  lodash@>=4.0.0 <=4.17.23: ">=4.18.0"
-  minimatch@<3.1.3: ">=3.1.3"
-  minimatch@<3.1.4: ">=3.1.4"
-  minimatch@>=10.0.0 <10.2.1: ">=10.2.1"
-  minimatch@>=10.0.0 <10.2.3: ">=10.2.3"
-  minimatch@>=5.0.0 <5.1.7: ">=5.1.7"
-  minimatch@>=5.0.0 <5.1.8: ">=5.1.8"
-  minimatch@>=9.0.0 <9.0.6: ">=9.0.6"
-  minimatch@>=9.0.0 <9.0.7: ">=9.0.7"
-  path-to-regexp@>=8.0.0 <8.4.0: ">=8.4.0"
-  picomatch@<2.3.2: ">=2.3.2"
-  picomatch@>=4.0.0 <4.0.4: ">=4.0.4"
-  svelte@<=5.55.6: ">=5.55.7"
-  svelte@>=5.46.0 <=5.55.6: ">=5.55.7"
-  svelte@>=5.51.5 <=5.55.6: ">=5.55.7"
-  tmp@<0.2.6: ^0.2.6
-  # Force a single typescript version across the whole dep graph. Without this, deps that pin
-  # an older 6.0.x (e.g. @anolilab/eslint-config, @sxzz/test-utils) pull typescript@6.0.2 while
-  # the workspace uses 6.0.3 — and @volar/typescript's proxyCreateProgram surface-types clash
-  # because of new private properties between 6.0.2 and 6.0.3.
-  typescript: 6.0.3
-  undici@<6.23.0: ">=6.23.0"
-  undici@<6.24.0: ">=6.24.0"
-  vite@>=8.0.0 <=8.0.4: ">=8.0.5"
-  ws@>=8.0.0 <8.20.1: ">=8.20.1"
-  yaml@>=2.0.0 <2.8.3: ">=2.8.3"
+    "@hono/node-server@<1.19.13": ">=1.19.13"
+    ajv@>=7.0.0-alpha.0 <8.18.0: ">=8.18.0"
+    axios@>=1.0.0 <1.15.0: ">=1.15.0"
+    axios@>=1.0.0 <1.15.1: ">=1.15.1"
+    axios@>=1.0.0 <1.15.2: ">=1.15.2"
+    brace-expansion@<1.1.13: ">=1.1.13"
+    brace-expansion@>=2.0.0 <2.0.3: ">=2.0.3"
+    brace-expansion@>=4.0.0 <5.0.5: ">=5.0.5"
+    brace-expansion@>=5.0.0 <5.0.6: ^5.0.6
+    chrono-node@<2.2.4: ">=2.2.4"
+    defu@<=6.1.4: ">=6.1.5"
+    devalue@>=5.6.3 <=5.8.0: ">=5.8.1"
+    diff@>=5.0.0 <5.2.2: ">=5.2.2"
+    fast-uri@<=3.1.0: ">=3.1.1"
+    fast-uri@<=3.1.1: ">=3.1.2"
+    flatted@<=3.4.1: ">=3.4.2"
+    follow-redirects@<=1.15.11: ">=1.16.0"
+    glob@>=10.2.0 <10.5.0: ">=10.5.0"
+    handlebars@>=4.0.0 <4.7.9: ">=4.7.9"
+    handlebars@>=4.0.0 <=4.7.8: ">=4.7.9"
+    happy-dom@>=15.10.0 <=20.8.7: ">=20.8.8"
+    hono: ">=4.12.16"
+    hono@<4.12.12: ">=4.12.12"
+    hono@<4.12.16: ">=4.12.16"
+    hono@<4.12.7: ">=4.12.7"
+    hono@>=4.0.0 <=4.12.11: ">=4.12.12"
+    ip-address@<=10.1.0: ">=10.1.1"
+    js-yaml@>=4.0.0 <4.1.1: ">=4.1.1"
+    lodash-es@<=4.17.23: ">=4.18.0"
+    lodash-es@>=4.0.0 <=4.17.23: ">=4.18.0"
+    lodash@<=4.17.23: ">=4.18.0"
+    lodash@>=4.0.0 <=4.17.22: ">=4.17.23"
+    lodash@>=4.0.0 <=4.17.23: ">=4.18.0"
+    minimatch@<3.1.3: ">=3.1.3"
+    minimatch@<3.1.4: ">=3.1.4"
+    minimatch@>=10.0.0 <10.2.1: ">=10.2.1"
+    minimatch@>=10.0.0 <10.2.3: ">=10.2.3"
+    minimatch@>=5.0.0 <5.1.7: ">=5.1.7"
+    minimatch@>=5.0.0 <5.1.8: ">=5.1.8"
+    minimatch@>=9.0.0 <9.0.6: ">=9.0.6"
+    minimatch@>=9.0.0 <9.0.7: ">=9.0.7"
+    path-to-regexp@>=8.0.0 <8.4.0: ">=8.4.0"
+    picomatch@<2.3.2: ">=2.3.2"
+    picomatch@>=4.0.0 <4.0.4: ">=4.0.4"
+    svelte@<=5.55.6: ">=5.55.7"
+    svelte@>=5.46.0 <=5.55.6: ">=5.55.7"
+    svelte@>=5.51.5 <=5.55.6: ">=5.55.7"
+    tmp@<0.2.6: ^0.2.6
+    # Force a single typescript version across the whole dep graph. Without this, deps that pin
+    # an older 6.0.x (e.g. @anolilab/eslint-config, @sxzz/test-utils) pull typescript@6.0.2 while
+    # the workspace uses 6.0.3 — and @volar/typescript's proxyCreateProgram surface-types clash
+    # because of new private properties between 6.0.2 and 6.0.3.
+    typescript: 6.0.3
+    undici@<6.23.0: ">=6.23.0"
+    undici@<6.24.0: ">=6.24.0"
+    vite@>=8.0.0 <=8.0.4: ">=8.0.5"
+    ws@>=8.0.0 <8.20.1: ">=8.20.1"
+    yaml@>=2.0.0 <2.8.3: ">=2.8.3"
 
 patchedDependencies:
-  oxc-parser: patches/oxc-parser.patch
+    oxc-parser: patches/oxc-parser.patch
 
 peerDependencyRules:
-  # vite is an optional peer of vitest/@vitest/mocker and rollup-plugin-import-trace.
-  # packem itself is a rollup plugin, not a vite consumer — vite gets pulled in transitively.
+    # vite is an optional peer of vitest/@vitest/mocker and rollup-plugin-import-trace.
+    # packem itself is a rollup plugin, not a vite consumer — vite gets pulled in transitively.
 
-  allowedVersions:
-    # vite 8 not yet in rollup-plugin-import-trace's peer range
+    allowedVersions:
+        # vite 8 not yet in rollup-plugin-import-trace's peer range
 
-    # @anolilab/* configs pin exact prettier/secretlint/textlint; widen to current catalog
-    "@anolilab/commitlint-config>@commitlint/cli": "^21.0.0"
-    "@anolilab/eslint-config>@eslint/css": "^1.0.0"
-    "@anolilab/eslint-config>tailwind-csstree": "^0.1.0"
-    "@anolilab/lint-staged-config>lint-staged": "^17.0.0"
-    "@anolilab/lint-staged-config>prettier": "^3.8.0"
-    "@anolilab/lint-staged-config>secretlint": "^13.0.0"
-    "@anolilab/prettier-config>prettier": "^3.8.0"
-    "@anolilab/textlint-config>textlint": "^15.5.0"
+        # @anolilab/* configs pin exact prettier/secretlint/textlint; widen to current catalog
+        "@anolilab/commitlint-config>@commitlint/cli": "^21.0.0"
+        "@anolilab/eslint-config>@eslint/css": "^1.0.0"
+        "@anolilab/eslint-config>tailwind-csstree": "^0.1.0"
+        "@anolilab/lint-staged-config>lint-staged": "^17.0.0"
+        "@anolilab/lint-staged-config>prettier": "^3.8.0"
+        "@anolilab/lint-staged-config>secretlint": "^13.0.0"
+        "@anolilab/prettier-config>prettier": "^3.8.0"
+        "@anolilab/textlint-config>textlint": "^15.5.0"
 
-    # postgraphile stack is pulled in only by packem's externals integration test
-    "@dataplan/pg>graphql": "^15.0.0"
-    "@dataplan/pg>pg-sql2": "^4.0.0"
-    "@sxzz/test-utils>typescript": "^6.0.0"
+        # postgraphile stack is pulled in only by packem's externals integration test
+        "@dataplan/pg>graphql": "^15.0.0"
+        "@dataplan/pg>pg-sql2": "^4.0.0"
+        "@sxzz/test-utils>typescript": "^6.0.0"
 
-    # eslint 10 + typescript 6: plugins haven't updated peer ranges yet
-    "eslint-plugin-no-for-of-array>eslint": "^10.0.0"
-    "eslint-plugin-no-for-of-array>typescript": "^6.0.0"
-    "eslint-plugin-promise>eslint": "^10.0.0"
-    "grafast>graphql": "^15.0.0"
-    "grafserv>graphql": "^15.0.0"
-    "graphile-utils>graphile-build": "^4.0.0"
-    "graphile-utils>graphile-build-pg": "^4.0.0"
-    "graphile-utils>graphql": "^15.0.0"
-    "postgraphile>@dataplan/pg": "^1.0.0"
-    "postgraphile>grafast": "^1.0.0"
-    "postgraphile>graphile-build": "^4.0.0"
-    "postgraphile>graphile-build-pg": "^4.0.0"
-    "postgraphile>graphile-config": "^1.0.0"
-    "postgraphile>graphql": "^15.0.0"
-    "postgraphile>pg-sql2": "^4.0.0"
-    "rollup-plugin-import-trace>vite": "^8.0.0"
-    "ruru-types>graphql": "^15.0.0"
-    "ruru>graphql": "^15.0.0"
+        # eslint 10 + typescript 6: plugins haven't updated peer ranges yet
+        "eslint-plugin-no-for-of-array>eslint": "^10.0.0"
+        "eslint-plugin-no-for-of-array>typescript": "^6.0.0"
+        "eslint-plugin-promise>eslint": "^10.0.0"
+        "grafast>graphql": "^15.0.0"
+        "grafserv>graphql": "^15.0.0"
+        "graphile-utils>graphile-build": "^4.0.0"
+        "graphile-utils>graphile-build-pg": "^4.0.0"
+        "graphile-utils>graphql": "^15.0.0"
+        "postgraphile>@dataplan/pg": "^1.0.0"
+        "postgraphile>grafast": "^1.0.0"
+        "postgraphile>graphile-build": "^4.0.0"
+        "postgraphile>graphile-build-pg": "^4.0.0"
+        "postgraphile>graphile-config": "^1.0.0"
+        "postgraphile>graphql": "^15.0.0"
+        "postgraphile>pg-sql2": "^4.0.0"
+        "rollup-plugin-import-trace>vite": "^8.0.0"
+        "ruru-types>graphql": "^15.0.0"
+        "ruru>graphql": "^15.0.0"
 
-    # typedoc / @sxzz/test-utils not yet published with typescript 6 support
-    "typedoc>typescript": "^6.0.0"
-  ignoreMissing:
-    - vite
+        # typedoc / @sxzz/test-utils not yet published with typescript 6 support
+        "typedoc>typescript": "^6.0.0"
+    ignoreMissing:
+        - vite
 
 publicHoistPattern:
-  - "*eslint*"
-  - "@prettier/plugin-*"
-  - "*prettier-plugin-*"
-  - "*textlint-*"
+    - "*eslint*"
+    - "@prettier/plugin-*"
+    - "*prettier-plugin-*"
+    - "*textlint-*"
 saveWorkspaceProtocol: true
 strictPeerDependencies: false

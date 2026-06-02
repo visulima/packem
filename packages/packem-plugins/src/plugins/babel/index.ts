@@ -217,7 +217,9 @@ export const babelTransformPlugin = ({
             if (pool) {
                 // The worker runs the identical transformCode routine; a per-file
                 // `filename`/`sourceFileName` default is applied inside it from `id`.
-                return pool.exec("transform", [sourcecode, id, baseTransformOptions]) as Promise<{ code: string; map: TransformOptions["inputSourceMap"] } | undefined>;
+                return pool.exec("transform", [sourcecode, id, baseTransformOptions]) as Promise<
+                    { code: string; map: TransformOptions["inputSourceMap"] } | undefined
+                >;
             }
 
             const result = await transformCode(sourcecode, id, baseTransformOptions);

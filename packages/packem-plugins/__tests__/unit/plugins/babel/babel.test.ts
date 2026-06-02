@@ -34,8 +34,7 @@ const getTransformHandler = (plugin: Plugin): TransformHandler => {
 // Minimal `this` context for invoking the transform hook directly.
 const transformContext = { meta: { watchMode: false } } as unknown as TransformPluginContext;
 
-const runTransform = async (plugin: Plugin, code: string, id: string) =>
-    getTransformHandler(plugin).call(transformContext, code, id);
+const runTransform = async (plugin: Plugin, code: string, id: string) => getTransformHandler(plugin).call(transformContext, code, id);
 
 describe("babel transform-code", () => {
     it("applies babel plugins and returns transformed code", async () => {
