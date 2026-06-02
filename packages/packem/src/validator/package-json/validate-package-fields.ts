@@ -427,13 +427,22 @@ const validateDeclarationFields = ({ cjsJSExtension, context, pkg, validation }:
         showWarning = Boolean(pkg.main?.endsWith(`.${cjsJSExtension}`));
     }
 
-    if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation.packageJson?.types !== false) {
+    const hasTypes = pkg.types !== undefined || pkg.typings !== undefined;
+
+    if (!hasTypes && showWarning && validation.packageJson?.types !== false) {
         warn(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
     }
+
+    // A type: module package that relies on the classic top-level "main" + "types"
+    // keys (instead of "exports" subpaths) already resolves types under node10 via
+    // "types"; "typesVersions" only matters for "exports" subpath resolution, so the
+    // nudge would be spurious here.
+    const usesLegacyMainTypes = pkg.type === "module" && pkg.main !== undefined && hasTypes;
 
     if (
         (context.options.declaration === true || context.options.declaration === "compatible")
         && showWarning
+        && !usesLegacyMainTypes
         && validation.packageJson?.typesVersions !== false
         && (() => {
             // typesVersions is missing from the stale type-fest@0.20.2 transitively
