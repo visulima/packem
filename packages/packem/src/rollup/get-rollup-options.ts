@@ -886,7 +886,7 @@ const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsR
         // This overrides any userDtsOptions.resolve from the spread above.
         resolve: dtsResolve,
         tsconfig: context.tsconfig?.path,
-    }) as unknown as Plugin[];
+    });
 };
 
 // Avoid create multiple dts plugins instance and parsing the same tsconfig multi times,
