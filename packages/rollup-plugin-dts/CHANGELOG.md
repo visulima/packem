@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.30](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.29...@visulima/rollup-plugin-dts@1.0.0-alpha.30) (2026-06-02)
+
+### Features
+
+* **babel:** add parallel worker-pool transforms ([#204](https://github.com/visulima/packem/issues/204)) ([7a5444c](https://github.com/visulima/packem/commit/7a5444c4a17c464b4809323374b1244701425f4b))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.29](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.28...@visulima/rollup-plugin-dts@1.0.0-alpha.29) (2026-06-02)
 
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.28](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.27...@visulima/rollup-plugin-dts@1.0.0-alpha.28) (2026-06-01)
