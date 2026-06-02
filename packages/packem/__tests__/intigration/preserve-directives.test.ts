@@ -411,4 +411,66 @@ const bar = "bar";
 exports.bar = bar;
 `);
     });
+
+    // Regression guard against stale-cache directive output: a warm build cache
+    // must re-emit the directive prologue whenever a source file's leading
+    // directive is added or removed between incremental builds. Without this,
+    // a rebuild can serve a chunk from before the directive change and silently
+    // drop (or keep) `"use client";`, which reads like nondeterminism. All three
+    // builds below reuse the same project dir (and therefore the same on-disk
+    // cache) — only the source changes.
+    it("should invalidate the cache when a leading directive changes between rebuilds", async () => {
+        expect.assertions(9);
+
+        const withDirective = `"use client";
+
+export const value = "x";`;
+        const withoutDirective = `export const value = "x";`;
+        const mjsPath = `${temporaryDirectoryPath}/dist/index.mjs`;
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, withDirective);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "./dist/index.mjs",
+            type: "module",
+            types: "./dist/index.d.ts",
+        });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
+        await createPackemConfig(temporaryDirectoryPath, { runtime: "browser" });
+
+        // Build 1: directive present — populates the cache.
+        const firstBuild = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(firstBuild.exitCode).toBe(0);
+        expect(normalizeBundleOutput(readFileSync(mjsPath)).startsWith("'use client';")).toBe(true);
+
+        // Build 2: directive removed — a warm-cache rebuild must drop it.
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, withoutDirective);
+
+        const secondBuild = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(secondBuild.exitCode).toBe(0);
+        expect(readFileSync(mjsPath)).not.toContain("use client");
+
+        // Build 3: directive re-added — a warm-cache rebuild must bring it back.
+        // This is the assertion that catches a cache that keys off something
+        // other than the (changed) source content.
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, withDirective);
+
+        const thirdBuild = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(thirdBuild.exitCode).toBe(0);
+        expect(normalizeBundleOutput(readFileSync(mjsPath)).startsWith("'use client';")).toBe(true);
+
+        // None of the rebuilds should have errored.
+        expect(firstBuild.stderr).toBe("");
+        expect(secondBuild.stderr).toBe("");
+        expect(thirdBuild.stderr).toBe("");
+    });
 });
