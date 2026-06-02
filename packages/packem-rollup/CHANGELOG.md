@@ -1,3 +1,15 @@
+## @visulima/packem-rollup [1.0.0-alpha.68](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.67...@visulima/packem-rollup@1.0.0-alpha.68) (2026-06-02)
+
+### Features
+
+* add duplicated package detector ([#203](https://github.com/visulima/packem/issues/203)) ([2b29466](https://github.com/visulima/packem/commit/2b29466bc7980477fe0e2a500feba2487dd7758a))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.48
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.29
+
 ## @visulima/packem-rollup [1.0.0-alpha.67](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.66...@visulima/packem-rollup@1.0.0-alpha.67) (2026-06-01)
 
 ### Miscellaneous Chores

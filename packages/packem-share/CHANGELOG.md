@@ -1,3 +1,13 @@
+## @visulima/packem-share [1.0.0-alpha.48](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.47...@visulima/packem-share@1.0.0-alpha.48) (2026-06-02)
+
+### Features
+
+* add duplicated package detector ([#203](https://github.com/visulima/packem/issues/203)) ([2b29466](https://github.com/visulima/packem/commit/2b29466bc7980477fe0e2a500feba2487dd7758a))
+
+### Miscellaneous Chores
+
+* **benchmarks:** port build-tool benchmark suite onto the 2.0 codebase ([#201](https://github.com/visulima/packem/issues/201)) ([8abdf09](https://github.com/visulima/packem/commit/8abdf0938bb7c5b2b7baabbb6d2698c73dba5d55))
+
 ## @visulima/packem-share [1.0.0-alpha.47](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.46...@visulima/packem-share@1.0.0-alpha.47) (2026-05-28)
 
 ### Features
