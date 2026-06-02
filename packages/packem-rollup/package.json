@@ -170,7 +170,7 @@
     "peerDependencies": {
         "@swc/core": "*",
         "esbuild": "*",
-        "rollup": ">=4.60.4",
+        "rollup": ">=4.61.0",
         "sucrase": "*"
     },
     "peerDependenciesMeta": {
