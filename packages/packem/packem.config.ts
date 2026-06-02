@@ -25,8 +25,30 @@ export default defineConfig({
         "rs-module-lexer",
         "oxc-parser",
         "oxc-resolver",
+        // workerpool spawns the babel worker as a real on-disk module at runtime,
+        // so it must stay an external `import`/`require` rather than be bundled in.
+        "workerpool",
     ],
     rollup: {
+        // The parallel babel transform spawns a worker thread, which workerpool can
+        // only load from a real on-disk file. packem-plugins is otherwise inlined, so
+        // we copy its built babel worker (and the transform-code chunk it imports) into
+        // our own dist. The nested `babel-runtime/plugins/babel/` layout preserves the
+        // worker's `../../packem_shared/…` import depth so the chunk resolves at runtime.
+        // Kept in sync with WORKER_RELATIVE_PATH in packem-plugins' babel plugin.
+        copy: {
+            flatten: true,
+            targets: [
+                {
+                    dest: "babel-runtime/plugins/babel",
+                    src: "../packem-plugins/dist/plugins/babel/worker.js",
+                },
+                {
+                    dest: "babel-runtime/packem_shared",
+                    src: "../packem-plugins/dist/packem_shared/transform-code-*.js",
+                },
+            ],
+        },
         dts: {
             oxc: true,
             // disabled till visulima is fixed

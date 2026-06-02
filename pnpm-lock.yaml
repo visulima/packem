@@ -383,6 +383,9 @@ catalogs:
         source-map-js:
             specifier: ^1.2.1
             version: 1.2.1
+        workerpool:
+            specifier: 10.0.2
+            version: 10.0.2
     script:
         jiti:
             specifier: 2.7.0
@@ -2028,6 +2031,9 @@ importers:
             unplugin-vue:
                 specifier: ">=7.2.0"
                 version: 7.2.0(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(less@4.6.4)(sass-embedded@1.100.0)(sass@1.100.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.15))(terser@5.47.1)(tsx@4.22.4)(vue@3.5.35(typescript@6.0.3))(yaml@2.9.0)
+            workerpool:
+                specifier: catalog:prod
+                version: 10.0.2
         devDependencies:
             "@anolilab/eslint-config":
                 specifier: catalog:lint
@@ -2401,6 +2407,9 @@ importers:
             typescript:
                 specifier: 6.0.3
                 version: 6.0.3
+            workerpool:
+                specifier: catalog:prod
+                version: 10.0.2
         devDependencies:
             "@anolilab/eslint-config":
                 specifier: catalog:lint
@@ -17480,6 +17489,9 @@ packages:
 
     wordwrap@1.0.0:
         resolution: { integrity: sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q== }
+
+    workerpool@10.0.2:
+        resolution: { integrity: sha512-8PCeZlCwu0+8hXruze1ahYNsY+M0LOCmbmySZ9BWWqWIXP9TAXa6FZCxACTDL/0j47pFcC4xW98Gr8nAC5oymg== }
 
     workerpool@9.3.4:
         resolution: { integrity: sha512-TmPRQYYSAnnDiEB0P/Ytip7bFGvqnSU6I2BcuSw7Hx+JSg/DsUi5ebYfc8GYaSdpuvOcEs6dXxPurOYpe9QFwg== }
@@ -34128,6 +34140,8 @@ snapshots:
     word-wrap@1.2.5: {}
 
     wordwrap@1.0.0: {}
+
+    workerpool@10.0.2: {}
 
     workerpool@9.3.4: {}
 

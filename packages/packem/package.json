@@ -208,7 +208,8 @@
         "jiti": "catalog:script",
         "magic-string": "catalog:utils",
         "mlly": "catalog:prod",
-        "tinyexec": "catalog:node"
+        "tinyexec": "catalog:node",
+        "workerpool": "catalog:prod"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "catalog:lint",
