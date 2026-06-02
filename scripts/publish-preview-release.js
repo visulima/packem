@@ -32,15 +32,13 @@ const affectedRepoPackages = JSON.parse(json);
 
 const packagesPath = join(rootDirectory, "packages");
 
-const packages = affectedRepoPackages.map((projectName) => {
-    const packageJsonPath = join(packagesPath, projectName, "package.json");
-
-    if (!existsSync(packageJsonPath)) {
-        throw new Error(`package.json not found at ${packageJsonPath}`);
-    }
-
-    return join(packagesPath, projectName);
-});
+const packages = affectedRepoPackages
+    .map((projectName) => join(packagesPath, projectName))
+    // Only `packages/*` projects are published to the preview registry. Affected
+    // projects that live elsewhere (e.g. `benchmarks/`, nested example packages)
+    // can surface here through the dependency graph — skip them instead of
+    // failing the job.
+    .filter((packageDirectory) => existsSync(join(packageDirectory, "package.json")));
 
 if (packages.length > 0) {
     execFileSync("pnpm", ["exec", "pkg-pr-new", "publish", "--comment=update", "--pnpm", ...packages], { stdio: "inherit" });

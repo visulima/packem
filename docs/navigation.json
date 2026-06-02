@@ -219,6 +219,11 @@
           "title": "Hooks",
           "href": "/docs/options/hooks",
           "description": "Build lifecycle hooks"
+        },
+        {
+          "title": "Duplicate packages",
+          "href": "/docs/options/detect-duplicated",
+          "description": "Detect dependencies bundled more than once"
         }
       ]
     },

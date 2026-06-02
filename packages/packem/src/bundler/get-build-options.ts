@@ -3,6 +3,7 @@ import { babelTransformPlugin } from "@visulima/packem-plugins/babel";
 import { copyPlugin } from "@visulima/packem-plugins/plugin/copy";
 import { dataUriPlugin } from "@visulima/packem-plugins/plugin/data-uri";
 import { debarrelPlugin } from "@visulima/packem-plugins/plugin/debarrel";
+import { detectDuplicatedPlugin } from "@visulima/packem-plugins/plugin/detect-duplicated";
 import { esmShimCjsSyntaxPlugin } from "@visulima/packem-plugins/plugin/esm-shim-cjs-syntax";
 import { externalsPlugin } from "@visulima/packem-plugins/plugin/externals";
 import { importAttributesPlugin } from "@visulima/packem-plugins/plugin/import-attributes";
@@ -359,6 +360,9 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             // tree-shaking already covers — rollup-only.
             !isRolldown && pureNewExpressionPluginInstance,
             !isRolldown && purePluginInstance,
+
+            context.options.rollup.detectDuplicated !== false
+            && detectDuplicatedPlugin(getLogger(context), context.options.rootDir, context.options.rollup.detectDuplicated),
 
             !isRolldown
             && context.options.transformer

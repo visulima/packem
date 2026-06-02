@@ -10,6 +10,7 @@ import type { OXCResolveOptions, OXCTransformPluginConfig } from "@visulima/pack
 import type { CopyPluginOptions } from "@visulima/packem-plugins/plugin/copy";
 import type { DataUriPluginOptions } from "@visulima/packem-plugins/plugin/data-uri";
 import type { DebarrelPluginOptions } from "@visulima/packem-plugins/plugin/debarrel";
+import type { DetectDuplicatedPluginOptions } from "@visulima/packem-plugins/plugin/detect-duplicated";
 import type { EsmShimCjsSyntaxOptions } from "@visulima/packem-plugins/plugin/esm-shim-cjs-syntax";
 import type { ResolveExternalsPluginOptions } from "@visulima/packem-plugins/plugin/externals";
 import type { LicenseOptions } from "@visulima/packem-plugins/plugin/license";
@@ -82,6 +83,13 @@ export interface PackemRollupOptions {
     copy?: CopyPluginOptions | false;
     dataUri?: DataUriPluginOptions | false;
     debarrel?: DebarrelPluginOptions | false;
+
+    /**
+     * Detect dependencies that get bundled more than once (multiple versions, or
+     * the same version from multiple directories) and report them. Enabled by
+     * default; set to `false` to disable, or pass options to configure.
+     */
+    detectDuplicated?: DetectDuplicatedPluginOptions | false;
     dts?: RollupDtsOptions;
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
     esbuild?: EsbuildOptions | false;

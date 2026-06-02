@@ -1079,6 +1079,36 @@ importers:
                 specifier: 6.0.3
                 version: 6.0.3
 
+    examples/duplicated-packages/app:
+        devDependencies:
+            "@visulima/packem":
+                specifier: workspace:*
+                version: link:../../../packages/packem
+            esbuild:
+                specifier: catalog:build
+                version: 0.28.0
+            examples_packem_duplicated_packages_pkg1:
+                specifier: workspace:*
+                version: link:../packages/pkg1
+            examples_packem_duplicated_packages_pkg2:
+                specifier: workspace:*
+                version: link:../packages/pkg2
+            rimraf:
+                specifier: ^6.1.3
+                version: 6.1.3
+
+    examples/duplicated-packages/packages/pkg1:
+        dependencies:
+            ms:
+                specifier: 2.0.0
+                version: 2.0.0
+
+    examples/duplicated-packages/packages/pkg2:
+        dependencies:
+            ms:
+                specifier: 2.1.3
+                version: 2.1.3
+
     examples/dynamic-imports:
         devDependencies:
             "@visulima/packem":
@@ -1945,10 +1975,10 @@ importers:
                 specifier: 1.0.0-alpha.47
                 version: link:../packem-share
             "@visulima/rollup-plugin-css":
-                specifier: 1.0.0-alpha.46
+                specifier: 1.0.0-alpha.47
                 version: link:../rollup-plugin-css
             "@visulima/rollup-plugin-dts":
-                specifier: 1.0.0-alpha.27
+                specifier: 1.0.0-alpha.28
                 version: link:../rollup-plugin-dts
             "@visulima/tsconfig":
                 specifier: catalog:visulima
@@ -2108,7 +2138,7 @@ importers:
                 specifier: workspace:*
                 version: link:../packem-plugins
             "@visulima/packem-rollup":
-                specifier: 1.0.0-alpha.66
+                specifier: 1.0.0-alpha.67
                 version: link:../packem-rollup
             "@visulima/pail":
                 specifier: catalog:visulima
@@ -2595,7 +2625,7 @@ importers:
                 specifier: catalog:visulima
                 version: 3.0.0-alpha.10
             "@visulima/rollup-plugin-dts":
-                specifier: 1.0.0-alpha.27
+                specifier: 1.0.0-alpha.28
                 version: link:../rollup-plugin-dts
             clean-css:
                 specifier: catalog:style
@@ -13939,6 +13969,9 @@ packages:
     mrmime@2.0.1:
         resolution: { integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ== }
         engines: { node: ">=10" }
+
+    ms@2.0.0:
+        resolution: { integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A== }
 
     ms@2.1.3:
         resolution: { integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA== }
@@ -29739,6 +29772,8 @@ snapshots:
     mri@1.2.0: {}
 
     mrmime@2.0.1: {}
+
+    ms@2.0.0: {}
 
     ms@2.1.3: {}
 

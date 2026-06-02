@@ -28,4 +28,21 @@ describe("memoize", () => {
         expect(memoized(1, 5)).toBe(3); // still cache since the key is the same
         expect(mockedFunction).toHaveBeenCalledTimes(1);
     });
+
+    it("should clear the cache when destroy is called", () => {
+        expect.assertions(3);
+
+        const mockedFunction = vi.fn((a: number, b: number) => a + b);
+        const memoized = memoizeByKey(mockedFunction)();
+
+        expect(memoized(1, 2)).toBe(3);
+        expect(mockedFunction).toHaveBeenCalledTimes(1);
+
+        memoized.destroy();
+
+        // cache cleared, so the underlying function runs again for the same args
+        memoized(1, 2);
+
+        expect(mockedFunction).toHaveBeenCalledTimes(2);
+    });
 });

@@ -13,6 +13,7 @@ ignore: |
     *workspace.yaml
     chromatic.yml
     __fixtures__/
+    .github/ignore-files-for-nx-affected.yml
 
 rules:
     braces:
