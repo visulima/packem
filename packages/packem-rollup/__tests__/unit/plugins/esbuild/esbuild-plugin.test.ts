@@ -26,6 +26,7 @@ const callTransform = async (plugin: ReturnType<typeof esbuildPlugin>, code: str
     };
     const context: PluginContext = { warn: vi.fn(), ...context_ } as PluginContext;
 
+    // eslint-disable-next-line vitest/no-conditional-tests -- this is a test helper, not a test body
     if (!transform.filter.id.test(id)) {
         return undefined;
     }

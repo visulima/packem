@@ -16,7 +16,7 @@ describe("chunk-splitter parseExports", () => {
 
         const exported = [...parseExports(buildContext(), buildModule("/a.js", "export const foo = 1; export const bar = 2;"))];
 
-        expect(exported).toEqual([
+        expect(exported).toStrictEqual([
             { exportedName: "foo", from: "self", type: "named" },
             { exportedName: "bar", from: "self", type: "named" },
         ]);
@@ -27,7 +27,7 @@ describe("chunk-splitter parseExports", () => {
 
         const exported = [...parseExports(buildContext(), buildModule("/a.js", "export function foo() {} export class Bar {}"))];
 
-        expect(exported).toEqual([
+        expect(exported).toStrictEqual([
             { exportedName: "foo", from: "self", type: "named" },
             { exportedName: "Bar", from: "self", type: "named" },
         ]);
@@ -38,7 +38,7 @@ describe("chunk-splitter parseExports", () => {
 
         const exported = [...parseExports(buildContext(), buildModule("/a.js", "export default 42;"))];
 
-        expect(exported).toEqual([{ exportedName: "default", from: "self", type: "named" }]);
+        expect(exported).toStrictEqual([{ exportedName: "default", from: "self", type: "named" }]);
     });
 
     it("should yield named re-exports with bindings for `export { x } from './y'`", () => {
@@ -46,7 +46,7 @@ describe("chunk-splitter parseExports", () => {
 
         const exported = [...parseExports(buildContext(), buildModule("/a.js", "export { foo, bar as baz } from './y.js';"))];
 
-        expect(exported).toEqual([
+        expect(exported).toStrictEqual([
             {
                 bindings: [
                     { exportedName: "foo", importedName: "foo" },
@@ -64,7 +64,7 @@ describe("chunk-splitter parseExports", () => {
 
         const exported = [...parseExports(buildContext(), buildModule("/a.js", "export * from './y.js';"))];
 
-        expect(exported).toEqual([{ from: "other", source: "./y.js", type: "barrel" }]);
+        expect(exported).toStrictEqual([{ from: "other", source: "./y.js", type: "barrel" }]);
     });
 
     it("should yield a named self-export for `export * as ns from './y'`", () => {
@@ -72,7 +72,7 @@ describe("chunk-splitter parseExports", () => {
 
         const exported = [...parseExports(buildContext(), buildModule("/a.js", "export * as ns from './y.js';"))];
 
-        expect(exported).toEqual([{ exportedName: "ns", from: "self", type: "named" }]);
+        expect(exported).toStrictEqual([{ exportedName: "ns", from: "self", type: "named" }]);
     });
 
     it("should yield re-bindings for `export { x } as alias` without a source", () => {
@@ -80,7 +80,7 @@ describe("chunk-splitter parseExports", () => {
 
         const exported = [...parseExports(buildContext(), buildModule("/a.js", "const x = 1; export { x as renamed };"))];
 
-        expect(exported).toEqual([{ exportedName: "renamed", from: "self", type: "named" }]);
+        expect(exported).toStrictEqual([{ exportedName: "renamed", from: "self", type: "named" }]);
     });
 
     it("should skip non-export statements", () => {
@@ -88,7 +88,7 @@ describe("chunk-splitter parseExports", () => {
 
         const exported = [...parseExports(buildContext(), buildModule("/a.js", "const x = 1; function y() {} export const z = 3;"))];
 
-        expect(exported).toEqual([{ exportedName: "z", from: "self", type: "named" }]);
+        expect(exported).toStrictEqual([{ exportedName: "z", from: "self", type: "named" }]);
     });
 
     it("should throw when module.code is null", () => {

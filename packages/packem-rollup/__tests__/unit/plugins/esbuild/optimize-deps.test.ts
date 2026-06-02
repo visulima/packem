@@ -57,8 +57,8 @@ describe("esbuild optimizeDeps", () => {
         const result = await optimizeDeps({ cwd: "/virtual/project", include: ["react", "react-dom"], sourceMap: false });
 
         expect(result.cacheDir).toBe("/cache/optimize-deps");
-        expect(result.optimized.get("react")).toEqual({ file: "/cache/optimize-deps/react.js" });
-        expect(result.optimized.get("react-dom")).toEqual({ file: "/cache/optimize-deps/react-dom.js" });
+        expect(result.optimized.get("react")).toStrictEqual({ file: "/cache/optimize-deps/react.js" });
+        expect(result.optimized.get("react-dom")).toStrictEqual({ file: "/cache/optimize-deps/react-dom.js" });
     });
 
     it("should invoke esbuild.build exactly once with the include[] entry points and the optimize-deps plugin", async () => {
@@ -191,7 +191,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
 
         const result = await onResolve({ path: "lodash-es", resolveDir: "/virtual" });
 
-        expect(result).toEqual({ external: true });
+        expect(result).toStrictEqual({ external: true });
     });
 
     it("should short-circuit (return undefined) on the recursive resolve marked with __resolving_dep_path__", async () => {
@@ -221,7 +221,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
 
         expect(resolveSpy).toHaveBeenCalledWith("react", expect.objectContaining({ kind: "import-statement", resolveDir: "/virtual/src" }));
         expect(result?.namespace).toBe("optimize-deps");
-        expect(result?.pluginData).toEqual({ absolute: "/resolved/file.js", resolveDir: "/virtual/src" });
+        expect(result?.pluginData).toStrictEqual({ absolute: "/resolved/file.js", resolveDir: "/virtual/src" });
     });
 
     it("should bubble the inner resolve result when it carries errors or warnings", async () => {
@@ -249,13 +249,14 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
 
         await optimizeDeps({ cwd: "/virtual", include: ["react"], sourceMap: false });
 
+        // eslint-disable-next-line vitest/no-conditional-in-test -- narrowing guard before invoking the captured callback
         if (!onResolve) {
             throw new Error("onResolve was not registered");
         }
 
         const result = await onResolve({ path: "react", resolveDir: "/virtual" });
 
-        expect(result).toEqual(errored);
+        expect(result).toStrictEqual(errored);
     });
 
     it("should pass through (return undefined) when the path is neither excluded nor in include[]", async () => {
@@ -289,7 +290,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: "/abs/react.js", resolveDir: "/virtual/src" },
         });
 
-        expect(result).toEqual({ contents: "export * from '/abs/react.js'", resolveDir: "/virtual/src" });
+        expect(result).toStrictEqual({ contents: "export * from '/abs/react.js'", resolveDir: "/virtual/src" });
     });
 
     it("should emit `module.exports = require('<absolute>')` for a module with no named exports", async () => {
@@ -309,7 +310,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: "/abs/react.js", resolveDir: "/virtual/src" },
         });
 
-        expect(result).toEqual({ contents: "module.exports = require('/abs/react.js')", resolveDir: "/virtual/src" });
+        expect(result).toStrictEqual({ contents: "module.exports = require('/abs/react.js')", resolveDir: "/virtual/src" });
     });
 
     it("should normalize Windows-style backslashes in the absolute path to forward slashes", async () => {

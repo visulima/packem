@@ -31,4 +31,11 @@ export default createConfig(
             "unicorn/prefer-module": "off",
         },
     },
+    {
+        files: ["**/__tests__/**"],
+        rules: {
+            // vi.fn() generic type params are noise for these simple stubs.
+            "vitest/require-mock-type-parameters": "off",
+        },
+    },
 );

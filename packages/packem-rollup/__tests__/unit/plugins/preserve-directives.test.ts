@@ -95,7 +95,7 @@ describe("preserveDirectivesPlugin", () => {
 
         expect(result?.code).not.toContain("#!");
         expect(result?.meta.preserveDirectives.shebang).toBe("#!/usr/bin/env node");
-        expect(result?.meta.preserveDirectives.directives).toEqual([]);
+        expect(result?.meta.preserveDirectives.directives).toStrictEqual([]);
     });
 
     it("should return undefined when neither shebang nor directive is present", () => {
@@ -159,7 +159,7 @@ describe("preserveDirectivesPlugin", () => {
         const result = callTransform(plugin, code, "/path/a.js");
 
         // Both directives end up in the per-module set; renderChunk emits both prepended to the chunk.
-        expect(result?.meta.preserveDirectives.directives).toEqual(expect.arrayContaining(["use client", "use server"]));
+        expect(result?.meta.preserveDirectives.directives).toStrictEqual(expect.arrayContaining(["use client", "use server"]));
 
         const chunk = callRenderChunk(plugin, "export const x = 1;\n", { fileName: "out.js", moduleIds: ["/path/a.js"] }, { sourcemap: false });
 
@@ -211,16 +211,12 @@ describe("preserveDirectivesPlugin", () => {
         // warm rebuild where transform was served from cache. Directives must be
         // recovered from `meta.preserveDirectives` via getModuleInfo.
         const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
-        const getModuleInfo = (id: string) =>
-            id === "/path/a.js" ? { meta: { preserveDirectives: { directives: ["use client"] } } } : undefined;
+        const moduleInfo: Record<string, { meta: Record<string, unknown> }> = {
+            "/path/a.js": { meta: { preserveDirectives: { directives: ["use client"] } } },
+        };
+        const getModuleInfo = (id: string) => moduleInfo[id];
 
-        const result = callRenderChunk(
-            plugin,
-            "export const x = 1;\n",
-            { fileName: "out.js", moduleIds: ["/path/a.js"] },
-            { sourcemap: false },
-            getModuleInfo,
-        );
+        const result = callRenderChunk(plugin, "export const x = 1;\n", { fileName: "out.js", moduleIds: ["/path/a.js"] }, { sourcemap: false }, getModuleInfo);
 
         expect(result?.code).toMatch(LEADING_USE_CLIENT_REGEX);
     });
