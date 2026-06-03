@@ -114,6 +114,26 @@ describe(debarrelPlugin, () => {
         expect(result).toBeUndefined();
     });
 
+    it("should skip virtual modules and query-suffixed ids", async () => {
+        expect.assertions(3);
+
+        const plugin = debarrelPlugin({}, mockLogger as unknown as Console);
+
+        const mockContext = {
+            resolve: mockResolve,
+        } as unknown as ThisParameterType<TransformHandler>;
+
+        // Vue/Svelte SFC sub-modules carry a `?query` yet can end in a source
+        // extension; a rolled-up commonjs/virtual module is `\0`-prefixed. Neither
+        // exists on disk, so debarrel must skip them instead of readFile-ing the id.
+        const sfc = await getTransformHandler(plugin).call(mockContext, "code", "/test/App.vue?vue&type=script&setup=true&lang.ts", { ssr: false });
+        const virtual = await getTransformHandler(plugin).call(mockContext, "code", "\0virtual:module.ts", { ssr: false });
+
+        expect(sfc).toBeUndefined();
+        expect(virtual).toBeUndefined();
+        expect(fs.readFile).not.toHaveBeenCalled();
+    });
+
     it("should cache file reads", async () => {
         expect.assertions(2);
 
