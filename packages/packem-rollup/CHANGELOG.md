@@ -1,3 +1,10 @@
+## @visulima/packem-rollup [1.0.0-alpha.70](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.69...@visulima/packem-rollup@1.0.0-alpha.70) (2026-06-03)
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.31
+
 ## @visulima/packem-rollup [1.0.0-alpha.69](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.68...@visulima/packem-rollup@1.0.0-alpha.69) (2026-06-02)
 
 ### Features
