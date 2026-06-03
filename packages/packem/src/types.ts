@@ -189,11 +189,6 @@ export interface BuildOptions {
      * Automatically enforces a single entry point.
      */
     exe?: boolean | ExeOptions;
-    /** Experimental features configuration */
-    experimental?: {
-        // If true, the `oxc resolve` plugin will be used instead of the default `@rollup/plugin-node-resolve` and `@rollup/plugin-alias`.
-        oxcResolve?: boolean;
-    };
     /** External dependencies that should not be bundled */
     externals: (RegExp | string)[];
     /** Whether to fail the build on warnings */

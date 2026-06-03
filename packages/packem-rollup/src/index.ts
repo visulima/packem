@@ -3,7 +3,7 @@ export { default as browserslistToEsbuild } from "./plugins/esbuild/browserslist
 export { jsxRemoveAttributes, type JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
 export { preserveDirectivesPlugin, type PreserveDirectivesPluginOptions } from "./plugins/preserve-directives";
 export { pureNewExpressionPlugin } from "./plugins/pure-new-expression-plugin";
-export type { ExtendedRollupNodeResolveOptions, PackemRollupOptions, RollupPlugins } from "./types";
+export type { ExtendedRollupNodeResolveOptions, LegacyNodeResolveOptions, PackemRollupOptions, ResolveOptions, RollupPlugins } from "./types";
 export type { Alias, ResolverObject as AliasResolverObject, ResolvedAlias, RollupAliasOptions } from "@rollup/plugin-alias";
 export { default as alias } from "@rollup/plugin-alias";
 export type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
@@ -11,7 +11,6 @@ export { default as commonjs } from "@rollup/plugin-commonjs";
 export type { RollupDynamicImportVariablesOptions } from "@rollup/plugin-dynamic-import-vars";
 export { default as dynamicImportVars } from "@rollup/plugin-dynamic-import-vars";
 export { default as inject, type RollupInjectOptions } from "@rollup/plugin-inject";
-export { default as nodeResolve, type RollupNodeResolveOptions } from "@rollup/plugin-node-resolve";
 export { default as replace, type RollupReplaceOptions } from "@rollup/plugin-replace";
 export { type RollupWasmOptions, default as wasm } from "@rollup/plugin-wasm";
 export { importTrace, patchErrorWithTrace } from "rollup-plugin-import-trace";

@@ -94,6 +94,17 @@ const oxcResolvePlugin = (options: OXCResolveOptions, rootDirectory: string, log
                     });
                 }
 
+                // Query-suffixed specifiers (`./icon.svg?data-uri`, `./file.txt?raw`,
+                // `./x.css?url`) are resolved by oxc-resolver to "<abs-path><query>".
+                // Re-running that through `this.resolve()` returns null — rollup's
+                // default resolver can't stat a path that ends in `?query` — which
+                // would drop the import as unresolved. Downstream load plugins (raw,
+                // data-uri, url) consume the query directly, so return the resolved
+                // id as-is and skip the round-trip.
+                if (String(source).includes("?")) {
+                    return { id: id as string, moduleSideEffects: hasModuleSideEffects(id as string) };
+                }
+
                 const rollupResolvedResult = await this.resolve(id as string, importer, {
                     skipSelf: true,
                     ...resolveOptions,

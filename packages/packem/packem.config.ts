@@ -12,7 +12,6 @@ export default defineConfig({
         "@rollup/plugin-dynamic-import-vars",
         "@rollup/plugin-inject",
         "@rollup/plugin-json",
-        "@rollup/plugin-node-resolve",
         "@rollup/plugin-replace",
         "@rollup/plugin-wasm",
         "@rollup/pluginutils",

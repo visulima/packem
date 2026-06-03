@@ -234,63 +234,6 @@ const generateOptions = (
                 // Optionally preserve symbol names during minification
                 tsconfigRaw: tsconfig?.config,
             },
-            experimental: {
-                /**
-                 * Some default options copy from
-                 * https://github.com/import-js/eslint-import-resolver-typescript/blob/master/src/index.ts
-                 * https://github.com/rolldown/rolldown/blob/main/crates/rolldown_resolver/src/resolver.rs
-                 */
-                resolve: {
-                    aliasFields: [["browser"]],
-                    // Following option must be *false* for polyfill to work
-                    builtinModules: false,
-                    conditionNames: [
-                        "default",
-                        "types",
-
-                        "import",
-                        "require",
-                        "module-sync",
-
-                        "node",
-                        "node-addons",
-                        "browser",
-
-                        // APF: https://angular.io/guide/angular-package-format
-                        "esm2020",
-                        "es2020",
-                        "es2015",
-                    ],
-                    extensionAlias: {
-                        ".cjs": [".cts", ".d.cts", ".cjs"],
-                        ".js": [
-                            ".ts",
-                            // `.tsx` can also be compiled as `.js`
-                            ".tsx",
-                            ".d.ts",
-                            ".js",
-                        ],
-                        ".jsx": [".tsx", ".d.ts", ".jsx"],
-                        ".mjs": [".mts", ".d.mts", ".mjs"],
-                    },
-                    extensions: [".ts", ".tsx", ".d.ts", ".js", ".jsx", ".json", ".node"],
-                    mainFields: [
-                        "types",
-                        "typings",
-
-                        // APF: https://angular.io/guide/angular-package-format
-                        "fesm2020",
-                        "fesm2015",
-                        "esm2020",
-                        "es2020",
-
-                        "main",
-                        "module",
-                        "browser",
-                        "jsnext:main",
-                    ],
-                },
-            },
             json: {
                 preferConst: false,
             },
@@ -344,14 +287,71 @@ const generateOptions = (
                 objectGuards: true,
                 preventAssignment: true,
             },
+            /**
+             * Options for the oxc-resolver-backed module resolution plugin.
+             *
+             * Some defaults are adapted from:
+             * https://github.com/import-js/eslint-import-resolver-typescript/blob/master/src/index.ts
+             * https://github.com/rolldown/rolldown/blob/main/crates/rolldown_resolver/src/resolver.rs
+             *
+             * Legacy `@rollup/plugin-node-resolve` keys (`exportConditions`,
+             * `browser`) are still accepted here and mapped onto the oxc options
+             * at build time (see `mergeNodeResolveIntoOxc`).
+             */
             resolve: {
-                // old behavior node 14 and removed in node 17
-                allowExportsFolderMapping: false,
-                // @see https://github.com/rollup/plugins/pull/1823 why we need to set the correct condition
-                exportConditions: [environment ?? "production", "module-sync"],
+                aliasFields: [["browser"]],
+                // Following option must be *false* for polyfill to work.
+                builtinModules: false,
+                // RUNTIME conditions only. "types"/"typings" must NOT appear here:
+                // oxc-resolver honours the order packages declare in their `exports`
+                // map, and many packages list `"types"` before `"import"`. Including
+                // it would resolve a runtime import to a `.d.ts` file, which rollup
+                // then tries to parse as JavaScript and fails. DTS resolution is
+                // handled separately by @visulima/rollup-plugin-dts.
+                conditionNames: [
+                    environment ?? "production",
+                    "default",
+
+                    "import",
+                    "require",
+                    "module-sync",
+
+                    "node",
+                    "node-addons",
+                    "browser",
+
+                    // APF: https://angular.io/guide/angular-package-format
+                    "esm2020",
+                    "es2020",
+                    "es2015",
+                ],
+                // NO `extensionAlias` here. The `.js`→`.ts`/`.tsx` (and `.mjs`→`.mts`,
+                // `.cjs`→`.cts`) rewriting is handled by the dedicated
+                // `resolveTypescriptMjsCts` plugin, which is context-aware: it tries TS
+                // extensions first for *source* relative imports, but `.js` first for
+                // bare specifiers and node_modules imports (matching node-resolve /
+                // esbuild). A static, always-TS-first `extensionAlias` here would
+                // hijack that plugin's "try .js first" probe and resolve a
+                // node_modules `./file.js` to a stray co-located `.ts`.
+                // `.js`-first ordering (DEFAULT_EXTENSIONS) so a bare/`node_modules`
+                // specifier prefers the published `.js` over a co-located `.ts`
+                // (matches node-resolve / esbuild behavior). `.d.ts` is present but
+                // never wins for runtime resolution because the runtime extensions
+                // precede it and the conditionNames/mainFields above carry no
+                // "types" entry — see the note there.
                 extensions: DEFAULT_EXTENSIONS,
-                // Following option must be *false* for polyfill to work
-                preferBuiltins: false,
+                mainFields: [
+                    // APF: https://angular.io/guide/angular-package-format
+                    "fesm2020",
+                    "fesm2015",
+                    "esm2020",
+                    "es2020",
+
+                    "module",
+                    "main",
+                    "browser",
+                    "jsnext:main",
+                ],
             },
             resolveExternals: {
                 builtins: true,
@@ -567,6 +567,16 @@ const generateOptions = (
         }
 
         options.transformerName = options.transformer.NAME;
+
+        // SWC's `externalHelpers: true` emits imports from `@swc/helpers`. That
+        // package is a runtime helper dependency meant to be resolved by the
+        // consumer, not bundled — keep it external so the helpers aren't
+        // duplicated into every chunk that uses them. (node-resolve happened to
+        // leave it external by failing to resolve the subpaths; the oxc resolver
+        // resolves them, so we must externalize it explicitly.)
+        if (options.transformerName === "swc") {
+            options.externals = [...options.externals, /^@swc\/helpers(?:\/.*)?$/];
+        }
     }
 
     logger.info({

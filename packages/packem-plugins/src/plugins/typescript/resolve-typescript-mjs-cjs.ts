@@ -113,9 +113,17 @@ const resolveTypescriptMjsCts = (): Plugin => {
                     skipSelf: true,
                 };
 
-                // For source code relative imports: try TS extensions in order
-                // In TypeScript convention, ./file.js means ./file.ts
-                if (!isBareSpecifier(id) && !importer.includes("/node_modules/")) {
+                // For source code relative imports: try TS extensions in order.
+                // In TypeScript convention, ./file.js means ./file.ts.
+                //
+                // The `id` check (not just `importer`) matters because the oxc resolve
+                // plugin resolves a bare specifier to an ABSOLUTE node_modules path and
+                // then re-runs `this.resolve()` on it, which re-enters this hook. At that
+                // point `id` is the absolute `…/node_modules/pkg/file.js` but the importer
+                // is still the source file — without the `id` guard we'd wrongly apply
+                // source TS-first rewriting and resolve a package's stray co-located
+                // `.ts` over its shipped `.js`.
+                if (!isBareSpecifier(id) && !importer.includes("/node_modules/") && !id.includes("/node_modules/")) {
                     return tryRewrites(this, rewrites, base, importer, resolveOptions, false);
                 }
 
