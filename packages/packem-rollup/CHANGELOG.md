@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.71](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.70...@visulima/packem-rollup@1.0.0-alpha.71) (2026-06-03)
+
+### Bug Fixes
+
+* **packem:** replace node-resolve with oxc resolver & isolate DTS cache per entry-set ([#206](https://github.com/visulima/packem/issues/206)) ([b2eb482](https://github.com/visulima/packem/commit/b2eb4822b44393add900d1d2272bc886b13ce738))
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.32
+
 ## @visulima/packem-rollup [1.0.0-alpha.70](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.69...@visulima/packem-rollup@1.0.0-alpha.70) (2026-06-03)
 
 
