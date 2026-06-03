@@ -70,6 +70,11 @@ const extras = (compilerOptions: TsConfigJson["compilerOptions"] | undefined): C
  */
 const RAW_ASSET_EXTENSION_REGEX = /\.(md|txt|htm|html|data)$/;
 
+// Matches `@swc/helpers` and any of its subpaths, so SWC's `externalHelpers`
+// imports are kept external instead of bundled. Module-scoped to avoid
+// recompiling the pattern on every build.
+const SWC_HELPERS_REGEX = /^@swc\/helpers(?:\/.*)?$/;
+
 /**
  * Resolves TSConfig JSX option to a standardized JSX runtime value.
  * @param jsx The JSX option from TSConfig
@@ -287,6 +292,7 @@ const generateOptions = (
                 objectGuards: true,
                 preventAssignment: true,
             },
+
             /**
              * Options for the oxc-resolver-backed module resolution plugin.
              *
@@ -299,7 +305,14 @@ const generateOptions = (
              * at build time (see `mergeNodeResolveIntoOxc`).
              */
             resolve: {
-                aliasFields: [["browser"]],
+                // No `browser` alias field by default — these defaults target the
+                // `node` runtime (the default). The `browser` condition, alias field
+                // and main field are added only when `runtime: "browser"` is set,
+                // which flips `resolve.browser = true` and is folded in by
+                // `mergeNodeResolveIntoOxc`. Baking `browser` in unconditionally
+                // resolved node-targeted deps (e.g. `@visulima/colorize`, `@visulima/pail`)
+                // to their browser builds, which emit `%c` CSS markup instead of ANSI.
+                aliasFields: [],
                 // Following option must be *false* for polyfill to work.
                 builtinModules: false,
                 // RUNTIME conditions only. "types"/"typings" must NOT appear here:
@@ -308,22 +321,22 @@ const generateOptions = (
                 // it would resolve a runtime import to a `.d.ts` file, which rollup
                 // then tries to parse as JavaScript and fails. DTS resolution is
                 // handled separately by @visulima/rollup-plugin-dts.
+                // These mirror the *effective* condition set the previous
+                // `@rollup/plugin-node-resolve` default used: the configured
+                // `exportConditions` (`[environment, "module-sync"]`) plus the
+                // import/require/default conditions node-resolve always adds. We
+                // intentionally do NOT add `"node"`, `"node-addons"` or the APF
+                // (`esm2020`/`es2020`/`es2015`) conditions here: node-resolve did not,
+                // and adding `"node"` resolves isomorphic packages (e.g. `lit`) to
+                // their Node/SSR builds, diverging from the established behavior and
+                // bloating output. Node builtins are handled by the externals plugin
+                // (`builtinModules: false`), not by a `"node"` condition.
                 conditionNames: [
                     environment ?? "production",
-                    "default",
-
+                    "module-sync",
                     "import",
                     "require",
-                    "module-sync",
-
-                    "node",
-                    "node-addons",
-                    "browser",
-
-                    // APF: https://angular.io/guide/angular-package-format
-                    "esm2020",
-                    "es2020",
-                    "es2015",
+                    "default",
                 ],
                 // NO `extensionAlias` here. The `.js`→`.ts`/`.tsx` (and `.mjs`→`.mts`,
                 // `.cjs`→`.cts`) rewriting is handled by the dedicated
@@ -340,18 +353,9 @@ const generateOptions = (
                 // precede it and the conditionNames/mainFields above carry no
                 // "types" entry — see the note there.
                 extensions: DEFAULT_EXTENSIONS,
-                mainFields: [
-                    // APF: https://angular.io/guide/angular-package-format
-                    "fesm2020",
-                    "fesm2015",
-                    "esm2020",
-                    "es2020",
-
-                    "module",
-                    "main",
-                    "browser",
-                    "jsnext:main",
-                ],
+                // node-resolve's default mainFields were `["module", "main"]`; mirror
+                // them rather than the broader APF set the experimental oxc config used.
+                mainFields: ["module", "main"],
             },
             resolveExternals: {
                 builtins: true,
@@ -575,7 +579,7 @@ const generateOptions = (
         // leave it external by failing to resolve the subpaths; the oxc resolver
         // resolves them, so we must externalize it explicitly.)
         if (options.transformerName === "swc") {
-            options.externals = [...options.externals, /^@swc\/helpers(?:\/.*)?$/];
+            options.externals = [...options.externals, SWC_HELPERS_REGEX];
         }
     }
 

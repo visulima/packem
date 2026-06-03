@@ -128,8 +128,8 @@ function requireDeeks () {
 		};
 		Object.defineProperty(exports, "__esModule", { value: true });
 		exports.deepKeysFromList = exports.deepKeys = void 0;
-		const utils = __importStar(/*@__PURE__*/ requireUtils());
-		__exportStar(/*@__PURE__*/ requireTypes(), exports);
+		const utils = __importStar(requireUtils());
+		__exportStar(requireTypes(), exports);
 		function deepKeys(object, options) {
 		  const parsedOptions = mergeOptions(options);
 		  const visited = /* @__PURE__ */ new WeakSet();
@@ -331,8 +331,8 @@ function requireDeeks () {
 		};
 		Object.defineProperty(exports, "__esModule", { value: true });
 		exports.deepKeysFromList = exports.deepKeys = void 0;
-		const utils = __importStar(/*@__PURE__*/ requireUtils());
-		__exportStar(/*@__PURE__*/ requireTypes(), exports);
+		const utils = __importStar(requireUtils());
+		__exportStar(requireTypes(), exports);
 		function deepKeys(object, options) {
 		  const parsedOptions = mergeOptions(options);
 		  const visited = /* @__PURE__ */ new WeakSet();

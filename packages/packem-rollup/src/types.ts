@@ -78,6 +78,7 @@ export interface LegacyNodeResolveOptions {
     browser?: boolean;
     /** Node-resolve `exportConditions`; maps to (and is prepended onto) `conditionNames`. */
     exportConditions?: string[];
+
     /**
      * Node-resolve `preferBuiltins`. Node builtins are externalized by the externals
      * plugin, so this is dropped before reaching the oxc resolver; it is retained as a
@@ -101,12 +102,6 @@ export type ResolveOptions = LegacyNodeResolveOptions
          */
         unresolvedImportBehavior?: "error" | "warn";
     };
-
-/**
- * @deprecated Renamed to {@link ResolveOptions}. Module resolution no longer uses
- * `@rollup/plugin-node-resolve`; this alias is kept for backwards compatibility.
- */
-export type ExtendedRollupNodeResolveOptions = ResolveOptions;
 
 export interface PackemRollupOptions {
     alias?: RollupAliasOptions | false;

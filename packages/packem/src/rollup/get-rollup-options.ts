@@ -400,20 +400,21 @@ export const getTransformerConfig = (
 // Fold the meaningful ones onto their oxc equivalents and strip every non-oxc key
 // so the result is safe to hand to `ResolverFactory`.
 const mergeNodeResolveIntoOxc = (
-    resolve: Exclude<InternalBuildOptions["rollup"]["resolve"], false | undefined>,
+    resolveOptions: Exclude<InternalBuildOptions["rollup"]["resolve"], false | undefined>,
 ): OXCResolveOptions => {
-    const {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured out so they are not forwarded to ResolverFactory
-        allowExportsFolderMapping,
-        browser,
-        exportConditions,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- node-resolve concept; node builtins are handled by the externals plugin, so this is intentionally dropped
-        preferBuiltins,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- consumed by sharedOnWarn, not by the resolver
-        unresolvedImportBehavior,
-        ...oxc
-    } = resolve;
-    const base = { ...oxc } as Record<string, unknown>;
+    const { browser, exportConditions } = resolveOptions;
+    const base = { ...resolveOptions } as Record<string, unknown>;
+
+    // Strip the legacy node-resolve-only keys before the object reaches
+    // `ResolverFactory`. The folder-mapping and prefer-builtins flags have no oxc
+    // equivalent (node builtins are externalized by the externals plugin), and the
+    // unresolved-import behavior is consumed by `sharedOnWarn`, not the resolver.
+    // `browser` and `exportConditions` are folded onto their oxc equivalents below.
+    delete base.allowExportsFolderMapping;
+    delete base.browser;
+    delete base.exportConditions;
+    delete base.preferBuiltins;
+    delete base.unresolvedImportBehavior;
 
     const conditionNames = new Set<string>(Array.isArray(base.conditionNames) ? (base.conditionNames as string[]) : []);
 
@@ -426,24 +427,24 @@ const mergeNodeResolveIntoOxc = (
     // `browser: true` (node-resolve) → ensure the "browser" condition is active
     // and the browser alias field is consulted.
     if (browser) {
-        base.conditionNames = [...new Set(["browser", ...((base.conditionNames as string[] | undefined) ?? [])])];
-        base.aliasFields = [["browser"], ...((base.aliasFields as unknown[] | undefined) ?? [])];
+        base.conditionNames = [...new Set(["browser", ...(base.conditionNames as string[] | undefined) ?? []])];
+        base.aliasFields = [["browser"], ...(base.aliasFields as unknown[] | undefined) ?? []];
     }
 
-    return base as OXCResolveOptions;
+    return base;
 };
 
 // eslint-disable-next-line import/exports-last -- consumed by the shared bundler builder
 export const createNodeResolver = (context: BuildContext<InternalBuildOptions>): Plugin | undefined => {
-    const { resolve } = context.options.rollup;
+    const { resolve: resolveOptions } = context.options.rollup;
 
     // `rollup.resolve === false` explicitly disables module resolution.
-    if (!resolve) {
+    if (!resolveOptions) {
         return undefined;
     }
 
     return oxcResolvePlugin(
-        mergeNodeResolveIntoOxc(resolve),
+        mergeNodeResolveIntoOxc(resolveOptions),
         context.options.rootDir,
         getLogger(context),
         context.tsconfig?.path,

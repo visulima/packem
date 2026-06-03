@@ -1305,7 +1305,7 @@ exports[`packem ecosystem > should work with provided 'sitefetch' ecosystem suit
 import path from 'node:path';
 import fs from 'node:fs';
 import { encode } from 'gpt-tokenizer/model/gpt-4o';
-import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-Cog8kO28.js';
+import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-BJSD_AW0.js';
 
 function toArr(any) {
   return any == null ? [] : Array.isArray(any) ? any : [any];
@@ -1992,7 +1992,7 @@ declare function fetchSite(url: string, options: Options): Promise<FetchSiteResu
 declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 export { fetchSite, serializePages };
 ",
-  "export { f as fetchSite, s as serializePages } from './packem_shared/index-Cog8kO28.js';
+  "export { f as fetchSite, s as serializePages } from './packem_shared/index-BJSD_AW0.js';
 import 'happy-dom';
 import 'cheerio';
 ",
@@ -5207,7 +5207,7 @@ function requirePicocolors () {
 	return picocolors.exports;
 }
 
-var picocolorsExports = /*@__PURE__*/ requirePicocolors();
+var picocolorsExports = requirePicocolors();
 const c = /*@__PURE__*/getDefaultExportFromCjs(picocolorsExports);
 
 const turndown = new Turndown();

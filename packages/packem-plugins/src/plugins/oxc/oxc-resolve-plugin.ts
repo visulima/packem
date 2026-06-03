@@ -45,7 +45,14 @@ const oxcResolvePlugin = (options: OXCResolveOptions, rootDirectory: string, log
                     return undefined;
                 }
 
-                let hasModuleSideEffects: (location: string) => boolean = (_: string) => false;
+                // Default to *true* (module has side effects → not stripped) when the
+                // owning package.json declares no `sideEffects` field. This matches
+                // rollup's / `@rollup/plugin-node-resolve`'s convention: only an explicit
+                // `sideEffects: false` (handled below) opts a package into aggressive
+                // tree-shaking. Defaulting to `false` here silently tree-shook
+                // side-effect-only imports such as `import "./styles.css"`, dropping CSS
+                // from the bundle entirely.
+                let hasModuleSideEffects: (location: string) => boolean = (_: string) => true;
 
                 try {
                     const { packageJson, path } = await findPackageJson(dirname(id as string), {
@@ -101,7 +108,7 @@ const oxcResolvePlugin = (options: OXCResolveOptions, rootDirectory: string, log
                 // would drop the import as unresolved. Downstream load plugins (raw,
                 // data-uri, url) consume the query directly, so return the resolved
                 // id as-is and skip the round-trip.
-                if (String(source).includes("?")) {
+                if (source.includes("?")) {
                     return { id: id as string, moduleSideEffects: hasModuleSideEffects(id as string) };
                 }
 

@@ -3,7 +3,7 @@ export { default as browserslistToEsbuild } from "./plugins/esbuild/browserslist
 export { jsxRemoveAttributes, type JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
 export { preserveDirectivesPlugin, type PreserveDirectivesPluginOptions } from "./plugins/preserve-directives";
 export { pureNewExpressionPlugin } from "./plugins/pure-new-expression-plugin";
-export type { ExtendedRollupNodeResolveOptions, LegacyNodeResolveOptions, PackemRollupOptions, ResolveOptions, RollupPlugins } from "./types";
+export type { LegacyNodeResolveOptions, PackemRollupOptions, ResolveOptions, RollupPlugins } from "./types";
 export type { Alias, ResolverObject as AliasResolverObject, ResolvedAlias, RollupAliasOptions } from "@rollup/plugin-alias";
 export { default as alias } from "@rollup/plugin-alias";
 export type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
