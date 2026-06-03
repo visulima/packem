@@ -9,7 +9,6 @@ import {
     importTrace,
     inject,
     jsxRemoveAttributes,
-    nodeResolve,
     patchErrorWithTrace,
     polyfillNode,
     preserveDirectivesPlugin,
@@ -32,13 +31,12 @@ describe("@visulima/packem-rollup public barrel", () => {
     });
 
     it("should re-export the @rollup ecosystem plugin entry points", () => {
-        expect.assertions(8);
+        expect.assertions(7);
 
         expect(alias).toBeTypeOf("function");
         expect(commonjs).toBeTypeOf("function");
         expect(dynamicImportVariables).toBeTypeOf("function");
         expect(inject).toBeTypeOf("function");
-        expect(nodeResolve).toBeTypeOf("function");
         expect(replace).toBeTypeOf("function");
         expect(wasm).toBeTypeOf("function");
         expect(polyfillNode).toBeTypeOf("function");

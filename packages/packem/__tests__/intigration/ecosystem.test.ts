@@ -62,33 +62,4 @@ describe("packem ecosystem", () => {
 
         expect(distributionFiles).toMatchSnapshot();
     });
-
-    it.todo.each(ecosystemSuites)("should work with provided '%s' ecosystem suite and oxc resolver", async (suite) => {
-        expect.assertions(3);
-
-        const fullSuitePath = join(ecosystemPath, suite);
-
-        await createPackemConfig(fullSuitePath, {
-            experimental: {
-                oxcResolve: true,
-            },
-            transformer: "esbuild",
-        });
-
-        const binProcess = await execPackem("build", [], {
-            cwd: fullSuitePath,
-        });
-
-        expect(binProcess.stderr).toBe("");
-        expect(binProcess.exitCode).toBe(0);
-
-        const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {
-            recursive: true,
-            withFileTypes: true,
-        })
-            .filter((dirent) => dirent.isFile())
-            .map((dirent) => readFileSync(join(dirent.parentPath, dirent.name)));
-
-        expect(distributionFiles).toMatchSnapshot();
-    });
 });

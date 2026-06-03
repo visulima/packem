@@ -1,7 +1,6 @@
 import type { RollupAliasOptions } from "@rollup/plugin-alias";
 import type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 import type { RollupJsonOptions } from "@rollup/plugin-json";
-import type { RollupNodeResolveOptions } from "@rollup/plugin-node-resolve";
 import type { RollupReplaceOptions } from "@rollup/plugin-replace";
 import type { RollupWasmOptions } from "@rollup/plugin-wasm";
 import type { FilterPattern } from "@rollup/pluginutils";
@@ -65,15 +64,44 @@ interface RollupDynamicImportVariablesOptions {
     warnOnError?: boolean;
 }
 
-export interface ExtendedRollupNodeResolveOptions extends RollupNodeResolveOptions {
+/**
+ * Legacy `@rollup/plugin-node-resolve` option keys. Module resolution is now
+ * handled by the oxc resolver, but these keys are still accepted and mapped onto
+ * the equivalent oxc-resolver options at build time so existing configs (and the
+ * svelte/solid presets) keep working. Prefer the native oxc keys
+ * (`conditionNames`, `aliasFields`, …) in new configs.
+ */
+export interface LegacyNodeResolveOptions {
+    /** Node-resolve `allowExportsFolderMapping`; ignored by the oxc resolver (dropped at build time). */
+    allowExportsFolderMapping?: boolean;
+    /** Node-resolve `browser`; maps to the `"browser"` condition + the `browser` alias field. */
+    browser?: boolean;
+    /** Node-resolve `exportConditions`; maps to (and is prepended onto) `conditionNames`. */
+    exportConditions?: string[];
+
     /**
-     * Controls how unresolved import warnings from the node-resolve plugin are handled.
-     * - `"error"` (default): Treat unresolved imports as errors, causing the build to fail
-     * - `"warn"`: Treat unresolved imports as warnings, allowing the build to continue
-     * @default "error"
+     * Node-resolve `preferBuiltins`. Node builtins are externalized by the externals
+     * plugin, so this is dropped before reaching the oxc resolver; it is retained as a
+     * config key only because the build runtime still sets it from `runtime`.
      */
-    unresolvedImportBehavior?: "error" | "warn";
+    preferBuiltins?: boolean;
 }
+
+/**
+ * Module-resolution options, passed to the oxc-resolver-backed resolve plugin.
+ * Accepts the native oxc-resolver options plus a few legacy node-resolve keys
+ * ({@link LegacyNodeResolveOptions}) that are mapped onto their oxc equivalents.
+ */
+export type ResolveOptions = LegacyNodeResolveOptions
+    & OXCResolveOptions & {
+        /**
+         * Controls how unresolved imports are handled.
+         * - `"error"` (default): treat unresolved imports as errors, failing the build.
+         * - `"warn"`: emit a warning and continue.
+         * @default "error"
+         */
+        unresolvedImportBehavior?: "error" | "warn";
+    };
 
 export interface PackemRollupOptions {
     alias?: RollupAliasOptions | false;
@@ -93,9 +121,6 @@ export interface PackemRollupOptions {
     dts?: RollupDtsOptions;
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
     esbuild?: EsbuildOptions | false;
-    experimental?: {
-        resolve?: OXCResolveOptions | false;
-    };
     json?: RollupJsonOptions | false;
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
     license?: LicenseOptions | false;
@@ -117,7 +142,7 @@ export interface PackemRollupOptions {
     raw?: RawLoaderOptions | false;
     replace?: Omit<RollupReplaceOptions, "cwd"> | false;
     requireCJS?: RequireCJSPluginOptions | false;
-    resolve?: ExtendedRollupNodeResolveOptions | false;
+    resolve?: ResolveOptions | false;
     resolveExternals?: ResolveExternalsPluginOptions;
     shebang?: Partial<ShebangOptions> | false;
     shim?: EsmShimCjsSyntaxOptions | false;

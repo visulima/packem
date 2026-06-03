@@ -3,7 +3,7 @@ import { versions } from "node:process";
 
 import { cyan } from "@visulima/colorize";
 import { cachingPlugin, resolveAliases, resolveFileUrlPlugin } from "@visulima/packem-plugins";
-import type { InternalOXCTransformPluginConfig } from "@visulima/packem-plugins/oxc";
+import type { InternalOXCTransformPluginConfig, OXCResolveOptions } from "@visulima/packem-plugins/oxc";
 import { oxcResolvePlugin } from "@visulima/packem-plugins/oxc";
 import { externalsPlugin } from "@visulima/packem-plugins/plugin/externals";
 import { fixDtsDefaultCjsExportsPlugin } from "@visulima/packem-plugins/plugin/fix-dts-default-cjs-exports";
@@ -21,7 +21,6 @@ import {
     alias as aliasPlugin,
     browserslistToEsbuild,
     importTrace,
-    nodeResolve as nodeResolvePlugin,
     pureNewExpressionPlugin,
     purePlugin,
     replace as replacePlugin,
@@ -393,19 +392,63 @@ export const getTransformerConfig = (
     throw new Error(`A Unknown transformer was provided`);
 };
 
+// `rollup.resolve` carries the native oxc-resolver options plus a few legacy
+// `@rollup/plugin-node-resolve` keys (`exportConditions`, `browser`,
+// `preferBuiltins`, `allowExportsFolderMapping`) kept for back-compat — the
+// svelte/solid presets, existing user configs, and the runtime fixups below
+// (e.g. `preferBuiltins`/`browser` set from the build runtime) still use them.
+// Fold the meaningful ones onto their oxc equivalents and strip every non-oxc key
+// so the result is safe to hand to `ResolverFactory`.
+const mergeNodeResolveIntoOxc = (
+    resolveOptions: Exclude<InternalBuildOptions["rollup"]["resolve"], false | undefined>,
+): OXCResolveOptions => {
+    const { browser, exportConditions } = resolveOptions;
+    const base = { ...resolveOptions } as Record<string, unknown>;
+
+    // Strip the legacy node-resolve-only keys before the object reaches
+    // `ResolverFactory`. The folder-mapping and prefer-builtins flags have no oxc
+    // equivalent (node builtins are externalized by the externals plugin), and the
+    // unresolved-import behavior is consumed by `sharedOnWarn`, not the resolver.
+    // `browser` and `exportConditions` are folded onto their oxc equivalents below.
+    delete base.allowExportsFolderMapping;
+    delete base.browser;
+    delete base.exportConditions;
+    delete base.preferBuiltins;
+    delete base.unresolvedImportBehavior;
+
+    const conditionNames = new Set<string>(Array.isArray(base.conditionNames) ? (base.conditionNames as string[]) : []);
+
+    // `exportConditions` (node-resolve) → `conditionNames` (oxc): preset-supplied
+    // conditions (e.g. "svelte", "solid") must take precedence, so prepend them.
+    if (Array.isArray(exportConditions)) {
+        base.conditionNames = [...new Set([...exportConditions, ...conditionNames])];
+    }
+
+    // `browser: true` (node-resolve) → ensure the "browser" condition is active
+    // and the browser alias field is consulted.
+    if (browser) {
+        base.conditionNames = [...new Set(["browser", ...(base.conditionNames as string[] | undefined) ?? []])];
+        base.aliasFields = [["browser"], ...(base.aliasFields as unknown[] | undefined) ?? []];
+    }
+
+    return base;
+};
+
 // eslint-disable-next-line import/exports-last -- consumed by the shared bundler builder
 export const createNodeResolver = (context: BuildContext<InternalBuildOptions>): Plugin | undefined => {
-    if (context.options.rollup.resolve && !context.options.experimental?.oxcResolve) {
-        return nodeResolvePlugin({
-            ...context.options.rollup.resolve,
-        });
+    const { resolve: resolveOptions } = context.options.rollup;
+
+    // `rollup.resolve === false` explicitly disables module resolution.
+    if (!resolveOptions) {
+        return undefined;
     }
 
-    if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
-        return oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, getLogger(context), context.tsconfig?.path);
-    }
-
-    return undefined;
+    return oxcResolvePlugin(
+        mergeNodeResolveIntoOxc(resolveOptions),
+        context.options.rootDir,
+        getLogger(context),
+        context.tsconfig?.path,
+    );
 };
 
 const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOptions>): boolean => {
@@ -417,6 +460,14 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOpt
     // eslint-disable-next-line no-secrets/no-secrets
     // @see https:// github.com/rollup/rollup/blob/5abe71bd5bae3423b4e2ee80207c871efde20253/cli/run/batchWarnings.ts#L236
     if (warning.code === "UNRESOLVED_IMPORT") {
+        const { resolve: resolveOptions } = context.options.rollup;
+
+        // `unresolvedImportBehavior: "warn"` keeps the build alive and lets the
+        // warning surface normally instead of failing. Default is "error".
+        if (resolveOptions && resolveOptions.unresolvedImportBehavior === "warn") {
+            return false;
+        }
+
         const error: Error & { id?: string } = new Error(
             `Failed to resolve the module "${warning.exporter ?? ""}" imported by "${cyan(relative(resolve(), warning.id ?? ""))}"`
             + `\nIs the module installed? Note:`
@@ -469,30 +520,6 @@ const formatRollupLog = (log: RollupLog): string => {
     return log.message;
 };
 
-const throwIfUnresolvedImportIsError = (context: BuildContext<InternalBuildOptions>, level: string, log: RollupLog, format: string): void => {
-    // Handle unresolved import warnings from node-resolve plugin
-    if (!(level === "warn" && log.plugin === "node-resolve" && format.includes("Could not resolve import"))) {
-        return;
-    }
-
-    const unresolvedImportBehavior
-        = context.options.rollup.resolve && typeof context.options.rollup.resolve === "object"
-            ? context.options.rollup.resolve.unresolvedImportBehavior ?? "error"
-            : "error";
-
-    if (unresolvedImportBehavior === "error") {
-        const error: Error & { id?: string } = new Error(format);
-
-        // Preserve the file id so rollup-plugin-import-trace can build the import chain
-        if (log.id) {
-            error.id = log.id;
-        }
-
-        throw error;
-    }
-    // If "warn", fall through to the warn case below
-};
-
 const handleRollupLog = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts", level: "debug" | "info" | "warn", log: RollupLog): void => {
     // DTS builds run in emitDtsOnly mode, so the JS chunk for every entry is empty
     // by design. Suppress the EMPTY_BUNDLE warnings here — onwarn already filters them
@@ -502,8 +529,6 @@ const handleRollupLog = (context: BuildContext<InternalBuildOptions>, type: "bui
     }
 
     const format = formatRollupLog(log);
-
-    throwIfUnresolvedImportIsError(context, level, log, format);
 
     const prefix = type + (log.plugin ? `:plugin:${log.plugin}` : "");
 

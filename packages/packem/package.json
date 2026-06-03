@@ -228,7 +228,6 @@
         "@rollup/plugin-dynamic-import-vars": "catalog:build",
         "@rollup/plugin-inject": "catalog:build",
         "@rollup/plugin-json": "catalog:build",
-        "@rollup/plugin-node-resolve": "catalog:build",
         "@rollup/plugin-replace": "catalog:build",
         "@rollup/plugin-wasm": "catalog:build",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
