@@ -7,6 +7,13 @@ export default defineConfig({
     entries: ["./types/*.types.ts"],
     declaration: true,
     transformer,
+    // This package ships type declarations only (no runtime entry), so there is
+    // intentionally no `main` field to validate.
+    validation: {
+        packageJson: {
+            main: false,
+        },
+    },
     rollup: {
         node10Compatibility: {
             writeToPackageJson: true,

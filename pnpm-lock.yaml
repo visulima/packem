@@ -1153,13 +1153,6 @@ importers:
         version: 6.0.3
 
   examples/mixed:
-    dependencies:
-      react:
-        specifier: ^19.2.7
-        version: 19.2.7
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/node':
         specifier: 25.9.1
@@ -1182,9 +1175,6 @@ importers:
       react:
         specifier: ^19.2.7
         version: 19.2.7
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/react':
         specifier: ^19.2.16
@@ -1462,9 +1452,6 @@ importers:
       react:
         specifier: ^19.2.7
         version: 19.2.7
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/react':
         specifier: ^19.2.16
@@ -1520,9 +1507,6 @@ importers:
       react:
         specifier: ^19.2.7
         version: 19.2.7
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/react':
         specifier: ^19.2.16
@@ -1712,9 +1696,6 @@ importers:
       react:
         specifier: ^19.2.7
         version: 19.2.7
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/react':
         specifier: ^19.2.16
@@ -1737,9 +1718,6 @@ importers:
       react:
         specifier: ^19.2.7
         version: 19.2.7
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/react':
         specifier: ^19.2.16
@@ -1759,9 +1737,6 @@ importers:
       react:
         specifier: ^19.2.7
         version: 19.2.7
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/react':
         specifier: ^19.2.16
@@ -1784,9 +1759,6 @@ importers:
       react:
         specifier: ^19.2.7
         version: 19.2.7
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
     devDependencies:
       '@swc/core':
         specifier: ^1.15.40

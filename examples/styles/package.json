@@ -2,6 +2,9 @@
     "name": "examples_packem_styles",
     "version": "1.0.0",
     "private": true,
+    "sideEffects": [
+        "**/*.css"
+    ],
     "type": "module",
     "exports": [
         "./dist/index.cjs",

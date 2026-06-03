@@ -2,6 +2,7 @@
     "name": "examples_packem_styles_inject",
     "version": "1.0.0",
     "private": true,
+    "sideEffects": true,
     "type": "module",
     "exports": [
         "./dist/index.cjs",

@@ -2,6 +2,7 @@
     "name": "examples_packem_mixed",
     "version": "1.0.0",
     "private": true,
+    "sideEffects": false,
     "description": "",
     "type": "commonjs",
     "exports": {
@@ -81,10 +82,6 @@
     "scripts": {
         "build": "packem build",
         "clean": "rimraf node_modules dist"
-    },
-    "dependencies": {
-        "react": "^19.2.7",
-        "react-dom": "^19.2.7"
     },
     "devDependencies": {
         "@types/node": "25.9.1",

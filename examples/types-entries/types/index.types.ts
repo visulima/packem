@@ -1,3 +1,3 @@
-import { InterfaceA, InterfaceB } from "@/demo";
+import { InterfaceA, InterfaceB } from "../src/demo";
 
 export type TypeC = InterfaceA | InterfaceB;

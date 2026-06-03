@@ -2,9 +2,18 @@
     "name": "examples_packem_copy",
     "version": "1.0.0",
     "private": true,
+    "sideEffects": false,
     "type": "commonjs",
     "main": "./dist/index.cjs",
     "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.d.ts"
+            ]
+        }
+    },
     "files": [
         "./dist"
     ],

@@ -2,6 +2,7 @@
     "name": "examples_packem_dynamic-imports",
     "version": "1.0.0",
     "private": true,
+    "sideEffects": false,
     "type": "module",
     "exports": {
         ".": {
@@ -11,6 +12,14 @@
     },
     "main": "./dist/index.cjs",
     "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.d.ts"
+            ]
+        }
+    },
     "files": [
         "./dist"
     ],

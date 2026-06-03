@@ -9,6 +9,7 @@ import cssnanoMinifier from "@visulima/packem/css/minifier/cssnano";
 
 export default defineConfig({
     transformer,
+    declaration: false,
     rollup: {
         css: {
             mode: "inject",
