@@ -919,9 +919,9 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
     // empty facade and its `.d.ts`/`.d.mts`/`.d.cts` never get written. Keying on
     // the entry names gives each distinct build its own instance.
     const entriesKey = context.options.entries
-        .map((entry) => entry.name)
-        .filter(Boolean)
-        .sort()
+        .map((entry) => entry.name ?? "")
+        .filter((name) => name !== "")
+        .toSorted((a, b) => a.localeCompare(b))
         .join(",");
     const uniqueProcessId = `dts-plugin:${String(process.pid)}${context.tsconfig?.path ?? ""}:${resolveKey}:${entriesKey}`;
 
