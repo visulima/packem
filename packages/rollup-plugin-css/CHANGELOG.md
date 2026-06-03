@@ -1,3 +1,5 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.50](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.49...@visulima/rollup-plugin-css@1.0.0-alpha.50) (2026-06-03)
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.49](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.48...@visulima/rollup-plugin-css@1.0.0-alpha.49) (2026-06-02)
 
 ### Features
