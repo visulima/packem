@@ -254,6 +254,55 @@ export function method() {
         expect(existsSync(`${temporaryDirectoryPath}/dist/index.production.d.cts`)).toBe(true);
     });
 
+    it("should emit the shared declaration when several runtime conditions point `types` at one file", async () => {
+        expect.assertions(7);
+
+        // Several runtime conditions (node, workerd, browser, browser.development)
+        // all point their `types` at one shared `./dist/index.d.ts` but use
+        // different JS files. Each condition becomes its own build group sharing a
+        // runtime, so their concurrent DTS builds used to clobber each other's
+        // cache and drop the shared `index.d.ts` (the multi-environment collapse).
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value: string = "shared";`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackemConfig(temporaryDirectoryPath, { config: { runtime: "browser" } });
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    types: "./dist/index.d.ts",
+                    workerd: { import: "./dist/index.server.js", types: "./dist/index.d.ts" },
+                    browser: {
+                        development: { import: "./dist/index.development.js", types: "./dist/index.d.ts" },
+                        import: "./dist/index.browser.js",
+                        types: "./dist/index.d.ts",
+                    },
+                    node: { import: "./dist/index.server.js", types: "./dist/index.d.ts" },
+                    import: "./dist/index.js",
+                },
+            },
+            type: "module",
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.exitCode).toBe(0);
+        // The shared declaration referenced by every `types` condition must exist…
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toBe(true);
+        // …and carry the real type, not collapse to an empty facade.
+        expect(readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toContain("value");
+        // The runtime-variant JS outputs are still produced.
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.browser.js`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.development.js`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.server.js`)).toBe(true);
+    });
+
     it("should work with dev and prod optimize conditions in nested-convention", async () => {
         expect.assertions(14);
 
