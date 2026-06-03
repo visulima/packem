@@ -14,6 +14,64 @@ const DIST_PATH_REGEXP = /.*\/dist\/.*/;
 
 const TRAILING_SLASH_REGEXP = /\/$/;
 
+const MJS_OUTPUT_REGEXP = /\.mjs$/;
+const CJS_OUTPUT_REGEXP = /\.cjs$/;
+const DECLARATION_OUTPUT_REGEXP = /\.d\.[mc]?ts$/;
+// Plain `.js` that is not a declaration file; its format depends on package type.
+const JS_OUTPUT_REGEXP = /(?<!\.d)\.js$/;
+
+/**
+ * Collects every output file path and condition key referenced by a
+ * package.json's `exports`/`main`/`module`/`types`. Used to derive emit formats
+ * in unbundle mode, which skips {@link inferEntries}.
+ * @param packageJson The package manifest to scan.
+ * @returns Referenced output file paths and the set of export condition keys.
+ */
+const collectPackageOutputs = (packageJson: NormalizedPackageJson): { conditions: Set<string>; files: string[] } => {
+    const files: string[] = [];
+    const conditions = new Set<string>();
+
+    const walk = (value: unknown): void => {
+        if (typeof value === "string") {
+            files.push(value);
+
+            return;
+        }
+
+        if (Array.isArray(value)) {
+            for (const item of value) {
+                walk(item);
+            }
+
+            return;
+        }
+
+        if (value && typeof value === "object") {
+            for (const [key, nested] of Object.entries(value)) {
+                // Subpath keys start with "." (e.g. "./core"); everything else is
+                // a condition name (import, require, types, node, development, …).
+                if (!key.startsWith(".")) {
+                    conditions.add(key);
+                }
+
+                walk(nested);
+            }
+        }
+    };
+
+    if (packageJson.exports) {
+        walk(packageJson.exports);
+    }
+
+    for (const field of [packageJson.main, packageJson.module, packageJson.types]) {
+        if (typeof field === "string") {
+            files.push(field);
+        }
+    }
+
+    return { conditions, files };
+};
+
 /**
  * Minimal structural view of the {@link BuildContext}'s `logger` (a `Pail`
  * instance). The `@visulima/pail` package's export map is not resolvable by
@@ -27,39 +85,131 @@ interface AutoPresetLogger {
     warn: (...arguments_: unknown[]) => void;
 }
 
+/**
+ * Resolves and stores `emitESM`/`emitCJS` for unbundle mode (which skips
+ * {@link inferEntries}). Mirrors the package.json signals `inferEntries` reads,
+ * but only when neither flag is set explicitly by the user.
+ * @param context The build context (mutated in place).
+ * @param conditions Export condition keys referenced by package.json.
+ * @param files Output file paths referenced by package.json.
+ */
+const resolveUnbundleEmitFormats = (context: BuildContext<InternalBuildOptions>, conditions: Set<string>, files: string[]): void => {
+    if (context.options.emitESM !== undefined || context.options.emitCJS !== undefined) {
+        return;
+    }
+
+    const packageType: "cjs" | "esm" = context.pkg.type === "module" ? "esm" : "cjs";
+    const hasPlainJs = files.some((file) => JS_OUTPUT_REGEXP.test(file));
+
+    let emitESM = files.some((file) => MJS_OUTPUT_REGEXP.test(file)) || conditions.has("import") || conditions.has("module");
+    let emitCJS = files.some((file) => CJS_OUTPUT_REGEXP.test(file)) || conditions.has("require");
+
+    // Plain `.js` (and the no-signal fallback) follow the package type.
+    if ((hasPlainJs || (!emitESM && !emitCJS)) && packageType === "esm") {
+        emitESM = true;
+    } else if (hasPlainJs || (!emitESM && !emitCJS)) {
+        emitCJS = true;
+    }
+
+    context.options.emitESM = emitESM;
+    context.options.emitCJS = emitCJS;
+};
+
+/**
+ * Resolves and stores `declaration` for unbundle mode: respects an explicit
+ * config/CLI value, otherwise enables it when package.json references types.
+ * @param context The build context (mutated in place).
+ * @param conditions Export condition keys referenced by package.json.
+ * @param files Output file paths referenced by package.json.
+ */
+const resolveUnbundleDeclaration = (context: BuildContext<InternalBuildOptions>, conditions: Set<string>, files: string[]): void => {
+    if (context.options.declaration !== undefined) {
+        return;
+    }
+
+    const hasTypes = Boolean(context.pkg.types) || conditions.has("types") || files.some((file) => DECLARATION_OUTPUT_REGEXP.test(file));
+
+    context.options.declaration = hasTypes ? "node16" : false;
+};
+
+/**
+ * Builds one entry per source file for unbundle mode (preserving the source
+ * tree) and resolves the emit-format flags package.json implies.
+ *
+ * Unbundle mode skips {@link inferEntries}, so without this the emit-format
+ * flags stay unset, every entry has neither `cjs` nor `esm`, and nothing is
+ * emitted ("Emitting of ESM/CJS bundles is disabled").
+ * @param context The build context (its `options.entries` is replaced in place).
+ */
+const prepareUnbundleEntries = (context: BuildContext<InternalBuildOptions>): void => {
+    context.options.entries.length = 0;
+
+    const sourceDirectory = join(context.options.rootDir, context.options.sourceDir);
+
+    if (!isAccessibleSync(sourceDirectory)) {
+        throw new Error("No 'src' directory found. Please provide entries manually.");
+    }
+
+    const sourceFiles = collectSync(sourceDirectory, {
+        extensions: [],
+        includeDirs: false,
+        includeSymlinks: false,
+        skip: [EXCLUDE_REGEXP, DIST_PATH_REGEXP],
+    });
+
+    // Filter for TypeScript/JavaScript files
+    const codeFiles = sourceFiles.filter((file) => ALLOWED_TRANSFORM_EXTENSIONS_REGEX.test(file) && !file.endsWith(".d.ts"));
+
+    const { conditions, files } = collectPackageOutputs(context.pkg as NormalizedPackageJson);
+
+    resolveUnbundleEmitFormats(context, conditions, files);
+    resolveUnbundleDeclaration(context, conditions, files);
+
+    const emitESM = context.options.emitESM ?? false;
+    const emitCJS = context.options.emitCJS ?? false;
+
+    for (const file of codeFiles) {
+        const relativePath = file.replace(`${sourceDirectory}/`, "");
+        const name = relativePath.replace(ALLOWED_TRANSFORM_EXTENSIONS_REGEX, "").replaceAll("/", "/");
+
+        context.options.entries.push({
+            cjs: emitCJS,
+            declaration: context.options.declaration,
+            esm: emitESM,
+            input: file,
+            name,
+        });
+    }
+
+    const tags: string[] = [];
+
+    if (emitESM) {
+        tags.push("[esm]");
+    }
+
+    if (emitCJS) {
+        tags.push("[cjs]");
+    }
+
+    if (context.options.declaration) {
+        tags.push("[dts]");
+    }
+
+    const entryCount = context.options.entries.length;
+
+    (context.logger as AutoPresetLogger).info(
+        "Unbundle mode: preserving source structure for",
+        cyan(`${String(entryCount)} ${entryCount === 1 ? "entry" : "entries"}`),
+        gray(tags.join(" ")),
+    );
+};
+
 const autoPreset: BuildConfig = {
     hooks: {
         "build:prepare": async function (context: BuildContext<InternalBuildOptions>) {
             // For unbundle mode, always create entries for all source files
             if (context.options.unbundle) {
-                // Clear existing entries
-                context.options.entries.length = 0;
-
-                const sourceDirectory = join(context.options.rootDir, context.options.sourceDir);
-
-                if (!isAccessibleSync(sourceDirectory)) {
-                    throw new Error("No 'src' directory found. Please provide entries manually.");
-                }
-
-                const sourceFiles = collectSync(sourceDirectory, {
-                    extensions: [],
-                    includeDirs: false,
-                    includeSymlinks: false,
-                    skip: [EXCLUDE_REGEXP, DIST_PATH_REGEXP],
-                });
-
-                // Filter for TypeScript/JavaScript files
-                const codeFiles = sourceFiles.filter((file) => ALLOWED_TRANSFORM_EXTENSIONS_REGEX.test(file) && !file.endsWith(".d.ts"));
-
-                for (const file of codeFiles) {
-                    const relativePath = file.replace(`${sourceDirectory}/`, "");
-                    const name = relativePath.replace(ALLOWED_TRANSFORM_EXTENSIONS_REGEX, "").replaceAll("/", "/");
-
-                    context.options.entries.push({
-                        input: file,
-                        name,
-                    });
-                }
+                prepareUnbundleEntries(context);
 
                 // Don't run the normal auto logic
                 return;

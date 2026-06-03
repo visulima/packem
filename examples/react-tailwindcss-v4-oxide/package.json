@@ -1,6 +1,9 @@
 {
     "name": "examples_packem_react_tailwindcss-v4-oxide",
     "private": true,
+    "sideEffects": [
+        "**/*.css"
+    ],
     "keywords": [
         "tailwind",
         "tailwind-oxide",

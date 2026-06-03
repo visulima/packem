@@ -908,7 +908,22 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
     // re-used for later builds, which breaks direct-bypass inlining for devDeps that only
     // showed up after the first build finished.
     const resolveKey = computeDtsResolveKey(dtsResolve);
-    const uniqueProcessId = `dts-plugin:${String(process.pid)}${context.tsconfig?.path ?? ""}:${resolveKey}`;
+
+    // Include the build's entry set in the key. The per-environment/runtime DTS
+    // builds run in parallel (Promise.all), and `rollup-plugin-dts` is stateful
+    // (it holds a TS program and tracks emitted declarations). Environment
+    // siblings that share a runtime (e.g. the default vs development vs
+    // production groups, all `node`) would otherwise resolve to the same
+    // `resolveKey` and share a single plugin instance across concurrent builds —
+    // contaminating each other so the default entry's declaration collapses to an
+    // empty facade and its `.d.ts`/`.d.mts`/`.d.cts` never get written. Keying on
+    // the entry names gives each distinct build its own instance.
+    const entriesKey = context.options.entries
+        .map((entry) => entry.name ?? "")
+        .filter((name) => name !== "")
+        .toSorted((a, b) => a.localeCompare(b))
+        .join(",");
+    const uniqueProcessId = `dts-plugin:${String(process.pid)}${context.tsconfig?.path ?? ""}:${resolveKey}:${entriesKey}`;
 
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "dts");
 

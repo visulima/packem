@@ -21,6 +21,7 @@ import type { RollupError } from "rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
+import { version as packemVersion } from "../../package.json";
 import { resolveBundlerName } from "../bundler/build";
 import { ensureBundlerInstalled, ensureTransformerInstalled } from "../bundler/ensure-installed";
 import autoPreset from "../config/preset/auto";
@@ -863,6 +864,7 @@ const packem = async (
     const cacheKey
         = getCacheHash(
             JSON.stringify({
+                packemVersion,
                 version: packageJson.version,
                 ...packageJson.dependencies,
                 ...packageJson.devDependencies,

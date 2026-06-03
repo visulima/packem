@@ -2,6 +2,7 @@
     "name": "examples_packem_multi_exports",
     "version": "1.0.0",
     "private": true,
+    "sideEffects": false,
     "type": "module",
     "exports": {
         ".": {
@@ -58,8 +59,7 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "react": "^19.2.7",
-        "react-dom": "^19.2.7"
+        "react": "^19.2.7"
     },
     "devDependencies": {
         "@types/react": "^19.2.16",

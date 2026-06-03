@@ -2,6 +2,7 @@
     "name": "examples_packem_ignore_export_keys",
     "version": "1.0.0",
     "private": true,
+    "sideEffects": false,
     "type": "module",
     "exports": {
         ".": "./dist/index.js",

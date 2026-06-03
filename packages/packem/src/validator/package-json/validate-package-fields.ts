@@ -191,14 +191,10 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
                 }
             }
 
-            // Validate mutually exclusive conditions
-            if (conditions.includes("import") && conditions.includes("require")) {
-                // This is actually valid they are mutually exclusive by nature
-            }
-
-            if (conditions.includes("development") && conditions.includes("production")) {
-                warn(context, `Conflicting conditions "development" and "production" at ${path}. These conditions are mutually exclusive`);
-            }
+            // Note: pairs like `import`/`require` and `development`/`production` are
+            // mutually exclusive at resolution time (only one ever matches), but
+            // declaring both is valid and intended — that's how a package ships
+            // separate builds per condition. So we do not warn about them here.
 
             // Recursively validate condition values
             conditions.forEach((condition) => {

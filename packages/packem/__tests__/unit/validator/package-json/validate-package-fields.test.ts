@@ -891,7 +891,7 @@ describe(validatePackageFields, () => {
             );
         });
 
-        it("should warn on conflicting development and production conditions", () => {
+        it("should accept both development and production conditions together", () => {
             expect.assertions(1);
 
             const context = {
@@ -915,10 +915,10 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
-                context,
-                "Conflicting conditions \"development\" and \"production\" at exports. These conditions are mutually exclusive",
-            );
+            // Declaring both `development` and `production` is a valid, intended
+            // pattern (a package shipping a separate build per condition); the
+            // resolver only ever activates one. It must not produce a warning.
+            expect(mockedWarn).not.toHaveBeenCalled();
         });
 
         it("should accept null values to block subpaths", () => {

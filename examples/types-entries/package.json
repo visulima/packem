@@ -2,8 +2,20 @@
     "name": "examples_packem_type_entries",
     "version": "1.0.0",
     "private": true,
-    "main": "./dist/index.cjs",
-    "types": "./types/index.types.ts",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/types/index.types.d.ts"
+        }
+    },
+    "types": "./dist/types/index.types.d.ts",
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/types/index.types.d.ts"
+            ]
+        }
+    },
     "files": [
         "./dist"
     ],

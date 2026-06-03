@@ -201,6 +201,59 @@ export function method() {
         }
     });
 
+    it("should emit base declarations for the default entry alongside dev/prod conditions", async () => {
+        expect.assertions(7);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value: string = process.env.NODE_ENV ?? "";`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackemConfig(temporaryDirectoryPath);
+        // The default/import/require entries share the `node` runtime with the
+        // development/production siblings. The DTS plugin used to be memoized
+        // across these parallel environment builds, so the default entry's
+        // declaration collapsed to an empty facade and `index.d.mts`/`.d.cts`
+        // were never written. They must be emitted here.
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        development: "./dist/index.development.mjs",
+                        production: "./dist/index.production.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        development: "./dist/index.development.cjs",
+                        production: "./dist/index.production.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", ["--no-environment"], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        // Base (default-condition) declarations — the regression.
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.d.mts`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.d.cts`)).toBe(true);
+        // The default-entry declaration must carry the real type, not be an empty facade.
+        expect(readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`)).toContain("value");
+        expect(readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`)).toContain("value");
+
+        // Environment-specific declarations remain emitted too.
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.development.d.mts`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.production.d.cts`)).toBe(true);
+    });
+
     it("should work with dev and prod optimize conditions in nested-convention", async () => {
         expect.assertions(14);
 

@@ -2,6 +2,7 @@
     "name": "examples_packem_typedoc",
     "version": "1.0.0",
     "private": true,
+    "sideEffects": false,
     "type": "module",
     "exports": {
         ".": {

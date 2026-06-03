@@ -531,6 +531,15 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
         },
 
         async transform(code, id) {
+            // Skip virtual modules and query-suffixed ids (e.g. Vue/Svelte SFC
+            // sub-modules like `App.vue?vue&type=script&lang.ts`, commonjs proxies).
+            // These are not on-disk barrel files, yet their id can end in a source
+            // extension; getDebarrelModifications reads the source by id from disk,
+            // so passing a virtual id through would throw ENOENT.
+            if (id.includes("\0") || id.includes("?")) {
+                return undefined;
+            }
+
             if (!isSourceFile(id)) {
                 return undefined;
             }
