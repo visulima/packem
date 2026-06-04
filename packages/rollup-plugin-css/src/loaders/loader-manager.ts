@@ -83,7 +83,12 @@ class LoaderManager {
      * @param options.options Internal style processing options
      */
     public constructor({ extensions, loaders, logger, options }: LoadersOptions) {
-        this.test = (file: string): boolean => extensions.some((extension) => file.toLowerCase().endsWith(extension));
+        this.test = (file: string): boolean => {
+            // Lowercase the filename once per call instead of once per extension.
+            const lower = file.toLowerCase();
+
+            return extensions.some((extension) => lower.endsWith(extension));
+        };
 
         if (loaders.length > 0) {
             this.add(...loaders);

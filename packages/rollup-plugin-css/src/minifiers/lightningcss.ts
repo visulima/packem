@@ -1,7 +1,8 @@
-import { browserslistToTargets, transform } from "lightningcss";
+import { transform } from "lightningcss";
 
 import type { LoaderContext } from "../loaders/types";
 import type { ExtractedData, InternalStyleOptions } from "../types";
+import browserslistToTargets from "../utils/browserslist-targets";
 import type { Minifier } from "./types";
 
 /**

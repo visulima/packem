@@ -24,7 +24,12 @@ const safeMtime = async (file: string): Promise<number> => {
     }
 };
 
-const resolveStopDirectory = async (cwd: string): Promise<string | undefined> => {
+// The stop directory only depends on `cwd`, which is constant for the whole
+// build, yet loadConfig runs once per CSS file. Memoize the (potentially two)
+// directory-tree walks per cwd so we don't repeat the FS traversal per file.
+const stopDirectoryCache = new Map<string, Promise<string | undefined>>();
+
+const computeStopDirectory = async (cwd: string): Promise<string | undefined> => {
     try {
         const foundMonorepoRoot = await findMonorepoRoot(cwd);
 
@@ -38,10 +43,44 @@ const resolveStopDirectory = async (cwd: string): Promise<string | undefined> =>
     }
 };
 
+const resolveStopDirectory = async (cwd: string): Promise<string | undefined> => {
+    let cached = stopDirectoryCache.get(cwd);
+
+    if (!cached) {
+        cached = computeStopDirectory(cwd);
+        stopDirectoryCache.set(cwd, cached);
+    }
+
+    return cached;
+};
+
+const normalizeConfig = async (postcssConfig: Result, cwd: string, logger: RollupLogger): Promise<Result> => {
+    const result: Result = {
+        file: postcssConfig.file,
+        options: postcssConfig.options,
+        plugins: await ensurePCSSPlugins(postcssConfig.plugins, cwd, logger),
+    };
+
+    if (result.options.parser) {
+        result.options.parser = await ensurePCSSOption(result.options.parser, "parser", cwd, logger);
+    }
+
+    if (result.options.syntax) {
+        result.options.syntax = await ensurePCSSOption(result.options.syntax, "syntax", cwd, logger);
+    }
+
+    if (result.options.stringifier) {
+        result.options.stringifier = await ensurePCSSOption(result.options.stringifier, "stringifier", cwd, logger);
+    }
+
+    return result;
+};
+
 const loadOrCachePostcssConfig = async (
     options: PostCSSConfigLoaderOptions,
     cwd: string,
     environment: Environment,
+    logger: RollupLogger,
     searchPath: string,
     stopDirectory: string | undefined,
 ): Promise<Result> => {
@@ -70,11 +109,15 @@ const loadOrCachePostcssConfig = async (
         },
     );
 
+    // Cache the fully-normalized result so a per-file cache hit can return it
+    // directly without re-running ensurePCSSPlugins/ensurePCSSOption each time.
+    const result = await normalizeConfig(postcssConfig, cwd, logger);
+
     const mtime = await safeMtime(postcssConfig.file);
 
-    configCache.set(searchPath, { mtime, result: postcssConfig });
+    configCache.set(searchPath, { mtime, result });
 
-    return postcssConfig;
+    return result;
 };
 
 const loadConfig = async (
@@ -95,27 +138,7 @@ const loadConfig = async (
     const stopDirectory = await resolveStopDirectory(cwd);
 
     try {
-        const postcssConfig = await loadOrCachePostcssConfig(options, cwd, environment, searchPath, stopDirectory);
-
-        const result: Result = {
-            file: postcssConfig.file,
-            options: postcssConfig.options,
-            plugins: await ensurePCSSPlugins(postcssConfig.plugins, cwd, logger),
-        };
-
-        if (result.options.parser) {
-            result.options.parser = await ensurePCSSOption(result.options.parser, "parser", cwd, logger);
-        }
-
-        if (result.options.syntax) {
-            result.options.syntax = await ensurePCSSOption(result.options.syntax, "syntax", cwd, logger);
-        }
-
-        if (result.options.stringifier) {
-            result.options.stringifier = await ensurePCSSOption(result.options.stringifier, "stringifier", cwd, logger);
-        }
-
-        return result;
+        return await loadOrCachePostcssConfig(options, cwd, environment, logger, searchPath, stopDirectory);
     } catch (error) {
         if (error instanceof Error && error.message.includes("No PostCSS Config found in")) {
             return { file: "", options: {}, plugins: [] };

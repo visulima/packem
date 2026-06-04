@@ -116,7 +116,10 @@ const cssPlugin = (
         };
     }
 
-    let extracted: Extracted[] = [];
+    // Keyed by extracted module id for O(1) upsert/dedupe in transform().
+    // Insertion order is preserved by Map, matching previous push order; the
+    // consumers below re-sort by the chunk's module id order anyway.
+    const extracted = new Map<string, Extracted>();
 
     /**
      * Traverses imported modules to find all CSS dependencies in a chunk.
@@ -180,15 +183,21 @@ const cssPlugin = (
          * @returns Hash string for cache invalidation or undefined if no CSS
          */
         augmentChunkHash(chunk) {
-            if (extracted.length === 0) {
+            if (extracted.size === 0) {
                 return undefined;
             }
 
             const ids = traverseImportedModules(chunk.modules, this.getModuleInfo);
 
-            const hashable = extracted
-                .filter((extract) => ids.includes(extract.id))
-                .toSorted((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id))
+            // Precompute id -> lastIndex once so membership and ordering are
+            // O(1) lookups instead of ids.includes/lastIndexOf per entry.
+            const lastIndex = new Map<string, number>();
+
+            ids.forEach((id, index) => lastIndex.set(id, index));
+
+            const hashable = [...extracted.values()]
+                .filter((extract) => lastIndex.has(extract.id))
+                .toSorted((a, b) => (lastIndex.get(a.id) as number) - (lastIndex.get(b.id) as number))
                 .map((extract) => `${basename(extract.id)}:${extract.css}`);
 
             if (hashable.length === 0) {
@@ -211,7 +220,7 @@ const cssPlugin = (
         async buildStart() {
             // Reset extracted CSS on every build so deleted files don't leave phantom
             // entries that would be emitted in the next generateBundle call.
-            extracted = [];
+            extracted.clear();
 
             logger = createRollupLogger(this, "css");
 
@@ -267,7 +276,7 @@ const cssPlugin = (
         },
         // eslint-disable-next-line sonarjs/cognitive-complexity
         async generateBundle(outputOptions, bundle) {
-            if (extracted.length === 0 || !(outputOptions.dir || outputOptions.file)) {
+            if (extracted.size === 0 || !(outputOptions.dir || outputOptions.file)) {
                 return;
             }
 
@@ -291,7 +300,15 @@ const cssPlugin = (
                     this.error(["Extraction path must be nested inside output directory,", `which is ${relative(cwd, directory)}`].join("\n"));
                 }
 
-                const entries = extracted.filter((extract) => ids.includes(extract.id)).toSorted((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id));
+                // Precompute id -> lastIndex once so membership and ordering are
+                // O(1) lookups instead of ids.includes/lastIndexOf per entry.
+                const lastIndex = new Map<string, number>();
+
+                ids.forEach((id, index) => lastIndex.set(id, index));
+
+                const entries = [...extracted.values()]
+                    .filter((extract) => lastIndex.has(extract.id))
+                    .toSorted((a, b) => (lastIndex.get(a.id) as number) - (lastIndex.get(b.id) as number));
                 const result = await concat(entries);
 
                 return {
@@ -508,7 +525,7 @@ const cssPlugin = (
                     filesEmitted: emittedList.length,
                     message: `CSS processing complete`,
                     plugin: "css",
-                    totalExtracted: extracted.length,
+                    totalExtracted: extracted.size,
                     totalSize: emittedList.reduce((sum, [, ids]) => sum + ids.length, 0),
                 });
             }
@@ -519,8 +536,9 @@ const cssPlugin = (
                 return undefined;
             }
 
-            // Skip empty files
-            if (code.replaceAll(/\s/g, "") === "") {
+            // Skip empty files. Short-circuit on the first non-whitespace char
+            // instead of allocating a whitespace-stripped copy of the source.
+            if (!/\S/.test(code)) {
                 logger.debug({ message: `Skipping empty file: ${transformId}`, plugin: "css" });
 
                 return undefined;
@@ -581,8 +599,10 @@ const cssPlugin = (
             if (result.extracted) {
                 const { id } = result.extracted;
 
-                extracted = extracted.filter((extract) => extract.id !== id);
-                extracted.push(result.extracted);
+                // O(1) upsert: re-inserting an existing id keeps its content
+                // updated while deduping re-transforms of the same module
+                // (watch mode / re-eval).
+                extracted.set(id, result.extracted);
 
                 logger.debug({
                     cssSize: result.extracted.css.length,

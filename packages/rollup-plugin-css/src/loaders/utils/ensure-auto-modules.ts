@@ -5,8 +5,11 @@ import type { AutoModules } from "../../types";
 // https://github.com/vitejs/vite/blob/37af8a7be417f1fb2cf9a0d5e9ad90b76ff211b4/packages/vite/src/node/plugins/css.ts#L185
 
 /** RegExp pattern to detect CSS module files by naming convention */
+// The `i` flag keeps module detection case-insensitive so files like
+// `Foo.MODULE.CSS` are recognized, consistent with the lowercased extension
+// matching in LoaderManager.test.
 // eslint-disable-next-line regexp/no-unused-capturing-group
-const MODULE_FILE_PATTERN = /\.module\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/;
+const MODULE_FILE_PATTERN = /\.module\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/i;
 
 /**
  * Determines if CSS modules should be enabled for a given file.

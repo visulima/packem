@@ -51,12 +51,25 @@ const concat = (extracted: Extracted[]): Promise<Concatenated> => {
 
             if (consumer) {
                 consumer.eachMapping((item) => {
-                    sm.addMapping({
+                    const mapping: Parameters<typeof sm.addMapping>[0] = {
                         generated: { column: item.generatedColumn, line: offset + item.generatedLine },
-                        name: item.name,
-                        original: { column: item.originalColumn as number, line: item.originalLine as number },
-                        source: item.source,
-                    });
+                    };
+
+                    // `eachMapping` yields generated-only segments whose original
+                    // position/source are null. source-map-js treats a present
+                    // `original` object as a full mapping and asserts that its
+                    // line/column are numbers and `source` is a string, so only
+                    // attach it when the original position is actually present.
+                    if (item.originalLine != null && item.originalColumn != null && item.source != null) {
+                        mapping.original = { column: item.originalColumn, line: item.originalLine };
+                        mapping.source = item.source;
+
+                        if (item.name != null) {
+                            mapping.name = item.name;
+                        }
+                    }
+
+                    sm.addMapping(mapping);
                 });
 
                 if (data.sourcesContent) {

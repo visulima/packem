@@ -1,7 +1,8 @@
 import type { CSSModuleExports } from "lightningcss";
-import { browserslistToTargets, transform } from "lightningcss";
+import { transform } from "lightningcss";
 
 import type { LightningCSSOptions } from "../types";
+import browserslistToTargets from "../utils/browserslist-targets";
 import { generateJsExports } from "../utils/generate-js-exports";
 import type { Loader } from "./types";
 import ensureAutoModules from "./utils/ensure-auto-modules";
