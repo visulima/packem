@@ -1,3 +1,17 @@
+## @visulima/css-style-inject [1.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.16...@visulima/css-style-inject@1.0.0-alpha.17) (2026-06-04)
+
+### Bug Fixes
+
+* **css-style-inject:** id dedup via getElementById, SSR dedup, robust head container + bench ([b0635ab](https://github.com/visulima/packem/commit/b0635ab393b76480e4db8e543266810bdcf86528))
+
+### Styles
+
+* clear eslint debt from the audit/types passes ([fd68951](https://github.com/visulima/packem/commit/fd68951681817078ae579dcad10963b1a07c1d27))
+
+### Code Refactoring
+
+* **css-style-inject:** tighten internal TypeScript types ([f64cccc](https://github.com/visulima/packem/commit/f64cccc2af5551dd303fd976baa58294f24df011))
+
 ## @visulima/css-style-inject [1.0.0-alpha.16](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.15...@visulima/css-style-inject@1.0.0-alpha.16) (2026-05-28)
 
 ### Features
