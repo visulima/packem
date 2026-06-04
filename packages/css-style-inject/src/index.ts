@@ -19,7 +19,7 @@ export const SSR_INJECT_ID = "__styleInject_SSR_MODULES";
  * @param css The CSS string to inject
  * @param options Configuration options
  * @param [options.id] Unique identifier for the style tag
- * @param [options.insertAt] Where to insert the style tag - number for index, 'first'/'last' for position, or object with 'before' selector
+ * @param [options.insertAt] Where to insert the style tag - number for index, 'first'/'last' for position, or object with 'before' selector. A negative number counts from the end and resolves to position `children.length + insertAt + 1`, so `-1` appends at the very end (after the last child) and `-2` inserts before the last child.
  * @param [options.singleTag] Whether to reuse a single style tag
  * @param [options.container] CSS selector for the container element
  * @param [options.attributes] Additional attributes to set on the style tag
@@ -42,13 +42,18 @@ export const cssStyleInject = (
     }
 
     if (typeof document === "undefined") {
-        globalThis[SSR_INJECT_ID] = globalThis[SSR_INJECT_ID] ?? [];
-        globalThis[SSR_INJECT_ID].push({ css, id: options.id });
+        const store = (globalThis[SSR_INJECT_ID] ??= []);
+
+        if (options.id && store.some((entry) => entry.id === options.id)) {
+            return;
+        }
+
+        store.push({ css, id: options.id });
 
         return;
     }
 
-    if (options.id && document.querySelector(`#${options.id}`)) {
+    if (options.id && document.getElementById(options.id)) {
         return;
     }
 
@@ -56,7 +61,11 @@ export const cssStyleInject = (
     const insertAt = options.insertAt ?? "last";
 
     const container
-        = typeof options.container === "string" ? (document.querySelector(options.container) as HTMLElement | undefined) : document.querySelectorAll("head")[0];
+        = typeof options.container === "string"
+            ? (document.querySelector(options.container) as HTMLElement | undefined)
+            // Prefer the native `document.head` (fast path in real browsers); fall back to
+            // a `head` lookup for environments/test doubles where `document.head` is absent.
+            : ((document.head ?? document.querySelectorAll("head")[0]) as HTMLElement | undefined);
 
     if (!container) {
         throw new Error("Unable to find container element");
@@ -73,7 +82,13 @@ export const cssStyleInject = (
         }
 
         if (options.attributes) {
+            // Reserved attributes are controlled by dedicated options (id, type, nonce)
+            // and must not be silently overridden by a user-supplied attributes map.
             Object.entries(options.attributes).forEach(([key, value]) => {
+                if (key === "id" || key === "type" || key === "nonce") {
+                    return;
+                }
+
                 styleTag.setAttribute(key, value);
             });
         }
@@ -91,7 +106,7 @@ export const cssStyleInject = (
             }
         } else if (typeof insertAt === "number") {
             // Insert at specific index
-            const children = [...container.children];
+            const { children } = container;
             const index = insertAt < 0 ? Math.max(0, children.length + insertAt + 1) : insertAt;
 
             if (index <= 0) {

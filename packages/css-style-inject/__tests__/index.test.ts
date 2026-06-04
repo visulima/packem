@@ -133,11 +133,11 @@ describe(cssStyleInject, () => {
 
             const id = "test-style";
 
-            mockDocument.querySelector.mockReturnValue(mockElement);
+            mockDocument.getElementById.mockReturnValue(mockElement);
 
             cssStyleInject("body { margin: 0; }", { id });
 
-            expect(mockDocument.querySelector).toHaveBeenCalledWith(`#${id}`);
+            expect(mockDocument.getElementById).toHaveBeenCalledWith(id);
             expect(mockDocument.createElement).not.toHaveBeenCalled();
         });
 
@@ -146,11 +146,11 @@ describe(cssStyleInject, () => {
 
             const id = "test-style";
 
-            mockDocument.querySelector.mockReturnValue(null);
+            mockDocument.getElementById.mockReturnValue(null);
 
             cssStyleInject("body { margin: 0; }", { id });
 
-            expect(mockDocument.querySelector).toHaveBeenCalledWith(`#${id}`);
+            expect(mockDocument.getElementById).toHaveBeenCalledWith(id);
             expect(mockDocument.createElement).toHaveBeenCalledWith("style");
         });
     });
@@ -437,10 +437,10 @@ describe(cssStyleInject, () => {
                 children: [{ before: vi.fn() }, { before: vi.fn() }],
             };
 
-            // Mock querySelector for container selection and ID check
-            mockDocument.querySelector
-                .mockReturnValueOnce(null) // First call for ID check returns null
-                .mockReturnValueOnce(customContainer); // Second call for container selection
+            // ID dedup uses getElementById (no existing element); querySelector is used
+            // only for the custom container selection.
+            mockDocument.getElementById.mockReturnValue(null);
+            mockDocument.querySelector.mockReturnValue(customContainer);
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }", options);
