@@ -1,3 +1,17 @@
+## @visulima/packem-share [1.0.0-alpha.49](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.48...@visulima/packem-share@1.0.0-alpha.49) (2026-06-04)
+
+### Bug Fixes
+
+* **packem-share:** correct memoize/svg-encoder/getPackageName and harden cache & regex utils ([520ca29](https://github.com/visulima/packem/commit/520ca29ac9349e6ff383fb3d11abdd0424badb60))
+
+### Styles
+
+* clear eslint debt from the audit/types passes ([fd68951](https://github.com/visulima/packem/commit/fd68951681817078ae579dcad10963b1a07c1d27))
+
+### Code Refactoring
+
+* **packem-share:** tighten internal TypeScript types ([3681702](https://github.com/visulima/packem/commit/3681702327e368b31db5ace7be5519071c6925c6))
+
 ## @visulima/packem-share [1.0.0-alpha.48](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.47...@visulima/packem-share@1.0.0-alpha.48) (2026-06-02)
 
 ### Features
