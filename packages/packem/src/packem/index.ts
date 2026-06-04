@@ -621,6 +621,14 @@ const generateOptions = (
         }
     }
 
+    // Preserve the resolved browserslist for per-group browser builds. Even when
+    // the global runtime is "node" (and `browserTargets` is cleared below), entry
+    // groups whose per-group runtime is "browser" must still see the intended
+    // browserslist targets (see prepareRollupConfig / resolveTransformerTarget).
+    if (options.resolvedBrowserTargets === undefined) {
+        options.resolvedBrowserTargets = options.browserTargets ?? [];
+    }
+
     if (options.runtime === "node") {
         options.browserTargets = [];
     }

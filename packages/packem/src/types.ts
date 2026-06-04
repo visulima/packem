@@ -132,6 +132,13 @@ export interface BuildOptions {
     analyze?: boolean;
     /** Browser targets for transpilation (e.g., ['chrome 58', 'firefox 57']) */
     browserTargets?: string[];
+    /**
+     * The resolved browserslist result, preserved even when the global runtime
+     * is "node" (where `browserTargets` is cleared). Per-group browser builds use
+     * this so that browser-runtime entries in an otherwise node package keep their
+     * intended browserslist targets.
+     */
+    resolvedBrowserTargets?: string[];
     /** Custom builder functions for different build types */
     builder?: Record<string, (context: BuildContext<BuildOptions>, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
 

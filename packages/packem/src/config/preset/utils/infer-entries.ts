@@ -592,6 +592,11 @@ const inferEntries = async (
     // Clear directory cache to ensure fresh results for each test run
     directoryCache.clear();
 
+    // Reset the private-subfolder warning latch per call so that, in a long-lived
+    // process building multiple packages (monorepo orchestration, watch mode),
+    // every package can emit the debug message instead of only the first one.
+    privateSubfolderWarningShown = false;
+
     const warnings: string[] = [];
 
     // Sort files so least-nested files are first
@@ -866,7 +871,7 @@ const inferEntries = async (
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if ((output.file.includes("/*") || outputSlug.includes("*")) && output.key === "exports") {
             if (!privateSubfolderWarningShown) {
-                (context.logger as InferEntriesLogger).debug("Private subfolders are not supported, if you need this feature please open an issue on GitHub.");
+                (context.logger as InferEntriesLogger | undefined)?.debug("Private subfolders are not supported, if you need this feature please open an issue on GitHub.");
 
                 privateSubfolderWarningShown = true;
             }

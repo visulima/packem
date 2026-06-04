@@ -141,19 +141,25 @@ const buildDeclarationTypesLine = (
 
     let foundCompatibleDts: SizeEntry | undefined;
 
+    // A compatible variant is only expected when the resolved dtsPath is a
+    // variant extension (.d.cts/.d.mts). For a plain `.d.ts` path no variant
+    // search runs, so fall through to the single-file types line below using
+    // the declaration we already found rather than discarding it.
     if (!dtsPath.includes(".d.ts")) {
         dtsPath = dtsPath.replace(DTS_VARIANT_EXTENSION_REGEX, `.d.ts`);
 
         foundCompatibleDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
+
+        if (!foundCompatibleDts) {
+            return "";
+        }
     }
 
-    if (!foundCompatibleDts) {
-        return "";
+    if (foundCompatibleDts) {
+        foundDtsEntries.push(foundCompatibleDts.path);
     }
 
-    foundDtsEntries.push(foundCompatibleDts.path);
-
-    if (type === "commonjs") {
+    if (type === "commonjs" && foundCompatibleDts) {
         return `\n  types:\n${[foundDts, foundCompatibleDts]
             .map(
                 (value: SizeEntry) =>
@@ -839,8 +845,19 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     logger.success(green(context.options.name ? `Build succeeded for ${context.options.name}` : "Build succeeded"));
 
-    // Remove duplicated build entries
-    context.buildEntries = context.buildEntries.filter((entry, index, self) => self.findIndex((bEntry) => bEntry.path === entry.path) === index);
+    // Remove duplicated build entries (keep first occurrence). A Set on the
+    // path keeps this linear instead of the previous O(n^2) findIndex-in-filter.
+    const seenBuildEntryPaths = new Set<string>();
+
+    context.buildEntries = context.buildEntries.filter((entry) => {
+        if (seenBuildEntryPaths.has(entry.path)) {
+            return false;
+        }
+
+        seenBuildEntryPaths.add(entry.path);
+
+        return true;
+    });
 
     // Walk dist, then compute size metrics in parallel. The previous shape ran
     // stat → brotli → gzip serially per file (brotli at quality 11 alone was

@@ -295,7 +295,12 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                         sourceMap: context.options.sourcemap,
                         ...context.options.rollup.css,
                     },
-                    context.options.browserTargets ?? [],
+                    // For per-group browser builds the global `browserTargets` may
+                    // have been cleared (when the global runtime is node), so fall
+                    // back to the preserved `resolvedBrowserTargets`.
+                    context.options.runtime === "browser" && (!context.options.browserTargets || context.options.browserTargets.length === 0)
+                        ? context.options.resolvedBrowserTargets ?? []
+                        : context.options.browserTargets ?? [],
                     context.options.rootDir,
                     context.options.sourceDir,
                     context.environment,

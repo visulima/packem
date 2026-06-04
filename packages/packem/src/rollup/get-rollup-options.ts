@@ -175,6 +175,11 @@ export const resolveNodeTarget = (context: BuildContext<InternalBuildOptions>): 
 };
 
 const resolveTransformerTarget = (context: BuildContext<InternalBuildOptions>, currentTarget: string | string[] | undefined, nodeTarget: string): string[] => {
+    // For per-group browser builds the global `browserTargets` may have been
+    // cleared (when the global runtime is node), so prefer the preserved
+    // `resolvedBrowserTargets`, falling back to `browserTargets`.
+    const browserTargets = context.options.browserTargets && context.options.browserTargets.length > 0 ? context.options.browserTargets : context.options.resolvedBrowserTargets ?? context.options.browserTargets ?? [];
+
     if (currentTarget) {
         const targets = arrayify(currentTarget);
 
@@ -183,13 +188,13 @@ const resolveTransformerTarget = (context: BuildContext<InternalBuildOptions>, c
         }
 
         if (context.options.runtime === "browser") {
-            return [...new Set([...browserslistToEsbuild(context.options.browserTargets ?? []), ...targets])];
+            return [...new Set([...browserslistToEsbuild(browserTargets), ...targets])];
         }
 
         return targets;
     }
 
-    return context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
+    return context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(browserTargets);
 };
 
 const getEsbuildTransformerConfig = (context: BuildContext<InternalBuildOptions>, nodeTarget: string): EsbuildPluginConfig => {
@@ -197,31 +202,37 @@ const getEsbuildTransformerConfig = (context: BuildContext<InternalBuildOptions>
         throw new Error("No esbuild options found in your configuration.");
     }
 
-    if (context.tsconfig?.config.compilerOptions?.target?.toLowerCase() === "es3") {
+    // Treat the shared transformer config as read-only input: the JS build
+    // groups run concurrently and share the same `context.options.rollup.esbuild`
+    // reference, so mutating it in place lets one group clobber another's
+    // resolved target/keepNames. Compute the resolved values into locals and
+    // merge them into a fresh returned object instead.
+    const isEs3 = context.tsconfig?.config.compilerOptions?.target?.toLowerCase() === "es3";
+
+    if (isEs3) {
         getLogger(context).warn(
             [
                 "ES3 target is not supported by esbuild, so ES5 will be used instead..",
                 "Please set 'target' option in tsconfig to at least ES5 to disable this error",
             ].join(" "),
         );
-
-        context.tsconfig.config.compilerOptions.target = "es5";
-        context.options.rollup.esbuild.target = "es5";
     }
 
     // Add targets to esbuild target
-    context.options.rollup.esbuild.target = resolveTransformerTarget(context, context.options.rollup.esbuild.target, nodeTarget);
+    const resolvedTarget = isEs3 ? "es5" : resolveTransformerTarget(context, context.options.rollup.esbuild.target, nodeTarget);
+
+    let resolvedKeepNames = context.options.rollup.esbuild.keepNames;
 
     // keepNames is not needed when minify is disabled.
     // Also transforming multiple times with keepNames enabled breaks tree-shaking.
     if (!context.options.minify) {
-        context.options.rollup.esbuild.keepNames = false;
+        resolvedKeepNames = false;
 
         getLogger(context).debug("Disabling keepNames because minify is disabled");
     }
 
-    if (context.tsconfig?.config.compilerOptions?.target === "es5") {
-        context.options.rollup.esbuild.keepNames = false;
+    if (isEs3 || context.tsconfig?.config.compilerOptions?.target === "es5") {
+        resolvedKeepNames = false;
 
         getLogger(context).debug("Disabling keepNames because target is set to es5");
     }
@@ -245,6 +256,9 @@ const getEsbuildTransformerConfig = (context: BuildContext<InternalBuildOptions>
         minifyWhitespace: context.options.minify,
         sourceMap: context.options.sourcemap,
         ...context.options.rollup.esbuild,
+        // Resolved values override the spread input without mutating the shared object.
+        keepNames: resolvedKeepNames,
+        target: resolvedTarget,
     } satisfies EsbuildPluginConfig;
 };
 

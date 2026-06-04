@@ -31,9 +31,13 @@ export const collectBuildEntries = (
 ): void => {
     const outputChunks = output.filter((item) => item.type === "chunk" && item.isEntry);
 
+    // Hoist entry-chunk fileNames into a Set once so the per-import membership
+    // test below is O(1) instead of an O(chunks) `.some()` scan per import.
+    const entryChunkNames = new Set(outputChunks.map((c) => c.fileName));
+
     for (const entry of outputChunks) {
         context.buildEntries.push({
-            chunks: (entry.imports ?? []).filter((id) => outputChunks.some((c) => c.fileName === id)),
+            chunks: (entry.imports ?? []).filter((id) => entryChunkNames.has(id)),
             dynamicImports: entry.dynamicImports ?? [],
             exports: entry.exports ?? [],
             modules: Object.entries(entry.modules ?? {}).map(([id, module_]) => {

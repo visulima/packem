@@ -170,7 +170,9 @@ const prepareUnbundleEntries = (context: BuildContext<InternalBuildOptions>): vo
 
     for (const file of codeFiles) {
         const relativePath = file.replace(`${sourceDirectory}/`, "");
-        const name = relativePath.replace(ALLOWED_TRANSFORM_EXTENSIONS_REGEX, "").replaceAll("/", "/");
+        // Normalize Windows backslashes to forward slashes (the prior
+        // `replaceAll("/", "/")` was a no-op).
+        const name = relativePath.replace(ALLOWED_TRANSFORM_EXTENSIONS_REGEX, "").replaceAll("\\", "/");
 
         context.options.entries.push({
             cjs: emitCJS,

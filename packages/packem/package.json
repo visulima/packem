@@ -182,6 +182,7 @@
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
         "lint:types": "tsc --noEmit",
         "test": "vitest run --cache",
+        "test:bench": "vitest bench --run",
         "test:bundlers": "pnpm run test:rollup && pnpm run test:rolldown",
         "test:coverage": "vitest run --cache --coverage",
         "test:rolldown": "cross-env PACKEM_TEST_BUNDLER=rolldown vitest run --cache __tests__/intigration",
