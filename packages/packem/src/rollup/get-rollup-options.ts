@@ -129,7 +129,10 @@ export const createChunkFileNames = (getExtension: () => string, usePreserveModu
  * @returns entryFileNames function for Rollup
  */
 // eslint-disable-next-line import/exports-last -- consumed by the shared bundler builder
-export const createEntryFileNames = (getExtension: (chunk: PreRenderedChunk) => string, usePreserveModules: boolean) => {
+export const createEntryFileNames = (
+    getExtension: (chunk: PreRenderedChunk) => string,
+    usePreserveModules: boolean,
+): ((chunkInfo: PreRenderedChunk) => string | undefined) => {
     if (usePreserveModules) {
         return (chunkInfo: PreRenderedChunk): string | undefined => {
             const { name } = chunkInfo;
