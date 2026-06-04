@@ -79,7 +79,9 @@ const getOriginalPackageName = (typePackageName: string): string => {
         const parts = typePackageName.split("/");
 
         if (parts[1] === "types") {
-            return `@${parts[0] ?? ""}/${parts.slice(2).join("/")}`;
+            // parts[0] already includes the leading "@" (e.g. "@foo"), so reuse it
+            // directly instead of re-prefixing with "@" (which produced "@@foo/bar").
+            return `${parts[0] ?? ""}/${parts.slice(2).join("/")}`;
         }
     }
 
@@ -134,6 +136,16 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     }
 
     const devDeps = new Set<string>(Object.keys(pkg.devDependencies ?? {}));
+
+    // Precompute the declared-dependency name sets once. These maps are static for
+    // the build, so the per-import-edge `declared` check in `options.external` can do
+    // O(1) Set lookups instead of rebuilding Object.keys(...).includes four times per edge.
+    const declaredDependencies = new Set<string>([
+        ...Object.keys(pkg.dependencies ?? {}),
+        ...Object.keys(pkg.devDependencies ?? {}),
+        ...Object.keys(pkg.peerDependencies ?? {}),
+        ...Object.keys(pkg.optionalDependencies ?? {}),
+    ]);
 
     const resolvedExternalsOptions = context.options.rollup.resolveExternals ?? {};
 
@@ -200,8 +212,14 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
         }
     }
 
-    const isIncluded = (id: string) => [...include].some((rx) => rx.test(id));
-    const isExcluded = (id: string) => [...exclude].some((rx) => rx.test(id));
+    // include/exclude are fully built above and never mutated afterward, so snapshot
+    // them to arrays once instead of spreading the Set on every isIncluded/isExcluded
+    // call (these run on the per-import-edge hot path inside `options.external`).
+    const includePatterns = [...include];
+    const excludePatterns = [...exclude];
+
+    const isIncluded = (id: string) => includePatterns.some((rx) => rx.test(id));
+    const isExcluded = (id: string) => excludePatterns.some((rx) => rx.test(id));
 
     let tsconfigPathPatterns: RegExp[] = [];
 
@@ -238,8 +256,14 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
         options: (rollupOptions: InputOptions) => {
             // eslint-disable-next-line no-param-reassign, sonarjs/cognitive-complexity
             rollupOptions.external = (rawOriginalId: string, rawImporter: string | undefined) => {
-                if (cacheResolved.has(rawOriginalId)) {
-                    return cacheResolved.get(rawOriginalId);
+                // The node-builtin branch (when `resolvedExternalsOptions.builtins` is
+                // undefined) computes its result from the importer, not just the specifier.
+                // Key the cache on both so the first importer of e.g. `fs` cannot poison the
+                // decision for a later importer that is in/out of the include set.
+                const cacheKey = `${rawOriginalId}::${rawImporter ?? ""}`;
+
+                if (cacheResolved.has(cacheKey)) {
+                    return cacheResolved.get(cacheKey);
                 }
 
                 const originalId = toPath(rawOriginalId);
@@ -274,11 +298,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     context.usedDependencies.add(packageName);
 
                     const importerFromSource = !importer || !isFromNodeModules(importer, context.options.rootDir);
-                    const declared
-                        = Object.keys(pkg.dependencies ?? {}).includes(packageName)
-                            || Object.keys(pkg.devDependencies ?? {}).includes(packageName)
-                            || Object.keys(pkg.peerDependencies ?? {}).includes(packageName)
-                            || Object.keys(pkg.optionalDependencies ?? {}).includes(packageName);
+                    const declared = declaredDependencies.has(packageName);
 
                     if (
                         importerFromSource
@@ -292,7 +312,11 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     }
                 }
 
-                for (const candidate of [originalId, resolvedId].filter(Boolean)) {
+                // `resolvedId` is usually undefined, so iterate the candidates without
+                // allocating a fresh `[originalId, resolvedId].filter(Boolean)` array per edge.
+                const candidates = resolvedId ? [originalId, resolvedId] : [originalId];
+
+                for (const candidate of candidates) {
                     // Self-import: `pkg.name` exactly or `pkg.name/subpath`. A loose
                     // `startsWith(pkg.name)` match would incorrectly treat sibling workspace
                     // packages sharing the same scope+prefix (e.g. `@visulima/packem-rollup`
@@ -301,7 +325,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     const isSelfImport = pkg.name ? candidate === pkg.name || candidate.startsWith(`${pkg.name}/`) : false;
 
                     if (RELATIVE_OR_NULL_RE.test(candidate) || isAbsolute(candidate) || (sourceDirectoryPattern?.test(candidate) ?? false) || isSelfImport) {
-                        cacheResolved.set(rawOriginalId, false);
+                        cacheResolved.set(cacheKey, false);
 
                         return false;
                     }
@@ -313,14 +337,14 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                             result = isIncluded(importer) && !isExcluded(importer);
                         }
 
-                        cacheResolved.set(rawOriginalId, result as boolean);
+                        cacheResolved.set(cacheKey, result as boolean);
 
                         return result;
                     }
 
                     if (candidate[0] === "#" && !candidate.startsWith("#/")) {
                         // `#` imports are handled by the resolveId hook — never external here.
-                        cacheResolved.set(rawOriginalId, false);
+                        cacheResolved.set(cacheKey, false);
 
                         return false;
                     }
@@ -333,13 +357,13 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     // externalization, letting rollup load the peer's source through the
                     // commonjs plugin and into esbuild, which blows up on vite 8's chunks.
                     if (isIncluded(candidate) && !isExcluded(candidate)) {
-                        cacheResolved.set(rawOriginalId, true);
+                        cacheResolved.set(cacheKey, true);
 
                         return true;
                     }
 
                     if (tsconfigPathPatterns.some((rx) => rx.test(candidate))) {
-                        cacheResolved.set(rawOriginalId, false);
+                        cacheResolved.set(cacheKey, false);
 
                         return false;
                     }
@@ -347,7 +371,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     if (packageName && shouldResolveForDts(packageName)) {
                         // dtsResolve wants this package's types inlined; let rollup / DTS plugin
                         // resolve it. Tracking already happened above.
-                        cacheResolved.set(rawOriginalId, false);
+                        cacheResolved.set(cacheKey, false);
 
                         return false;
                     }
@@ -357,7 +381,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
 
                 logExternalMessage(originalId, context.logger);
 
-                cacheResolved.set(rawOriginalId, false);
+                cacheResolved.set(cacheKey, false);
 
                 return false;
             };

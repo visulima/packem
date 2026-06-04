@@ -9,6 +9,15 @@ import { dirname, join, relative, resolve } from "@visulima/path";
 import MagicString from "magic-string";
 import type { Plugin, TransformResult } from "rollup";
 
+// Matches `from '...'` / `from "..."` / `from `...`` import/export sources.
+// Hoisted to module scope so it isn't recompiled per module; `lastIndex` is reset
+// before each use since it carries the global flag.
+const FROM_REGEX = /\bfrom\s+['"`]([^'"`]+)['"`]/g;
+
+// Modules excluded by the transform hook's id filter.
+const NODE_MODULES_RE = /[/\\]node_modules[/\\]/;
+const VIRTUAL_MODULE_RE = /^\0/;
+
 /**
  * Try to resolve a file with implicit extensions (.js, .json)
  * or as a directory (index.js, package.json main field).
@@ -118,20 +127,30 @@ const resolveImplicitExternalsPlugin = <T = unknown>(context: BuildContext<T>): 
 
     return {
         name: "packem:resolve-implicit-externals",
-        async transform(code: string, id: string): Promise<TransformResult> {
+        transform: {
+            // Skip virtual (`\0`) and node_modules modules natively so the hook is
+            // never invoked for them.
+            filter: {
+                id: {
+                    exclude: [VIRTUAL_MODULE_RE, NODE_MODULES_RE],
+                },
+            },
+            // eslint-disable-next-line sonarjs/cognitive-complexity
+            async handler(code: string, id: string): Promise<TransformResult> {
             // Only process source files (not node_modules or virtual modules)
             if (id.includes("/node_modules/") || id.startsWith("\0")) {
                 return undefined;
             }
 
             // Find all import/export statements with bare specifiers
-            const fromRegex = /\bfrom\s+['"`]([^'"`]+)['"`]/g;
             const matches: { importId: string; quoteEnd: number; quoteStart: number }[] = [];
 
             let regexMatch;
 
+            FROM_REGEX.lastIndex = 0;
+
             // eslint-disable-next-line no-cond-assign
-            while ((regexMatch = fromRegex.exec(code)) !== null) {
+            while ((regexMatch = FROM_REGEX.exec(code)) !== null) {
                 const importId = regexMatch[1];
 
                 if (!importId || !isBareSpecifier(importId)) {
@@ -245,6 +264,7 @@ const resolveImplicitExternalsPlugin = <T = unknown>(context: BuildContext<T>): 
                 code: magicString.toString(),
                 map: magicString.generateMap({ hires: true }),
             };
+            },
         },
     };
 };

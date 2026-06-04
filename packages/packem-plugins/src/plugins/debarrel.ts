@@ -220,13 +220,22 @@ const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], co
     return { imp, localExportName } as { imp: ImportSpecifier | undefined; localExportName?: string };
 };
 
+// exportNames are JS identifiers, so the compiled `… as <name>` matcher is stable —
+// cache it per exportName to avoid recompiling the RegExp on every barrel resolution.
+const aliasedImportRegexCache = new Map<string, RegExp>();
+
 const findAliasedImportName = (specifiers: string, exportName: string): string | undefined => {
     if (getDeclarationKind(specifiers) !== "import" || !AS_KEYWORD_RE.test(specifiers)) {
         return undefined;
     }
 
     // Ensure we only match full identifier aliases, not prefixes
-    const regex = new RegExp(String.raw`(\w+)\s+as\s+${exportName}(?!\w)`);
+    let regex = aliasedImportRegexCache.get(exportName);
+
+    if (!regex) {
+        regex = new RegExp(String.raw`(\w+)\s+as\s+${exportName}(?!\w)`);
+        aliasedImportRegexCache.set(exportName, regex);
+    }
 
     return regex.exec(specifiers)?.[0];
 };

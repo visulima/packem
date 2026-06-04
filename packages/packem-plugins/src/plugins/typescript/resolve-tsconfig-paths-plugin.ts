@@ -74,18 +74,23 @@ const findBestPatternMatch = <T>(values: ReadonlyArray<T>, getPattern: (value: T
     return matchedValue;
 };
 
+interface ParsedPathPatterns {
+    /** Exact (asterisk-free) pattern strings, kept for fast exact-match lookup. */
+    exact: Set<string>;
+    /** Parsed wildcard patterns. */
+    patterns: Pattern[];
+}
+
 /**
- * Returns an exact-match pattern string or the best matching `Pattern`.
+ * Parse and validate the tsconfig `paths` keys once.
  *
- * `patternStrings` contains both pattern strings (containing "*") and regular strings.
- * Returns an exact match if possible, or a pattern match, or undefined.
- *
- * These are verified by verifyCompilerOptions to have 0 or 1 "*" characters.
- * @see https://github.com/microsoft/TypeScript/blob/main/src/compiler/program.ts#L4332-L4365
+ * `pathsKeys` and their parsed `{prefix,suffix}` forms are invariant for the plugin
+ * lifetime, so the parse/validate work is hoisted here instead of being redone on
+ * every resolveId call.
  */
-// eslint-disable-next-line sonarjs/function-return-type
-const matchPatternOrExact = (patternStrings: ReadonlyArray<string>, candidate: string): Pattern | string | undefined => {
+const parsePathPatterns = (patternStrings: ReadonlyArray<string>): ParsedPathPatterns => {
     const patterns: Pattern[] = [];
+    const exact = new Set<string>();
 
     for (const patternString of patternStrings) {
         if (!hasZeroOrOneAsteriskCharacter(patternString)) {
@@ -96,13 +101,30 @@ const matchPatternOrExact = (patternStrings: ReadonlyArray<string>, candidate: s
 
         if (pattern) {
             patterns.push(pattern);
-        } else if (patternString === candidate) {
-            // pattern was matched as is - no need to search further
-            return patternString;
+        } else {
+            exact.add(patternString);
         }
     }
 
-    return findBestPatternMatch(patterns, (_) => _, candidate);
+    return { exact, patterns };
+};
+
+/**
+ * Returns an exact-match pattern string or the best matching `Pattern`.
+ *
+ * Returns an exact match if possible, or a pattern match, or undefined.
+ *
+ * These are verified by verifyCompilerOptions to have 0 or 1 "*" characters.
+ * @see https://github.com/microsoft/TypeScript/blob/main/src/compiler/program.ts#L4332-L4365
+ */
+// eslint-disable-next-line sonarjs/function-return-type
+const matchPatternOrExact = (parsed: ParsedPathPatterns, candidate: string): Pattern | string | undefined => {
+    if (parsed.exact.has(candidate)) {
+        // pattern was matched as is - no need to search further
+        return candidate;
+    }
+
+    return findBestPatternMatch(parsed.patterns, (_) => _, candidate);
 };
 
 /**
@@ -173,6 +195,10 @@ export const resolveTsconfigPathsPlugin = (
     const { paths, resolvedBaseUrl } = getTsconfigPaths(rootDirectory, tsconfig, logger);
     const pathsKeys = Object.keys(paths);
 
+    // Parse/validate the `paths` keys once for the plugin lifetime instead of on
+    // every resolveId call.
+    const parsedPathPatterns = parsePathPatterns(pathsKeys);
+
     return {
         name: "plugin:resolve-tsconfig-paths",
         resolveId: {
@@ -228,7 +254,7 @@ export const resolveTsconfigPathsPlugin = (
                 }
 
                 // If the module name does not match any of the patterns in `paths` we hand off resolving to webpack
-                const matchedPattern = matchPatternOrExact(pathsKeys, id);
+                const matchedPattern = matchPatternOrExact(parsedPathPatterns, id);
 
                 if (!matchedPattern) {
                     logger.debug({

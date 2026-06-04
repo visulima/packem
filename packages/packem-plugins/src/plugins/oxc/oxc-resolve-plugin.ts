@@ -7,20 +7,23 @@ import type { Plugin } from "rollup";
 
 import type { OXCResolveOptions } from "./types";
 
-let cachedResolver: ResolverFactory | undefined;
-
-const packageJsonCache: FindPackageJsonCache = new Map();
-
 const oxcResolvePlugin = (options: OXCResolveOptions, rootDirectory: string, logger: Console, tsconfigPath?: string): Plugin => {
     const { ignoreSideEffectsForRoot, ...userOptions } = options;
 
-    cachedResolver ??= new ResolverFactory({
+    // Per-plugin-instance state. packem builds multiple environments / formats /
+    // presets (ESM+CJS, server/client, DTS pass) in a single process, each calling
+    // this factory with its own rootDirectory / tsconfigPath / conditionNames.
+    // A module-scoped resolver (constructed once via `??=`) would capture the FIRST
+    // build's options and silently resolve every later build against the wrong
+    // configuration; a shared package.json cache would likewise leak sideEffects
+    // decisions across builds. Keep both scoped to the plugin instance.
+    const packageJsonCache: FindPackageJsonCache = new Map();
+
+    const resolver = new ResolverFactory({
         ...userOptions,
         roots: [...userOptions.roots ?? [], rootDirectory],
         tsconfig: tsconfigPath ? { configFile: tsconfigPath, references: "auto" } : undefined,
     });
-
-    const resolver = cachedResolver;
 
     return <Plugin>{
         name: "oxc-resolve",

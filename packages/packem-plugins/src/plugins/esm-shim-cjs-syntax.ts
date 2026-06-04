@@ -124,7 +124,12 @@ const esmShimCjsSyntaxPlugin = (packageJson: PackageJson, options: EsmShimCjsSyn
                 if (packageJson.engines?.node) {
                     const minNodeVersion = minVersion(packageJson.engines.node);
 
-                    if (minNodeVersion && minNodeVersion.major >= 20 && minNodeVersion.minor >= 11) {
+                    // `import.meta.dirname` / `import.meta.filename` are available since
+                    // Node 20.11, so any 20.11+ release — including 21.x and 22.x whose
+                    // minor happens to be < 11 — supports the modern shim. Compare the
+                    // full version instead of AND-ing the minor check independently of
+                    // the major (which wrongly excluded e.g. `>=21` and `>=22`).
+                    if (minNodeVersion && (minNodeVersion.major > 20 || (minNodeVersion.major === 20 && minNodeVersion.minor >= 11))) {
                         shim = generateCJSShimNode20_11;
                     }
                 }

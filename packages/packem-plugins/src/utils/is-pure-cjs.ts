@@ -1,11 +1,16 @@
 import { createRequire } from "node:module";
 
 import { readFile } from "@visulima/fs";
+import type { FindPackageJsonCache } from "@visulima/package";
 import { findPackageJson } from "@visulima/package/package-json";
 import { init, parse } from "cjs-module-lexer";
 import type { ResolvedId } from "rollup";
 
 let initted = false;
+
+// Shared package.json cache so the require-cjs-transformer renderChunk pass doesn't
+// re-walk and re-read package.json for every module classification.
+const packageJsonCache: FindPackageJsonCache = new Map();
 
 /**
  * Determines if a module is a pure CommonJS module by checking various indicators.
@@ -63,7 +68,7 @@ export const isPureCJS = async (
         // If we have a resolved path, check it
         if (resolvedPath) {
             try {
-                const { packageJson } = await findPackageJson(resolvedPath);
+                const { packageJson } = await findPackageJson(resolvedPath, { cache: packageJsonCache });
 
                 if (packageJson.type === "module") {
                     return false;
