@@ -1,3 +1,26 @@
+## @visulima/packem [2.0.0-alpha.85](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.84...@visulima/packem@2.0.0-alpha.85) (2026-06-04)
+
+### Bug Fixes
+
+* **packem:** browser-runtime targets, shared esbuild config isolation, entry-collection perf + bench ([2e2d2da](https://github.com/visulima/packem/commit/2e2d2da705e270ec5a94fc7f26d8a1268fe6cc39))
+* **packem:** default esbuild keepNames to false ([#207](https://github.com/visulima/packem/issues/207)) ([ceab5c5](https://github.com/visulima/packem/commit/ceab5c521a18eed10f9137d59826f9eb6e6f178e))
+
+### Performance Improvements
+
+* **packem:** prune orphan shared declaration chunk variants in dts output ([ef823a9](https://github.com/visulima/packem/commit/ef823a9f4ef78867afc6706141a12a2bbf637474))
+
+### Styles
+
+* clear eslint debt from the audit/types passes ([fd68951](https://github.com/visulima/packem/commit/fd68951681817078ae579dcad10963b1a07c1d27))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.49
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.52
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.33
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.72
+
 ## @visulima/packem [2.0.0-alpha.84](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.83...@visulima/packem@2.0.0-alpha.84) (2026-06-03)
 
 ### Bug Fixes
