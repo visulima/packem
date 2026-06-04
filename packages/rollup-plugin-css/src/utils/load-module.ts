@@ -46,7 +46,7 @@ const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): 
         symlinks: false,
     };
 
-    const require = createRequire(import.meta.url) as unknown as Require;
+    const require: Require = createRequire(import.meta.url);
 
     try {
         const resolvedPath = resolve([moduleId, `./${moduleId}`], options);

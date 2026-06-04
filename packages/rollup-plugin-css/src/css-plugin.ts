@@ -131,8 +131,8 @@ const cssPlugin = (
      * @param getModuleInfo Rollup's module info getter function
      * @returns Array of CSS file IDs that belong to this chunk
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, sonarjs/cognitive-complexity
-    const traverseImportedModules = (chunkModules: Record<string, any>, getModuleInfo: GetModuleInfo): string[] => {
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+    const traverseImportedModules = (chunkModules: Record<string, unknown>, getModuleInfo: GetModuleInfo): string[] => {
         const ids: string[] = [];
 
         for (const module of Object.keys(chunkModules)) {
@@ -419,8 +419,7 @@ const cssPlugin = (
                     })(
                         extractedData,
                         sourceMap,
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (options[options.minifier.name as keyof StyleOptions] as Record<string, any> | undefined) ?? {},
+                        (options[options.minifier.name as keyof StyleOptions] as Record<string, unknown> | undefined) ?? {},
                     );
 
                     extractedData.css = minifiedCss;
