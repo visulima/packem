@@ -6,6 +6,10 @@
 const svgEncoder = (buffer: Buffer): string => {
     let svgString = buffer.toString("utf8");
 
+    // Strip real XML/HTML comments so they are not carried into the inlined,
+    // base64-encoded asset (mirrors the sibling `stripSvgComments` util).
+    svgString = svgString.replaceAll(/<!--[\s\S]*?-->/g, "");
+    // Also strip the literal `//gs` marker some tooling leaves in SVG sources.
     svgString = svgString.replaceAll("//gs", "");
     // Safe regex that matches only the exact 'class' attribute without backtracking
     // Uses word boundaries and explicit character sets to avoid ReDoS

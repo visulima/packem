@@ -40,15 +40,38 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
             return typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey;
         }
 
+        // Fast path for the common case (resolveId/transform helpers keyed by a
+        // string/number id): build the key from primitive args directly,
+        // avoiding the cost of safe-stable-stringify. Each value is prefixed
+        // with its type so distinct shapes (e.g. "1" vs 1) never collide, and
+        // values are joined with a NUL separator that cannot appear in a normal
+        // module id. The arity prefix disambiguates differing argument counts.
+        const separator = String.fromCharCode(0);
+
+        let allPrimitive = true;
+
+        for (const argument of arguments_) {
+            const type = typeof argument;
+
+            if (type !== "string" && type !== "number" && type !== "boolean" && argument !== undefined && argument !== null) {
+                allPrimitive = false;
+
+                break;
+            }
+        }
+
+        if (allPrimitive) {
+            return `${arguments_.length}${separator}${arguments_.map((argument) => `${typeof argument}:${String(argument)}`).join(separator)}`;
+        }
+
         return stringify({ args: arguments_ }) ?? JSON.stringify(arguments_);
     };
 
     const memoized = ((...arguments_: Parameters<T>) => {
         const key = resolveKey(arguments_);
-        const existing = cache.get(key);
 
-        if (existing !== undefined) {
-            return existing;
+        if (cache.has(key)) {
+            return cache.get(key) as ReturnType<T>;
         }
 
         const result = function_(...arguments_) as ReturnType<T>;

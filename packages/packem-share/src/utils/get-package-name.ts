@@ -6,7 +6,13 @@
 const getPackageName = (id = ""): string => {
     const s = id.split("/");
 
-    return ((s[0] as string).startsWith("@") ? `${s[0] as string}/${s[1] as string}` : s[0]) as string;
+    if ((s[0] as string).startsWith("@")) {
+        // A bare scoped specifier with no subpath (e.g. "@scope") has no second
+        // segment; return the scope as-is rather than producing "@scope/undefined".
+        return s[1] === undefined ? (s[0] as string) : `${s[0] as string}/${s[1]}`;
+    }
+
+    return s[0] as string;
 };
 
 export default getPackageName;

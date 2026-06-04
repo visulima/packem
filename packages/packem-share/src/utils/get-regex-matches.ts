@@ -5,7 +5,11 @@
  * @returns An array of all matched strings, filtered to remove empty matches
  */
 const getRegexMatches = (regex: RegExp, source: string): string[] => {
-    const internalRegex = regex;
+    // A non-global regex never advances `lastIndex`, so the loop below would
+    // restart at index 0 forever. Use a global-flagged clone in that case.
+    // Cloning also keeps the function side-effect free (the caller's regex
+    // `lastIndex` is never mutated).
+    const internalRegex = new RegExp(regex.source, regex.flags.includes("g") ? regex.flags : `${regex.flags}g`);
     const matches: string[] = [];
 
     let regexMatches;

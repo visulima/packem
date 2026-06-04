@@ -47,6 +47,12 @@ class FileCache {
     // avoids redoing that call (and its Windows `\\?\` prefixing) per cache access.
     readonly #namespacedCwd: string;
 
+    // The plain `cwd`. The module ids handed to the cache are usually NOT
+    // namespaced, so on Windows the `\\?\`-prefixed `#namespacedCwd` would never
+    // match; stripping the plain form too keeps cache keys consistent across
+    // platforms. On POSIX `toNamespacedPath` is the identity, so both are equal.
+    readonly #cwd: string;
+
     readonly #cachePath: string | undefined;
 
     readonly #hashKey: string;
@@ -71,6 +77,7 @@ class FileCache {
      */
     public constructor(cwd: string, cachePath: string | undefined, hashKey: string, logger: RollupLogger) {
         this.#namespacedCwd = toNamespacedPath(cwd);
+        this.#cwd = cwd;
         this.#hashKey = hashKey;
 
         if (cachePath === undefined) {
@@ -270,7 +277,14 @@ class FileCache {
      * @returns The complete file path for the cache entry
      */
     private getFilePath(name: string, subDirectory?: string): string {
+        // Strip both the namespaced and plain `cwd`: incoming ids are usually
+        // not namespaced, so on Windows only the plain form matches, while a
+        // namespaced id (if one is ever passed) is handled by the first replace.
         let optimizedName = name.replaceAll(this.#namespacedCwd, "");
+
+        if (this.#cwd !== this.#namespacedCwd) {
+            optimizedName = optimizedName.replaceAll(this.#cwd, "");
+        }
 
         optimizedName = optimizedName.replaceAll(":", "-");
 

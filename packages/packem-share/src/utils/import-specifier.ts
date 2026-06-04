@@ -21,14 +21,20 @@ export const parseSpecifier = (specifier: string): [packageName: string, subpath
         const secondSlash = specifier.indexOf("/", firstSlash + 1);
 
         if (secondSlash === -1) {
-            return [specifier, undefined];
+            // A trailing slash (e.g. "@org/") leaves the slash in the name; trim
+            // it so the package name is canonical and has no subpath.
+            return [specifier.endsWith("/") ? specifier.slice(0, -1) : specifier, undefined];
         }
 
-        return [specifier.slice(0, secondSlash), specifier.slice(secondSlash + 1)];
+        const subpath = specifier.slice(secondSlash + 1);
+
+        return [specifier.slice(0, secondSlash), subpath === "" ? undefined : subpath];
     }
 
     // Regular package: package[/subpath]
-    return [specifier.slice(0, firstSlash), specifier.slice(firstSlash + 1)];
+    const subpath = specifier.slice(firstSlash + 1);
+
+    return [specifier.slice(0, firstSlash), subpath === "" ? undefined : subpath];
 };
 
 /**
