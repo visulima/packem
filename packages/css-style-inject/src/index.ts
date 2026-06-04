@@ -9,7 +9,7 @@ declare global {
 }
 
 /** @type {HTMLElement[]} */
-const containers: (Element | undefined)[] = [];
+const containers: Element[] = [];
 /** @type {Record<string, HTMLStyleElement>[]} */
 const styleTags: Record<string, HTMLStyleElement>[] = [];
 
@@ -128,7 +128,7 @@ export const cssStyleInject = (
     };
 
     /** @type {HTMLStyleElement} */
-    let styleTag;
+    let styleTag: HTMLStyleElement;
 
     if (singleTag) {
         let id = containers.indexOf(container);
