@@ -1,3 +1,23 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.52](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.51...@visulima/rollup-plugin-css@1.0.0-alpha.52) (2026-06-04)
+
+### Bug Fixes
+
+* **rollup-plugin-css:** sourcemap null-mapping guard, cache resolver/config, transform hot-path perf + bench ([916efa3](https://github.com/visulima/packem/commit/916efa3ee84ad8e6e8a2dd74e75c2c875835ff2b))
+
+### Styles
+
+* clear eslint debt from the audit/types passes ([fd68951](https://github.com/visulima/packem/commit/fd68951681817078ae579dcad10963b1a07c1d27))
+
+### Code Refactoring
+
+* **rollup-plugin-css:** tighten internal TypeScript types ([3feb0ad](https://github.com/visulima/packem/commit/3feb0ad249f33e5d33b92f053b75a7a90a5b9239))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.49
+* **@visulima/css-style-inject:** upgraded to 1.0.0-alpha.17
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.51](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.50...@visulima/rollup-plugin-css@1.0.0-alpha.51) (2026-06-03)
 
 ## @visulima/rollup-plugin-css [1.0.0-alpha.50](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.49...@visulima/rollup-plugin-css@1.0.0-alpha.50) (2026-06-03)
