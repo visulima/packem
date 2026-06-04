@@ -1945,13 +1945,13 @@ importers:
         specifier: catalog:visulima
         version: 3.0.0-alpha.25(@visulima/find-cache-dir@3.0.0-alpha.9)(@visulima/pail@4.0.0-alpha.16(express@5.2.1)(hono@4.12.19))(github-slugger@2.0.0)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.48
+        specifier: 1.0.0-alpha.49
         version: link:../packem-share
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.51
+        specifier: 1.0.0-alpha.52
         version: link:../rollup-plugin-css
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.32
+        specifier: 1.0.0-alpha.33
         version: link:../rollup-plugin-dts
       '@visulima/tsconfig':
         specifier: catalog:visulima
@@ -1986,15 +1986,27 @@ importers:
       mlly:
         specifier: catalog:prod
         version: 1.8.2
+      oxc-parser:
+        specifier: catalog:dev
+        version: 0.133.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
+      oxc-resolver:
+        specifier: catalog:node
+        version: 11.20.0
       package-manager-detector:
         specifier: catalog:peer
         version: 1.6.0
       rollup:
         specifier: '>=4.61.0'
         version: 4.61.0
+      rollup-plugin-license:
+        specifier: catalog:build
+        version: 3.7.1(picomatch@4.0.4)(rollup@4.61.0)
       rollup-plugin-svelte:
         specifier: '>=7.2.3'
         version: 7.2.3(rollup@4.61.0)(svelte@5.56.1(@typescript-eslint/types@8.59.4))
+      rs-module-lexer:
+        specifier: catalog:dev
+        version: 2.8.0
       tinyexec:
         specifier: catalog:node
         version: 1.2.4
@@ -2111,7 +2123,7 @@ importers:
         specifier: workspace:*
         version: link:../packem-plugins
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.71
+        specifier: 1.0.0-alpha.72
         version: link:../packem-rollup
       '@visulima/pail':
         specifier: catalog:visulima
@@ -2176,12 +2188,6 @@ importers:
       minireset.css:
         specifier: catalog:style
         version: 0.0.7
-      oxc-parser:
-        specifier: catalog:dev
-        version: 0.133.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
-      oxc-resolver:
-        specifier: catalog:node
-        version: 11.20.0
       oxc-transform:
         specifier: catalog:dev
         version: 0.133.0
@@ -2233,9 +2239,6 @@ importers:
       rollup-plugin-dts:
         specifier: catalog:build
         version: 6.4.1(rollup@4.61.0)(typescript@6.0.3)
-      rollup-plugin-license:
-        specifier: catalog:build
-        version: 3.7.1(picomatch@4.0.4)(rollup@4.61.0)
       rollup-plugin-lit-css:
         specifier: catalog:build
         version: 6.0.1(postcss@8.5.15)(rollup@4.61.0)
@@ -2248,9 +2251,6 @@ importers:
       rollup-plugin-visualizer:
         specifier: catalog:build
         version: 7.0.1(rolldown@1.0.3)(rollup@4.61.0)
-      rs-module-lexer:
-        specifier: catalog:dev
-        version: 2.8.0
       sass:
         specifier: catalog:style
         version: 1.100.0
@@ -2592,13 +2592,13 @@ importers:
         specifier: catalog:visulima
         version: 5.0.0-alpha.23(ini@7.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.48
+        specifier: 1.0.0-alpha.49
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
         version: 3.0.0-alpha.10
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.32
+        specifier: 1.0.0-alpha.33
         version: link:../rollup-plugin-dts
       clean-css:
         specifier: catalog:style
@@ -2950,7 +2950,7 @@ importers:
         specifier: catalog:visulima
         version: 5.0.0-alpha.23(ini@7.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.48
+        specifier: 1.0.0-alpha.49
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
@@ -3029,7 +3029,7 @@ importers:
         specifier: catalog:types
         version: 0.0.11
       '@visulima/css-style-inject':
-        specifier: 1.0.0-alpha.16
+        specifier: 1.0.0-alpha.17
         version: link:../css-style-inject
       '@vitest/coverage-v8':
         specifier: catalog:test
