@@ -7,7 +7,7 @@ import type { ParseResult } from "@babel/parser";
 import { parse } from "@babel/parser";
 import t from "@babel/types";
 import { extractIdentifiers, isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST, walkASTAsync } from "ast-kit";
-import type { Plugin, RenderedChunk, TransformPluginContext, TransformResult } from "rollup";
+import type { ExistingRawSourceMap, Plugin, RenderedChunk, TransformPluginContext, TransformResult } from "rollup";
 
 import { filenameDtsTo, filenameJsToDts, filenameToDts, RE_DTS, RE_DTS_MAP, RE_NODE_MODULES, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
@@ -144,13 +144,13 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     continue;
 
                 if (sourcemap) {
-                    if (chunk.type === "chunk" || typeof (chunk as { source?: unknown }).source !== "string")
+                    if (chunk.type === "chunk" || typeof chunk.source !== "string")
                         continue;
 
-                    const map = JSON.parse((chunk as { source: string }).source);
+                    const map = JSON.parse(chunk.source) as ExistingRawSourceMap;
 
                     map.sourcesContent = undefined;
-                    (chunk as any).source = JSON.stringify(map);
+                    chunk.source = JSON.stringify(map);
                 } else {
                     delete bundle[chunk.fileName];
                 }
@@ -695,12 +695,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         const hasModuleAugmentation = program.body.some((node) => node.type === "TSModuleDeclaration" && node.id.type === "StringLiteral");
 
         if (!hasExport && hasModuleAugmentation) {
-            program.body.push({
-                declaration: null,
-                source: null,
-                specifiers: [],
-                type: "ExportNamedDeclaration",
-            } as unknown as t.Statement);
+            program.body.push(t.exportNamedDeclaration(null, [], null));
         }
 
         // recover comments
@@ -1720,8 +1715,10 @@ const rewriteImportExport = (
 
 const overwriteNode = <T>(node: t.Node, newNode: T): T => {
     // clear object keys
+    const record = node as unknown as Record<string, unknown>;
+
     for (const key of Object.keys(node)) {
-        delete (node as any)[key];
+        delete record[key];
     }
 
     Object.assign(node, newNode);

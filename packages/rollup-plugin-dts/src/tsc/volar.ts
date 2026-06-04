@@ -26,7 +26,9 @@ const loadVueLanguageTools = (): {
         ) as typeof import("@vue/language-core");
         const getLanguagePlugin = (ts: typeof Ts, options: Ts.CreateProgramOptions) => {
             const $rootDir = options.options.$rootDir as string;
-            const $configRaw = options.options.$configRaw as (Ts.TsConfigSourceFile & { vueCompilerOptions?: any }) | undefined;
+            const $configRaw = options.options.$configRaw as
+                | (Ts.TsConfigSourceFile & { vueCompilerOptions?: import("@vue/language-core").RawVueCompilerOptions })
+                | undefined;
 
             const resolver = new vue.CompilerOptionsResolver(ts, ts.sys.readFile);
 

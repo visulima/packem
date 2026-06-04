@@ -418,7 +418,7 @@ const resolveTsconfigPath = (
     return { resolvedTsconfig: undefined, tsconfig: undefined };
 };
 
-const validateTsgoCompatibility = (tsgo: false | { path?: string }, vue: boolean, tsMacro: boolean, oxc: unknown): void => {
+const validateTsgoCompatibility = (tsgo: false | { path?: string }, vue: boolean, tsMacro: boolean, oxc: IsolatedDeclarationsOptions | false): void => {
     if (!tsgo) {
         return;
     }

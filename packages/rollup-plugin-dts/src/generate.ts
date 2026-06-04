@@ -11,7 +11,7 @@ import { createFilter } from "@rollup/pluginutils";
 import type { BirpcReturn } from "birpc";
 import { createDebug } from "obug";
 import { isolatedDeclarationSync, transformSync } from "oxc-transform";
-import type { Plugin, SourceMapInput } from "rollup";
+import type { ExistingRawSourceMap, Plugin, SourceMapInput } from "rollup";
 
 import { filenameToDts, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
@@ -23,7 +23,7 @@ import { runTsgo } from "./tsgo";
 
 const debug = createDebug("rollup-plugin-dts:generate");
 
-const WORKER_URL: string = (import.meta as any).WORKER_URL ?? "./tsc/worker.js";
+const WORKER_URL: string = import.meta.WORKER_URL ?? "./tsc/worker.js";
 
 export interface TsModule {
     /** `.ts` source code */
@@ -183,12 +183,12 @@ export const createGeneratePlugin = ({
                     continue;
 
                 // Strip names and sourcesContent from DTS sourcemap assets (works for both generate() and write())
-                if (chunk.type === "asset" && RE_DTS_MAP.test(fileName) && typeof (chunk as { source: unknown }).source === "string") {
-                    const map = JSON.parse((chunk as { source: string }).source);
+                if (chunk.type === "asset" && RE_DTS_MAP.test(fileName) && typeof chunk.source === "string") {
+                    const map = JSON.parse(chunk.source) as ExistingRawSourceMap;
 
                     map.names = [];
                     delete map.sourcesContent;
-                    (chunk as any).source = JSON.stringify(map);
+                    chunk.source = JSON.stringify(map);
                 }
 
                 if (emitDtsOnly && chunk.type === "chunk" && !RE_DTS.test(fileName) && !RE_DTS_MAP.test(fileName)) {
@@ -263,10 +263,10 @@ export const createGeneratePlugin = ({
                     dtsCode = result.code;
 
                     if (result.map) {
-                        map = result.map;
-                        map.sourcesContent = undefined;
+                        result.map.sourcesContent = undefined;
                         // DTS sourcemaps should not contain names
-                        (map as any).names = [];
+                        result.map.names = [];
+                        map = result.map;
                     }
                 } else {
                     const entries = eager ? undefined : [...entryIds];
@@ -554,7 +554,12 @@ const collectJsonExports = (code: string) => {
         plugins: [["typescript", { dts: true }]],
         sourceType: "module",
     });
-    const members = (program.body as any)[0]?.declarations?.[0]?.id?.typeAnnotation?.typeAnnotation?.members as TSPropertySignature[] | undefined;
+    const [firstStatement] = program.body;
+    const declarator = firstStatement?.type === "VariableDeclaration" ? firstStatement.declarations[0] : undefined;
+    const typeAnnotation = declarator?.id.type === "Identifier" ? declarator.id.typeAnnotation : undefined;
+    const typeLiteral
+        = typeAnnotation?.type === "TSTypeAnnotation" && typeAnnotation.typeAnnotation.type === "TSTypeLiteral" ? typeAnnotation.typeAnnotation : undefined;
+    const members = typeLiteral?.members as TSPropertySignature[] | undefined;
 
     if (!Array.isArray(members)) {
         throw new TypeError(
