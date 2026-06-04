@@ -105,16 +105,32 @@ const createTsProgram = ({ context = globalContext, cwd, entries, id, tsconfig, 
     });
 };
 
+// Cache the set of root file names per program so membership checks during program
+// lookup are O(1) instead of re-allocating the roots array and doing an O(roots) scan
+// per candidate, per module load.
+const programRootsCache = new WeakMap<ts.Program, Set<string>>();
+
+const getProgramRoots = (program: ts.Program): Set<string> => {
+    let roots = programRootsCache.get(program);
+
+    if (!roots) {
+        roots = new Set(program.getRootFileNames());
+        programRootsCache.set(program, roots);
+    }
+
+    return roots;
+};
+
 const createOrGetTsModule = (options: TscOptions): TscModule => {
     const { context = globalContext, entries, id } = options;
     const existingProgram = context.programs.find((candidate) => {
-        const roots = candidate.getRootFileNames();
+        const roots = getProgramRoots(candidate);
 
         if (entries) {
-            return entries.every((entry) => roots.includes(entry));
+            return entries.every((entry) => roots.has(entry));
         }
 
-        return roots.includes(id);
+        return roots.has(id);
     });
 
     if (existingProgram) {

@@ -93,6 +93,11 @@ export const createGeneratePlugin = ({
         : undefined;
     const dtsMap: DtsMap = new Map<string, TsModule>();
 
+    // Maintained incrementally by the transform hook so the (non-eager) tsc load path
+    // does not rebuild the full entries array from `dtsMap` on every module load
+    // (which is O(n) per load and O(n^2) over the build).
+    const entryIds = new Set<string>();
+
     /**
      * A map of input id to output file name
      * @example
@@ -264,7 +269,7 @@ export const createGeneratePlugin = ({
                         (map as any).names = [];
                     }
                 } else {
-                    const entries = eager ? undefined : [...dtsMap.values()].filter((v) => v.isEntry).map((v) => v.id);
+                    const entries = eager ? undefined : [...entryIds];
                     const options: Omit<TscOptions, "programs"> = {
                         build,
                         context: tscContext,
@@ -398,6 +403,7 @@ export { __json_default_export as default }`;
                             const code = readFileSync(tsId, "utf8");
 
                             dtsMap.set(absoluteId, { code, id: tsId, isEntry: true });
+                            entryIds.add(tsId);
                             debug("populated dtsMap from source for cached re-resolution: %s (via %s)", absoluteId, tsId);
                             break;
                         }
@@ -463,6 +469,8 @@ export { __json_default_export as default }`;
                     debug("register dts source: %s", id);
 
                     if (isEntry) {
+                        entryIds.add(id);
+
                         const name = inputAliasMap.get(id);
 
                         this.emitFile({
@@ -470,6 +478,8 @@ export { __json_default_export as default }`;
                             name: name ? `${name}.d` : undefined,
                             type: "chunk",
                         });
+                    } else {
+                        entryIds.delete(id);
                     }
                 }
 
@@ -544,7 +554,13 @@ const collectJsonExports = (code: string) => {
         plugins: [["typescript", { dts: true }]],
         sourceType: "module",
     });
-    const members = (program.body as any)[0].declarations[0].id.typeAnnotation.typeAnnotation.members as TSPropertySignature[];
+    const members = (program.body as any)[0]?.declarations?.[0]?.id?.typeAnnotation?.typeAnnotation?.members as TSPropertySignature[] | undefined;
+
+    if (!Array.isArray(members)) {
+        throw new TypeError(
+            "rollup-plugin-dts: unexpected JSON declaration shape — expected `declare const _exports: { ... }` with an object type literal. The emitted dts may have changed; cannot extract named exports.",
+        );
+    }
 
     for (const member of members) {
         if (member.key.type === "Identifier") {
