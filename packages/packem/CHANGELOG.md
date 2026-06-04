@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.87](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.86...@visulima/packem@2.0.0-alpha.87) (2026-06-04)
+
+### Bug Fixes
+
+* **packem:** ship the bundled CJS-DTS star-export guard (re-release) ([d8669e6](https://github.com/visulima/packem/commit/d8669e60bd0b6363faff6441c890b314ca02e78c))
+
 ## @visulima/packem [2.0.0-alpha.86](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.85...@visulima/packem@2.0.0-alpha.86) (2026-06-04)
 
 ### Bug Fixes
