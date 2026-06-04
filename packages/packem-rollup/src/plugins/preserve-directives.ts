@@ -178,8 +178,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
 
             try {
                 ast = this.parse(magicString.toString(), { allowReturnOutsideFunction: true });
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } catch (error: any) {
+            } catch (error) {
                 this.warn({
                     code: "PARSE_ERROR",
                     message: `failed to parse "${id}" and extract the directives.`,

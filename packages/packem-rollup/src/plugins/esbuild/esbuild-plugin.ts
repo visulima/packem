@@ -20,6 +20,11 @@ import warn from "./utils/warn";
 
 const SOURCE_FILE_TS_RE = /\.[cm]ts/;
 
+// Loaders whose output esbuild emits as ESM (so the transform must request the
+// "esm" format). Typed as the wide `Loader[]` so membership checks accept any
+// `Loader` value without a per-call cast.
+const ESM_FORMAT_LOADERS: Loader[] = ["base64", "binary", "dataurl", "text", "json"];
+
 const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap, ...esbuildOptions }: EsbuildPluginConfig): RollupPlugin => {
     // Clone the shared singleton so per-plugin loader customizations stay local
     // to this plugin instance and don't leak into other esbuild/swc/oxc paths or
@@ -119,7 +124,7 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
                 }
 
                 const result = await transform(code, {
-                    format: (["base64", "binary", "dataurl", "text", "json"] satisfies Loader[] as Loader[]).includes(loader) ? "esm" : undefined,
+                    format: ESM_FORMAT_LOADERS.includes(loader) ? "esm" : undefined,
                     loader,
                     // @see https://github.com/evanw/esbuild/issues/1932#issuecomment-1013380565
                     sourcefile: id.replace(SOURCE_FILE_TS_RE, ".ts"),

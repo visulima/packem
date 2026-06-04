@@ -5,6 +5,8 @@ import MagicString from "magic-string";
 import type { Plugin } from "rollup";
 
 interface NewExpressionWithRollupExtras {
+    // eslint-disable-next-line no-underscore-dangle -- `_rollupAnnotations` is rollup's extended ast property name
+    _rollupAnnotations?: { type: string }[];
     callee?: { name?: string; type?: string };
     rollupAnnotations?: { type: string }[];
     start?: number;
@@ -60,7 +62,7 @@ export const pureNewExpressionPlugin = (options: { constructors: string[]; sourc
                         const node = rawNode as unknown as NewExpressionWithRollupExtras;
                         const calleeName = node.callee?.name;
                         // eslint-disable-next-line no-underscore-dangle -- `_rollupAnnotations` is rollup's extended ast property name
-                        const annotations = (rawNode as unknown as { _rollupAnnotations?: { type: string }[] })._rollupAnnotations;
+                        const annotations = node._rollupAnnotations;
 
                         if (
                             node.type === "NewExpression"

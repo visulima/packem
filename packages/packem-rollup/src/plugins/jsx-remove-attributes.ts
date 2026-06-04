@@ -56,8 +56,7 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
 
                 try {
                     ast = this.parse(code, { allowReturnOutsideFunction: true });
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                } catch (error: any) {
+                } catch (error) {
                     this.warn({
                         code: "PARSE_ERROR",
                         message: `[packem:jsx-remove-attributes]: failed to parse "${id}" and remove the jsx attribute.`,
@@ -74,8 +73,8 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
                     enter(node) {
                         if (node.type === "CallExpression" && node.callee.type === "Identifier" && AUTOMATIC_RUNTIME_CALLEES.has(node.callee.name)) {
                             const filteredArguments = node.arguments.filter(
-                                (argument) => argument.type === "ObjectExpression" && Array.isArray(argument.properties),
-                            ) as ObjectExpression[];
+                                (argument): argument is ObjectExpression => argument.type === "ObjectExpression" && Array.isArray(argument.properties),
+                            );
 
                             for (const object of filteredArguments) {
                                 for (const property of object.properties) {
