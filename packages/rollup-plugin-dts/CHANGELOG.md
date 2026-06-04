@@ -1,3 +1,17 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.33](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.32...@visulima/rollup-plugin-dts@1.0.0-alpha.33) (2026-06-04)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** treeshake override, cache tsconfig parse and tsc load path + bench ([6334d64](https://github.com/visulima/packem/commit/6334d6447c204397fb0cbcafe7e5083417e9cab3))
+
+### Styles
+
+* clear eslint debt from the audit/types passes ([fd68951](https://github.com/visulima/packem/commit/fd68951681817078ae579dcad10963b1a07c1d27))
+
+### Code Refactoring
+
+* **rollup-plugin-dts:** tighten internal TypeScript types ([28120d2](https://github.com/visulima/packem/commit/28120d2980617a9e349f52accecd39a9fd85843b))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.32](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.31...@visulima/rollup-plugin-dts@1.0.0-alpha.32) (2026-06-03)
 
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.31](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.30...@visulima/rollup-plugin-dts@1.0.0-alpha.31) (2026-06-03)
