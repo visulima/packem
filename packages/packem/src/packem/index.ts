@@ -1,4 +1,3 @@
-/* eslint-disable no-secrets/no-secrets */
 import process from "node:process";
 
 import { bold, cyan } from "@visulima/colorize";
@@ -218,10 +217,19 @@ const generateOptions = (
                 jsxSideEffects: true,
 
                 /**
-                 * esbuild renames variables even if minification is not enabled
-                 * https://esbuild.github.io/try/#dAAwLjE5LjUAAGNvbnN0IGEgPSAxOwooZnVuY3Rpb24gYSgpIHt9KTs
+                 * Match esbuild's own default (`false`) and let packages opt in.
+                 *
+                 * `keepNames` wraps every name-inferred function/closure in
+                 * `__name(fn, "name")` (an `Object.defineProperty` call). For a named
+                 * closure created inside a hot function (recursion / per-element / per-call)
+                 * that `defineProperty` runs on every invocation, which measurably slows
+                 * closure-heavy code in the *published* (minified) build while staying
+                 * invisible in dev builds — see https://github.com/visulima/packem/issues/207.
+                 * Stack-trace/`.name` preservation after minification is really the consuming
+                 * app bundler's concern, so packages that genuinely rely on runtime name
+                 * reflection opt in explicitly via `rollup.esbuild.keepNames: true`.
                  */
-                keepNames: true,
+                keepNames: false,
 
                 /**
                  * Improve performance by generating smaller source maps
@@ -625,9 +633,7 @@ const generateOptions = (
     // the global runtime is "node" (and `browserTargets` is cleared below), entry
     // groups whose per-group runtime is "browser" must still see the intended
     // browserslist targets (see prepareRollupConfig / resolveTransformerTarget).
-    if (options.resolvedBrowserTargets === undefined) {
-        options.resolvedBrowserTargets = options.browserTargets ?? [];
-    }
+    options.resolvedBrowserTargets ??= options.browserTargets ?? [];
 
     if (options.runtime === "node") {
         options.browserTargets = [];

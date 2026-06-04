@@ -44,6 +44,23 @@ export default defineConfig({
 })
 ```
 
+#### Preserving function & class names (`keepNames`)
+
+esbuild can preserve original `function`/`class` names through minification (so `fn.name` and stack traces stay readable). Packem leaves this **off by default** — matching esbuild's own default — and lets you opt in:
+
+```typescript
+export default defineConfig({
+  minify: true,
+  esbuild: {
+    keepNames: true // opt in when you rely on runtime name reflection
+  }
+})
+```
+
+<Callout type="warning">
+`keepNames` wraps every name-inferred function/closure in `__name(fn, "name")` (an `Object.defineProperty` call). For a **named closure created inside a hot function** (recursion, per-element, per-call), that `defineProperty` runs on *every* invocation — which can make a closure-heavy **published** (minified) build several times slower than its dev build, where minification (and thus `keepNames`) is off. Only enable it for packages that genuinely need runtime `fn.name`/`Class.name`; stack-trace preservation after minification is usually the consuming app bundler's concern. See [issue #207](https://github.com/visulima/packem/issues/207).
+</Callout>
+
 ### Terser
 
 ```typescript
