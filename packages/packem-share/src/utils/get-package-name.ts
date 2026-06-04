@@ -4,15 +4,17 @@
  * @returns The extracted package name
  */
 const getPackageName = (id = ""): string => {
-    const s = id.split("/");
+    // `String.split` always yields at least one element, so `first` is never the
+    // default; the default only satisfies `noUncheckedIndexedAccess` without a cast.
+    const [first = "", second] = id.split("/");
 
-    if ((s[0] as string).startsWith("@")) {
+    if (first.startsWith("@")) {
         // A bare scoped specifier with no subpath (e.g. "@scope") has no second
         // segment; return the scope as-is rather than producing "@scope/undefined".
-        return s[1] === undefined ? (s[0] as string) : `${s[0] as string}/${s[1]}`;
+        return second === undefined ? first : `${first}/${second}`;
     }
 
-    return s[0] as string;
+    return first;
 };
 
 export default getPackageName;

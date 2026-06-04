@@ -59,8 +59,7 @@ class FileCache {
 
     #isEnabled = true;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    readonly #memoryCache = new Map<string, any>();
+    readonly #memoryCache = new Map<string, unknown>();
 
     // In-flight async disk writes from `set()`. The build doesn't await individual
     // writes (it would block on tens of thousands of files on a large cold build);

@@ -12,7 +12,7 @@ const getRegexMatches = (regex: RegExp, source: string): string[] => {
     const internalRegex = new RegExp(regex.source, regex.flags.includes("g") ? regex.flags : `${regex.flags}g`);
     const matches: string[] = [];
 
-    let regexMatches;
+    let regexMatches: RegExpExecArray | null;
 
     // eslint-disable-next-line no-cond-assign
     while ((regexMatches = internalRegex.exec(source)) !== null) {

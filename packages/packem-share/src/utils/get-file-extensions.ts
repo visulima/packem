@@ -4,11 +4,11 @@ import type { BuildContext, Format } from "../types";
 /**
  * Extension mappings for better performance than switch statements.
  */
-const JS_TO_DTS_MAP = new Map([
+const JS_TO_DTS_MAP = new Map<string, "d.cts" | "d.mts" | "d.ts">([
     ["cjs", "d.cts"],
     ["js", "d.ts"],
     ["mjs", "d.mts"],
-] as const);
+]);
 
 const FORMAT_EXTENSIONS = {
     dts: { cjs: "d.ts", esm: "d.ts" },
@@ -108,7 +108,7 @@ export const getDtsExtension = <T extends FileExtensionOptions>(context: BuildCo
         const jsExtension = strategy.outputExtensionMap?.[format];
 
         if (jsExtension) {
-            const mappedExtension = JS_TO_DTS_MAP.get(jsExtension as "cjs" | "js" | "mjs") ?? "d.ts";
+            const mappedExtension = JS_TO_DTS_MAP.get(jsExtension) ?? "d.ts";
 
             // If we get d.ts for an unknown extension and both formats are emitted, use format-based extensions
             if (mappedExtension === "d.ts" && jsExtension !== "js" && strategy.isDualFormat) {

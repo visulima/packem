@@ -5,7 +5,7 @@
  */
 const arrayify = <T>(x: T | T[] | null | undefined): T[] => {
     if (x === undefined || x === null) {
-        return [] as T[];
+        return [];
     }
 
     return Array.isArray(x) ? x : ([x] as T[]);
