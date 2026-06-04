@@ -1,3 +1,23 @@
+## @visulima/packem-rollup [1.0.0-alpha.72](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.71...@visulima/packem-rollup@1.0.0-alpha.72) (2026-06-04)
+
+### Bug Fixes
+
+* **packem-rollup:** shared-loader mutation, chunk-splitter recursion/sourcemap fixes, parse perf + bench ([7a90c64](https://github.com/visulima/packem/commit/7a90c6400bd6aee9a3225a9479b53fa5ffcda89b))
+
+### Styles
+
+* clear eslint debt from the audit/types passes ([fd68951](https://github.com/visulima/packem/commit/fd68951681817078ae579dcad10963b1a07c1d27))
+
+### Code Refactoring
+
+* **packem-rollup:** tighten internal TypeScript types ([c381f84](https://github.com/visulima/packem/commit/c381f84b62f250426e962126c87663bdd3001c48))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.49
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.33
+
 ## @visulima/packem-rollup [1.0.0-alpha.71](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.70...@visulima/packem-rollup@1.0.0-alpha.71) (2026-06-03)
 
 ### Bug Fixes
