@@ -70,7 +70,12 @@ interface ParsedExports {
  * @returns Parsed export information, or undefined if no default export is found or parsing fails.
  */
 const extractExports = (code: string, info: CodeInfo, options: Options): ParsedExports | undefined => {
-    const defaultExportCandidate = findExports(code).find((esmExport) => esmExport.names.includes("default"));
+    // `findExports` types `names` as `string[]`, but at runtime star re-exports
+    // (`export * from "..."`) come back with `names` undefined. Multi-entry packages
+    // bundle such star re-exports into their declaration output, so guard the access
+    // — an export without names is never the default-export candidate anyway.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- mlly's ESMExport types `names` as non-optional, but star exports omit it at runtime (proven to crash without this guard).
+    const defaultExportCandidate = findExports(code).find((esmExport) => esmExport.names?.includes("default"));
 
     // Check for `export default identifier;` which mlly doesn't pick up as a named export of 'default'
     const directDefaultMatch = DIRECT_DEFAULT_RE.exec(code);

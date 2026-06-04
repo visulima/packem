@@ -117,6 +117,26 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
+        it("does not crash on a multi-entry CJS declaration that star re-exports siblings", () => {
+            expect.assertions(2);
+
+            // Multi-entry CJS packages bundle `export * from "./sibling"` into their
+            // `.d.cts`. mlly's findExports returns those star exports with `names`
+            // undefined, which used to crash extractExports' default-candidate `.find`
+            // ("Cannot read properties of undefined (reading 'includes')"). Reported for
+            // a CJS-main package whose entries are index/types/drizzle.
+            const code = "export * from \"./types\";\nexport * from \"./drizzle\";\ndeclare const x: number;\nexport { x };\n";
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["x"],
+                fileName: "index.d.cts",
+                isEntry: true,
+                type: "chunk",
+            };
+
+            expect(() => renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} })).not.toThrow();
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
         it("should not transform if no default export in chunk.exports", () => {
             expect.assertions(2);
 
