@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.86](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.85...@visulima/packem@2.0.0-alpha.86) (2026-06-04)
+
+### Bug Fixes
+
+* **packem:** declare directly-imported runtime deps (fixes ERR_MODULE_NOT_FOUND) ([3a32234](https://github.com/visulima/packem/commit/3a32234cf2a4bf90f8c521a9cbebfc624e84fa9f))
+
 ## @visulima/packem [2.0.0-alpha.85](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.84...@visulima/packem@2.0.0-alpha.85) (2026-06-04)
 
 ### Bug Fixes
