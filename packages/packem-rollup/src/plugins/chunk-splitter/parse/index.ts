@@ -85,24 +85,26 @@ const parseExportDefault = function* (): Generator<ParsedExportInfo> {
     yield { exportedName: "default", from: "self", type: "named" };
 };
 
-const parseExports = function* (context: PluginContext, module_: ModuleInfo): Generator<ParsedExportInfo> {
+const collectExports = function (context: PluginContext, module_: ModuleInfo): ParsedExportInfo[] {
     assert.ok(module_.code !== null, `Module ${module_.id} doesn't have associated code`);
     const node = context.parse(module_.code);
+
+    const result: ParsedExportInfo[] = [];
 
     for (const statement of node.body) {
         switch (statement.type) {
             case "ExportAllDeclaration": {
-                yield* parseExportAll(statement);
+                result.push(...parseExportAll(statement));
                 break;
             }
 
             case "ExportDefaultDeclaration": {
-                yield* parseExportDefault();
+                result.push(...parseExportDefault());
                 break;
             }
 
             case "ExportNamedDeclaration": {
-                yield* parseExportNamed(statement);
+                result.push(...parseExportNamed(statement));
                 break;
             }
 
@@ -110,6 +112,34 @@ const parseExports = function* (context: PluginContext, module_: ModuleInfo): Ge
             // do nothing
         }
     }
+
+    return result;
+};
+
+/**
+ * Parsing a module's source is the dominant cost of the chunk splitter and is
+ * fully redundant on repeat visits of an unchanged module (the same shared
+ * barrel is commonly reachable from many entries/re-export paths within one
+ * build). Memoize the parsed export list per module id so each module is
+ * parsed at most once per build. The cache is keyed by id and lives for the
+ * duration of the plugin instance.
+ */
+const parseExports = function (context: PluginContext, module_: ModuleInfo, cache?: Map<string, ParsedExportInfo[]>): ParsedExportInfo[] {
+    if (!cache) {
+        return collectExports(context, module_);
+    }
+
+    const cached = cache.get(module_.id);
+
+    if (cached !== undefined) {
+        return cached;
+    }
+
+    const parsed = collectExports(context, module_);
+
+    cache.set(module_.id, parsed);
+
+    return parsed;
 };
 
 export default parseExports;

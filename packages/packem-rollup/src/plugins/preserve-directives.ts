@@ -142,7 +142,10 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
              * Those assumptions are also made by acorn, babel and swc; see their parser sources for confirmation.
              */
             if (code.startsWith("#") && code[1] === "!") {
-                let firstNewLineIndex = 0;
+                // Default to end-of-file so a shebang-only file with no trailing
+                // newline (e.g. `#!/usr/bin/env node` followed by EOF) is still
+                // captured and stripped rather than silently lost.
+                let firstNewLineIndex = code.length;
 
                 for (let codeLength = code.length, index = 2; index < codeLength; index += 1) {
                     const charCode = code.codePointAt(index);
@@ -153,10 +156,12 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                     }
                 }
 
-                if (firstNewLineIndex) {
+                if (firstNewLineIndex > 0) {
                     shebangs[id] = code.slice(0, firstNewLineIndex);
 
-                    magicString.remove(0, firstNewLineIndex + 1);
+                    // Clamp so we never remove past the end of the source when no
+                    // line terminator was found.
+                    magicString.remove(0, Math.min(firstNewLineIndex + 1, code.length));
                     hasChanged = true;
 
                     logger.debug({

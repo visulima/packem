@@ -21,7 +21,10 @@ import warn from "./utils/warn";
 const SOURCE_FILE_TS_RE = /\.[cm]ts/;
 
 const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap, ...esbuildOptions }: EsbuildPluginConfig): RollupPlugin => {
-    const loaders = DEFAULT_LOADERS;
+    // Clone the shared singleton so per-plugin loader customizations stay local
+    // to this plugin instance and don't leak into other esbuild/swc/oxc paths or
+    // across builds in watch mode.
+    const loaders = { ...DEFAULT_LOADERS };
 
     if (_loaders !== undefined) {
         for (const [key, value] of Object.entries(_loaders)) {

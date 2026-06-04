@@ -21,25 +21,27 @@ interface NewExpressionWithRollupExtras {
 export const pureNewExpressionPlugin = (options: { constructors: string[]; sourcemap?: boolean }): Plugin => {
     const constructorSet = new Set(options.constructors.filter((c) => !c.includes(".")));
 
+    // Build a single word-boundary RegExp once (outside the handler) so the
+    // per-module quick check is one scan instead of one full-string scan per
+    // constructor name. The word boundaries also avoid false positives where a
+    // constructor name only appears as a substring of an unrelated identifier
+    // (e.g. "Map" inside "MapView").
+    const escapeForRegExp = (value: string): string => value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+    const quickCheckRegExp
+        = constructorSet.size > 0 ? new RegExp(String.raw`\b(?:${[...constructorSet].map(escapeForRegExp).join("|")})\b`) : undefined;
+
     return {
         name: "packem:pure-new-expression",
         transform: {
             handler(code: string) {
-                if (constructorSet.size === 0) {
+                if (constructorSet.size === 0 || quickCheckRegExp === undefined) {
                     return undefined;
                 }
 
-                // Quick check — skip if none of the constructor names appear in the code
-                let hasAny = false;
-
-                for (const constructor of constructorSet) {
-                    if (code.includes(constructor)) {
-                        hasAny = true;
-                        break;
-                    }
-                }
-
-                if (!hasAny) {
+                // Quick check — skip if none of the constructor names appear in the
+                // code (as a whole word). The actual annotation decision is still
+                // made on the parsed AST below.
+                if (!quickCheckRegExp.test(code)) {
                     return undefined;
                 }
 

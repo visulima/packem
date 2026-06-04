@@ -20,6 +20,19 @@ interface PropertyLiteralValue extends Property {
 
 const JSX_FILE_RE = /\.[jt]sx$/;
 
+/**
+ * Callees emitted by React's automatic runtime. `jsx` is used for single (or no)
+ * child, `jsxs` for multiple static children, and `jsxDEV` in development. They
+ * all carry the same props object as the second argument, so attribute stripping
+ * must cover all three.
+ *
+ * Ordering note: this plugin relies on running AFTER the JSX transformer, so the
+ * per-module source contains bare `jsx(`/`jsxs(`/`jsxDEV(` identifier callees
+ * (not `jsxRuntime.jsx`). Only the automatic runtime is supported; the classic
+ * runtime (`React.createElement`) is intentionally out of scope.
+ */
+const AUTOMATIC_RUNTIME_CALLEES = new Set(["jsx", "jsxs", "jsxDEV"]);
+
 export type JSXRemoveAttributesPlugin = {
     attributes: string[];
 };
@@ -59,7 +72,7 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
 
                 walk(ast, {
                     enter(node) {
-                        if (node.type === "CallExpression" && node.callee.type === "Identifier" && node.callee.name === "jsx") {
+                        if (node.type === "CallExpression" && node.callee.type === "Identifier" && AUTOMATIC_RUNTIME_CALLEES.has(node.callee.name)) {
                             const filteredArguments = node.arguments.filter(
                                 (argument) => argument.type === "ObjectExpression" && Array.isArray(argument.properties),
                             ) as ObjectExpression[];
