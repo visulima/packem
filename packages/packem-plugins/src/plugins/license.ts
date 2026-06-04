@@ -10,7 +10,7 @@ import { replaceContentWithinMarker } from "@visulima/packem-share/utils";
 import type { Plugin } from "rollup";
 import rollupLicensePlugin from "rollup-plugin-license";
 
-const sortLicenses = (licenses: Set<string>) => {
+const sortLicenses = (licenses: Set<string>): string[] => {
     const withParenthesis: string[] = [];
     const noParenthesis: string[] = [];
 

@@ -88,7 +88,7 @@ const extractExports = (code: string, info: CodeInfo, options: Options): ParsedE
                 specifier: undefined, // No specifier for locally defined default
                 start: directDefaultMatch.index,
                 type: "default", // Important: Set type to 'default' for correct handling later
-            } as unknown as ESMExport, // Cast because we are creating a partial mock
+            } satisfies ESMExport,
             exports: [],
         };
     }

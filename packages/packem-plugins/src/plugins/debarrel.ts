@@ -183,7 +183,11 @@ const getImportNames = (specifiers: string): ImportName[] => {
     return names;
 };
 
-const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], code: string) => {
+const findMatchingImport = (
+    exp: ExportSpecifier,
+    imports: ImportSpecifier[],
+    code: string,
+): { imp: ImportSpecifier | undefined; localExportName?: string } => {
     let localExportName = exp.ln;
 
     let imp = imports.find((index: ImportSpecifier) => index.ss < exp.s && index.se > exp.e && index.d === -1);
@@ -217,7 +221,7 @@ const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], co
         }
     }
 
-    return { imp, localExportName } as { imp: ImportSpecifier | undefined; localExportName?: string };
+    return { imp, localExportName };
 };
 
 // exportNames are JS identifiers, so the compiled `… as <name>` matcher is stable —

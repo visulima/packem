@@ -59,7 +59,7 @@ export const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
                 return `export default "${uri}"`;
             }
 
-            const buf = (await readFile(cleanId, { buffer: true })) as unknown as Uint8Array;
+            const buf = await readFile(cleanId, { buffer: true });
             const base64 = Buffer.from(buf).toString("base64");
             const prefix = type.startsWith("text/") ? `data:${type};charset=utf-8;base64,` : `data:${type};base64,`;
             const uri = `${prefix}${base64}`;

@@ -176,8 +176,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin 
                             });
 
                             fileDesc.copied.push(destination);
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        } catch (error: any) {
+                        } catch (error: unknown) {
                             logger.error({
                                 context: [error],
                                 message: `error copying file ${fileName} → ${destinationFileName}`,

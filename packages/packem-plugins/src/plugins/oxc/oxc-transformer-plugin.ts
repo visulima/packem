@@ -34,7 +34,7 @@ const oxcTransformPlugin: TransformerFunction<InternalOXCTransformPluginConfig> 
                         return error;
                     }
 
-                    return (error as { message?: string }).message ?? JSON.stringify(error);
+                    return error.message ?? JSON.stringify(error);
                 });
 
                 return this.error({
