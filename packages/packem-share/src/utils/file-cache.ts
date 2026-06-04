@@ -59,7 +59,7 @@ class FileCache {
 
     #isEnabled = true;
 
-    readonly #memoryCache = new Map<string, unknown>();
+    readonly #memoryCache = new Map<string>();
 
     // In-flight async disk writes from `set()`. The build doesn't await individual
     // writes (it would block on tens of thousands of files on a large cold build);

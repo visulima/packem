@@ -42,7 +42,9 @@ export const cssStyleInject = (
     }
 
     if (typeof document === "undefined") {
-        const store = (globalThis[SSR_INJECT_ID] ??= []);
+        globalThis[SSR_INJECT_ID] ??= [];
+
+        const store = globalThis[SSR_INJECT_ID];
 
         if (options.id && store.some((entry) => entry.id === options.id)) {
             return;
@@ -53,6 +55,7 @@ export const cssStyleInject = (
         return;
     }
 
+    // eslint-disable-next-line unicorn/prefer-query-selector -- getElementById is intentional: querySelector(`#${id}`) throws on ids that aren't valid CSS identifiers (the crash this dedup fixes).
     if (options.id && document.getElementById(options.id)) {
         return;
     }
@@ -65,6 +68,7 @@ export const cssStyleInject = (
             ? (document.querySelector(options.container) as HTMLElement | undefined)
             // Prefer the native `document.head` (fast path in real browsers); fall back to
             // a `head` lookup for environments/test doubles where `document.head` is absent.
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- lib.dom types `document.head` as non-null, but it is genuinely absent in SSR/test-double environments; the fallback is load-bearing.
             : ((document.head ?? document.querySelectorAll("head")[0]) as HTMLElement | undefined);
 
     if (!container) {

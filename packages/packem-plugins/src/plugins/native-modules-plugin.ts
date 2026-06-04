@@ -90,7 +90,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
             // If distributionDirectory is not set yet, try to get it from this context
             if (!distributionDirectory) {
-                if (this.meta?.rollupVersion) {
+                if (this.meta.rollupVersion) {
                     // We're in a rollup context, but output dir might not be available yet
                     // Return a placeholder that will be resolved later
                     return `export default require("./${nativesDirectory}/${outputName}");`;

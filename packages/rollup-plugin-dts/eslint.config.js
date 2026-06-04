@@ -12,6 +12,7 @@ export default createConfig(
             // so typed rules (e.g. vitest/unbound-method) crash trying to type them.
             "**/__fixtures__/**",
             "__fixtures__",
+            "__bench__",
             "__docs__",
             "__tests__/fixtures/**",
             "__tests__/rollup-plugin-dts/**",

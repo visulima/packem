@@ -135,135 +135,135 @@ const resolveImplicitExternalsPlugin = <T = unknown>(context: BuildContext<T>): 
                     exclude: [VIRTUAL_MODULE_RE, NODE_MODULES_RE],
                 },
             },
-            // eslint-disable-next-line sonarjs/cognitive-complexity
+
             async handler(code: string, id: string): Promise<TransformResult> {
             // Only process source files (not node_modules or virtual modules)
-            if (id.includes("/node_modules/") || id.startsWith("\0")) {
-                return undefined;
-            }
-
-            // Find all import/export statements with bare specifiers
-            const matches: { importId: string; quoteEnd: number; quoteStart: number }[] = [];
-
-            let regexMatch;
-
-            FROM_REGEX.lastIndex = 0;
-
-            // eslint-disable-next-line no-cond-assign
-            while ((regexMatch = FROM_REGEX.exec(code)) !== null) {
-                const importId = regexMatch[1];
-
-                if (!importId || !isBareSpecifier(importId)) {
-                    continue;
+                if (id.includes("/node_modules/") || id.startsWith("\0")) {
+                    return undefined;
                 }
 
-                const [packageName, subpath] = parseSpecifier(importId);
+                // Find all import/export statements with bare specifiers
+                const matches: { importId: string; quoteEnd: number; quoteStart: number }[] = [];
 
-                if (subpath && packageName && isExternalPackage(packageName)) {
-                    const quoteStart = regexMatch.index + regexMatch[0].indexOf(importId);
+                let regexMatch;
 
-                    matches.push({
-                        importId,
-                        quoteEnd: quoteStart + importId.length,
-                        quoteStart,
-                    });
+                FROM_REGEX.lastIndex = 0;
+
+                // eslint-disable-next-line no-cond-assign
+                while ((regexMatch = FROM_REGEX.exec(code)) !== null) {
+                    const importId = regexMatch[1];
+
+                    if (!importId || !isBareSpecifier(importId)) {
+                        continue;
+                    }
+
+                    const [packageName, subpath] = parseSpecifier(importId);
+
+                    if (subpath && packageName && isExternalPackage(packageName)) {
+                        const quoteStart = regexMatch.index + regexMatch[0].indexOf(importId);
+
+                        matches.push({
+                            importId,
+                            quoteEnd: quoteStart + importId.length,
+                            quoteStart,
+                        });
+                    }
                 }
-            }
 
-            if (matches.length === 0) {
-                return undefined;
-            }
+                if (matches.length === 0) {
+                    return undefined;
+                }
 
-            // Resolve all matches
-            const startDirectory = dirname(id);
-            const resolutions = await Promise.all(
-                matches.map(async (matchItem) => {
-                    const [packageName, subpath] = parseSpecifier(matchItem.importId);
+                // Resolve all matches
+                const startDirectory = dirname(id);
+                const resolutions = await Promise.all(
+                    matches.map(async (matchItem) => {
+                        const [packageName, subpath] = parseSpecifier(matchItem.importId);
 
-                    if (!subpath) {
-                        return undefined;
-                    }
+                        if (!subpath) {
+                            return undefined;
+                        }
 
-                    const cacheKey = `${packageName}:${subpath}:${startDirectory}`;
+                        const cacheKey = `${packageName}:${subpath}:${startDirectory}`;
 
-                    // Check cache first
-                    const cached = resolutionCache.get(cacheKey);
+                        // Check cache first
+                        const cached = resolutionCache.get(cacheKey);
 
-                    if (cached !== undefined) {
-                        return cached ? { ...matchItem, resolvedId: cached } : undefined;
-                    }
+                        if (cached !== undefined) {
+                            return cached ? { ...matchItem, resolvedId: cached } : undefined;
+                        }
 
-                    // Find package.json
-                    const packageJsonPath = await findPackageJson(startDirectory, packageName);
+                        // Find package.json
+                        const packageJsonPath = await findPackageJson(startDirectory, packageName);
 
-                    if (!packageJsonPath) {
-                        resolutionCache.set(cacheKey, undefined);
-
-                        return undefined;
-                    }
-
-                    // Read and cache package.json
-                    let pkgJson = packageJsonCache.get(packageJsonPath);
-
-                    if (pkgJson === undefined) {
-                        try {
-                            pkgJson = parsePackageJsonSync(packageJsonPath, {
-                                resolveCatalogs: true,
-                            });
-                            packageJsonCache.set(packageJsonPath, pkgJson);
-                        } catch {
-                            packageJsonCache.set(packageJsonPath, undefined);
+                        if (!packageJsonPath) {
                             resolutionCache.set(cacheKey, undefined);
 
                             return undefined;
                         }
-                    }
 
-                    // If package has exports field, let Node.js handle resolution (even if subpath not defined)
-                    if (pkgJson.exports) {
-                        resolutionCache.set(cacheKey, undefined);
+                        // Read and cache package.json
+                        let pkgJson = packageJsonCache.get(packageJsonPath);
 
-                        return undefined;
-                    }
+                        if (pkgJson === undefined) {
+                            try {
+                                pkgJson = parsePackageJsonSync(packageJsonPath, {
+                                    resolveCatalogs: true,
+                                });
+                                packageJsonCache.set(packageJsonPath, pkgJson);
+                            } catch {
+                                packageJsonCache.set(packageJsonPath, undefined);
+                                resolutionCache.set(cacheKey, undefined);
 
-                    // Resolve with implicit extensions
-                    const packageDirectory = dirname(packageJsonPath);
-                    const subpathFullPath = join(packageDirectory, subpath);
-                    const resolvedPath = await tryResolveImplicit(subpathFullPath);
+                                return undefined;
+                            }
+                        }
 
-                    if (!resolvedPath) {
-                        resolutionCache.set(cacheKey, undefined);
+                        // If package has exports field, let Node.js handle resolution (even if subpath not defined)
+                        if (pkgJson.exports) {
+                            resolutionCache.set(cacheKey, undefined);
 
-                        return undefined;
-                    }
+                            return undefined;
+                        }
 
-                    const relativePath = relative(packageDirectory, resolvedPath);
-                    const resolvedId = `${packageName}/${relativePath}`;
+                        // Resolve with implicit extensions
+                        const packageDirectory = dirname(packageJsonPath);
+                        const subpathFullPath = join(packageDirectory, subpath);
+                        const resolvedPath = await tryResolveImplicit(subpathFullPath);
 
-                    resolutionCache.set(cacheKey, resolvedId);
+                        if (!resolvedPath) {
+                            resolutionCache.set(cacheKey, undefined);
 
-                    return { ...matchItem, resolvedId };
-                }),
-            );
+                            return undefined;
+                        }
 
-            // Apply changes
-            const validResolutions = resolutions.filter((r): r is NonNullable<typeof r> => r !== undefined);
+                        const relativePath = relative(packageDirectory, resolvedPath);
+                        const resolvedId = `${packageName}/${relativePath}`;
 
-            if (validResolutions.length === 0) {
-                return undefined;
-            }
+                        resolutionCache.set(cacheKey, resolvedId);
 
-            const magicString = new MagicString(code);
+                        return { ...matchItem, resolvedId };
+                    }),
+                );
 
-            for (const { quoteEnd, quoteStart, resolvedId } of validResolutions) {
-                magicString.overwrite(quoteStart, quoteEnd, resolvedId);
-                this.debug(`[resolve-implicit-externals] Rewriting ${code.slice(quoteStart, quoteEnd)} -> ${resolvedId} in ${id}`);
-            }
+                // Apply changes
+                const validResolutions = resolutions.filter((r): r is NonNullable<typeof r> => r !== undefined);
 
-            return {
-                code: magicString.toString(),
-                map: magicString.generateMap({ hires: true }),
-            };
+                if (validResolutions.length === 0) {
+                    return undefined;
+                }
+
+                const magicString = new MagicString(code);
+
+                for (const { quoteEnd, quoteStart, resolvedId } of validResolutions) {
+                    magicString.overwrite(quoteStart, quoteEnd, resolvedId);
+                    this.debug(`[resolve-implicit-externals] Rewriting ${code.slice(quoteStart, quoteEnd)} -> ${resolvedId} in ${id}`);
+                }
+
+                return {
+                    code: magicString.toString(),
+                    map: magicString.generateMap({ hires: true }),
+                };
             },
         },
     };

@@ -60,11 +60,11 @@ const concat = (extracted: Extracted[]): Promise<Concatenated> => {
                     // `original` object as a full mapping and asserts that its
                     // line/column are numbers and `source` is a string, so only
                     // attach it when the original position is actually present.
-                    if (item.originalLine != null && item.originalColumn != null && item.source != null) {
+                    if (typeof item.originalLine === "number" && typeof item.originalColumn === "number" && typeof item.source === "string") {
                         mapping.original = { column: item.originalColumn, line: item.originalLine };
                         mapping.source = item.source;
 
-                        if (item.name != null) {
+                        if (typeof item.name === "string") {
                             mapping.name = item.name;
                         }
                     }

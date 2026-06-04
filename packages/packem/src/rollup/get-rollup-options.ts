@@ -132,7 +132,7 @@ export const createChunkFileNames = (getExtension: () => string, usePreserveModu
 export const createEntryFileNames = (
     getExtension: (chunk: PreRenderedChunk) => string,
     usePreserveModules: boolean,
-): ((chunkInfo: PreRenderedChunk) => string | undefined) => {
+): (chunkInfo: PreRenderedChunk) => string | undefined => {
     if (usePreserveModules) {
         return (chunkInfo: PreRenderedChunk): string | undefined => {
             const { name } = chunkInfo;

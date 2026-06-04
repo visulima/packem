@@ -132,13 +132,7 @@ export interface BuildOptions {
     analyze?: boolean;
     /** Browser targets for transpilation (e.g., ['chrome 58', 'firefox 57']) */
     browserTargets?: string[];
-    /**
-     * The resolved browserslist result, preserved even when the global runtime
-     * is "node" (where `browserTargets` is cleared). Per-group browser builds use
-     * this so that browser-runtime entries in an otherwise node package keep their
-     * intended browserslist targets.
-     */
-    resolvedBrowserTargets?: string[];
+
     /** Custom builder functions for different build types */
     builder?: Record<string, (context: BuildContext<BuildOptions>, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
 
@@ -151,6 +145,7 @@ export interface BuildOptions {
      * `"rollup"` bundler.
      */
     bundler?: "rollup" | "rolldown";
+
     /** Whether to enable CommonJS interop for ESM modules */
     cjsInterop?: boolean;
     /** Whether to clean the output directory before building */
@@ -180,6 +175,7 @@ export interface BuildOptions {
      * If `false` or `undefined`, generate both declaration and source files.
      */
     dtsOnly?: boolean;
+
     /** Whether to emit CommonJS output */
     emitCJS?: boolean;
     /** Whether to emit ESM output */
@@ -196,6 +192,7 @@ export interface BuildOptions {
      * Automatically enforces a single entry point.
      */
     exe?: boolean | ExeOptions;
+
     /** External dependencies that should not be bundled */
     externals: (RegExp | string)[];
     /** Whether to fail the build on warnings */
@@ -215,6 +212,7 @@ export interface BuildOptions {
      * @default { alias: {}, debug: false, interopDefault: true }
      */
     jiti: Omit<JitiOptions & { absoluteJitiPath?: boolean }, "onError" | "transform">;
+
     /** Signal to use when killing child processes */
     killSignal?: KillSignal;
     /** Whether to minify the output */
@@ -223,15 +221,23 @@ export interface BuildOptions {
     name: string;
     /** Node.js 10 compatibility options */
     node10Compatibility?: Node10CompatibilityOptions | false;
+    onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined>);
     /** Command to run or function to execute after successful build */
 
-    onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined>);
     /** Timeout for the onSuccess command in milliseconds */
     onSuccessTimeout?: number;
     /** Output directory for build artifacts */
     outDir: string;
     /** Custom file extensions for different output formats */
     outputExtensionMap?: Record<Format, string>;
+
+    /**
+     * The resolved browserslist result, preserved even when the global runtime
+     * is "node" (where `browserTargets` is cleared). Per-group browser builds use
+     * this so that browser-runtime entries in an otherwise node package keep their
+     * intended browserslist targets.
+     */
+    resolvedBrowserTargets?: string[];
     /** Rollup-specific build options */
     rollup: RollupBuildOptions;
     /** Root directory of the project */

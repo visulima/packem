@@ -1,4 +1,4 @@
-/* eslint-disable consistent-return, sonarjs/cognitive-complexity, import/exports-last, @typescript-eslint/no-non-null-assertion, @typescript-eslint/prefer-nullish-coalescing, no-await-in-loop, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-dynamic-delete, unicorn/prevent-abbreviations, unicorn/no-await-expression-member, unicorn/no-null, @typescript-eslint/restrict-template-expressions, no-plusplus, @stylistic/no-extra-parens, jsdoc/check-indentation, jsdoc/match-description, import/no-commonjs, prefer-const -- this file orchestrates the dts generation pipeline; rule-by-rule refactoring would obscure the control flow and many `any` usages stem from JSON.parse / rollup internal types */
+/* eslint-disable consistent-return, sonarjs/cognitive-complexity, import/exports-last, @typescript-eslint/no-non-null-assertion, @typescript-eslint/prefer-nullish-coalescing, no-await-in-loop, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-dynamic-delete, unicorn/prevent-abbreviations, unicorn/no-await-expression-member, unicorn/no-null, @typescript-eslint/restrict-template-expressions, no-plusplus, @stylistic/no-extra-parens, jsdoc/check-indentation, jsdoc/match-description, import/no-commonjs, prefer-const -- this file orchestrates the dts generation pipeline; rule-by-rule refactoring would obscure the control flow and many `any` usages stem from JSON.parse / rollup internal types */
 import type { ChildProcess } from "node:child_process";
 import { fork } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -23,7 +23,8 @@ import { runTsgo } from "./tsgo";
 
 const debug = createDebug("rollup-plugin-dts:generate");
 
-const WORKER_URL: string = import.meta.WORKER_URL ?? "./tsc/worker.js";
+// `WORKER_URL` is injected at build time; it is not part of the standard `ImportMeta`.
+const WORKER_URL: string = (import.meta as ImportMeta & { WORKER_URL?: string }).WORKER_URL ?? "./tsc/worker.js";
 
 export interface TsModule {
     /** `.ts` source code */

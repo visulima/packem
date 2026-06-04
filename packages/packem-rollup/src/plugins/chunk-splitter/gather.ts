@@ -16,14 +16,16 @@ interface ExportInfo {
 
 /**
  * State threaded through the recursive gather to keep traversal correct and
- * cheap across re-export chains:
- * - `visited` is the set of module ids currently on the recursion path. It
- *   guards against circular barrel re-exports (e.g. a -> b -> a), which are
- *   legal input that rollup itself tolerates; without it the mutual recursion
- *   is unbounded. Ids are removed when their subtree finishes so legitimate
- *   diamond re-exports through sibling statements are still fully traversed.
- * - `parseCache` memoizes the (expensive) parse of each module's source so a
- *   shared barrel reachable through many paths is parsed at most once per run.
+ * cheap across re-export chains.
+ *
+ * `visited` is the set of module ids currently on the recursion path. It guards
+ * against circular barrel re-exports (e.g. a -> b -> a), which are legal input
+ * that rollup itself tolerates; without it the mutual recursion is unbounded.
+ * Ids are removed when their subtree finishes so legitimate diamond re-exports
+ * through sibling statements are still fully traversed.
+ *
+ * `parseCache` memoizes the (expensive) parse of each module's source so a
+ * shared barrel reachable through many paths is parsed at most once per run.
  */
 interface GatherState {
     parseCache: Map<string, ParsedExportInfo[]>;

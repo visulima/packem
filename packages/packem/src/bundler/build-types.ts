@@ -2,13 +2,81 @@ import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getCacheHash, getChunkFilename, getDtsExtension } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
-import type { Plugin, RollupCache } from "rollup";
+import type { OutputBundle, Plugin, RollupCache } from "rollup";
 
 import { getRollupDtsOptions } from "../rollup/get-rollup-options";
 import type { BuildEntry, InternalBuildOptions } from "../types";
 import { getRollupBuild } from "./get-rollup";
 
 const DTS_CACHE_KEY = "rollup-dts.json";
+
+// Drop orphan SHARED declaration chunks. A shared chunk is emitted for *every*
+// extension in `allExtensions` because `chunkFileNames` (getChunkFilename) has no
+// skip mechanism, unlike `entryFileNames`. So a shared chunk that only ESM entries
+// import still produces a `.d.cts` that no surviving `.cjs` entry references.
+//
+// Strategy: treat every *kept* entry chunk (an `isEntry` chunk that the SKIP_CHUNK
+// pass did NOT delete — i.e. one that legitimately wants this extension) as a
+// reachability root, walk `imports` / `dynamicImports` transitively, and remove
+// any non-entry chunk not reached.
+//
+// GUARDRAIL: deletion is conservative — only chunks provably unreachable from a kept
+// entry root are removed. If a write produced no kept entry chunks (no roots), bail
+// out and keep everything, rather than risk the "multi-environment DTS collapse"
+// regression by stranding a declaration that is in fact referenced.
+// Returns the set of chunk fileNames reachable from the kept entry chunks, or
+// `undefined` when there are no entry roots (the signal to keep everything).
+const collectReachableChunks = (bundle: OutputBundle): Set<string> | undefined => {
+    const reachable = new Set<string>();
+    const stack: string[] = [];
+
+    for (const [fileName, output] of Object.entries(bundle)) {
+        if (output.type === "chunk" && output.isEntry) {
+            reachable.add(fileName);
+            stack.push(fileName);
+        }
+    }
+
+    if (stack.length === 0) {
+        return undefined;
+    }
+
+    while (stack.length > 0) {
+        const current = stack.pop() as string;
+        const output = bundle[current];
+
+        if (output.type !== "chunk") {
+            continue;
+        }
+
+        for (const imported of [...output.imports, ...output.dynamicImports]) {
+            // `bundle[imported]` is absent for external / non-bundled imports, so gate
+            // on `Object.hasOwn` (rollup's `OutputBundle` index type can't express the
+            // missing-key case).
+            if (Object.hasOwn(bundle, imported) && bundle[imported].type === "chunk" && !reachable.has(imported)) {
+                reachable.add(imported);
+                stack.push(imported);
+            }
+        }
+    }
+
+    return reachable;
+};
+
+const pruneOrphanSharedDeclarationChunks = (bundle: OutputBundle): void => {
+    const reachable = collectReachableChunks(bundle);
+
+    if (!reachable) {
+        return;
+    }
+
+    for (const [fileName, output] of Object.entries(bundle)) {
+        if (output.type === "chunk" && !output.isEntry && !reachable.has(fileName)) {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete, no-param-reassign -- rollup requires in-place mutation of the bundle to drop chunks.
+            delete bundle[fileName];
+        }
+    }
+};
 
 /**
  * Minimal structural logger contract. `@visulima/pail`'s shipped `Pail` type
@@ -147,66 +215,9 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
                     }
                 }
 
-                // PHASE 2 — drop orphan SHARED declaration chunks. A shared chunk
-                // is emitted for *every* extension in `allExtensions` because
-                // `chunkFileNames` (getChunkFilename) has no skip mechanism, unlike
-                // `entryFileNames`. So a shared chunk that only ESM entries import
-                // still produces a `.d.cts` that no surviving `.cjs` entry references.
-                //
-                // Strategy: treat every *kept* entry chunk (an `isEntry` chunk that
-                // PHASE 1 did NOT delete — i.e. one that legitimately wants this
-                // extension) as a reachability root, then walk `imports` /
-                // `dynamicImports` transitively. Any non-entry chunk not reached is
-                // a provably-orphan declaration variant and is removed.
-                //
-                // GUARDRAIL: deletion is conservative — we only remove a chunk we
-                // can prove is unreachable from a kept entry root. If this write
-                // produced no kept entry chunks at all (no roots), we bail out and
-                // keep everything, rather than risk the "multi-environment DTS
-                // collapse" regression by stranding a declaration that is in fact
-                // referenced.
-                const isChunk = (fileName: string): boolean => bundle[fileName]?.type === "chunk";
-
-                const reachable = new Set<string>();
-                const stack: string[] = [];
-
-                for (const [fileName, output] of Object.entries(bundle)) {
-                    if (output.type === "chunk" && output.isEntry) {
-                        reachable.add(fileName);
-                        stack.push(fileName);
-                    }
-                }
-
-                // No surviving entry wants this extension — keep everything rather
-                // than risk deleting a declaration that is in fact referenced.
-                if (stack.length === 0) {
-                    return;
-                }
-
-                while (stack.length > 0) {
-                    const current = stack.pop() as string;
-                    const output = bundle[current];
-
-                    if (!output || output.type !== "chunk") {
-                        continue;
-                    }
-
-                    for (const imported of [...output.imports, ...output.dynamicImports]) {
-                        if (isChunk(imported) && !reachable.has(imported)) {
-                            reachable.add(imported);
-                            stack.push(imported);
-                        }
-                    }
-                }
-
-                for (const [fileName, output] of Object.entries(bundle)) {
-                    // Only non-entry (shared / dynamic) chunks are eligible for
-                    // pruning; entry chunks are governed solely by PHASE 1.
-                    if (output.type === "chunk" && !output.isEntry && !reachable.has(fileName)) {
-                        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete, no-param-reassign -- see PHASE 1: rollup requires in-place mutation of the bundle to drop chunks.
-                        delete bundle[fileName];
-                    }
-                }
+                // PHASE 2 — drop orphan SHARED declaration chunks not reachable from
+                // any kept entry chunk of this extension (see helper above).
+                pruneOrphanSharedDeclarationChunks(bundle);
             },
             name: "packem:filter-skip-chunks",
         };

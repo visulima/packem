@@ -5,5 +5,5 @@
         "lib": ["es2023", "dom", "dom.iterable"],
         "moduleResolution": "bundler"
     },
-    "include": ["src/**/*", "*.d.ts", "__tests__/index.test.ts"]
+    "include": ["src/**/*", "*.d.ts", "__tests__/index.test.ts", "__bench__/**/*"]
 }

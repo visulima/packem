@@ -34,6 +34,7 @@ const oxcTransformPlugin: TransformerFunction<InternalOXCTransformPluginConfig> 
                         return error;
                     }
 
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- oxc errors are typed with a string `message`, but defensively fall back to a JSON dump for malformed runtime error objects.
                     return error.message ?? JSON.stringify(error);
                 });
 

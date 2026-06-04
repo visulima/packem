@@ -14,6 +14,9 @@ import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOptio
 import { mm } from "./utils/sourcemap";
 
 const RELATIVE_PATH_RE = /^\.[/\\]/;
+// Matches the first non-whitespace character; used to skip empty/whitespace-only CSS
+// without allocating a stripped copy of the source.
+const NON_WHITESPACE_RE = /\S/;
 
 /**
  * Sorts loaders by their name order according to the specified processing sequence.
@@ -537,7 +540,7 @@ const cssPlugin = (
 
             // Skip empty files. Short-circuit on the first non-whitespace char
             // instead of allocating a whitespace-stripped copy of the source.
-            if (!/\S/.test(code)) {
+            if (!NON_WHITESPACE_RE.test(code)) {
                 logger.debug({ message: `Skipping empty file: ${transformId}`, plugin: "css" });
 
                 return undefined;

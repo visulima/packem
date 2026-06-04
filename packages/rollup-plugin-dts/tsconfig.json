@@ -6,6 +6,6 @@
         "noUncheckedIndexedAccess": false,
         "skipLibCheck": true
     },
-    "include": ["src", "__tests__"],
+    "include": ["src", "__tests__", "__bench__"],
     "exclude": ["__tests__/fixtures", "__tests__/__fixtures__"]
 }

@@ -5,7 +5,7 @@ import MagicString from "magic-string";
 import type { Plugin } from "rollup";
 
 interface NewExpressionWithRollupExtras {
-    // eslint-disable-next-line no-underscore-dangle -- `_rollupAnnotations` is rollup's extended ast property name
+
     _rollupAnnotations?: { type: string }[];
     callee?: { name?: string; type?: string };
     rollupAnnotations?: { type: string }[];
@@ -30,7 +30,7 @@ export const pureNewExpressionPlugin = (options: { constructors: string[]; sourc
     // (e.g. "Map" inside "MapView").
     const escapeForRegExp = (value: string): string => value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
     const quickCheckRegExp
-        = constructorSet.size > 0 ? new RegExp(String.raw`\b(?:${[...constructorSet].map(escapeForRegExp).join("|")})\b`) : undefined;
+        = constructorSet.size > 0 ? new RegExp(String.raw`\b(?:${[...constructorSet].map((value) => escapeForRegExp(value)).join("|")})\b`) : undefined;
 
     return {
         name: "packem:pure-new-expression",

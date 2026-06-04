@@ -31,7 +31,7 @@ const JSX_FILE_RE = /\.[jt]sx$/;
  * (not `jsxRuntime.jsx`). Only the automatic runtime is supported; the classic
  * runtime (`React.createElement`) is intentionally out of scope.
  */
-const AUTOMATIC_RUNTIME_CALLEES = new Set(["jsx", "jsxs", "jsxDEV"]);
+const AUTOMATIC_RUNTIME_CALLEES = new Set(["jsx", "jsxDEV", "jsxs"]);
 
 export type JSXRemoveAttributesPlugin = {
     attributes: string[];

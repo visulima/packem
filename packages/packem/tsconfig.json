@@ -27,5 +27,5 @@
         "noUnusedParameters": false,
         "useUnknownInCatchVariables": false
     },
-    "include": ["src/**/*", "*.d.ts", "./packem.config.ts", "__tests__/**/*"]
+    "include": ["src/**/*", "*.d.ts", "./packem.config.ts", "__tests__/**/*", "__bench__/**/*"]
 }

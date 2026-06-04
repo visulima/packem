@@ -8,6 +8,7 @@ export default createConfig(
             "node_modules",
             "coverage",
             "__fixtures__",
+            "__bench__",
             "__docs__",
             "examples",
             "vitest.config.ts",

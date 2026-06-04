@@ -46,7 +46,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
         // with its type so distinct shapes (e.g. "1" vs 1) never collide, and
         // values are joined with a NUL separator that cannot appear in a normal
         // module id. The arity prefix disambiguates differing argument counts.
-        const separator = String.fromCharCode(0);
+        const separator = String.fromCodePoint(0);
 
         let allPrimitive = true;
 
@@ -61,7 +61,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
         }
 
         if (allPrimitive) {
-            return `${arguments_.length}${separator}${arguments_.map((argument) => `${typeof argument}:${String(argument)}`).join(separator)}`;
+            return `${String(arguments_.length)}${separator}${arguments_.map((argument) => `${typeof argument}:${String(argument)}`).join(separator)}`;
         }
 
         return stringify({ args: arguments_ }) ?? JSON.stringify(arguments_);
