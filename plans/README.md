@@ -15,11 +15,19 @@ survived verification against the actual code.
 
 | Plan | Title | Priority | Effort | Risk | Depends on | Status |
 |------|-------|----------|--------|------|------------|--------|
-| 001  | Run the rolldown integration suite in CI (advisory job) | P1 | S | LOW | — | TODO |
-| 002  | Guard against cross-polluting rollup/rolldown snapshots on `vitest -u` | P1 | S | LOW | — | TODO |
-| 003  | Fix `jsx-remove-attributes` corrupting output when stripped attr is first prop | P2 | S | LOW | — | TODO |
-| 004  | Extract the duplicated dependency-cache load logic in `build.ts` | P3 | S | LOW | — | TODO |
-| 005  | Add a root `AGENTS.md` for the monorepo | P2 | S | LOW | — (content reflects 001 & 002) | TODO |
+| 001  | Run the rolldown integration suite in CI (advisory job) | P1 | S | LOW | — | DONE (4d8f4eacf) |
+| 002  | Guard against cross-polluting rollup/rolldown snapshots on `vitest -u` | P1 | S | LOW | — | DONE (a0a490cbb) |
+| 003  | Fix `jsx-remove-attributes` corrupting output when stripped attr is first prop | P2 | S | LOW | — | DONE (5b36f504c) |
+| 004  | Extract the duplicated dependency-cache load logic in `build.ts` | P3 | S | LOW | — | DONE (00e2e7954) |
+| 005  | Add a root `AGENTS.md` for the monorepo | P2 | S | LOW | — (content reflects 001 & 002) | DONE |
+
+> Executed in-tree on branch `advisor/improve-batch` (2026-06-10). Worktree-isolated
+> executor dispatch was unavailable in this environment, so the plans were run
+> manually with the same verification gates each plan specifies. Plan 003's
+> proposed removal strategy had a latent overlap bug (consecutive stripped props
+> where the second is last) caught by the existing multi-attribute test; the
+> committed fix uses a leading-comma strategy instead and extracts a helper that
+> also drops the file's pre-existing cognitive-complexity lint violation.
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
 
