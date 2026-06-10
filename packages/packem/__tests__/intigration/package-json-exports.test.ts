@@ -15,17 +15,22 @@ const NODE_JS_VERSION = `${splitNodeJsVersion[0] ?? ""}.${splitNodeJsVersion[1] 
 
 const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
 
-const ASSIGN_DEVELOPMENT_REGEX = /=\s*"development"/;
+// Match the assigned string-literal value regardless of quote style: rollup
+// emits double quotes (`= "production"`) while rolldown's codegen emits
+// backtick template literals (`` = `production` ``) for the same value. Both
+// are semantically identical, so the assertions accept any of the three JS
+// string-quote characters.
+const ASSIGN_DEVELOPMENT_REGEX = /=\s*["'`]development["'`]/;
 
-const ASSIGN_PRODUCTION_REGEX = /=\s*"production"/;
+const ASSIGN_PRODUCTION_REGEX = /=\s*["'`]production["'`]/;
 
-const ASSIGN_INDEX_REGEX = /=\s*"index"/;
+const ASSIGN_INDEX_REGEX = /=\s*["'`]index["'`]/;
 
-const ASSIGN_CORE_REGEX = /=\s*"core"/;
+const ASSIGN_CORE_REGEX = /=\s*["'`]core["'`]/;
 
-const ASSIGN_CORE_DEVELOPMENT_REGEX = /=\s*"coredevelopment"/;
+const ASSIGN_CORE_DEVELOPMENT_REGEX = /=\s*["'`]coredevelopment["'`]/;
 
-const ASSIGN_CORE_PRODUCTION_REGEX = /=\s*"coreproduction"/;
+const ASSIGN_CORE_PRODUCTION_REGEX = /=\s*["'`]coreproduction["'`]/;
 
 const PROCESS_ENV_NODE_ENV_REGEX = /process.env.NODE_ENV/;
 
