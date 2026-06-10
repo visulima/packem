@@ -2,34 +2,89 @@
 
 exports[`packem swc > should generate shared common chunks with SWC transformer > entry1.cjs output 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require_foo = require("./chunks/foo-DTqsO28k.js");
-let _swc_helpers____ts_add_disposable_resource = require("@swc/helpers/_/_ts_add_disposable_resource");
-let _swc_helpers____ts_dispose_resources = require("@swc/helpers/_/_ts_dispose_resources");
+const require_foo = require("./chunks/foo-SZ0x3kzp.js");
+//#region \\0@oxc-project+runtime@0.133.0/helpers/esm/usingCtx.js
+function _usingCtx() {
+	var r = "function" == typeof SuppressedError ? SuppressedError : function(r, e) {
+		var n = Error();
+		return n.name = "SuppressedError", n.error = r, n.suppressed = e, n;
+	}, e = {}, n = [];
+	function using(r, e) {
+		if (null != e) {
+			if (Object(e) !== e) throw new TypeError("using declarations can only be used with objects, functions, null, or undefined.");
+			if (r) var o = e[Symbol.asyncDispose || Symbol["for"]("Symbol.asyncDispose")];
+			if (void 0 === o && (o = e[Symbol.dispose || Symbol["for"]("Symbol.dispose")], r)) var t = o;
+			if ("function" != typeof o) throw new TypeError("Object is not disposable.");
+			t && (o = function o() {
+				try {
+					t.call(e);
+				} catch (r) {
+					return Promise.reject(r);
+				}
+			}), n.push({
+				v: e,
+				d: o,
+				a: r
+			});
+		} else r && n.push({
+			d: e,
+			a: r
+		});
+		return e;
+	}
+	return {
+		e,
+		u: using.bind(null, !1),
+		a: using.bind(null, !0),
+		d: function d() {
+			var o, t = this.e, s = 0;
+			function next() {
+				for (; o = n.pop();) try {
+					if (!o.a && 1 === s) return s = 0, n.push(o), Promise.resolve().then(next);
+					if (o.d) {
+						var r = o.d.call(o.v);
+						if (o.a) return s |= 2, Promise.resolve(r).then(next, err);
+					} else s |= 1;
+				} catch (r) {
+					return err(r);
+				}
+				if (1 === s) return t !== e ? Promise.reject(t) : Promise.resolve();
+				if (t !== e) throw t;
+			}
+			function err(n) {
+				return t = t !== e ? new r(n, t) : n, next();
+			}
+			return next();
+		}
+	};
+}
+//#endregion
 //#region src/bar.ts
 var Bar = class {
 	method() {
-		let s = {
-			stack: [],
-			error: void 0,
-			hasError: !1
-		};
 		try {
-			let o = (0, _swc_helpers____ts_add_disposable_resource._)(s, { [Symbol.dispose]: () => {
-				console.log("Hooray!");
-			} }, !1);
-			console.log("using resource", o);
-		} catch (r) {
-			s.error = r, s.hasError = !0;
+			var _usingCtx$1 = _usingCtx();
+			const getResource = () => {
+				return { [Symbol.dispose]: () => {
+					console.log("Hooray!");
+				} };
+			};
+			const resource = _usingCtx$1.u(getResource());
+			console.log("using resource", resource);
+		} catch (_) {
+			_usingCtx$1.e = _;
 		} finally {
-			(0, _swc_helpers____ts_dispose_resources._)(s);
+			_usingCtx$1.d();
 		}
 	}
 };
 //#endregion
 //#region src/entry1.ts
 const entry1 = () => {
-	let t = new Bar(), e = new require_foo.Foo();
-	return t.method(), e.foo();
+	const bar = new Bar();
+	const foo = new require_foo.Foo();
+	bar.method();
+	return foo.foo();
 };
 //#endregion
 exports.entry1 = entry1;
@@ -37,34 +92,89 @@ exports.entry1 = entry1;
 `;
 
 exports[`packem swc > should generate shared common chunks with SWC transformer > entry1.mjs output 1`] = `
-"import { t as Foo } from "./chunks/foo-D82BIBPp.js";
-import { _ } from "@swc/helpers/_/_ts_add_disposable_resource";
-import { _ as _$1 } from "@swc/helpers/_/_ts_dispose_resources";
+"import { t as Foo } from "./chunks/foo-BMvk-HZX.js";
+//#region \\0@oxc-project+runtime@0.133.0/helpers/esm/usingCtx.js
+function _usingCtx() {
+	var r = "function" == typeof SuppressedError ? SuppressedError : function(r, e) {
+		var n = Error();
+		return n.name = "SuppressedError", n.error = r, n.suppressed = e, n;
+	}, e = {}, n = [];
+	function using(r, e) {
+		if (null != e) {
+			if (Object(e) !== e) throw new TypeError("using declarations can only be used with objects, functions, null, or undefined.");
+			if (r) var o = e[Symbol.asyncDispose || Symbol["for"]("Symbol.asyncDispose")];
+			if (void 0 === o && (o = e[Symbol.dispose || Symbol["for"]("Symbol.dispose")], r)) var t = o;
+			if ("function" != typeof o) throw new TypeError("Object is not disposable.");
+			t && (o = function o() {
+				try {
+					t.call(e);
+				} catch (r) {
+					return Promise.reject(r);
+				}
+			}), n.push({
+				v: e,
+				d: o,
+				a: r
+			});
+		} else r && n.push({
+			d: e,
+			a: r
+		});
+		return e;
+	}
+	return {
+		e,
+		u: using.bind(null, !1),
+		a: using.bind(null, !0),
+		d: function d() {
+			var o, t = this.e, s = 0;
+			function next() {
+				for (; o = n.pop();) try {
+					if (!o.a && 1 === s) return s = 0, n.push(o), Promise.resolve().then(next);
+					if (o.d) {
+						var r = o.d.call(o.v);
+						if (o.a) return s |= 2, Promise.resolve(r).then(next, err);
+					} else s |= 1;
+				} catch (r) {
+					return err(r);
+				}
+				if (1 === s) return t !== e ? Promise.reject(t) : Promise.resolve();
+				if (t !== e) throw t;
+			}
+			function err(n) {
+				return t = t !== e ? new r(n, t) : n, next();
+			}
+			return next();
+		}
+	};
+}
+//#endregion
 //#region src/bar.ts
 var Bar = class {
 	method() {
-		let s = {
-			stack: [],
-			error: void 0,
-			hasError: !1
-		};
 		try {
-			let o = _(s, { [Symbol.dispose]: () => {
-				console.log("Hooray!");
-			} }, !1);
-			console.log("using resource", o);
-		} catch (r) {
-			s.error = r, s.hasError = !0;
+			var _usingCtx$1 = _usingCtx();
+			const getResource = () => {
+				return { [Symbol.dispose]: () => {
+					console.log("Hooray!");
+				} };
+			};
+			const resource = _usingCtx$1.u(getResource());
+			console.log("using resource", resource);
+		} catch (_) {
+			_usingCtx$1.e = _;
 		} finally {
-			_$1(s);
+			_usingCtx$1.d();
 		}
 	}
 };
 //#endregion
 //#region src/entry1.ts
 const entry1 = () => {
-	let t = new Bar(), e = new Foo();
-	return t.method(), e.foo();
+	const bar = new Bar();
+	const foo = new Foo();
+	bar.method();
+	return foo.foo();
 };
 //#endregion
 export { entry1 };
@@ -73,22 +183,26 @@ export { entry1 };
 
 exports[`packem swc > should generate shared common chunks with SWC transformer > entry2.cjs output 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require_foo = require("./chunks/foo-DTqsO28k.js");
+const require_foo = require("./chunks/foo-SZ0x3kzp.js");
 //#region src/index.ts
 var Index = class {
 	async method() {
-		let e = { a: 1 }, s = { b: 2 };
-		console.log({
-			...e,
-			...s
-		}, Object.assign({}, e, s));
+		const x = { a: 1 };
+		const y = { b: 2 };
+		const z = {
+			...x,
+			...y
+		};
+		console.log(z, /* @__PURE__ */ Object.assign({}, x, y));
 	}
 };
 //#endregion
 //#region src/entry2.ts
 const entry2 = () => {
-	let r = new Index(), t = new require_foo.Foo();
-	return r.method(), t.foo();
+	const index = new Index();
+	const foo = new require_foo.Foo();
+	index.method();
+	return foo.foo();
 };
 //#endregion
 exports.entry2 = entry2;
@@ -96,22 +210,26 @@ exports.entry2 = entry2;
 `;
 
 exports[`packem swc > should generate shared common chunks with SWC transformer > entry2.mjs output 1`] = `
-"import { t as Foo } from "./chunks/foo-D82BIBPp.js";
+"import { t as Foo } from "./chunks/foo-BMvk-HZX.js";
 //#region src/index.ts
 var Index = class {
 	async method() {
-		let e = { a: 1 }, s = { b: 2 };
-		console.log({
-			...e,
-			...s
-		}, Object.assign({}, e, s));
+		const x = { a: 1 };
+		const y = { b: 2 };
+		const z = {
+			...x,
+			...y
+		};
+		console.log(z, /* @__PURE__ */ Object.assign({}, x, y));
 	}
 };
 //#endregion
 //#region src/entry2.ts
 const entry2 = () => {
-	let r = new Index(), t = new Foo();
-	return r.method(), t.foo();
+	const index = new Index();
+	const foo = new Foo();
+	index.method();
+	return foo.foo();
 };
 //#endregion
 export { entry2 };
@@ -120,8 +238,8 @@ export { entry2 };
 
 exports[`packem swc > should handle modern TypeScript syntax with SWC transformer > modern features index.cjs output 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require_ModernFeatures = require("./packem_shared/ModernFeatures-CX9G-0Mp.cjs");
-exports.ModernFeatures = require_ModernFeatures.ModernFeatures;
+const require_modern = require("./packem_shared/modern-BqlvN68p.cjs");
+exports.ModernFeatures = require_modern.ModernFeatures;
 "
 `;
 
@@ -145,7 +263,7 @@ export { ModernFeatures };
 `;
 
 exports[`packem swc > should handle modern TypeScript syntax with SWC transformer > modern features index.mjs output 1`] = `
-"import { ModernFeatures } from "./packem_shared/ModernFeatures-do-qwZu5.mjs";
+"import { t as ModernFeatures } from "./packem_shared/modern-DOzcZA77.mjs";
 export { ModernFeatures };
 "
 `;

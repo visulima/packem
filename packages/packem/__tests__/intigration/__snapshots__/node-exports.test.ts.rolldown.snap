@@ -142,13 +142,6 @@ export { test as default, test2 };
 "
 `;
 
-exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop > mjs output 1`] = `
-"const test = () => "this should be in final bundle";
-
-export { test as default };
-"
-`;
-
 exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop > cjs output 1`] = `
 "const test = () => "this should be in final bundle";
 
@@ -156,11 +149,17 @@ module.exports = test;
 "
 `;
 
-exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > package.mjs output 1`] = `
-"const packageA = () => "This is a named export";
-const d = "This is a default export";
+exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop > mjs output 1`] = `
+"const test = () => "this should be in final bundle";
 
-export { d as default, packageA };
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > index.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_package = require('./package.cjs');
+exports.packageA = require_package.packageA;
 "
 `;
 
@@ -183,10 +182,11 @@ exports.packageA = packageA;
 "
 `;
 
-exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > index.cjs output 1`] = `
-"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require_package = require('./package.cjs');
-exports.packageA = require_package.packageA;
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > package.mjs output 1`] = `
+"const packageA = () => "This is a named export";
+const d = "This is a default export";
+
+export { d as default, packageA };
 "
 `;
 
@@ -362,97 +362,7 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > cjs output 1`] = `
-"var g = Object.defineProperty;
-var u = (e, r) => g(e, "name", {
-	value: r,
-	configurable: !0
-});
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-var b = Object.defineProperty, t = u((e, r) => b(e, "name", {
-	value: r,
-	configurable: !0
-}), "o$1"), h = Object.create, i = Object.defineProperty;
-t((e, r) => i(e, "name", {
-	value: r,
-	configurable: !0
-}), "__name");
-var P = Object.getOwnPropertyDescriptor, f = Object.getOwnPropertyNames, O = Object.getPrototypeOf, d = Object.prototype.hasOwnProperty;
-t((e, r) => function() {
-	return e && (r = (0, e[f(e)[0]])(e = 0)), r;
-}, "__esm");
-t((e, r) => () => (e && (r = e(e = 0)), r), "__esmMin");
-t((e, r) => function() {
-	return r || ((0, e[f(e)[0]])((r = { exports: {} }).exports, r), e = null), r.exports;
-}, "__commonJS");
-t((e, r) => () => (r || (e((r = { exports: {} }).exports, r), e = null), r.exports), "__commonJSMin");
-t((e, r) => {
-	let o = {};
-	for (var a in e) i(o, a, {
-		get: e[a],
-		enumerable: !0
-	});
-	return r || i(o, Symbol.toStringTag, { value: "Module" }), o;
-}, "__exportAll");
-var v = t((e, r, o, a) => {
-	if (r && typeof r == "object" || typeof r == "function") for (var l = f(r), n = 0, s = l.length, _; n < s; n++) _ = l[n], !d.call(e, _) && _ !== o && i(e, _, {
-		get: ((c) => r[c]).bind(null, _),
-		enumerable: !(a = P(r, _)) || a.enumerable
-	});
-	return e;
-}, "__copyProps");
-t((e, r, o) => (v(e, r, "default"), o && v(o, r, "default")), "__reExport");
-t((e, r, o) => (o = e != null ? h(O(e)) : {}, v(r || !e || !e.__esModule ? i(o, "default", {
-	value: e,
-	enumerable: !0
-}) : o, e)), "__toESM");
-t((e) => d.call(e, "module.exports") ? e["module.exports"] : v(i({}, "__esModule", { value: !0 }), e), "__toCommonJS");
-t((e) => new Uint8Array(Buffer.from(e, "base64")), "__toBinaryNode");
-(() => {
-	for (var e = new Uint8Array(128), r = 0; r < 64; r++) e[r < 26 ? r + 65 : r < 52 ? r + 71 : r < 62 ? r - 4 : r * 4 - 205] = r;
-	return (o) => {
-		for (var a = o.length, l = new Uint8Array((a - (o[a - 1] == "=") - (o[a - 2] == "=")) * 3 / 4 | 0), n = 0, s = 0; n < a;) {
-			var _ = e[o.charCodeAt(n++)], c = e[o.charCodeAt(n++)], m = e[o.charCodeAt(n++)], y = e[o.charCodeAt(n++)];
-			l[s++] = _ << 2 | c >> 4, l[s++] = c << 4 | m >> 2, l[s++] = m << 6 | y;
-		}
-		return l;
-	};
-})();
-((e) => typeof require < "u" ? require : typeof Proxy < "u" ? new Proxy(e, { get: t((r, o) => (typeof require < "u" ? require : r)[o], "get") }) : e)(function(e) {
-	if (typeof require < "u") return require.apply(this, arguments);
-	throw Error("Calling \`require\` for \\"" + e + "\\" in an environment that doesn't expose the \`require\` function. See https://rolldown.rs/in-depth/bundling-cjs#require-external-modules for more details.");
-});
-var x = Object.defineProperty, p = u((e, r) => x(e, "name", {
-	value: r,
-	configurable: !0
-}), "o"), w = class {
-	static {
-		u(this, "t");
-	}
-	static {
-		p(this, "Parent");
-	}
-	constructor() {}
-}, S = class {
-	static {
-		u(this, "c");
-	}
-	static {
-		p(this, "Feature");
-	}
-	constructor() {}
-}, j = class extends w {
-	static {
-		u(this, "Child");
-	}
-	static {
-		p(this, "Child");
-	}
-	constructor() {
-		this.feature = new S(), console.log("before"), super(), console.log("after");
-	}
-};
-exports.Child = j;
-
+"Object.defineProperty(exports,Symbol.toStringTag,{value:\`Module\`});var e=class{constructor(){}},t=class{constructor(){}},n=class extends e{constructor(){console.log(\`before\`),super(),this.feature=new t,console.log(\`after\`)}};exports.Child=n;
 //# sourceMappingURL=index.cjs.map"
 `;
 
@@ -487,103 +397,8 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs output 1`] = `
-"var g = Object.defineProperty;
-var u = (e, r) => g(e, "name", {
-	value: r,
-	configurable: !0
-}), b = Object.defineProperty, t = u((e, r) => b(e, "name", {
-	value: r,
-	configurable: !0
-}), "o$1"), h = Object.create, i = Object.defineProperty;
-t((e, r) => i(e, "name", {
-	value: r,
-	configurable: !0
-}), "__name");
-var x = Object.getOwnPropertyDescriptor, v = Object.getOwnPropertyNames, P = Object.getPrototypeOf, d = Object.prototype.hasOwnProperty;
-t((e, r) => function() {
-	return e && (r = (0, e[v(e)[0]])(e = 0)), r;
-}, "__esm");
-t((e, r) => () => (e && (r = e(e = 0)), r), "__esmMin");
-t((e, r) => function() {
-	return r || ((0, e[v(e)[0]])((r = { exports: {} }).exports, r), e = null), r.exports;
-}, "__commonJS");
-t((e, r) => () => (r || (e((r = { exports: {} }).exports, r), e = null), r.exports), "__commonJSMin");
-t((e, r) => {
-	let o = {};
-	for (var a in e) i(o, a, {
-		get: e[a],
-		enumerable: !0
-	});
-	return r || i(o, Symbol.toStringTag, { value: "Module" }), o;
-}, "__exportAll");
-var p = t((e, r, o, a) => {
-	if (r && typeof r == "object" || typeof r == "function") for (var l = v(r), n = 0, s = l.length, _; n < s; n++) _ = l[n], !d.call(e, _) && _ !== o && i(e, _, {
-		get: ((c) => r[c]).bind(null, _),
-		enumerable: !(a = x(r, _)) || a.enumerable
-	});
-	return e;
-}, "__copyProps");
-t((e, r, o) => (p(e, r, "default"), o && p(o, r, "default")), "__reExport");
-t((e, r, o) => (o = e != null ? h(P(e)) : {}, p(r || !e || !e.__esModule ? i(o, "default", {
-	value: e,
-	enumerable: !0
-}) : o, e)), "__toESM");
-t((e) => d.call(e, "module.exports") ? e["module.exports"] : p(i({}, "__esModule", { value: !0 }), e), "__toCommonJS");
-t((e) => new Uint8Array(Buffer.from(e, "base64")), "__toBinaryNode");
-(() => {
-	for (var e = new Uint8Array(128), r = 0; r < 64; r++) e[r < 26 ? r + 65 : r < 52 ? r + 71 : r < 62 ? r - 4 : r * 4 - 205] = r;
-	return (o) => {
-		for (var a = o.length, l = new Uint8Array((a - (o[a - 1] == "=") - (o[a - 2] == "=")) * 3 / 4 | 0), n = 0, s = 0; n < a;) {
-			var _ = e[o.charCodeAt(n++)], c = e[o.charCodeAt(n++)], m = e[o.charCodeAt(n++)], y = e[o.charCodeAt(n++)];
-			l[s++] = _ << 2 | c >> 4, l[s++] = c << 4 | m >> 2, l[s++] = m << 6 | y;
-		}
-		return l;
-	};
-})();
-((e) => typeof require < "u" ? require : typeof Proxy < "u" ? new Proxy(e, { get: t((r, o) => (typeof require < "u" ? require : r)[o], "get") }) : e)(function(e) {
-	if (typeof require < "u") return require.apply(this, arguments);
-	throw Error("Calling \`require\` for \\"" + e + "\\" in an environment that doesn't expose the \`require\` function. See https://rolldown.rs/in-depth/bundling-cjs#require-external-modules for more details.");
-});
-var O = Object.defineProperty, f = u((e, r) => O(e, "name", {
-	value: r,
-	configurable: !0
-}), "o"), w = class {
-	static {
-		u(this, "t");
-	}
-	static {
-		f(this, "Parent");
-	}
-	constructor() {}
-}, S = class {
-	static {
-		u(this, "c");
-	}
-	static {
-		f(this, "Feature");
-	}
-	constructor() {}
-}, $ = class extends w {
-	static {
-		u(this, "Child");
-	}
-	static {
-		f(this, "Child");
-	}
-	constructor() {
-		this.feature = new S(), console.log("before"), super(), console.log("after");
-	}
-};
-export { $ as Child };
-
+"var e=class{constructor(){}},t=class{constructor(){}},n=class extends e{constructor(){console.log(\`before\`),super(),this.feature=new t,console.log(\`after\`)}};export{n as Child};
 //# sourceMappingURL=index.mjs.map"
-`;
-
-exports[`packem node exports > should output 'default export' correctly > mjs output 1`] = `
-"const test = "this should be in final bundle";
-
-export { test as default };
-"
 `;
 
 exports[`packem node exports > should output 'default export' correctly > cjs output 1`] = `
@@ -593,7 +408,7 @@ module.exports = test;
 "
 `;
 
-exports[`packem node exports > should output 'default export' for nested folder correctly > mjs output 1`] = `
+exports[`packem node exports > should output 'default export' correctly > mjs output 1`] = `
 "const test = "this should be in final bundle";
 
 export { test as default };
@@ -604,5 +419,12 @@ exports[`packem node exports > should output 'default export' for nested folder 
 "const test = "this should be in final bundle";
 
 module.exports = test;
+"
+`;
+
+exports[`packem node exports > should output 'default export' for nested folder correctly > mjs output 1`] = `
+"const test = "this should be in final bundle";
+
+export { test as default };
 "
 `;

@@ -159,7 +159,7 @@ Object.defineProperty(exports, "warns", {
 `;
 
 exports[`packem package.json imports > should resolve package.json imports with a * and swc transformer > mjs output 1`] = `
-"import * as r from "#x.ts";
-export { r as warns };
+"import * as warns from "#x.ts";
+export { warns };
 "
 `;

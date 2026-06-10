@@ -19,14 +19,6 @@ export { template };
 "
 `;
 
-exports[`packem raw data > should generate js files with included raw content > mjs 1`] = `
-"
-const data = "const data = \\"thisismydata\\";\\nexport default data;";
-
-export { data };
-"
-`;
-
 exports[`packem raw data > should generate js files with included raw content > cjs 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 
@@ -36,9 +28,9 @@ exports.data = data;
 "
 `;
 
-exports[`packem raw data > should generate js files with included raw content when importing .js?raw > mjs 1`] = `
+exports[`packem raw data > should generate js files with included raw content > mjs 1`] = `
 "
-const data = "const message = \\"Hello from JS file\\";\\nconsole.log(message);\\nexport default message;";
+const data = "const data = \\"thisismydata\\";\\nexport default data;";
 
 export { data };
 "
@@ -53,9 +45,9 @@ exports.data = data;
 "
 `;
 
-exports[`packem raw data > should generate js files with included raw content when the '?raw' query param is used > mjs 1`] = `
+exports[`packem raw data > should generate js files with included raw content when importing .js?raw > mjs 1`] = `
 "
-const data = "thisismydata";
+const data = "const message = \\"Hello from JS file\\";\\nconsole.log(message);\\nexport default message;";
 
 export { data };
 "
@@ -67,5 +59,13 @@ exports[`packem raw data > should generate js files with included raw content wh
 const data = "thisismydata";
 
 exports.data = data;
+"
+`;
+
+exports[`packem raw data > should generate js files with included raw content when the '?raw' query param is used > mjs 1`] = `
+"
+const data = "thisismydata";
+
+export { data };
 "
 `;

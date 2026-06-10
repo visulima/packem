@@ -15,6 +15,20 @@ const INDENT_TYPE_TAB = "tab";
 function shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, value) {
 	return ignoreSingleSpaces && indentType === INDENT_TYPE_SPACE && value === 1;
 }
+/**
+Make a Map that counts how many indents/unindents have occurred for a given size and how many lines follow a given indentation.
+
+The key is a concatenation of the indentation type (s = space and t = tab) and the size of the indents/unindents.
+
+\`\`\`
+indents = {
+t3: [1, 0],
+t4: [1, 5],
+s5: [1, 0],
+s12: [1, 0],
+}
+\`\`\`
+*/
 function makeIndentsMap(string, ignoreSingleSpaces) {
 	const indents = /* @__PURE__ */ new Map();
 	let previousSize = 0;
@@ -40,7 +54,7 @@ function makeIndentsMap(string, ignoreSingleSpaces) {
 				use = 0;
 				weight = 1;
 			} else {
-				const absoluteIndentDifference = Math.abs(indentDifference);
+				const absoluteIndentDifference = /* @__PURE__ */ Math.abs(indentDifference);
 				if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, absoluteIndentDifference)) continue;
 				key = encodeIndentsKey(indentType, absoluteIndentDifference);
 			}
@@ -120,6 +134,20 @@ const INDENT_TYPE_TAB = "tab";
 function shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, value) {
 	return ignoreSingleSpaces && indentType === INDENT_TYPE_SPACE && value === 1;
 }
+/**
+Make a Map that counts how many indents/unindents have occurred for a given size and how many lines follow a given indentation.
+
+The key is a concatenation of the indentation type (s = space and t = tab) and the size of the indents/unindents.
+
+\`\`\`
+indents = {
+t3: [1, 0],
+t4: [1, 5],
+s5: [1, 0],
+s12: [1, 0],
+}
+\`\`\`
+*/
 function makeIndentsMap(string, ignoreSingleSpaces) {
 	const indents = /* @__PURE__ */ new Map();
 	let previousSize = 0;
@@ -145,7 +173,7 @@ function makeIndentsMap(string, ignoreSingleSpaces) {
 				use = 0;
 				weight = 1;
 			} else {
-				const absoluteIndentDifference = Math.abs(indentDifference);
+				const absoluteIndentDifference = /* @__PURE__ */ Math.abs(indentDifference);
 				if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, absoluteIndentDifference)) continue;
 				key = encodeIndentsKey(indentType, absoluteIndentDifference);
 			}

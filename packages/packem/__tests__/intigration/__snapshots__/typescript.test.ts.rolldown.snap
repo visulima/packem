@@ -52,7 +52,7 @@ exports[`packem typescript > should bundle deeks package > cjs content 1`] = `
 //#region \\0rolldown/runtime.js
 var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.0/node_modules/deeks/lib/utils.js
+//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/utils.js
 var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.isDocumentToRecurOn = exports.flatten = exports.unique = void 0;
@@ -64,13 +64,18 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
 		return [].concat(...array);
 	}
 	exports.flatten = flatten;
+	/**
+	* Returns whether this value is a document to recur on or not
+	* @param val Any item whose type will be evaluated
+	* @returns {boolean}
+	*/
 	function isDocumentToRecurOn(val) {
-		return typeof val === "object" && val !== null && !Array.isArray(val) && Object.keys(val).length;
+		return typeof val === "object" && val !== null && !/* @__PURE__ */ Array.isArray(val) && Object.keys(val).length;
 	}
 	exports.isDocumentToRecurOn = isDocumentToRecurOn;
 }));
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.0/node_modules/deeks/lib/types.js
+//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/types.js
 var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 }));
@@ -79,7 +84,7 @@ var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		if (k2 === void 0) k2 = k;
-		var desc = Object.getOwnPropertyDescriptor(m, k);
+		var desc = /* @__PURE__ */ Object.getOwnPropertyDescriptor(m, k);
 		if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) desc = {
 			enumerable: true,
 			get: function() {
@@ -108,13 +113,19 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 		__setModuleDefault(result, mod);
 		return result;
 	};
-	var __exportStar = exports && exports.__exportStar || function(m, exports2) {
-		for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
+	var __exportStar = exports && exports.__exportStar || function(m, exports$1) {
+		for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports$1, p)) __createBinding(exports$1, m, p);
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.deepKeysFromList = exports.deepKeys = void 0;
 	const utils = __importStar(require_utils());
 	__exportStar(require_types(), exports);
+	/**
+	* Return the deep keys list for a single document
+	* @param object
+	* @param options
+	* @returns {Array}
+	*/
 	function deepKeys(object, options) {
 		const parsedOptions = mergeOptions(options);
 		const visited = /* @__PURE__ */ new WeakSet();
@@ -122,6 +133,12 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 		return [];
 	}
 	exports.deepKeys = deepKeys;
+	/**
+	* Return the deep keys list for all documents in the provided list
+	* @param list
+	* @param options
+	* @returns Array[Array[String]]
+	*/
 	function deepKeysFromList(list, options, visited) {
 		const parsedOptions = mergeOptions(options);
 		const localVisited = visited ?? /* @__PURE__ */ new WeakSet();
@@ -153,13 +170,13 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 			const currentKey = frame.keys[frame.i++];
 			const value = frame.obj[currentKey];
 			const keyName = buildKeyName(frame.basePath, escapeNestedDotsIfSpecified(currentKey, options));
-			if (options.expandNestedObjects && utils.isDocumentToRecurOn(value) || options.arrayIndexesAsKeys && Array.isArray(value) && value.length) {
-				if (options.arrayIndexesAsKeys && Array.isArray(value)) {
+			if (options.expandNestedObjects && utils.isDocumentToRecurOn(value) || options.arrayIndexesAsKeys && /* @__PURE__ */ Array.isArray(value) && value.length) {
+				if (options.arrayIndexesAsKeys && /* @__PURE__ */ Array.isArray(value)) {
 					const arr = value;
 					for (let idx = arr.length - 1; idx >= 0; idx--) {
 						const elem = arr[idx];
 						const elemPath = buildKeyName(keyName, String(idx));
-						if (typeof elem === "object" && elem !== null && !Array.isArray(elem)) {
+						if (typeof elem === "object" && elem !== null && !/* @__PURE__ */ Array.isArray(elem)) {
 							if (!visited.has(elem)) {
 								visited.add(elem);
 								stack.push({
@@ -180,21 +197,29 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 						basePath: keyName
 					});
 				}
-			} else if (options.expandArrayObjects && Array.isArray(value)) {
+			} else if (options.expandArrayObjects && /* @__PURE__ */ Array.isArray(value)) {
 				const subKeys = processArrayKeys(value, keyName, options, visited);
 				for (const k of subKeys) result.push(k);
-			} else if (options.ignoreEmptyArrays && Array.isArray(value) && !value.length) continue;
+			} else if (options.ignoreEmptyArrays && /* @__PURE__ */ Array.isArray(value) && !value.length) continue;
 			else result.push(keyName);
 		}
 		return utils.unique(result);
 	}
+	/**
+	* Helper function to handle the processing of arrays when the expandArrayObjects
+	* option is specified.
+	* @param subArray
+	* @param currentKeyPath
+	* @param options
+	* @returns {*}
+	*/
 	function processArrayKeys(subArray, currentKeyPath, options, visited) {
 		let subArrayKeys = deepKeysFromList(subArray, options, visited);
 		if (!subArray.length) return options.ignoreEmptyArraysWhenExpanding ? [] : [currentKeyPath];
 		else if (subArray.length && utils.flatten(subArrayKeys).length === 0) return [currentKeyPath];
 		else {
 			subArrayKeys = subArrayKeys.map((schemaKeys) => {
-				if (Array.isArray(schemaKeys) && schemaKeys.length === 0) return [currentKeyPath];
+				if (/* @__PURE__ */ Array.isArray(schemaKeys) && schemaKeys.length === 0) return [currentKeyPath];
 				return schemaKeys.map((subKey) => buildKeyName(currentKeyPath, escapeNestedDotsIfSpecified(subKey, options)));
 			});
 			return utils.unique(utils.flatten(subArrayKeys));
@@ -204,6 +229,12 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 		if (options.escapeNestedDots) return key.replace(/\\./g, "\\\\.");
 		return key;
 	}
+	/**
+	* Function used to generate the key path
+	* @param upperKeyName String accumulated key path
+	* @param currentKeyName String current key name
+	* @returns String
+	*/
 	function buildKeyName(upperKeyName, currentKeyName) {
 		if (upperKeyName) return upperKeyName + "." + currentKeyName;
 		return currentKeyName;
@@ -241,7 +272,7 @@ exports[`packem typescript > should bundle deeks package > mjs content 1`] = `
 //#region \\0rolldown/runtime.js
 var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.0/node_modules/deeks/lib/utils.js
+//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/utils.js
 var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.isDocumentToRecurOn = exports.flatten = exports.unique = void 0;
@@ -253,13 +284,18 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
 		return [].concat(...array);
 	}
 	exports.flatten = flatten;
+	/**
+	* Returns whether this value is a document to recur on or not
+	* @param val Any item whose type will be evaluated
+	* @returns {boolean}
+	*/
 	function isDocumentToRecurOn(val) {
-		return typeof val === "object" && val !== null && !Array.isArray(val) && Object.keys(val).length;
+		return typeof val === "object" && val !== null && !/* @__PURE__ */ Array.isArray(val) && Object.keys(val).length;
 	}
 	exports.isDocumentToRecurOn = isDocumentToRecurOn;
 }));
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.0/node_modules/deeks/lib/types.js
+//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/types.js
 var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 }));
@@ -268,7 +304,7 @@ var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		if (k2 === void 0) k2 = k;
-		var desc = Object.getOwnPropertyDescriptor(m, k);
+		var desc = /* @__PURE__ */ Object.getOwnPropertyDescriptor(m, k);
 		if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) desc = {
 			enumerable: true,
 			get: function() {
@@ -297,13 +333,19 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 		__setModuleDefault(result, mod);
 		return result;
 	};
-	var __exportStar = exports && exports.__exportStar || function(m, exports2) {
-		for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
+	var __exportStar = exports && exports.__exportStar || function(m, exports$1) {
+		for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports$1, p)) __createBinding(exports$1, m, p);
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.deepKeysFromList = exports.deepKeys = void 0;
 	const utils = __importStar(require_utils());
 	__exportStar(require_types(), exports);
+	/**
+	* Return the deep keys list for a single document
+	* @param object
+	* @param options
+	* @returns {Array}
+	*/
 	function deepKeys(object, options) {
 		const parsedOptions = mergeOptions(options);
 		const visited = /* @__PURE__ */ new WeakSet();
@@ -311,6 +353,12 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 		return [];
 	}
 	exports.deepKeys = deepKeys;
+	/**
+	* Return the deep keys list for all documents in the provided list
+	* @param list
+	* @param options
+	* @returns Array[Array[String]]
+	*/
 	function deepKeysFromList(list, options, visited) {
 		const parsedOptions = mergeOptions(options);
 		const localVisited = visited ?? /* @__PURE__ */ new WeakSet();
@@ -342,13 +390,13 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 			const currentKey = frame.keys[frame.i++];
 			const value = frame.obj[currentKey];
 			const keyName = buildKeyName(frame.basePath, escapeNestedDotsIfSpecified(currentKey, options));
-			if (options.expandNestedObjects && utils.isDocumentToRecurOn(value) || options.arrayIndexesAsKeys && Array.isArray(value) && value.length) {
-				if (options.arrayIndexesAsKeys && Array.isArray(value)) {
+			if (options.expandNestedObjects && utils.isDocumentToRecurOn(value) || options.arrayIndexesAsKeys && /* @__PURE__ */ Array.isArray(value) && value.length) {
+				if (options.arrayIndexesAsKeys && /* @__PURE__ */ Array.isArray(value)) {
 					const arr = value;
 					for (let idx = arr.length - 1; idx >= 0; idx--) {
 						const elem = arr[idx];
 						const elemPath = buildKeyName(keyName, String(idx));
-						if (typeof elem === "object" && elem !== null && !Array.isArray(elem)) {
+						if (typeof elem === "object" && elem !== null && !/* @__PURE__ */ Array.isArray(elem)) {
 							if (!visited.has(elem)) {
 								visited.add(elem);
 								stack.push({
@@ -369,21 +417,29 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 						basePath: keyName
 					});
 				}
-			} else if (options.expandArrayObjects && Array.isArray(value)) {
+			} else if (options.expandArrayObjects && /* @__PURE__ */ Array.isArray(value)) {
 				const subKeys = processArrayKeys(value, keyName, options, visited);
 				for (const k of subKeys) result.push(k);
-			} else if (options.ignoreEmptyArrays && Array.isArray(value) && !value.length) continue;
+			} else if (options.ignoreEmptyArrays && /* @__PURE__ */ Array.isArray(value) && !value.length) continue;
 			else result.push(keyName);
 		}
 		return utils.unique(result);
 	}
+	/**
+	* Helper function to handle the processing of arrays when the expandArrayObjects
+	* option is specified.
+	* @param subArray
+	* @param currentKeyPath
+	* @param options
+	* @returns {*}
+	*/
 	function processArrayKeys(subArray, currentKeyPath, options, visited) {
 		let subArrayKeys = deepKeysFromList(subArray, options, visited);
 		if (!subArray.length) return options.ignoreEmptyArraysWhenExpanding ? [] : [currentKeyPath];
 		else if (subArray.length && utils.flatten(subArrayKeys).length === 0) return [currentKeyPath];
 		else {
 			subArrayKeys = subArrayKeys.map((schemaKeys) => {
-				if (Array.isArray(schemaKeys) && schemaKeys.length === 0) return [currentKeyPath];
+				if (/* @__PURE__ */ Array.isArray(schemaKeys) && schemaKeys.length === 0) return [currentKeyPath];
 				return schemaKeys.map((subKey) => buildKeyName(currentKeyPath, escapeNestedDotsIfSpecified(subKey, options)));
 			});
 			return utils.unique(utils.flatten(subArrayKeys));
@@ -393,6 +449,12 @@ var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
 		if (options.escapeNestedDots) return key.replace(/\\./g, "\\\\.");
 		return key;
 	}
+	/**
+	* Function used to generate the key path
+	* @param upperKeyName String accumulated key path
+	* @param currentKeyName String current key name
+	* @returns String
+	*/
 	function buildKeyName(upperKeyName, currentKeyName) {
 		if (upperKeyName) return upperKeyName + "." + currentKeyName;
 		return currentKeyName;
@@ -545,15 +607,15 @@ exports[`packem typescript > should compile only a type file > .d.ts type code o
 
 exports[`packem typescript > should support typescript decorator > cjs code output 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region \\0@oxc-project+runtime@0.133.0/helpers/esm/decorate.js
+function __decorate(decorators, target, key, desc) {
+	var c = arguments.length, r = c < 3 ? target : desc === null ? desc = /* @__PURE__ */ Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	return r;
+}
+//#endregion
 //#region src/index.ts
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __decorateClass = (decorators, target, key, kind) => {
-	var result = kind > 1 ? void 0 : kind ? __getOwnPropDesc(target, key) : target;
-	for (var i = decorators.length - 1, decorator; i >= 0; i--) if (decorator = decorators[i]) result = (kind ? decorator(target, key, result) : decorator(result)) || result;
-	if (kind && result) __defProp(target, key, result);
-	return result;
-};
 function first() {
 	console.log("first(): factory evaluated");
 	return function(target, propertyKey, descriptor) {
@@ -561,22 +623,22 @@ function first() {
 	};
 }
 var ExampleClass = class {};
-__decorateClass([first()], ExampleClass.prototype, "value", 2);
+__decorate([first()], ExampleClass.prototype, "value", void 0);
 //#endregion
 exports.ExampleClass = ExampleClass;
 "
 `;
 
 exports[`packem typescript > should support typescript decorator > mjs code output 1`] = `
-"//#region src/index.ts
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __decorateClass = (decorators, target, key, kind) => {
-	var result = kind > 1 ? void 0 : kind ? __getOwnPropDesc(target, key) : target;
-	for (var i = decorators.length - 1, decorator; i >= 0; i--) if (decorator = decorators[i]) result = (kind ? decorator(target, key, result) : decorator(result)) || result;
-	if (kind && result) __defProp(target, key, result);
-	return result;
-};
+"//#region \\0@oxc-project+runtime@0.133.0/helpers/esm/decorate.js
+function __decorate(decorators, target, key, desc) {
+	var c = arguments.length, r = c < 3 ? target : desc === null ? desc = /* @__PURE__ */ Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	return r;
+}
+//#endregion
+//#region src/index.ts
 function first() {
 	console.log("first(): factory evaluated");
 	return function(target, propertyKey, descriptor) {
@@ -584,7 +646,7 @@ function first() {
 	};
 }
 var ExampleClass = class {};
-__decorateClass([first()], ExampleClass.prototype, "value", 2);
+__decorate([first()], ExampleClass.prototype, "value", void 0);
 //#endregion
 export { ExampleClass };
 "

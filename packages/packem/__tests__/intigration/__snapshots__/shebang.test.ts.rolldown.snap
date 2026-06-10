@@ -52,6 +52,10 @@ exports[`shebang > should retain comments defined after a shebang > cjs output 1
 "#!/usr/bin/env node // <-- this thing is a shebang. :)
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 //#region src/index.ts
+/**
+* Get a shebang to use in node CLIs. Defaults to #!/usr/bin/env node
+* @returns string
+*/
 function getNodeSheBang() {
 	return "#!/usr/bin/env node";
 }
@@ -63,6 +67,10 @@ exports.getNodeSheBang = getNodeSheBang;
 exports[`shebang > should retain comments defined after a shebang > mjs output 1`] = `
 "#!/usr/bin/env node // <-- this thing is a shebang. :)
 //#region src/index.ts
+/**
+* Get a shebang to use in node CLIs. Defaults to #!/usr/bin/env node
+* @returns string
+*/
 function getNodeSheBang() {
 	return "#!/usr/bin/env node";
 }
@@ -74,6 +82,10 @@ export { getNodeSheBang };
 exports[`shebang > should retain shebangs defined elsewhere in a file > cjs output 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 //#region src/index.ts
+/**
+* Get a shebang to use in node CLIs. Defaults to #!/usr/bin/env node
+* @returns string
+*/
 function getNodeSheBang() {
 	return "#!/usr/bin/env node";
 }
@@ -84,6 +96,10 @@ exports.getNodeSheBang = getNodeSheBang;
 
 exports[`shebang > should retain shebangs defined elsewhere in a file > mjs output 1`] = `
 "//#region src/index.ts
+/**
+* Get a shebang to use in node CLIs. Defaults to #!/usr/bin/env node
+* @returns string
+*/
 function getNodeSheBang() {
 	return "#!/usr/bin/env node";
 }

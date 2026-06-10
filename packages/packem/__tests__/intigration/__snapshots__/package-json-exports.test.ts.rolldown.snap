@@ -123,9 +123,9 @@ exports.cli = cli;
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 1`] = `
-"import { Client } from './packem_shared/Client-DCW9Tgls.mjs';
+"import { Client } from './packem_shared/Client-BBMqEblW.mjs';
 import { Button } from './ui.mjs';
-import { action } from './packem_shared/action-BPf35DVp.mjs';
+import { action } from './packem_shared/action-DKFcx1Vi.mjs';
 export { Button, Client, Client as UIClient, action };
 "
 `;
@@ -152,9 +152,9 @@ export { Client };
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 4`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require_ui = require('./packem_shared/ui-DDaaQRb5.cjs');
-const require_Client = require('./packem_shared/Client-CLFYieZU.cjs');
-const require_action = require('./packem_shared/action-B80tVyuP.cjs');
+const require_ui = require('./packem_shared/ui-CCDytIvA.cjs');
+const require_Client = require('./packem_shared/Client-C9ddnDzS.cjs');
+const require_action = require('./packem_shared/action-PXD57KE3.cjs');
 exports.Button = require_ui.Button;
 exports.Client = require_Client.Client;
 exports.UIClient = require_Client.Client;
@@ -184,7 +184,7 @@ exports.Client = Client;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components with same layer 1`] = `
 "'use client';
-import { Client } from './packem_shared/Client-DCW9Tgls.mjs';
+import { Client } from './packem_shared/Client-BBMqEblW.mjs';
 import React, { useState } from 'react';
 
 function Button() {
@@ -230,7 +230,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 	enumerable: true
 }) : target, mod));
 
-const require_Client = require('./packem_shared/Client-CVSzmS1W.cjs');
+const require_Client = require('./packem_shared/Client-C9ddnDzS.cjs');
 let react = require('react');
 react = __toESM(react);
 function Button() {
@@ -412,7 +412,8 @@ module.exports = src_default;
 `;
 
 exports[`packem package.json exports > should work with multi entries 2`] = `
-"function client(c) {
+"require('./shared.cjs');
+function client(c) {
 	return "client" + c;
 }
 
