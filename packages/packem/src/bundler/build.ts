@@ -16,6 +16,40 @@ type BundlerName = "rolldown" | "rollup";
 
 const resolveBundlerName = (bundler: BundlerName | undefined): BundlerName => bundler ?? "rollup";
 
+const dependencyValidationEnabled = (context: BuildContext<InternalBuildOptions>): boolean =>
+    Boolean(context.options.validation && context.options.validation.dependencies !== false);
+
+// Replay the persisted dependencies cache into the build context. The cache is
+// populated by our own plugins and feeds dependency validation, so both the
+// rollup and rolldown paths must load it identically.
+const loadDependenciesCache = (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): void => {
+    const cachedDeps = fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
+
+    if (cachedDeps) {
+        // The deserialized cache payload can be partial despite the typed
+        // shape, so the runtime guards are intentional.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
+        cachedDeps.used?.forEach((dep) => context.usedDependencies.add(dep));
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
+        cachedDeps.hoisted?.forEach((dep) => context.hoistedDependencies.add(dep));
+    }
+};
+
+// Persist the context's resolved dependencies, but only when dependency
+// validation is enabled (both backends gate the write the same way).
+const persistDependenciesCache = (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): void => {
+    if (dependencyValidationEnabled(context)) {
+        fileCache.set(
+            DEPENDENCIES_CACHE_KEY,
+            {
+                hoisted: [...context.hoistedDependencies],
+                used: [...context.usedDependencies],
+            },
+            subDirectory,
+        );
+    }
+};
+
 const buildWithRollup = async (
     context: BuildContext<InternalBuildOptions>,
     fileCache: FileCache,
@@ -23,11 +57,10 @@ const buildWithRollup = async (
     rollupOptions: RollupOptions,
 ): Promise<void> => {
     const hasCachedDependencies
-        = context.options.validation
-            && context.options.validation.dependencies !== false
-            && !!fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
+        = dependencyValidationEnabled(context)
+            && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
 
-    const loadCache = !context.options.validation || context.options.validation.dependencies === false || hasCachedDependencies;
+    const loadCache = !dependencyValidationEnabled(context) || hasCachedDependencies;
 
     // Build the effective options without mutating the caller's object: only
     // inject the persisted rollup cache when cache loading is enabled.
@@ -40,16 +73,7 @@ const buildWithRollup = async (
         };
 
         if (hasCachedDependencies) {
-            const cachedDeps = fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
-
-            if (cachedDeps) {
-                // The deserialized cache payload can be partial despite the typed
-                // shape, so the runtime guards are intentional.
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
-                cachedDeps.used?.forEach((dep) => context.usedDependencies.add(dep));
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
-                cachedDeps.hoisted?.forEach((dep) => context.hoistedDependencies.add(dep));
-            }
+            loadDependenciesCache(context, fileCache, subDirectory);
         }
     }
 
@@ -61,16 +85,7 @@ const buildWithRollup = async (
             fileCache.set(BUNDLE_CACHE_KEY, buildResult.cache, subDirectory);
         }
 
-        if (context.options.validation && context.options.validation.dependencies !== false) {
-            fileCache.set(
-                DEPENDENCIES_CACHE_KEY,
-                {
-                    hoisted: [...context.hoistedDependencies],
-                    used: [...context.usedDependencies],
-                },
-                subDirectory,
-            );
-        }
+        persistDependenciesCache(context, fileCache, subDirectory);
 
         await context.hooks.callHook("rollup:build", context, buildResult);
 
@@ -100,21 +115,11 @@ const buildWithRolldown = async (
     // however, is populated by our own plugins and feeds dependency
     // validation — so it must stay in sync regardless of bundler.
     const hasCachedDependencies
-        = context.options.validation
-            && context.options.validation.dependencies !== false
-            && !!fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
+        = dependencyValidationEnabled(context)
+            && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
 
     if (hasCachedDependencies) {
-        const cachedDeps = fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
-
-        if (cachedDeps) {
-            // The deserialized cache payload can be partial despite the typed
-            // shape, so the runtime guards are intentional.
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
-            cachedDeps.used?.forEach((dep) => context.usedDependencies.add(dep));
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
-            cachedDeps.hoisted?.forEach((dep) => context.hoistedDependencies.add(dep));
-        }
+        loadDependenciesCache(context, fileCache, subDirectory);
     }
 
     const rolldown = await getRolldownBuild();
@@ -125,16 +130,7 @@ const buildWithRolldown = async (
     const bundle = await rolldown(rollupOptions as unknown as Record<string, unknown>);
 
     try {
-        if (context.options.validation && context.options.validation.dependencies !== false) {
-            fileCache.set(
-                DEPENDENCIES_CACHE_KEY,
-                {
-                    hoisted: [...context.hoistedDependencies],
-                    used: [...context.usedDependencies],
-                },
-                subDirectory,
-            );
-        }
+        persistDependenciesCache(context, fileCache, subDirectory);
 
         await context.hooks.callHook("rollup:build", context, bundle as unknown as RollupBuild);
 
