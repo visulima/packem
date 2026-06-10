@@ -147,6 +147,54 @@ jobs:
                   affected-files: "${{ steps.files.outputs.all_changed_files }}"
                   exclude-affected-projects: "bench,docs,examples_*"
 
+    test-rolldown:
+        name: "Test rolldown backend (advisory)"
+        if: "needs.files-changed.outputs.packages == 'true'"
+        needs: "files-changed"
+        runs-on: "ubuntu-latest"
+        # Advisory: NOT part of test-required-check yet. The rolldown full-suite
+        # run has known cache/ordering flakiness; surface regressions without
+        # gating merges until it has proven stable (see plans/001).
+        steps:
+            - name: "Harden Runner"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
+              with:
+                  egress-policy: "audit"
+
+            - name: "Git checkout ${{ env.HEAD_REPOSITORY }}:${{ env.HEAD_REF }}"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
+              env:
+                  GIT_COMMITTER_NAME: "GitHub Actions Shell"
+                  GIT_AUTHOR_NAME: "GitHub Actions Shell"
+                  EMAIL: "github-actions[bot]@users.noreply.github.com"
+              with:
+                  fetch-depth: 0
+
+            - name: "Setup resources and environment"
+              id: "setup"
+              uses: "anolilab/workflows/step/setup@802f3b1d00b0ab47c3102b4f4ebd866b9f7f8fcf" # v18.0.3
+              with:
+                  node-version: "22"
+                  install-packages: "false"
+                  install-node-gyp: "true"
+
+            - name: "Install packages"
+              shell: "bash"
+              run: "pnpm install --frozen-lockfile --prefer-offline"
+              env:
+                  "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": true
+                  "CYPRESS_INSTALL_BINARY": true
+                  "SKIP_CHECK": "true"
+                  "HUSKY": 0
+
+            - name: "Build packages"
+              shell: "bash"
+              run: "pnpm run build:packages"
+
+            - name: "Run rolldown integration suite"
+              shell: "bash"
+              run: "pnpm --filter @visulima/packem run test:rolldown"
+
     # This check runs once all dependant jobs have passed
     # It symbolizes that all required checks have successfully passed (Or skipped)
     # This check is the only required GitHub check
