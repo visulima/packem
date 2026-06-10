@@ -120,12 +120,13 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
         }
         : {
-            // Directive-based layers ("use client"/"use server") drive per-layer
-            // chunk splitting, which depends on packem's chunk-per-export entry
-            // promotion (chunkSplitter). That promotion is rollup-only, so the
-            // layer walk is gated to rollup; under rolldown directive modules are
-            // not promoted to entries, so `getModuleLayer` would find nothing to
-            // split on and the importer-layer graph walk is pure waste.
+            // The chunk-per-export entry promotion (chunkSplitter) now runs under
+            // both backends, but the directive-based layer walk here is still
+            // gated to rollup: it keys off `getModuleLayer` meta that the
+            // preserve-directives transform only populates on the rollup module
+            // graph. Under rolldown that meta is absent, so `getModuleLayer`
+            // would find nothing to split on and the per-module importer-layer
+            // graph walk would be pure waste.
             manualChunks: createSplitChunks(
                 context.dependencyGraphMap,
                 context.buildEntries,
@@ -277,10 +278,14 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
 
             context.options.rollup.debarrel && debarrelPlugin(context.options.rollup.debarrel, getLogger(context)),
 
-            // chunk-splitter parses module source via context.parse() in its
-            // moduleParsed hook; see the rolldown note on the pure plugins.
-            // Rolldown does native code-splitting, so this is rollup-only.
-            !isRolldown && chunkSplitter(),
+            // chunk-splitter promotes each re-exported entry binding to its own
+            // shared chunk (dist/packem_shared/*) via emitFile in its
+            // moduleParsed hook. It parses module source with context.parse();
+            // under rolldown moduleParsed sees raw TS/JSX (the native oxc
+            // transform runs later), so the splitter passes a per-extension
+            // `lang` to context.parse and falls back to "leave inlined" on any
+            // parse failure — see chunk-splitter/parse. Runs under both backends.
+            chunkSplitter(),
 
             context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
 

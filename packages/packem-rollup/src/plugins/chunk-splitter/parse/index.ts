@@ -85,9 +85,49 @@ const parseExportDefault = function* (): Generator<ParsedExportInfo> {
     yield { exportedName: "default", from: "self", type: "named" };
 };
 
+/**
+ * Pick the oxc parser `lang` for a module from its extension.
+ *
+ * Under rollup the chunk splitter runs in `moduleParsed`, where `module_.code`
+ * is already transpiled to plain JS, so `this.parse` (acorn) parses it as JS and
+ * this option is ignored. Under rolldown the native oxc transform runs AFTER
+ * `moduleParsed`, so `module_.code` is still the raw TS/JSX source — rolldown's
+ * `this.parse` is oxc-based and accepts `{ lang }`, so telling it the real
+ * dialect lets the splitter read exports off the untranspiled source. The value
+ * is harmless under rollup (acorn ignores unknown parse options).
+ */
+const langForId = (id: string): "js" | "jsx" | "ts" | "tsx" => {
+    if (/\.tsx$/.test(id)) {
+        return "tsx";
+    }
+
+    if (/\.[cm]?ts$/.test(id)) {
+        return "ts";
+    }
+
+    if (/\.jsx$/.test(id)) {
+        return "jsx";
+    }
+
+    return "js";
+};
+
 const collectExports = function (context: PluginContext, module_: ModuleInfo): ParsedExportInfo[] {
     assert.ok(module_.code !== null, `Module ${module_.id} doesn't have associated code`);
-    const node = context.parse(module_.code);
+
+    let node: ReturnType<PluginContext["parse"]>;
+
+    try {
+        // `lang` is a rolldown/oxc parse option (see langForId); rollup's acorn
+        // parse ignores it and reads the already-transpiled JS.
+        node = context.parse(module_.code, { lang: langForId(module_.id) } as Parameters<PluginContext["parse"]>[1]);
+    } catch {
+        // A module whose source can't be parsed for its export list simply isn't
+        // promoted to its own chunk — it stays inlined in its importer, which is
+        // the safe, pre-splitter default. Better to skip one module than to fail
+        // the whole build.
+        return [];
+    }
 
     const result: ParsedExportInfo[] = [];
 
