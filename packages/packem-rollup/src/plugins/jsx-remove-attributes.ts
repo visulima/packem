@@ -38,6 +38,56 @@ export type JSXRemoveAttributesPlugin = {
     attributes: string[];
 };
 
+// Starting at `end`, skip any whitespace and, if the next non-whitespace
+// character is a comma, consume it too. Returns the offset just past the
+// property's own trailing comma (or just past the trailing whitespace when the
+// property is last and has none).
+const scanPastTrailingComma = (code: string, end: number): number => {
+    let removeEnd = end;
+
+    while (removeEnd < code.length && WHITESPACE_RE.test(code[removeEnd] as string)) {
+        removeEnd += 1;
+    }
+
+    if (code[removeEnd] === ",") {
+        removeEnd += 1;
+    }
+
+    return removeEnd;
+};
+
+// Remove a matched property (and its separating comma) from the props object.
+//
+// - `trailingComma` (rolldown renderChunk): multi-line props end with a trailing
+//   comma, so remove the property plus its own trailing comma + whitespace.
+// - otherwise (rollup transform): single-line props. A leading `, ` only
+//   precedes the property when it is NOT first; consuming it matches the
+//   long-standing behaviour for middle/last props (adjacent stripped props each
+//   own their own leading comma, so removals never overlap). When the property
+//   IS first (preceded by `{`), consume the trailing comma instead so the
+//   opening brace survives — the original `start - 2` deleted it.
+const removeProperty = (magicString: MagicString, code: string, start: number, end: number, trailingComma: boolean): void => {
+    if (trailingComma) {
+        magicString.remove(start, scanPastTrailingComma(code, end));
+
+        return;
+    }
+
+    let removeStart = start;
+
+    while (removeStart > 0 && WHITESPACE_RE.test(code[removeStart - 1] as string)) {
+        removeStart -= 1;
+    }
+
+    if (code[removeStart - 1] === ",") {
+        magicString.remove(removeStart - 1, end);
+
+        return;
+    }
+
+    magicString.remove(start, scanPastTrailingComma(code, end));
+};
+
 /**
  * Walk an already-parsed program and strip the configured attributes from every
  * automatic-runtime JSX call's props object. Returns a `MagicString` only when an
@@ -74,24 +124,7 @@ const stripAttributes = (ast: Node, code: string, attributes: string[], trailing
                         ) {
                             const { end, start } = property as PropertyLiteralValue;
 
-                            if (trailingComma) {
-                                // Remove the property, then consume any whitespace + one
-                                // trailing comma after it.
-                                let removeEnd = end;
-
-                                while (removeEnd < code.length && WHITESPACE_RE.test(code[removeEnd] as string)) {
-                                    removeEnd += 1;
-                                }
-
-                                if (code[removeEnd] === ",") {
-                                    removeEnd += 1;
-                                }
-
-                                magicString.remove(start, removeEnd);
-                            } else {
-                                // -2 to remove the comma and the space before the property
-                                magicString.overwrite(start - 2, end, "");
-                            }
+                            removeProperty(magicString, code, start, end, trailingComma);
 
                             changed = true;
                         }

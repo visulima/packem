@@ -311,6 +311,67 @@ export = Tr;
 `);
     });
 
+    it("should delete a first-position attribute if the jsxRemoveAttributes is configured", async () => {
+        expect.assertions(4);
+
+        // Regression guard: when the stripped attribute is the FIRST property in the
+        // transpiled props object, removing the (non-existent) leading `, ` used to
+        // delete the object's opening `{`, emitting broken JS. data-testid is first here.
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.tsx`,
+            `const Tr = () => (<tr data-testid="test" className={"keep-me"} />);
+
+export default Tr;`,
+        );
+        await createPackageJson(temporaryDirectoryPath, {
+            dependencies: {
+                react: "^18.2.0",
+                "react-dom": "^18.2.0",
+            },
+            devDependencies: {
+                "@types/react": "^18.0.0",
+                "@types/react-dom": "^18.0.0",
+                typescript: "^5",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            type: "commonjs",
+            types: "./dist/index.d.ts",
+        });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                jsx: "react-jsx",
+                moduleResolution: "bundler",
+            },
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                rollup: {
+                    jsxRemoveAttributes: {
+                        attributes: ["data-testid"],
+                    },
+                },
+            },
+        });
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "react");
+        await installPackage(temporaryDirectoryPath, "react-dom");
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        // The stripped first-position attribute must be gone and the kept attribute intact.
+        expect(mjsContent.includes("data-testid")).toBe(false);
+        expect(mjsContent.includes("keep-me")).toBe(true);
+    });
+
     it("should delete a attributes if the jsxRemoveAttributes is configured", async () => {
         // eslint-disable-next-line vitest/prefer-expect-assertions -- assertion count legitimately differs by bundler: rolldown skips the CJS-interop check (different output shape)
         expect.assertions(isRolldown ? 6 : 7);
