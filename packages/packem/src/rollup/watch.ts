@@ -13,6 +13,8 @@ import { getRollupWatch } from "../bundler/get-rollup";
 import { PACKEM_CONFIG_FILES } from "../config/utils/find-packem-file";
 import loadPackageJson from "../config/utils/load-package-json";
 import prepareEntries from "../config/utils/prepare-entries";
+import { getRolldownWatch } from "../rolldown/get-rolldown";
+import { getRolldownOptions } from "../rolldown/get-rolldown-options";
 import type { InternalBuildOptions } from "../types";
 import { getRollupDtsOptions } from "./get-rollup-options";
 
@@ -198,6 +200,33 @@ const configureWatchOptions = (context: BuildContext<InternalBuildOptions>, curr
     return result;
 };
 
+/**
+ * Build rolldown's watch config. Rolldown watches the module graph itself and
+ * does NOT understand rollup's `chokidar`/`include` shape — its `WatcherOptions`
+ * takes glob `include`/`exclude` filters only. We default to excluding the noise
+ * directories and forward the user's glob `include`/`exclude` if they set any.
+ * (package.json / packem.config.* / tsconfig changes are handled separately by
+ * the fs.watch restart below, since they are not part of the module graph.)
+ */
+const configureRolldownWatchOptions = (context: BuildContext<InternalBuildOptions>): Record<string, unknown> => {
+    const exclude: (string | RegExp)[] = ["**/.git/**", "**/node_modules/**", "**/test-results/**"];
+    const userWatch = context.options.rollup.watch;
+
+    const result: Record<string, unknown> = { exclude };
+
+    if (userWatch && typeof userWatch === "object") {
+        if (userWatch.include !== undefined) {
+            result.include = userWatch.include;
+        }
+
+        if (userWatch.exclude !== undefined) {
+            exclude.push(...(Array.isArray(userWatch.exclude) ? userWatch.exclude : [userWatch.exclude]));
+        }
+    }
+
+    return result;
+};
+
 const watch = async (
     context: BuildContext<InternalBuildOptions>,
     fileCache: FileCache,
@@ -213,7 +242,11 @@ const watch = async (
         useCache = false;
     }
 
-    let watchers: RollupWatcher[] = [];
+    // Only `.close()` is used across both backends' watchers, so a structural
+    // type keeps the array bundler-agnostic (rolldown's watcher is not a RollupWatcher).
+    let watchers: { close: () => Promise<void> }[] = [];
+
+    const isRolldown = context.options.bundler === "rolldown";
 
     const closeWatchers = async (): Promise<void> => {
         await Promise.all(watchers.map((w) => w.close()));
@@ -221,26 +254,58 @@ const watch = async (
     };
 
     const startWatchers = async (): Promise<void> => {
-        const rollupWatch = await getRollupWatch();
-        const rollupOptions = await getRollupOptions(context, fileCache);
+        // Resolve the bundle watcher per backend, then run one shared block
+        // (rollup:watch hook → logInputs → watchHandler → push) so the two
+        // backends can't drift. Both early-return on empty input, so neither
+        // starts a DTS watcher when there are no entries to build.
+        let bundleWatcher: RollupWatcher;
+        let bundleOptions: { input?: Record<string, string> | string | string[] };
+        let bundleUseCache: boolean;
 
-        await context.hooks.callHook("rollup:options", context, rollupOptions);
+        if (isRolldown) {
+            // Rolldown bundle watcher (native). DTS, when enabled, still watches
+            // through rollup below — @visulima/rollup-plugin-dts isn't
+            // rolldown-compatible yet.
+            const rolldownWatch = await getRolldownWatch();
+            const rolldownOptions = await getRolldownOptions(context, fileCache);
 
-        if (Object.keys(rollupOptions.input ?? {}).length === 0) {
-            return;
+            await context.hooks.callHook("rollup:options", context, rolldownOptions);
+
+            if (Object.keys(rolldownOptions.input ?? {}).length === 0) {
+                return;
+            }
+
+            (rolldownOptions as Record<string, unknown>).watch = configureRolldownWatchOptions(context);
+
+            bundleWatcher = rolldownWatch(rolldownOptions) as unknown as RollupWatcher;
+            bundleOptions = rolldownOptions as { input?: Record<string, string> | string | string[] };
+            // Rolldown manages its own incremental state; there is no rollup-style
+            // serializable `cache`, so cache reuse is disabled for this watcher.
+            bundleUseCache = false;
+        } else {
+            const rollupWatch = await getRollupWatch();
+            const rollupOptions = await getRollupOptions(context, fileCache);
+
+            await context.hooks.callHook("rollup:options", context, rollupOptions);
+
+            if (Object.keys(rollupOptions.input ?? {}).length === 0) {
+                return;
+            }
+
+            if (useCache) {
+                rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
+            }
+
+            rollupOptions.watch = configureWatchOptions(context, rollupOptions.watch);
+
+            bundleWatcher = rollupWatch(rollupOptions);
+            bundleOptions = rollupOptions;
+            bundleUseCache = useCache;
         }
-
-        if (useCache) {
-            rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
-        }
-
-        rollupOptions.watch = configureWatchOptions(context, rollupOptions.watch);
-
-        const bundleWatcher = rollupWatch(rollupOptions);
 
         await context.hooks.callHook("rollup:watch", context, bundleWatcher);
 
-        logInputs(context, rollupOptions);
+        logInputs(context, bundleOptions);
 
         watchHandler({
             context,
@@ -249,13 +314,14 @@ const watch = async (
             mode: "bundle",
             runBuilder,
             runOnsuccess,
-            useCache,
+            useCache: bundleUseCache,
             watcher: bundleWatcher,
         });
 
         watchers.push(bundleWatcher);
 
         if (context.options.declaration) {
+            const rollupWatch = await getRollupWatch();
             const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
 
             if (useCache) {

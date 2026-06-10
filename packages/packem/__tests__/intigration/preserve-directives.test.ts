@@ -166,13 +166,20 @@ export default Tr;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toBe(`'use client';
+        // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown's native oxc transform emits the dev JSX runtime (jsxDEV, with `_jsxFileName`) under --development, while rollup uses esbuild (production jsx). This test asserts directive preservation; the dev-runtime body shape is not normalize-able.
+        if (isRolldown) {
+            // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above; the `"use client"` directive must be hoisted onto the entry regardless of jsx runtime shape
+            expect(/^['"]use client['"];/.test(mjsContent)).toBe(true);
+        } else {
+            // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above
+            expect(normalizeBundleOutput(mjsContent)).toBe(`'use client';
 import { jsx } from 'react/jsx-runtime';
 
 const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
 
 export { Tr as default };
 `);
+        }
 
         // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown emits a different CJS interop shape; the ESM/DTS assertions above already cover both bundlers
         if (!isRolldown) {
@@ -291,6 +298,54 @@ console.log("Hello, cli!");
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toMatchSnapshot("d.mts content");
+    });
+
+    // Single-entry directive preservation, verified under BOTH bundlers. This is
+    // the rolldown gap the manual-scan preserve-directives port closes: the plugin
+    // used to be rollup-only because its `transform` hook called `this.parse()`,
+    // which throws on rolldown's pre-transform TS/JSX. With a manual prologue scan
+    // it now runs under rolldown too, so a `"use client"` (plus a second
+    // directive) on the entry is hoisted onto the output, and `"use strict"` is
+    // left for the bundler to manage. Assertions are quote-style-agnostic because
+    // rolldown emits directives natively with double quotes while the rollup path
+    // re-emits them with single quotes.
+    it("should preserve entry directives under both bundlers", async () => {
+        expect.assertions(5);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `"use client";\n"use sukka";\n\nexport const widget = (): number => 1;\n`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "./dist/index.mjs",
+            type: "module",
+            types: "./dist/index.d.ts",
+        });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
+        await createPackemConfig(temporaryDirectoryPath, { runtime: "browser" });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        // Leading `"use client"` / `'use client'`, tolerant of bundler quote style.
+        expect(/^['"]use client['"];/.test(mjsContent)).toBe(true);
+        // The second directive of the multi-directive module is preserved too.
+        expect(/['"]use sukka['"];/.test(mjsContent)).toBe(true);
+        // The implementation survives (sanity check that we did not corrupt the module).
+        expect(mjsContent.includes("widget")).toBe(true);
     });
 
     // Rolldown chunks differ from rollup: it emits `import { foo } from './X';`

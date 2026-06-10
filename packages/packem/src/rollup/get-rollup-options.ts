@@ -623,14 +623,20 @@ export const buildAliasPlugin = (
 // eslint-disable-next-line import/exports-last -- consumed by the shared bundler builder
 export const buildPurePlugins = (
     context: BuildContext<InternalBuildOptions>,
-): { pureNewExpressionPluginInstance: Plugin | undefined; purePluginInstance: Plugin | undefined } => {
+): { pureNewExpressionPluginInstance: Plugin | undefined; purePluginInstance: Plugin | undefined; rolldownPurePluginInstance: Plugin | undefined } => {
     if (!context.options.rollup.pure) {
-        return { pureNewExpressionPluginInstance: undefined, purePluginInstance: undefined };
+        return { pureNewExpressionPluginInstance: undefined, purePluginInstance: undefined, rolldownPurePluginInstance: undefined };
     }
 
-    const purePluginInstance = purePlugin({
-        ...context.options.rollup.pure,
-        functions: [
+    // `PureAnnotationsOptions.functions` is declared required `(string|RegExp)[]`,
+    // but packem's default `pure: {}` (see generateOptions) supplies no `functions`
+    // key, so this is `undefined` at runtime for the common (unconfigured) case —
+    // the type lies, the `?? []` is load-bearing. Resolved once and reused for both
+    // the function list and the dotless-string constructor list below.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- default `pure: {}` has no `functions` prop; value is genuinely undefined at runtime despite the required type
+    const userPureFunctions: (RegExp | string)[] = context.options.rollup.pure.functions ?? [];
+
+    const pureFunctions: (RegExp | string)[] = [
             // Common utility functions
             "Object.defineProperty",
             "Object.assign",
@@ -752,13 +758,24 @@ export const buildPurePlugins = (
             "Buffer.allocUnsafe",
             "Buffer.isBuffer",
 
-            // `PureAnnotationsOptions.functions` is declared required `(string|RegExp)[]`,
-            // but packem's default `pure: {}` (see generateOptions) supplies no
-            // `functions` key, so this is `undefined` at runtime for the common
-            // (unconfigured) case — the type lies, the `?? []` is load-bearing.
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- default `pure: {}` has no `functions` prop; value is genuinely undefined at runtime despite the required type
-            ...context.options.rollup.pure.functions ?? [],
-        ],
+            ...userPureFunctions,
+    ];
+
+    // Constructors annotated as pure on `new X()`. rollup-plugin-pure only handles
+    // CallExpression, so packem's own plugin covers NewExpression. Any dotless
+    // string the user added to `functions` is also a valid constructor name.
+    const pureConstructors: string[] = [
+        "Proxy",
+        "WeakMap",
+        "WeakSet",
+        "WeakRef",
+
+        ...(userPureFunctions.filter((f) => typeof f === "string" && !f.includes(".")) as string[]),
+    ];
+
+    const purePluginInstance = purePlugin({
+        ...context.options.rollup.pure,
+        functions: pureFunctions,
         sourcemap: context.options.sourcemap,
     });
 
@@ -768,22 +785,22 @@ export const buildPurePlugins = (
     // Companion plugin for annotating `new Constructor()` expressions (NewExpression nodes),
     // which rollup-plugin-pure does not handle (it only covers CallExpression nodes).
     const pureNewExpressionPluginInstance = pureNewExpressionPlugin({
-        constructors: [
-            "Proxy",
-            "WeakMap",
-            "WeakSet",
-            "WeakRef",
-
-            // Same as above: default `pure: {}` makes `.functions` undefined at
-            // runtime despite the required declared type, so both the optional
-            // chain and the `?? []` fallback are load-bearing here.
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- default `pure: {}` has no `functions` prop; value is genuinely undefined at runtime despite the required type
-            ...((context.options.rollup.pure.functions?.filter((f: string | RegExp) => typeof f === "string" && !f.includes(".")) ?? []) as string[]),
-        ],
+        constructors: pureConstructors,
         sourcemap: context.options.sourcemap,
     });
 
-    return { pureNewExpressionPluginInstance, purePluginInstance };
+    // Rolldown variant: rollup-plugin-pure is transform-only and can't run under
+    // rolldown (native transform runs after plugin transforms), so a single
+    // renderChunk pass annotates both constructors AND functions on the final
+    // transpiled chunk. Used in place of the two transform-based plugins above.
+    const rolldownPurePluginInstance = pureNewExpressionPlugin({
+        constructors: pureConstructors,
+        functions: pureFunctions,
+        mode: "renderChunk",
+        sourcemap: context.options.sourcemap,
+    });
+
+    return { pureNewExpressionPluginInstance, purePluginInstance, rolldownPurePluginInstance };
 };
 
 // The rollup-specific entry point (getRollupOptions) lives in

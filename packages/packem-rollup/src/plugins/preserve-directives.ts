@@ -7,7 +7,6 @@
  */
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
-import type { Node } from "estree";
 import MagicString from "magic-string";
 import type { Plugin, SourceMap } from "rollup";
 
@@ -16,6 +15,153 @@ export type PreserveDirectivesPluginOptions = {
     exclude?: FilterPattern;
     include?: FilterPattern;
     logger: Console;
+};
+
+interface ScannedDirective {
+    /** Index just past the statement (after the terminating `;`, or after the closing quote on ASI) — matches estree's ExpressionStatement.end. */
+    end: number;
+    /** Index of the opening quote — matches estree's ExpressionStatement.start. */
+    start: number;
+    /** Directive text without the surrounding quotes (e.g. `use client`). */
+    value: string;
+}
+
+// Spelled with explicit escapes (not raw characters) so the set is reviewable
+// by eye: space, tab, form-feed, vertical-tab, no-break space, BOM.
+const WHITESPACE = new Set([" ", "\t", "\f", "\v", "\u00A0", "\uFEFF"]);
+// Line feed, carriage return, line separator (U+2028), paragraph separator (U+2029).
+const LINE_TERMINATORS = new Set(["\n", "\r", "\u2028", "\u2029"]);
+
+/**
+ * Extract a module's leading Directive Prologue WITHOUT a full parse.
+ *
+ * preserve-directives has to run under rolldown too, where the native oxc
+ * transform runs AFTER plugin `transform` hooks — so `this.parse()` here would
+ * see un-transpiled TS/JSX and throw. The Directive Prologue (and the shebang,
+ * handled separately by the caller) always precedes any TS/JSX-specific syntax,
+ * so a lightweight scan of just the prologue is both sufficient and
+ * backend-agnostic.
+ *
+ * Mirrors acorn/estree semantics so the rollup output stays byte-identical to
+ * the previous AST-based removal: the prologue is the leading run of
+ * ExpressionStatements whose expression is a single string literal, with
+ * whitespace and comments allowed before/between them; the returned spans match
+ * estree's ExpressionStatement `start`/`end` (start at the opening quote, end
+ * after the terminating `;` when present, otherwise after the closing quote).
+ */
+const scanLeadingDirectives = (code: string): ScannedDirective[] => {
+    const directives: ScannedDirective[] = [];
+    const { length } = code;
+    let index = 0;
+
+    // Advance past whitespace and comments. When `allowNewlines` is false the
+    // scan stops at the first line terminator (used to find a same-line
+    // statement terminator after a string literal).
+    const skipTrivia = (allowNewlines: boolean): void => {
+        while (index < length) {
+            const char = code[index] as string;
+
+            if (WHITESPACE.has(char)) {
+                index += 1;
+            } else if (LINE_TERMINATORS.has(char)) {
+                if (!allowNewlines) {
+                    return;
+                }
+
+                index += 1;
+            } else if (char === "/" && code[index + 1] === "/") {
+                index += 2;
+
+                while (index < length && !LINE_TERMINATORS.has(code[index] as string)) {
+                    index += 1;
+                }
+            } else if (char === "/" && code[index + 1] === "*") {
+                index += 2;
+
+                while (index < length && !(code[index] === "*" && code[index + 1] === "/")) {
+                    index += 1;
+                }
+
+                index += 2; // consume the closing `*/`
+            } else {
+                return;
+            }
+        }
+    };
+
+    while (index < length) {
+        skipTrivia(true);
+
+        if (index >= length) {
+            break;
+        }
+
+        const quote = code[index];
+
+        if (quote !== "\"" && quote !== "'") {
+            break; // first non-string statement ends the prologue
+        }
+
+        const stringStart = index;
+
+        index += 1;
+
+        let closed = false;
+
+        while (index < length) {
+            const char = code[index] as string;
+
+            if (char === "\\") {
+                index += 2; // skip the escaped character
+                continue;
+            }
+
+            if (char === quote) {
+                index += 1;
+                closed = true;
+                break;
+            }
+
+            if (LINE_TERMINATORS.has(char)) {
+                break; // an unterminated string literal is not a directive
+            }
+
+            index += 1;
+        }
+
+        if (!closed) {
+            break;
+        }
+
+        const stringEnd = index; // just past the closing quote
+        const value = code.slice(stringStart + 1, stringEnd - 1);
+
+        // Find the statement terminator on the same line.
+        skipTrivia(false);
+
+        const terminator = code[index];
+
+        if (terminator === ";") {
+            index += 1; // estree's ExpressionStatement.end includes the semicolon
+
+            directives.push({ end: index, start: stringStart, value });
+
+            continue;
+        }
+
+        if (index >= length || LINE_TERMINATORS.has(terminator as string) || terminator === "}") {
+            // ASI: the statement ends at the closing quote; no semicolon consumed.
+            directives.push({ end: stringEnd, start: stringStart, value });
+
+            continue;
+        }
+
+        // The string continues a larger expression (e.g. `"a" + "b"`,
+        // `"x".length`) — it is not a directive and the prologue ends here.
+        break;
+    }
+
+    return directives;
 };
 
 export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include = [], logger }: PreserveDirectivesPluginOptions): Plugin => {
@@ -71,6 +217,15 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                     }, new Set<string>());
 
                 const magicString = new MagicString(code);
+
+                // Defensive dedup: if the emitted chunk already carries a leading
+                // directive (e.g. a bundler that re-emits it natively), don't
+                // prepend a duplicate. Under both backends `transform` strips the
+                // source directive so this is normally a no-op, but it guards
+                // against rolldown's native directive emission re-introducing one.
+                for (const { value } of scanLeadingDirectives(code)) {
+                    outputDirectives.delete(value);
+                }
 
                 if (outputDirectives.size > 0) {
                     logger.debug({
@@ -171,75 +326,40 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 }
             }
 
-            /**
-             * rollup's built-in parser returns an extended version of ESTree Node.
-             */
-            let ast: Node | undefined;
-
-            try {
-                ast = this.parse(magicString.toString(), { allowReturnOutsideFunction: true });
-            } catch (error) {
-                this.warn({
-                    code: "PARSE_ERROR",
-                    message: `failed to parse "${id}" and extract the directives.`,
-                });
-
-                logger.warn(error);
-
-                return undefined;
-            }
-
-            // `ast.type` is typed as the literal "Program" by this.parse, so no runtime check is needed here.
-
-            for (const node of ast.body.filter(Boolean)) {
-                // Only parse the top level directives, once reached to the first non statement literal node, stop parsing
-                if (node.type !== "ExpressionStatement") {
-                    break;
-                }
-
-                let directive: string | undefined;
-
-                /**
-                 * rollup and estree defines `directive` field on the `ExpressionStatement` node;
-                 * see rollup's ExpressionStatement.ts source.
-                 */
-                if ("directive" in node) {
-                    directive = node.directive;
-                } else if (node.expression.type === "Literal" && typeof node.expression.value === "string" && directiveRegex.test(node.expression.value)) {
-                    directive = node.expression.value;
-                }
-
-                if (directive === "use strict") {
+            // Scan the leading Directive Prologue without a full parse so this
+            // runs under rolldown too (see scanLeadingDirectives). Scanning the
+            // post-shebang-removal source keeps the spans aligned with the
+            // `magicString` coordinates used by `remove()` below.
+            for (const { end, start, value } of scanLeadingDirectives(magicString.toString())) {
+                // `"use strict"` is left untouched: the bundler manages strict-mode
+                // emission per format, so it is neither hoisted nor stripped here.
+                if (value === "use strict") {
                     continue;
                 }
 
-                if (directive) {
-                    const existing = directives[id];
-
-                    if (existing) {
-                        existing.add(directive);
-                    } else {
-                        directives[id] = new Set<string>([directive]);
-                    }
-
-                    /**
-                     * rollup has extended acorn node with the `start` and the `end` field;
-                     * see rollup's Node.ts source for the extended shape.
-                     *
-                     * However, typescript doesn't know that, so we add type guards for typescript
-                     * to infer.
-                     */
-                    if ("start" in node && typeof node.start === "number" && "end" in node && typeof node.end === "number") {
-                        magicString.remove(node.start, node.end);
-
-                        hasChanged = true;
-                    }
-
-                    logger.debug({
-                        message: `directive "${directive}" for module "${id}" is preserved.`,
-                        prefix: "plugin:preserve-directives",
-                    });
+                // Only hoist real `use <word>` directives. The previous AST path
+                // relied on acorn's per-statement `directive` field; the regex is
+                // reconstructed with quotes because it anchors on them.
+                if (!directiveRegex.test(`"${value}"`)) {
+                    continue;
                 }
+
+                const existing = directives[id];
+
+                if (existing) {
+                    existing.add(value);
+                } else {
+                    directives[id] = new Set<string>([value]);
+                }
+
+                magicString.remove(start, end);
+
+                hasChanged = true;
+
+                logger.debug({
+                    message: `directive "${value}" for module "${id}" is preserved.`,
+                    prefix: "plugin:preserve-directives",
+                });
             }
 
             if (!hasChanged) {

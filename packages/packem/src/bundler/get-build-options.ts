@@ -120,10 +120,12 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
         }
         : {
-            // Directive-based layers ("use client"/"use server") only exist when the
-            // preserve-directives plugin runs, which is rollup-only and gated on the
-            // option. When it can't run, `getModuleLayer` always returns undefined, so
-            // createSplitChunks can skip its expensive importer-layer graph walks.
+            // Directive-based layers ("use client"/"use server") drive per-layer
+            // chunk splitting, which depends on packem's chunk-per-export entry
+            // promotion (chunkSplitter). That promotion is rollup-only, so the
+            // layer walk is gated to rollup; under rolldown directive modules are
+            // not promoted to entries, so `getModuleLayer` would find nothing to
+            // split on and the importer-layer graph walk is pure waste.
             manualChunks: createSplitChunks(
                 context.dependencyGraphMap,
                 context.buildEntries,
@@ -137,7 +139,7 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
     // Add esm mark and interop helper if esm export is detected
     const useEsModuleMark = context.tsconfig?.config.compilerOptions?.esModuleInterop;
 
-    const { pureNewExpressionPluginInstance, purePluginInstance } = buildPurePlugins(context);
+    const { pureNewExpressionPluginInstance, purePluginInstance, rolldownPurePluginInstance } = buildPurePlugins(context);
 
     const options: RollupOptions = {
         ...baseRollupOptions(context, "build"),
@@ -356,15 +358,17 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                 fileCache,
             ),
 
-            // pure-new-expression-plugin and rollup-plugin-pure both call
-            // this.parse() on module source in their transform hook. Under
-            // rolldown the native transform runs AFTER plugin transform hooks
-            // (and this.parse() has no filename, so it parses as plain JS),
-            // so they would choke on raw TS/JSX. Their only job is emitting
-            // /*#__PURE__*/ tree-shaking hints, which rolldown's native
-            // tree-shaking already covers — rollup-only.
+            // pure-new-expression-plugin and rollup-plugin-pure call this.parse()
+            // on module source in their transform hooks. Under rollup the
+            // transformer adapter has already produced plain JS by then, so both
+            // run as transforms. Under rolldown the native transform runs AFTER
+            // plugin transforms (raw TS/JSX at transform time), and
+            // rollup-plugin-pure is transform-only — so a single packem-owned
+            // renderChunk pass annotates both constructors and functions on the
+            // final transpiled chunk instead.
             !isRolldown && pureNewExpressionPluginInstance,
             !isRolldown && purePluginInstance,
+            isRolldown && rolldownPurePluginInstance,
 
             context.options.rollup.detectDuplicated !== false
             && detectDuplicatedPlugin(getLogger(context), context.options.rootDir, context.options.rollup.detectDuplicated),
@@ -373,10 +377,14 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             && context.options.transformer
             && cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
 
-            // preserve-directives parses module source via this.parse() in its
-            // transform hook; see the rolldown note on the pure plugins above.
-            !isRolldown
-            && context.options.rollup.preserveDirectives
+            // preserve-directives runs under both backends: its transform hook
+            // extracts the leading directive prologue with a manual scan (no
+            // this.parse, which would choke on rolldown's pre-transform TS/JSX),
+            // and its renderChunk hoists directives onto output chunks — both
+            // rolldown-safe. Note: bundled multi-layer *splitting* under rolldown
+            // is still limited (chunkSplitter entry-promotion is rollup-only), but
+            // single-entry / per-module directive preservation works on both.
+            context.options.rollup.preserveDirectives
             && preserveDirectivesPlugin({
                 directiveRegex: PRESERVE_DIRECTIVE_REGEX,
                 ...context.options.rollup.preserveDirectives,
@@ -429,17 +437,24 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
 
             context.options.cjsInterop && context.options.rollup.shim && esmShimCjsSyntaxPlugin(context.pkg, context.options.rollup.shim),
 
-            // jsx-remove-attributes parses module source via this.parse() in
-            // its transform hook; see the rolldown note on the pure plugins.
-            !isRolldown
-            && context.options.rollup.jsxRemoveAttributes
-            && cachingPlugin(
-                jsxRemoveAttributes({
+            // jsx-remove-attributes strips attributes from automatic-runtime JSX
+            // calls. Under rollup it runs as a transform (the transformer adapter
+            // has already produced `jsx(...)` calls, so this.parse sees plain JS)
+            // and is cached. Under rolldown the native transform runs after plugin
+            // transforms, so it instead runs in renderChunk on the transpiled
+            // chunk (no transform to cache there).
+            context.options.rollup.jsxRemoveAttributes
+            && (() => {
+                const instance = jsxRemoveAttributes({
                     attributes: context.options.rollup.jsxRemoveAttributes.attributes,
                     logger: getLogger(context),
-                }),
-                fileCache,
-            ),
+                    ...(isRolldown ? { mode: "renderChunk" as const } : {}),
+                });
+
+                // Only the rollup transform path is cacheable; the rolldown path
+                // runs in renderChunk (no transform output to cache).
+                return isRolldown ? instance : cachingPlugin(instance, fileCache);
+            })(),
 
             ...postPlugins,
 

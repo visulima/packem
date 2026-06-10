@@ -1031,12 +1031,13 @@ const packem = async (
                 throw new Error("Rollup watch is disabled. You should check your packem config.");
             }
 
-            // Watch is rollup-only today. Surface the fallback so users on
-            // `bundler: "rolldown"` know what's actually running until a
-            // rolldown watch path lands.
-            if (context.options.bundler === "rolldown") {
-                logger.warn({
-                    message: "Watch mode falls back to rollup; rolldown watch isn't supported yet.",
+            // Rolldown now drives its own native watch (see rollup/watch.ts). The
+            // bundle watcher is rolldown; only DTS watching still runs through
+            // rollup, since @visulima/rollup-plugin-dts isn't rolldown-compatible
+            // yet. Surface that one residual fallback when declarations are on.
+            if (context.options.bundler === "rolldown" && context.options.declaration) {
+                logger.info({
+                    message: "Declaration (DTS) watching runs through rollup; the bundle watcher is rolldown.",
                     prefix: "bundler",
                 });
             }

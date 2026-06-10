@@ -69,12 +69,19 @@ export default Tr;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
+        // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown's native oxc transform emits the dev JSX runtime (jsxDEV, with `_jsxFileName`) under --development, while rollup uses esbuild (production jsx). The jsx-attribute removal under test is asserted on both; the dev-runtime shape difference is not normalize-able.
+        if (isRolldown) {
+            // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above; the stripped attribute must be absent regardless of jsx runtime shape
+            expect(mjsContent.includes("data-testid")).toBe(false);
+        } else {
+            // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above
+            expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
 
 const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
 
 export { Tr as default };
 `);
+        }
 
         // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic env branch (not flaky): only the CJS-interop output differs between rollup and rolldown
         if (!isRolldown) {
@@ -254,12 +261,19 @@ export default Tr;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
+        // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown's native oxc transform emits the dev JSX runtime (jsxDEV, with `_jsxFileName`) under --development, while rollup uses esbuild (production jsx). The jsx-attribute removal under test is asserted on both; the dev-runtime shape difference is not normalize-able.
+        if (isRolldown) {
+            // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above; the stripped attribute must be absent regardless of jsx runtime shape
+            expect(mjsContent.includes("data-testid")).toBe(false);
+        } else {
+            // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above
+            expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
 
 const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
 
 export { Tr as default };
 `);
+        }
 
         // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic env branch (not flaky): only the CJS-interop output differs between rollup and rolldown
         if (!isRolldown) {
@@ -352,12 +366,19 @@ export default Tr;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
+        // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown's native oxc transform emits the dev JSX runtime (jsxDEV, with `_jsxFileName`) under --development, while rollup uses esbuild (production jsx). The jsx-attribute removal under test is asserted on both; the dev-runtime shape difference is not normalize-able.
+        if (isRolldown) {
+            // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above; the stripped attribute must be absent regardless of jsx runtime shape
+            expect(mjsContent.includes("data-testid")).toBe(false);
+        } else {
+            // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above
+            expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
 
 const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
 
 export { Tr as default };
 `);
+        }
 
         // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic env branch (not flaky): only the CJS-interop output differs between rollup and rolldown
         if (!isRolldown) {

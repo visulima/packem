@@ -16,16 +16,6 @@ type BundlerName = "rolldown" | "rollup";
 
 const resolveBundlerName = (bundler: BundlerName | undefined): BundlerName => bundler ?? "rollup";
 
-const ROLLDOWN_CSS_MODULE_TYPES = {
-    ".css": "js",
-    ".less": "js",
-    ".pcss": "js",
-    ".sass": "js",
-    ".scss": "js",
-    ".styl": "js",
-    ".stylus": "js",
-} as const;
-
 const buildWithRollup = async (
     context: BuildContext<InternalBuildOptions>,
     fileCache: FileCache,
@@ -129,20 +119,10 @@ const buildWithRolldown = async (
 
     const rolldown = await getRolldownBuild();
 
-    // Rolldown 1.0 removed native CSS bundling (rolldown#4271) and rejects any
-    // module whose extension defaults to `moduleTypes: "css"`. Our `rollup-plugin-css`
-    // already transforms CSS source into JS via the `transform()` hook, so override
-    // the defaults to treat CSS-family extensions as JS — rolldown's CSS detection
-    // gets bypassed and the plugin pipeline runs as it does under rollup.
-    const rolldownOptions = {
-        ...rollupOptions,
-        moduleTypes: {
-            ...ROLLDOWN_CSS_MODULE_TYPES,
-            ...(rollupOptions as { moduleTypes?: Record<string, string> }).moduleTypes,
-        },
-    } as unknown as Record<string, unknown>;
-
-    const bundle = await rolldown(rolldownOptions);
+    // `rollupOptions` here is produced by getRolldownOptions, which already applies
+    // the rolldown `moduleTypes` CSS override (see ROLLDOWN_CSS_MODULE_TYPES), so it
+    // can be passed straight through.
+    const bundle = await rolldown(rollupOptions as unknown as Record<string, unknown>);
 
     try {
         if (context.options.validation && context.options.validation.dependencies !== false) {

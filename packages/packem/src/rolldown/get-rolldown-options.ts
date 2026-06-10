@@ -7,6 +7,25 @@ import { getOxcTransformerConfig, resolveNodeTarget } from "../rollup/get-rollup
 import type { InternalBuildOptions } from "../types";
 
 /**
+ * Rolldown 1.0 removed native CSS bundling (rolldown#4271) and rejects any module
+ * whose extension defaults to `moduleTypes: "css"`. packem's `rollup-plugin-css`
+ * already transforms CSS source into JS via its `transform()` hook, so treat the
+ * CSS-family extensions as JS to bypass rolldown's native CSS detection and let
+ * the plugin pipeline run as it does under rollup. Shared by the one-shot build
+ * (bundler/build.ts) and the watch path (rollup/watch.ts).
+ */
+// eslint-disable-next-line import/exports-last -- consumed by the rolldown build + watch paths
+export const ROLLDOWN_CSS_MODULE_TYPES = {
+    ".css": "js",
+    ".less": "js",
+    ".pcss": "js",
+    ".sass": "js",
+    ".scss": "js",
+    ".styl": "js",
+    ".stylus": "js",
+} as const;
+
+/**
  * Rolldown bundles an oxc-based transform natively, so the rolldown builder
  * does NOT run packem's transformer adapter plugin (the esbuild/swc/sucrase/
  * oxc rollup plugin). Instead it feeds rolldown's `transform` input option the
@@ -49,6 +68,13 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
     const options = await createJsBuildOptions(context, fileCache, "rolldown");
 
     (options as Record<string, unknown>).transform = getRolldownTransformOptions(context);
+
+    // Bypass rolldown's native CSS detection (see ROLLDOWN_CSS_MODULE_TYPES). User
+    // overrides win, so spread any existing `moduleTypes` last.
+    (options as Record<string, unknown>).moduleTypes = {
+        ...ROLLDOWN_CSS_MODULE_TYPES,
+        ...((options as { moduleTypes?: Record<string, string> }).moduleTypes ?? {}),
+    };
 
     // Rolldown's `output.minify` defaults to `'dce-only'` (no identifier/whitespace
     // compression), while the rollup backend gets real minification through the
