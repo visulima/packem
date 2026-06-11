@@ -21,13 +21,13 @@ STOP conditions, and update your row when done.
 | 003  | Fix `jsx-remove-attributes` corrupting output when stripped attr is first prop | P2 | S | LOW | — | DONE (5b36f504c) |
 | 004  | Extract the duplicated dependency-cache load logic in `build.ts` | P3 | S | LOW | — | DONE (00e2e7954) |
 | 005  | Add a root `AGENTS.md` for the monorepo | P2 | S | LOW | — | DONE (4964b64c7) |
-| 006  | Make watch mode survive a failing `onSuccess` script (+ regression test) | P1 | S | LOW | — | TODO |
-| 007  | Clear the failing `pnpm audit` gate (shell-quote critical + hono moderates) | P1 | S | LOW | — | TODO |
-| 008  | Harden rollup-plugin-dts subprocess failure paths (fork hang, tsgo exit code) | P2 | S | LOW | — | TODO |
-| 011  | Write the rolldown support-status & graduation-criteria document | P2 | S | LOW | — (012 feeds one section) | TODO |
-| 009  | Spike: why does CSS disable the watch-mode cache? (report-only) | P3 | M | LOW | — | TODO |
-| 010  | Experiment: raise the vitest thread cap if measurably faster and stable | P3 | S | MED | — | TODO |
-| 012  | Spike: rolldown compatibility of `@visulima/rollup-plugin-dts` (go/no-go report) | P3 | M | LOW | — | TODO |
+| 006  | Make watch mode survive a failing `onSuccess` script (+ regression test) | P1 | S | LOW | — | DONE — APPROVED (branch `advisor/006-watch-onsuccess-crash`, commit a41363750; unmerged) |
+| 007  | Clear the failing `pnpm audit` gate (shell-quote critical + hono moderates) | P1 | S | LOW | — | DONE — APPROVED after 1 revision (branch `advisor/007-audit-overrides`, commit 0cf648896; unmerged; NOTE: adds `.pnpmfile.cjs` — pnpm v11 doesn't apply `overrides` to peer-resolved hono; remove the hook once `@modelcontextprotocol/sdk` ships hono>=4.12.21) |
+| 008  | Harden rollup-plugin-dts subprocess failure paths (fork hang, tsgo exit code) | P2 | S | LOW | — | DONE — APPROVED after 1 revision (branch `advisor/008-dts-subprocess-hardening`, commits e40c119d8 + d816d6c36; unmerged; NOTE: main tree has an uncommitted competing tsgo.ts fix — expect a small merge conflict) |
+| 011  | Write the rolldown support-status & graduation-criteria document | P2 | S | LOW | — (012 feeds one section) | DONE — APPROVED after 1 revision (branch `advisor/011-rolldown-status-doc`, commit 2c995e8e7; unmerged. Adds `docs/rolldown-status.md` + one AGENTS.md link line; criterion 2 cites 012's GO verdict. Maintainer decides: N=20 CI-green threshold, packem-rolldown placeholder fate) |
+| 009  | Spike: why does CSS disable the watch-mode cache? (report-only) | P3 | M | LOW | — | DONE — APPROVED (branch `advisor/009-css-cache-spike`, commit ae3fc2e18; report copied to `plans/009-report.md`. Root cause verified: css-plugin's `extracted` Map only repopulates in `transform`, which rollup skips for cached modules. Recommended Fix B (`meta.extracted` + `moduleParsed` recovery). Deviation: no live timings — harness blocker, disclosed; mechanism independently verified against rollup 4.60.4 dist) |
+| 010  | Experiment: raise the vitest thread cap if measurably faster and stable | P3 | S | MED | — | REJECTED — measured, gate failed (12-core machine, idle: baseline maxThreads=2 median 191.69s vs maxThreads=4 median 186.28s = 2.82% faster, needed ≥20%; 500/500 pass in all 5 runs, zero flakes). Bottleneck is the spawned CLI child builds saturating cores, not vitest thread count. No change committed; branch `advisor/010-vitest-threads` is empty |
+| 012  | Spike: rolldown compatibility of `@visulima/rollup-plugin-dts` (go/no-go report) | P3 | M | LOW | — | DONE — APPROVED (branch `advisor/012-rolldown-dts-spike`, commit 8890a5021; report copied to `plans/012-report.md`. Verdict: GO — one-line `\0`-virtual-module guard in generate.ts unblocks `emitDtsOnly` under rolldown; ~1 day total for dual-compat) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
 
