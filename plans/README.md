@@ -29,8 +29,8 @@ STOP conditions, and update your row when done.
 | 010  | Experiment: raise the vitest thread cap if measurably faster and stable | P3 | S | MED | — | REJECTED — measured, gate failed (12-core machine, idle: baseline maxThreads=2 median 191.69s vs maxThreads=4 median 186.28s = 2.82% faster, needed ≥20%; 500/500 pass in all 5 runs, zero flakes). Bottleneck is the spawned CLI child builds saturating cores, not vitest thread count. No change committed; branch `advisor/010-vitest-threads` is empty |
 | 012  | Spike: rolldown compatibility of `@visulima/rollup-plugin-dts` (go/no-go report) | P3 | M | LOW | — | DONE — APPROVED (branch `advisor/012-rolldown-dts-spike`, commit 8890a5021; report copied to `plans/012-report.md`. Verdict: GO — one-line `\0`-virtual-module guard in generate.ts unblocks `emitDtsOnly` under rolldown; ~1 day total for dual-compat) |
 | 013  | Fix the CSS watch-cache root cause and remove the `useCache` hack (009 follow-up) | P2 | M | MED | 009 | IN PROGRESS (executor running, branch `advisor/013-css-watch-cache-fix`) |
-| 014  | Make `rollup-plugin-dts` dual-compatible rollup+rolldown (012 GO path, items 1–5) | P2 | M | LOW-MED | 012 | IN PROGRESS (executor running, branch `advisor/014-rolldown-dts-compat`) |
-| 015  | Route packem's DTS through rolldown natively (012 GO path, item 6) | P2 | M | MED | 014 | TODO (written after 014 merges) |
+| 014  | Make `rollup-plugin-dts` dual-compatible rollup+rolldown (012 GO path, items 1–5) | P2 | M | LOW-MED | 012 | DONE — APPROVED, merged into alpha (commit 8e2b95d7b, merge a737680b7). Guard at `generate.ts` transform top; rolldown optional peer + dev dep (lockfile +3 lines, confined); alias rename verified pure via sed-normalized diff; 9 new rolldown-lane tests; reviewer re-ran suite (96 pass), lint, and packem typescript.test.ts (62 pass) in the worktree |
+| 015  | Route packem's DTS through rolldown natively (012 GO path, item 6) | P2 | M | MED | 014 | TODO (next: write the plan now that 014 is merged) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
 

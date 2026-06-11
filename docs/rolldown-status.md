@@ -38,17 +38,22 @@ Each checkbox is a decision point for the maintainer, not a preset constraint.
     Plan-012 spike (2026-06-11, `plans/012-report.md` on branch
     `advisor/012-rolldown-dts-spike`) returned **GO (conditional)**:
     `@visulima/rollup-plugin-dts` is ~97% rolldown-compatible today (rolldown
-    1.0.3). The single hard blocker is a one-line virtual-module guard in
-    `packages/rollup-plugin-dts/src/generate.ts` (line 491): adding
-    `if (id.startsWith("\0")) return null;` prevents the plugin's `transform`
-    hook from clobbering rolldown's injected `\0rolldown/runtime.js` module,
-    which currently causes a fatal `RUNTIME_MODULE_SYMBOL_NOT_FOUND` error.
-    Additional GO-path work (~1 day coarse): add rolldown as optional peer dep;
-    fix the test-lane alias confusion in `__tests__/index.test.ts:4` (imports
-    `rollupBuild as rolldownBuild` — the suite actually exercises rollup today);
-    optionally strip rolldown `//#region` comments from DTS output; then update
+    1.0.3). The single hard blocker was a one-line virtual-module guard in
+    `packages/rollup-plugin-dts/src/generate.ts`: `if (id.startsWith("\0"))`
+    prevents the plugin's `transform` hook from clobbering rolldown's injected
+    `\0rolldown/runtime.js` module, which previously caused a fatal
+    `RUNTIME_MODULE_SYMBOL_NOT_FOUND` error.
+
+    **Progress (2026-06-11, plan 014 merged):** the plugin side is DONE — the
+    virtual-module guard landed, rolldown is declared as an optional peer (+
+    dev) dependency, the `rollupBuild as rolldownBuild` alias misnomer in
+    `__tests__/index.test.ts` is fixed, and a real rolldown test lane
+    (`packages/rollup-plugin-dts/__tests__/rolldown.test.ts`, 4 fixtures × both
+    `emitDtsOnly` modes, content assertions) enforces the compat claim.
+    Remaining before this criterion can be ticked (plan 015): update
     `packages/packem/src/packem/index.ts` and `packages/packem/src/rollup/watch.ts`
-    to route DTS through rolldown when rolldown is the selected bundler.
+    to route DTS through rolldown when rolldown is the selected bundler, and
+    decide on stripping rolldown `//#region` comments from emitted d.ts.
 
 - [ ] **Snapshot currency**: `.rolldown.snap` files are kept up-to-date by the
       advisory CI job. "Current" means: no obsolete snapshot entries that differ
