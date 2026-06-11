@@ -8,22 +8,26 @@ import { createDebug } from "obug";
 
 const debug = createDebug("rollup-plugin-dts:tsgo");
 
-const spawnAsync = async (...args: Parameters<typeof spawn>): Promise<void> => {
+interface GetExePathModule {
+    default?: () => string;
+}
+
+export const spawnAsync = async (...args: Parameters<typeof spawn>): Promise<void> => {
     await new Promise<void>((resolve, reject) => {
         const child = spawn(...args);
 
-        child.on("close", () => {
-            resolve();
+        child.on("close", (code, signal) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(new Error(`tsgo exited with ${signal ? `signal ${signal}` : `code ${String(code)}`}`));
+            }
         });
         child.on("error", (error) => {
             reject(error);
         });
     });
 };
-
-interface GetExePathModule {
-    default?: () => string;
-}
 
 export const getTsgoPathFromNodeModules = (): string => {
     const requireFromHere = createRequire(import.meta.url);
