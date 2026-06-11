@@ -250,13 +250,7 @@ const watch = async (
     runOnsuccess: () => Promise<void>,
     doOnSuccessCleanup: () => Promise<void>,
 ): Promise<void> => {
-    let useCache = true;
-
-    // TODO: find a way to remove this hack
-    // This is a hack to prevent caching when using css loaders
-    if (context.options.rollup.css) {
-        useCache = false;
-    }
+    const useCache = true;
 
     // Only `.close()` is used across both backends' watchers, so a structural
     // type keeps the array bundler-agnostic (rolldown's watcher is not a RollupWatcher).
