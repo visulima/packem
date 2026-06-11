@@ -29,6 +29,8 @@ in `packem.config.ts`); code selects via `isRolldown = backend === "rolldown"`.
 - **DTS generation always runs through rollup** (via
   `@visulima/rollup-plugin-dts`) even under the rolldown backend.
 
+Support status and graduation criteria: see [docs/rolldown-status.md](./docs/rolldown-status.md).
+
 ## Build / test / lint commands
 
 | Purpose                                              | Command                   | Run from               |
