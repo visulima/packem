@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
@@ -179,6 +179,93 @@ describe("packem watch", () => {
 
         proc.kill("SIGINT");
         await proc;
+    });
+
+    it("should keep emitting CSS across watch rebuilds when the cache is enabled", { timeout: 60_000 }, async () => {
+        expect.assertions(7);
+
+        // Override the beforeEach config with CSS-enabled config (postcss, extract mode)
+        await createPackemConfig(temporaryDirectoryPath, {
+            cssLoader: ["postcss"],
+            cssOptions: { mode: "extract" },
+        });
+
+        // Write a JS entry that imports CSS
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `import "./style.css";\nexport const a = 1;\n`);
+        writeFileSync(`${temporaryDirectoryPath}/src/style.css`, `.a { color: red; }\n`);
+
+        const proc = execaNode(join(distributionPath, "cli/index.js"), ["build", "--development", "--watch", "--no-validation"], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        let stdout = "";
+
+        proc.stdout.on("data", (chunk: Buffer) => {
+            stdout += String(chunk);
+        });
+
+        proc.stderr.on("data", (chunk: Buffer) => {
+            stdout += String(chunk);
+        });
+
+        // "Rebuild finished" appears exactly once per complete build cycle (END event).
+        // Use it as the single marker to count completed builds.
+        const waitForRebuild = async (nthOccurrence: number, timeoutMs = 20_000): Promise<void> => {
+            const start = Date.now();
+
+            while (Date.now() - start < timeoutMs) {
+                const matches = stdout.match(/Rebuild finished/g);
+                const count = matches?.length ?? 0;
+
+                if (count >= nthOccurrence) {
+                    return;
+                }
+
+                // eslint-disable-next-line no-await-in-loop -- intentional sequential poll
+                await sleep(100);
+            }
+
+            throw new Error(`Timed out waiting for rebuild #${String(nthOccurrence)}\nstdout so far:\n${stdout}`);
+        };
+
+        // Wait for the initial build
+        await waitForRebuild(1);
+
+        // Assert: CSS artifact exists and contains `color: red`
+        const cssPath = `${temporaryDirectoryPath}/dist/index.css`;
+
+        expect(existsSync(cssPath)).toBe(true);
+        expect(readFileSync(cssPath)).toContain("color: red");
+
+        // Delete the CSS file, then trigger a JS-only change.
+        // With the bug: the CSS module is cached (unchanged) → transform() is
+        // skipped → `extracted` Map stays empty → generateBundle emits nothing →
+        // the deleted CSS file is NOT re-created.
+        // With the fix: moduleParsed fires for the cached CSS module, repopulates
+        // `extracted` from the stored meta → generateBundle re-emits the CSS file.
+        rmSync(cssPath);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `import "./style.css";\nexport const a = 2;\n`);
+
+        await waitForRebuild(2);
+
+        // Regression: with the bug, cached CSS modules skipped transform and the
+        // extracted Map was empty → generateBundle emitted nothing → CSS not re-created.
+        expect(existsSync(cssPath)).toBe(true);
+        expect(readFileSync(cssPath)).toContain("color: red");
+
+        // Trigger a CSS change so we confirm live updates still work
+        writeFileSync(`${temporaryDirectoryPath}/src/style.css`, `.a { color: blue; }\n`);
+
+        await waitForRebuild(3);
+
+        expect(existsSync(cssPath)).toBe(true);
+        expect(readFileSync(cssPath)).toContain("color: blue");
+
+        proc.kill("SIGINT");
+        const result = await proc;
+
+        expect(result.signal === "SIGINT" || result.exitCode === 0).toBe(true);
     });
 
     it("should keep watching when the onSuccess command fails", { timeout: 30_000 }, async () => {
