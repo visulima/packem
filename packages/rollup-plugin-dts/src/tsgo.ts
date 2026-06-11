@@ -8,7 +8,11 @@ import { createDebug } from "obug";
 
 const debug = createDebug("rollup-plugin-dts:tsgo");
 
-const spawnAsync = async (...args: Parameters<typeof spawn>): Promise<void> => {
+interface GetExePathModule {
+    default?: () => string;
+}
+
+export const spawnAsync = async (...args: Parameters<typeof spawn>): Promise<void> => {
     await new Promise<void>((resolve, reject) => {
         const child = spawn(...args);
 
@@ -36,10 +40,6 @@ const spawnAsync = async (...args: Parameters<typeof spawn>): Promise<void> => {
         });
     });
 };
-
-interface GetExePathModule {
-    default?: () => string;
-}
 
 export const getTsgoPathFromNodeModules = (): string => {
     const requireFromHere = createRequire(import.meta.url);

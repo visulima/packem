@@ -1,4 +1,4 @@
-/* eslint-disable consistent-return, sonarjs/cognitive-complexity, import/exports-last, @typescript-eslint/no-non-null-assertion, @typescript-eslint/prefer-nullish-coalescing, no-await-in-loop, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-dynamic-delete, unicorn/prevent-abbreviations, unicorn/no-await-expression-member, unicorn/no-null, @typescript-eslint/restrict-template-expressions, no-plusplus, @stylistic/no-extra-parens, jsdoc/check-indentation, jsdoc/match-description, import/no-commonjs, prefer-const -- this file orchestrates the dts generation pipeline; rule-by-rule refactoring would obscure the control flow and many `any` usages stem from JSON.parse / rollup internal types */
+/* eslint-disable consistent-return, sonarjs/cognitive-complexity, import/exports-last, @typescript-eslint/no-non-null-assertion, @typescript-eslint/prefer-nullish-coalescing, no-await-in-loop, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-dynamic-delete, unicorn/prevent-abbreviations, unicorn/no-await-expression-member, unicorn/no-null, @typescript-eslint/restrict-template-expressions, no-plusplus, @stylistic/no-extra-parens, jsdoc/check-indentation, jsdoc/match-description, import/no-commonjs -- this file orchestrates the dts generation pipeline; rule-by-rule refactoring would obscure the control flow and many `any` usages stem from JSON.parse / rollup internal types */
 import type { ChildProcess } from "node:child_process";
 import { fork } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -143,6 +143,16 @@ export const createGeneratePlugin = ({
                     childProcess = fork(new URL(WORKER_URL, import.meta.url), {
                         stdio: "inherit",
                     });
+
+                    await new Promise<void>((resolve, reject) => {
+                        childProcess!.once("spawn", () => {
+                            resolve();
+                        });
+                        childProcess!.once("error", (error) => {
+                            reject(new Error(`Failed to start the parallel tsc worker: ${error.message}`, { cause: error }));
+                        });
+                    });
+
                     rpc = (await import("birpc")).createBirpc<TscFunctions>(
                         {},
                         {
@@ -299,7 +309,15 @@ export const createGeneratePlugin = ({
                     };
                     let result: TscResult;
 
-                    result = parallel ? await rpc!.tscEmit(options) : tscModule.tscEmit(options);
+                    if (parallel) {
+                        if (!rpc) {
+                            return this.error(new Error("Parallel tsc worker is not initialized"));
+                        }
+
+                        result = await rpc.tscEmit(options);
+                    } else {
+                        result = tscModule.tscEmit(options);
+                    }
 
                     if (result.error) {
                         return this.error(result.error);
