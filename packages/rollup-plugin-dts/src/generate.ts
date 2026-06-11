@@ -481,6 +481,13 @@ export { __json_default_export as default }`;
 
         transform: {
             handler(code, id) {
+                // Bundler-injected virtual modules (rolldown's
+                // \0rolldown/runtime.js, rollup convention \0...) must pass
+                // through untouched: emitDtsOnly's "export { }" replacement
+                // would strip their runtime exports and break linking.
+                if (id.startsWith("\0"))
+                    return;
+
                 if (RE_DTS.test(id) || RE_NODE_MODULES.test(id))
                     return;
 
