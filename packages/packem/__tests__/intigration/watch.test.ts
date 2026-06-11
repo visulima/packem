@@ -180,4 +180,86 @@ describe("packem watch", () => {
         proc.kill("SIGINT");
         await proc;
     });
+
+    it("should keep watching when the onSuccess command fails", { timeout: 30_000 }, async () => {
+        expect.assertions(4);
+
+        // Start watch with a failing onSuccess command (exit 1)
+        const proc = execaNode(
+            join(distributionPath, "cli/index.js"),
+            ["build", "--development", "--watch", "--onSuccess=exit 1", "--no-validation"],
+            {
+                cwd: temporaryDirectoryPath,
+                reject: false,
+            },
+        );
+
+        // Accumulate both stdout and stderr — logger.error may write to either
+        let output = "";
+
+        proc.stdout.on("data", (chunk) => {
+            output += String(chunk);
+        });
+
+        proc.stderr.on("data", (chunk) => {
+            output += String(chunk);
+        });
+
+        const waitForMessage = async (message: string, timeoutMs = 10_000) => {
+            const start = Date.now();
+
+            while (Date.now() - start < timeoutMs) {
+                if (output.includes(message)) {
+                    return;
+                }
+
+                // eslint-disable-next-line no-await-in-loop -- intentional sequential poll: must wait between output checks for the failure message
+                await sleep(100);
+            }
+
+            throw new Error(`Timed out waiting for: "${message}"\noutput so far:\n${output}`);
+        };
+
+        // Wait for the initial build's onSuccess failure to be logged
+        await waitForMessage("onSuccess script failed with exit code 1");
+
+        // The process must still be alive after a failing onSuccess (execa uses null for "not yet exited")
+        expect(proc.exitCode).toBeNull();
+
+        // Trigger a rebuild to confirm the watcher kept running
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const a = 2;\n`);
+
+        // Wait for a second occurrence of the failure message (proving watcher rebuilt)
+        const waitForSecondFailure = async () => {
+            const start = Date.now();
+
+            while (Date.now() - start < 10_000) {
+                // Count occurrences of the failure message
+                const count = (output.match(/onSuccess script failed with exit code 1/g) ?? []).length;
+
+                if (count >= 2) {
+                    return;
+                }
+
+                // eslint-disable-next-line no-await-in-loop -- intentional sequential poll: must wait between output checks until failure appears twice
+                await sleep(100);
+            }
+
+            throw new Error(`Timed out waiting for second onSuccess failure after rebuild\noutput so far:\n${output}`);
+        };
+
+        await waitForSecondFailure();
+
+        // The process must still be alive after the second failure (execa uses null for "not yet exited")
+        expect(proc.exitCode).toBeNull();
+
+        // Stop the watcher
+        proc.kill("SIGINT");
+        const result = await proc; // resolved due to reject:false
+
+        // Assert no unhandled rejection crashed the process
+        expect(output).not.toContain("UnhandledPromiseRejection");
+        // Process terminated by our SIGINT is acceptable
+        expect(result.signal === "SIGINT" || result.exitCode === 0).toBe(true);
+    });
 });

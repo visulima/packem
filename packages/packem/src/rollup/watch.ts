@@ -68,7 +68,15 @@ const watchHandler = ({
     const logger = getLogger(context);
 
     watcher.on("change", async (id, { event }) => {
-        await doOnSuccessCleanup?.();
+        try {
+            await doOnSuccessCleanup?.();
+        } catch (error) {
+            logger.error({
+                context: [error],
+                message: `onSuccess cleanup failed: ${(error as Error).message}`,
+                prefix,
+            });
+        }
 
         logger.info({
             message: `${cyan(relative(".", id))} was ${event}d`,
@@ -84,51 +92,59 @@ const watchHandler = ({
     });
 
     watcher.on("event", async (event: RollupWatcherEvent) => {
-        // eslint-disable-next-line default-case
-        switch (event.code) {
-            case "BUNDLE_END": {
-                await event.result.close();
+        try {
+            // eslint-disable-next-line default-case
+            switch (event.code) {
+                case "BUNDLE_END": {
+                    await event.result.close();
 
-                if (useCache) {
-                    fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : `dts-${WATCH_CACHE_KEY}`, event.result.cache);
+                    if (useCache) {
+                        fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : `dts-${WATCH_CACHE_KEY}`, event.result.cache);
+                    }
+
+                    logger.raw(`\n⚡️ Build run in ${String(event.duration)}ms\n\n`);
+
+                    await runBuilder?.(true);
+
+                    break;
                 }
+                case "BUNDLE_START": {
+                    logger.info({
+                        message: cyan(`build started...`),
+                        prefix,
+                    });
 
-                logger.raw(`\n⚡️ Build run in ${String(event.duration)}ms\n\n`);
+                    break;
+                }
+                case "END": {
+                    logger.success({
+                        message: "Rebuild finished",
+                        prefix,
+                    });
 
-                await runBuilder?.(true);
+                    await runOnsuccess?.();
 
-                break;
+                    break;
+                }
+                case "ERROR": {
+                    enhanceRollupError(event.error);
+
+                    logger.error({
+                        context: [event.error],
+                        message: `Rebuild failed: ${event.error.message}`,
+                        prefix,
+                    });
+
+                    break;
+                }
+                // No default
             }
-            case "BUNDLE_START": {
-                logger.info({
-                    message: cyan(`build started...`),
-                    prefix,
-                });
-
-                break;
-            }
-            case "END": {
-                logger.success({
-                    message: "Rebuild finished",
-                    prefix,
-                });
-
-                await runOnsuccess?.();
-
-                break;
-            }
-            case "ERROR": {
-                enhanceRollupError(event.error);
-
-                logger.error({
-                    context: [event.error],
-                    message: `Rebuild failed: ${event.error.message}`,
-                    prefix,
-                });
-
-                break;
-            }
-            // No default
+        } catch (error) {
+            logger.error({
+                context: [error],
+                message: `Watch handler failed: ${(error as Error).message}`,
+                prefix,
+            });
         }
     });
 };
