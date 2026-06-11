@@ -5,6 +5,7 @@ import { join } from "@visulima/path";
 import picomatch from "picomatch";
 
 import type { InternalBuildOptions, ValidationOptions } from "../types";
+import escapeRegExp from "../utils/escape-regexp";
 
 /**
  * Minimal structural view of the Pail logger.
@@ -78,7 +79,7 @@ const checkPerFileLimits = (
         }
 
         const foundEntry = context.buildEntries.find((entry) => {
-            const normalizedPath = path.replace(new RegExp(`^.?/?${context.options.outDir}/?`), "");
+            const normalizedPath = path.replace(new RegExp(`^.?/?${escapeRegExp(context.options.outDir)}/?`), "");
 
             return entry.path.endsWith(normalizedPath) || picomatch(path)(entry.path);
         });

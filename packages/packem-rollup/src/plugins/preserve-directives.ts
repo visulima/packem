@@ -32,6 +32,11 @@ const WHITESPACE = new Set([" ", "\t", "\f", "\v", "\u00A0", "\uFEFF"]);
 // Line feed, carriage return, line separator (U+2028), paragraph separator (U+2029).
 const LINE_TERMINATORS = new Set(["\n", "\r", "\u2028", "\u2029"]);
 
+// Extracts the first quoted token from a rollup MODULE_LEVEL_DIRECTIVE warning
+// message (the offending directive, e.g. `"use client"`). Module-scoped to avoid
+// recompiling on every `onLog` call.
+const MODULE_LEVEL_DIRECTIVE_MESSAGE_RE = /"([^"]*)"|'([^']*)'/;
+
 /**
  * Extract a module's leading Directive Prologue WITHOUT a full parse.
  *
@@ -174,8 +179,16 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
         name: "packem:preserve-directives",
 
         onLog(level, log) {
+            // Only suppress the warning for directives this plugin actually
+            // preserves (matches `directiveRegex`). Other module-level directives
+            // are left to warn as usual so the user still hears about them.
             if (log.code === "MODULE_LEVEL_DIRECTIVE" && level === "warn") {
-                return false;
+                const match = MODULE_LEVEL_DIRECTIVE_MESSAGE_RE.exec(log.message);
+                const directive = match?.[1] ?? match?.[2];
+
+                if (directive !== undefined && directiveRegex.test(`"${directive}"`)) {
+                    return false;
+                }
             }
 
             return undefined;
@@ -233,7 +246,13 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                         prefix: "plugin:preserve-directives",
                     });
 
-                    magicString.prepend(`${Array.from(outputDirectives, (directive) => `'${directive}';`).join("\n")}\n`);
+                    // Emit each directive as a single-quoted string literal to match
+                    // the ecosystem convention (`'use client';`). Backslashes and
+                    // single quotes are escaped so a directive value containing them
+                    // cannot break out of the literal and inject statements.
+                    magicString.prepend(
+                        `${Array.from(outputDirectives, (directive) => `'${directive.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}';`).join("\n")}\n`,
+                    );
                 }
 
                 let shebang: string | undefined;
@@ -283,10 +302,22 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 return undefined;
             }
 
+            // Reset any state recorded for this id on a previous (watch) run.
+            // Without this, a directive/shebang removed from the source between
+            // rebuilds would keep being re-emitted, and the closure records would
+            // grow unboundedly across rebuilds.
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete directives[id];
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete shebangs[id];
+
             // MagicString's `hasChanged()` is slow, so we track the change manually
             let hasChanged = false;
 
-            const magicString: MagicString = new MagicString(code);
+            // Allocate MagicString lazily — only once we know there is an edit to
+            // make. Most modules have neither a shebang nor a directive prologue,
+            // so the common path avoids the allocation entirely.
+            let magicString: MagicString | undefined;
 
             /**
              * Here we are making 3 assumptions:
@@ -314,6 +345,8 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 if (firstNewLineIndex > 0) {
                     shebangs[id] = code.slice(0, firstNewLineIndex);
 
+                    magicString = new MagicString(code);
+
                     // Clamp so we never remove past the end of the source when no
                     // line terminator was found.
                     magicString.remove(0, Math.min(firstNewLineIndex + 1, code.length));
@@ -329,8 +362,12 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
             // Scan the leading Directive Prologue without a full parse so this
             // runs under rolldown too (see scanLeadingDirectives). Scanning the
             // post-shebang-removal source keeps the spans aligned with the
-            // `magicString` coordinates used by `remove()` below.
-            for (const { end, start, value } of scanLeadingDirectives(magicString.toString())) {
+            // `magicString` coordinates used by `remove()` below. When no shebang
+            // was stripped, the source is unchanged so we scan `code` directly and
+            // skip materializing the MagicString.
+            const scanSource = magicString === undefined ? code : magicString.toString();
+
+            for (const { end, start, value } of scanLeadingDirectives(scanSource)) {
                 // `"use strict"` is left untouched: the bundler manages strict-mode
                 // emission per format, so it is neither hoisted nor stripped here.
                 if (value === "use strict") {
@@ -352,6 +389,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                     directives[id] = new Set<string>([value]);
                 }
 
+                magicString ??= new MagicString(code);
                 magicString.remove(start, end);
 
                 hasChanged = true;
@@ -362,7 +400,10 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 });
             }
 
-            if (!hasChanged) {
+            // `magicString` is only allocated when an edit was made, so it is
+            // defined exactly when `hasChanged` is true; the explicit check also
+            // narrows the type for the return below.
+            if (!hasChanged || magicString === undefined) {
                 // If nothing has changed, we can avoid the expensive `toString()` and `generateMap()` calls
                 return undefined;
             }

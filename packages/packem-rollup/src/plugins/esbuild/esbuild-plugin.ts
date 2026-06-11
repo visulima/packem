@@ -46,13 +46,25 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
 
     const extensions: string[] = Object.keys(loaders);
 
-    const INCLUDE_REGEXP = new RegExp(String.raw`\.(${extensions.map((extension) => extension.slice(1)).join("|")})$`);
+    // Escape regex metacharacters in each extension before interpolating into the
+    // filter regex — loader keys are user-supplied and could contain `.`/`+`/etc.
+    const escapeForRegExp = (value: string): string => value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+
+    const INCLUDE_REGEXP = new RegExp(String.raw`\.(${extensions.map((extension) => escapeForRegExp(extension.slice(1))).join("|")})$`);
 
     // Used for custom include/exclude patterns when provided by the user
     const userFilter = include || exclude ? createFilter(include ?? INCLUDE_REGEXP, exclude) : undefined;
 
+    if (include) {
+        // The native hook filter below excludes non-loader-extension files before
+        // this plugin's handler runs, so a user `include` for an extension that
+        // isn't a known loader (e.g. `**/*.vue`) would never reach the handler.
+        // Warn so the constraint is visible rather than silently dropping files.
+        logger.debug("`include` is constrained to files matching a configured loader extension (%O)", extensions);
+    }
+
     let optimizeDepsResult: OptimizeDepsResult | undefined;
-    let cwd = process.cwd();
+    const cwd = process.cwd();
 
     return {
         async buildStart() {
@@ -70,14 +82,6 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
         },
 
         name: "packem:esbuild",
-
-        options({ context }) {
-            if (context) {
-                cwd = context;
-            }
-
-            return undefined;
-        },
 
         renderChunk: getRenderChunk({
             ...esbuildOptions,

@@ -8,7 +8,10 @@ import { resolve } from "./resolve";
 
 type Require = (id: string) => unknown;
 
-const loaded: Record<string, unknown> = {};
+// Cache keyed by `cwd\0moduleId` so the same module id resolved from different
+// working directories (e.g. two projects sharing one process) does not collide.
+// A `null` value records a previous failure-to-load so we don't retry it.
+const loaded = new Map<string, unknown>();
 const extensions = [".js", ".mjs", ".cjs", ".json"];
 
 // Helper function to load module from resolved path
@@ -31,12 +34,18 @@ const loadModuleFromPath = async (resolvedPath: string, require: Require): Promi
 };
 
 const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): Promise<unknown> => {
-    if (loaded[moduleId]) {
-        return loaded[moduleId];
-    }
+    const cacheKey = `${cwd}\0${moduleId}`;
 
-    if (loaded[moduleId] === null) {
-        return undefined;
+    if (loaded.has(cacheKey)) {
+        const cached = loaded.get(cacheKey);
+
+        if (cached === null) {
+            return undefined;
+        }
+
+        const cachedModule = cached as { default?: unknown } | undefined;
+
+        return cachedModule?.default ?? cachedModule;
     }
 
     const options: ResolveOptions = {
@@ -56,12 +65,12 @@ const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): 
             logger.warn({ message: `Skipping data URL module: ${moduleId}`, module: moduleId, plugin: "css" });
 
             // eslint-disable-next-line unicorn/no-null
-            loaded[moduleId] = null;
+            loaded.set(cacheKey, null);
 
             return undefined;
         }
 
-        loaded[moduleId] = await loadModuleFromPath(resolvedPath, require);
+        loaded.set(cacheKey, await loadModuleFromPath(resolvedPath, require));
     } catch (error) {
         logger.warn({
             message: `Failed to resolve or load module: ${error instanceof Error ? error.message : String(error)}`,
@@ -70,12 +79,12 @@ const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): 
         });
 
         // eslint-disable-next-line unicorn/no-null
-        loaded[moduleId] = null;
+        loaded.set(cacheKey, null);
 
         return undefined;
     }
 
-    const module = loaded[moduleId] as { default?: unknown } | undefined;
+    const module = loaded.get(cacheKey) as { default?: unknown } | undefined;
 
     return module?.default ?? module;
 };

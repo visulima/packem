@@ -96,4 +96,51 @@ describe("babelTransformPlugin", () => {
 
         expect((result as { code: string } | undefined)?.code).toContain("bar");
     });
+
+    it("treats `parallel: 0` as disabled and transforms in-process", async () => {
+        expect.assertions(1);
+
+        // `0` must mean "disabled", not "spawn a 0-worker pool" (which would break).
+        const plugin = babelTransformPlugin({ parallel: 0, parallelThreshold: 1, plugins: [renameFooPlugin] });
+
+        const result = await runTransform(plugin, "const foo = 1;", "/virtual/zero-workers.ts");
+
+        expect((result as { code: string } | undefined)?.code).toContain("bar");
+    });
+
+    it("treats `parallel: false` as disabled and transforms in-process", async () => {
+        expect.assertions(1);
+
+        const plugin = babelTransformPlugin({ parallel: false, parallelThreshold: 1, plugins: [renameFooPlugin] });
+
+        const result = await runTransform(plugin, "const foo = 1;", "/virtual/no-parallel.ts");
+
+        expect((result as { code: string } | undefined)?.code).toContain("bar");
+    });
+
+    it("uses the per-module id as the babel filename rather than a build-wide option", async () => {
+        expect.assertions(2);
+
+        // A babel plugin that records the filename it was given for each module.
+        const seenFilenames: string[] = [];
+        const recordFilenamePlugin = () => {
+            return {
+                visitor: {
+                    Program(_path: unknown, state: { filename?: string }) {
+                        seenFilenames.push(state.filename ?? "");
+                    },
+                },
+            };
+        };
+
+        const plugin = babelTransformPlugin({ filename: "/build-wide/ignored.ts", plugins: [recordFilenamePlugin] });
+
+        await runTransform(plugin, "const a = 1;", "/virtual/first.ts");
+        await runTransform(plugin, "const b = 2;", "/virtual/second.ts");
+
+        // The build-wide `filename` must NOT leak into every module; each module's own
+        // id is used as the babel filename.
+        expect(seenFilenames).toContain("/virtual/first.ts");
+        expect(seenFilenames).toContain("/virtual/second.ts");
+    });
 });

@@ -41,92 +41,122 @@ pnpm add @visulima/packem-rollup
 
 ## Usage
 
-### Data URI Plugin
+This package bundles the Rollup plugins that power packem. They are also reused as
+the rolldown `renderChunk` ports, so the directive/JSX/pure passes behave the same
+under both bundlers. The plugins are exported from the package root and from
+per-plugin subpath entries.
 
-The `dataUriPlugin` converts files to data URIs for inline embedding. It supports configurable SVG encoding strategies via query parameters.
+### Preserve Directives
 
-```typescript
-import { dataUriPlugin } from "@visulima/packem-rollup";
-
-export default {
-    plugins: [dataUriPlugin()],
-};
-```
-
-#### Query Parameters
-
-- `?data-uri` - Basic data URI conversion
-- `?data-uri&encoding=css` - Use CSS-optimized SVG encoding
-- `?data-uri&encoding=tiny` - Use tiny SVG encoding (default)
-- `?data-uri&srcset` - Encode spaces as %20 for srcset compatibility
-
-#### Examples
+`preserveDirectivesPlugin` hoists module-level directives (`"use client"`,
+`"use server"`, …) and shebangs to the top of the emitted chunk.
 
 ```typescript
-// Tiny SVG encoding (default)
-import icon from "./icon.svg?data-uri";
-
-// CSS-optimized SVG encoding
-import icon from "./icon.svg?data-uri&encoding=css";
-
-// Tiny SVG with srcset compatibility
-import icon from "./icon.svg?data-uri&srcset";
-
-// CSS encoding with srcset compatibility
-import icon from "./icon.svg?data-uri&encoding=css&srcset";
-```
-
-### Lazy Barrel Plugin
-
-The `lazyBarrelPlugin` implements lazy barrel optimization similar to Rspack's `lazyBarrel` experiment. It identifies side-effect-free barrel files and marks their re-export dependencies as lazy, only building them when their exports are actually requested.
-
-```typescript
-import { lazyBarrelPlugin } from "@visulima/packem-rollup";
+import { preserveDirectivesPlugin } from "@visulima/packem-rollup";
 
 export default {
     plugins: [
-        lazyBarrelPlugin({
-            sideEffectsCheck: true,
-            lazyThreshold: 2,
-            include: [/\.ts$/, /\.js$/],
-            exclude: [/\.test\.ts$/],
+        preserveDirectivesPlugin({
+            directiveRegex: /^use (client|server)$/,
+            logger: console,
         }),
     ],
 };
 ```
 
-#### Features
+### CJS Interop
 
-- **Barrel Detection**: Automatically identifies files with multiple re-exports
-- **Side Effects Checking**: Reads package.json to check `sideEffects` field
-- **Lazy Loading**: Generates lazy loading code for unused exports
-- **Configurable Threshold**: Set minimum exports to consider a file as a barrel
-- **Filtering**: Include/exclude specific file patterns
-
-#### How It Works
-
-1. **Analysis**: Parses module code to detect barrel export patterns
-2. **Side Effects Check**: Verifies if the module is marked as side-effect-free
-3. **Lazy Marking**: Marks re-export dependencies as lazy for deferred building
-4. **Code Generation**: Creates lazy loading wrappers for unused exports
-5. **Optimization**: Only builds modules when their exports are actually requested
-
-### URL Plugin
-
-The `urlPlugin` handles asset URLs, either inlining them as data URIs or copying them to a destination directory. SVG files are optimized using the shared `svgEncoder` utility before being base64 encoded.
+`cjsInteropPlugin` rewrites the entry chunk's `exports.default` /
+`exports.<name>` assignments to `module.exports` for `format: "cjs"` +
+`exports: "auto"` output, so `require()` returns the default export directly.
 
 ```typescript
-import { urlPlugin } from "@visulima/packem-rollup";
+import { cjsInteropPlugin } from "@visulima/packem-rollup/plugin/cjs-interop";
 
 export default {
-    plugins: [
-        urlPlugin({
-            limit: 14336, // 14kb
-            fileName: "[hash][extname]",
-        }),
-    ],
+    plugins: [cjsInteropPlugin({ addDefaultProperty: false, logger: console })],
 };
 ```
+
+### JSX Remove Attributes
+
+`jsxRemoveAttributes` strips configured attributes (e.g. `data-testid`) from
+automatic-runtime JSX calls (`jsx`/`jsxs`/`jsxDEV`).
+
+```typescript
+import { jsxRemoveAttributes } from "@visulima/packem-rollup";
+
+export default {
+    plugins: [jsxRemoveAttributes({ attributes: ["data-testid"], logger: console })],
+};
+```
+
+### Pure New Expression
+
+`pureNewExpressionPlugin` adds `/* @__PURE__ */` annotations to configured
+constructor instantiations (and, in `renderChunk` mode, function calls) so
+consumers can tree-shake them.
+
+```typescript
+import { pureNewExpressionPlugin } from "@visulima/packem-rollup";
+
+export default {
+    plugins: [pureNewExpressionPlugin({ constructors: ["WeakMap", "Map"] })],
+};
+```
+
+### Chunk Splitter
+
+`chunkSplitter` controls how shared code is split into chunks.
+
+```typescript
+import { chunkSplitter } from "@visulima/packem-rollup";
+
+export default {
+    plugins: [chunkSplitter()],
+};
+```
+
+### JSON
+
+`JsonPlugin` wraps `@rollup/plugin-json` and rewrites the emitted
+`export default <json>` to `module.exports = <json>` for CJS interop.
+
+```typescript
+import { JsonPlugin } from "@visulima/packem-rollup/plugin/json";
+
+export default {
+    plugins: [JsonPlugin({})],
+};
+```
+
+### Transformer adapters (esbuild / swc / sucrase)
+
+The TypeScript/JSX transformer adapters are exported from dedicated subpaths.
+
+```typescript
+import esbuildTransformer from "@visulima/packem-rollup/esbuild";
+import swcPlugin from "@visulima/packem-rollup/swc";
+import { sucrasePlugin } from "@visulima/packem-rollup/sucrase";
+```
+
+`browserslistToEsbuild` (root export) converts a Browserslist query into esbuild
+`target` strings:
+
+```typescript
+import { browserslistToEsbuild } from "@visulima/packem-rollup";
+
+const target = browserslistToEsbuild(["chrome 100", "ios_saf 15"]);
+// → ["chrome100", "ios15"]
+```
+
+### Re-exported Rollup plugins
+
+For convenience the package also re-exports a curated set of upstream Rollup
+plugins under their conventional names: `alias`, `commonjs`, `dynamicImportVars`
+(with `RollupDynamicImportVariablesOptions`), `inject`, `replace`, `wasm`,
+`polyfillNode`, `purePlugin`, `visualizer`, and `importTrace`. See
+[`src/index.ts`](./src/index.ts) for the full export surface.
 
 ## Related
 

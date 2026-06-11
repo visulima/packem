@@ -12,8 +12,24 @@ const spawnAsync = async (...args: Parameters<typeof spawn>): Promise<void> => {
     await new Promise<void>((resolve, reject) => {
         const child = spawn(...args);
 
-        child.on("close", () => {
-            resolve();
+        // Capture stderr when it isn't inherited so a non-zero exit can surface the cause.
+        let stderr = "";
+
+        child.stderr?.on("data", (chunk: Buffer | string) => {
+            stderr += chunk.toString();
+        });
+
+        child.on("close", (code, signal) => {
+            if (code === 0) {
+                resolve();
+
+                return;
+            }
+
+            const reason = code === null ? `was terminated by signal ${String(signal)}` : `exited with code ${String(code)}`;
+            const details = `tsgo ${reason}${stderr.trim() ? `\n${stderr.trim()}` : ""}`;
+
+            reject(new Error(details));
         });
         child.on("error", (error) => {
             reject(error);

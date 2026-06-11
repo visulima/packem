@@ -130,16 +130,19 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
             for (const { baseDirs, decl, node, parsed, url } of urlList) {
                 let resolved: UrlFile | undefined;
+                let resolveError: unknown;
 
                 try {
                     // eslint-disable-next-line no-await-in-loop
                     resolved ??= await options.resolve(url, [...baseDirs]);
-                } catch {
-                    /* noop */
+                } catch (error: unknown) {
+                    resolveError = error;
                 }
 
                 if (!resolved) {
-                    decl.warn(result, `Unresolved URL \`${url}\` in \`${decl.toString()}\``);
+                    const reason = resolveError instanceof Error ? `: ${resolveError.message}` : "";
+
+                    decl.warn(result, `Unresolved URL \`${url}\` in \`${decl.toString()}\`${reason}`);
 
                     continue;
                 }

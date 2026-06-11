@@ -552,7 +552,7 @@ const generateOptions = (
 
     if (options.runtime === undefined) {
         logger.warn(
-            "No runtime specified, defaulting to 'node'. This will change in packem v2 to 'browser', please add 'runtime: node' to your packem config or command call",
+            "No runtime specified, defaulting to 'node'. Add 'runtime: \"node\"' (or 'runtime: \"browser\"') to your packem config or pass --runtime to silence this warning.",
         );
 
         options.runtime = "node";
@@ -755,11 +755,11 @@ const createContext = async (
     await context.hooks.callHook("build:prepare", context);
 
     if (context.options.emitESM === undefined) {
-        logger.info("Emitting of ESM bundles, is disabled.");
+        logger.info("Emitting of ESM bundles is disabled.");
     }
 
     if (context.options.emitCJS === undefined) {
-        logger.info("Emitting of CJS bundles, is disabled.");
+        logger.info("Emitting of CJS bundles is disabled.");
     }
 
     if (context.options.minify) {
@@ -910,7 +910,12 @@ const packem = async (
         ) + getCacheHash(JSON.stringify(config));
 
     if (cachePath) {
-        createOrUpdateKeyStorage(cacheKey, cachePath, logger);
+        // Pass `shouldUpdate: true` so the existing keystore is read and merged
+        // rather than overwritten. Without it, the keystore is clobbered with
+        // only the current build mode's key and `removeOldCacheFolders` then
+        // deletes the *other* build mode's cache (dev/prod thrash on alternate
+        // builds).
+        createOrUpdateKeyStorage(cacheKey, cachePath, logger, true);
     }
 
     const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);

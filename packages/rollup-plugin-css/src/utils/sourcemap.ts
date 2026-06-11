@@ -110,7 +110,13 @@ class MapModifier {
 }
 
 export const getMap = (code: string, id?: string): string | undefined => {
-    const [, data] = mapBlockRe.exec(code) ?? mapLineRe.exec(code) ?? [];
+    // Use non-global clones for the single-match `.exec` so the module-level
+    // `/g` regexes' `lastIndex` does not persist across `getMap` calls (which
+    // would otherwise cause it to skip or miss matches on subsequent invocations).
+    const blockRe = new RegExp(mapBlockRe.source, mapBlockRe.flags.replace("g", ""));
+    const lineRe = new RegExp(mapLineRe.source, mapLineRe.flags.replace("g", ""));
+
+    const [, data] = blockRe.exec(code) ?? lineRe.exec(code) ?? [];
 
     if (!data) {
         return undefined;

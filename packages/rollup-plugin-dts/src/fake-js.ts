@@ -7,7 +7,7 @@ import type { ParseResult } from "@babel/parser";
 import { parse } from "@babel/parser";
 import t from "@babel/types";
 import { extractIdentifiers, isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST, walkASTAsync } from "ast-kit";
-import type { ExistingRawSourceMap, Plugin, RenderedChunk, TransformPluginContext, TransformResult } from "rollup";
+import type { ExistingRawSourceMap, NormalizedOutputOptions, Plugin, RenderedChunk, TransformPluginContext, TransformResult } from "rollup";
 
 import { filenameDtsTo, filenameJsToDts, filenameToDts, RE_DTS, RE_DTS_MAP, RE_NODE_MODULES, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
@@ -256,6 +256,24 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         // Track binding names to their declaration IDs for function overload merging
         const bindingToDeclarationId = new Map<string, number>();
         const stmtsToRemove = new Set<number>();
+        // Memoize `context.resolve(source, importer)` results for `import("x").T` references
+        // across every declaration in THIS module. Previously this cache lived inside
+        // `collectDependencies` (called once per top-level statement), so the same specifier
+        // referenced in N declarations triggered N resolves. Module-scoped + same importer.
+        const preserveImportTypeCache = new Map<string, boolean>();
+
+        // `import A = NS.Inner` (entity-name import-equals, not `= require(...)`) and
+        // `export = NS.thing` (non-identifier export-assignment) have no JS equivalent and,
+        // left raw, make rollup's parser die with cryptic `Expected ',', got '='` /
+        // `Expected '{', got '='`. Normalize them up-front into a type alias / default export
+        // so they flow through the normal declaration machinery below.
+        for (const [i, stmt] of program.body.entries()) {
+            if (stmt.type === "TSImportEqualsDeclaration" && stmt.moduleReference.type !== "TSExternalModuleReference") {
+                program.body[i] = t.tsTypeAliasDeclaration(stmt.id, undefined, t.tsTypeReference(stmt.moduleReference));
+            } else if (stmt.type === "TSExportAssignment" && stmt.expression.type !== "Identifier") {
+                program.body[i] = t.exportDefaultDeclaration(stmt.expression);
+            }
+        }
 
         for (const [i, stmt] of program.body.entries()) {
             const setStmt = (stmt: t.Statement) => (program.body[i] = stmt);
@@ -345,7 +363,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             const params: TypeParams = collectParams(decl);
 
             const childrenSet = new Set<t.Node>();
-            const deps = await collectDependencies(this, decl, id, namespaceStmts, childrenSet, identifierMap);
+            const deps = await collectDependencies(this, decl, id, namespaceStmts, childrenSet, identifierMap, preserveImportTypeCache);
             const children = [...childrenSet].filter((child) => bindings.every((b) => child !== b));
 
             if (decl !== stmt) {
@@ -475,7 +493,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         return result;
     }
 
-    function renderChunk(code: string, chunk: RenderedChunk) {
+    function renderChunk(code: string, chunk: RenderedChunk, options: NormalizedOutputOptions) {
         if (!RE_DTS.test(chunk.fileName)) {
             return;
         }
@@ -702,18 +720,30 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         const comments = new Set<t.Comment>();
         const commentsValue = new Set<string>(); // deduplicate
 
+        // Absolute directory the emitted chunk lives in, used to rebase
+        // `/// <reference path="..." />` directives (see rebaseReferencePath).
+        const outputDirectory = options.dir ?? (options.file ? path.dirname(options.file) : process.cwd());
+        const chunkOutputDirectory = path.resolve(outputDirectory, path.dirname(chunk.fileName));
+
         for (const id of chunk.moduleIds) {
             const preserveComments = commentsMap.get(id);
 
             if (preserveComments) {
-                preserveComments.forEach((c) => {
-                    const id = c.type + c.value;
+                // `path=` reference directives are relative to the SOURCE module; once hoisted
+                // onto the chunk they must be rebased to the chunk's output location, otherwise
+                // `path="./foo.d.ts"` points to the wrong place. `types=` directives reference
+                // package names and are location-independent, so they pass through untouched.
+                const sourceDirectory = path.dirname(id);
 
-                    if (commentsValue.has(id))
+                preserveComments.forEach((c) => {
+                    const rebased = rebaseReferencePath(c, sourceDirectory, chunkOutputDirectory);
+                    const dedupeKey = rebased.type + rebased.value;
+
+                    if (commentsValue.has(dedupeKey))
                         return;
 
-                    commentsValue.add(id);
-                    comments.add(c);
+                    commentsValue.add(dedupeKey);
+                    comments.add(rebased);
                 });
                 commentsMap.delete(id);
             }
@@ -812,10 +842,12 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         namespaceStmts: NamespaceMap,
         children: Set<t.Node>,
         identifierMap: Record<string, number>,
+        // Module-scoped cache (keyed by import specifier, shared across all declarations of the
+        // same module/importer) so `context.resolve` for `import("x").T` runs once per specifier.
+        preserveImportTypeCache: Map<string, boolean>,
     ): Promise<Dep[]> {
         const deps = new Set<Dep>();
         const seen = new Set<t.Node>();
-        const preserveImportTypeCache = new Map<string, boolean>();
 
         const inferredStack: string[][] = [];
         let currentInferred = new Set<string>();
@@ -1014,6 +1046,41 @@ function isChildSymbol(node: t.Node, parent: t.Node): boolean {
 const REFERENCE_RE = /\/\s*<reference\s+(?:path|types)=/;
 
 const collectReferenceDirectives = (comment: t.Comment[], negative = false) => comment.filter((c) => REFERENCE_RE.test(c.value) !== negative);
+
+// Matches the `path="..."` (or single-quoted) attribute of a triple-slash reference directive.
+const REFERENCE_PATH_RE = /(\/\s*<reference\s+path=)(["'])(.+?)\2/;
+
+// Rebase a `/// <reference path="./foo.d.ts" />` directive so its relative path — originally
+// correct relative to `sourceDirectory` — is correct relative to `chunkOutputDirectory` where
+// the comment is being hoisted. `types=` directives reference package names (not file paths)
+// and are returned untouched. Absolute paths are also left as-is.
+const rebaseReferencePath = (comment: t.Comment, sourceDirectory: string, chunkOutputDirectory: string): t.Comment => {
+    const match = REFERENCE_PATH_RE.exec(comment.value);
+
+    if (!match) {
+        return comment;
+    }
+
+    const [, prefix, quote, referencePath] = match;
+
+    if (path.isAbsolute(referencePath)) {
+        return comment;
+    }
+
+    const absoluteTarget = path.resolve(sourceDirectory, referencePath);
+    let rebased = path.relative(chunkOutputDirectory, absoluteTarget).replaceAll("\\", "/");
+
+    if (!rebased.startsWith(".")) {
+        rebased = `./${rebased}`;
+    }
+
+    if (rebased === referencePath) {
+        return comment;
+    }
+
+    // Return a fresh comment node so we don't mutate the cached entry shared across renders.
+    return { ...comment, value: comment.value.replace(REFERENCE_PATH_RE, `${prefix}${quote}${rebased}${quote}`) };
+};
 
 // CommonJS declaration syntax (`export = X`, `import X = require("y")`) cannot be
 // represented in a bundled ESM `.d.ts`. Used to emit a one-time warning per input.
@@ -1415,11 +1482,18 @@ const getIdFromTSEntityName = (node: t.TSEntityName): t.Identifier => {
 
 const isReferenceId = (node?: t.Node | null): node is t.Identifier | t.MemberExpression => isTypeOf(node, ["Identifier", "MemberExpression"]);
 
+// Detects rollup's injected interop-helper imports (`__export` / `__reExport`). These come
+// from rollup's synthetic helper facade, but the rendered chunk gives us no module handle to
+// key off — only the binding names. RISK: a user declaration that genuinely imports a binding
+// named `__export`/`__reExport` would be mis-detected. We match on the IMPORTED name (the
+// canonical rollup helper name) rather than the local alias, which is the most robust signal
+// available short of tracking the helper facade module — a user renaming a local TO `__export`
+// no longer trips this. See also the `_exports` suffix heuristic in patchReExport.
 const isHelperImport = (node: t.Node) =>
     node.type === "ImportDeclaration"
     && node.specifiers.length === 1
     && node.specifiers.every(
-        (spec) => spec.type === "ImportSpecifier" && spec.imported.type === "Identifier" && ["__export", "__reExport"].includes(spec.local.name),
+        (spec) => spec.type === "ImportSpecifier" && spec.imported.type === "Identifier" && ["__export", "__reExport"].includes(spec.imported.name),
     );
 
 /**
@@ -1563,6 +1637,11 @@ const patchReExport = (nodes: t.Statement[]) => {
             && node.specifiers.length === 1
             && node.specifiers[0].type === "ImportSpecifier"
             && node.specifiers[0].local.type === "Identifier"
+            // RISK: matches rollup's namespace-reexport facade binding by its `_exports` suffix
+            // convention. There is no module handle in the rendered chunk to key off, so a user
+            // declaration whose local binding genuinely ends in `_exports` could be mis-handled.
+            // The recorded name is only acted on later if a `__reExport`/namespace member usage
+            // references it, which limits (but does not eliminate) the blast radius.
             && node.specifiers[0].local.name.endsWith("_exports")
         ) {
             // record: import { t as a_exports } from "..."
@@ -1672,9 +1751,14 @@ const rewriteImportExport = (
                 ],
                 type: "ImportDeclaration",
             });
+
+            return true;
         }
 
-        return true;
+        // `import A = NS.Inner` (entity-name reference) is handled earlier in the transform
+        // loop by rewriting it to a type alias so it flows through the normal declaration
+        // machinery. It should never reach here, but guard against falling through to raw TS.
+        return false;
     }
 
     if (node.type === "TSExportAssignment" && node.expression.type === "Identifier") {

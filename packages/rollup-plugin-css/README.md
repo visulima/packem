@@ -430,7 +430,7 @@ Main CSS processing plugin for Rollup.
 
 #### Core Options
 
-- `mode` - Processing mode: `"inject"` | `"extract"` | `"emit"`
+- `mode` - Processing mode: `"inject"` | `"extract"` | `"emit"` | `"inline"`
 - `extensions` - File extensions to process
 - `include/exclude` - File inclusion/exclusion patterns
 - `autoModules` - Enable CSS modules automatically

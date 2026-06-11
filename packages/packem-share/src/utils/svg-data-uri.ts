@@ -27,7 +27,43 @@ const specialHexEncode = (match: string): string => {
 const collapseWhitespace = (input: string): string => input.trim().replaceAll(REGEX.whitespace, " ");
 const dataUriPayload = (input: string): string => encodeURIComponent(input).replaceAll(REGEX.urlHexPairs, specialHexEncode);
 
-const stripSvgComments = (input: string): string => input.replaceAll(/<!--[\s\S]*?-->/g, "");
+/**
+ * Strips XML/HTML comments from an SVG string.
+ *
+ * Uses a linear `indexOf` scan rather than a lazy comment regex, whose
+ * quantifier degrades to roughly quadratic on inputs with many unclosed comment
+ * openers. An unterminated comment drops the remainder, matching the regex's
+ * behaviour of only removing a balanced comment.
+ * @param input The SVG string to strip comments from
+ * @returns The SVG string without comments
+ */
+export const stripSvgComments = (input: string): string => {
+    let result = "";
+    let index = 0;
+
+    for (;;) {
+        const start = input.indexOf("<!--", index);
+
+        if (start === -1) {
+            result += input.slice(index);
+
+            break;
+        }
+
+        result += input.slice(index, start);
+
+        const end = input.indexOf("-->", start + 4);
+
+        if (end === -1) {
+            // Unterminated comment: drop the rest, mirroring the lazy regex.
+            break;
+        }
+
+        index = end + 3;
+    }
+
+    return result;
+};
 
 /**
  * Converts SVG to a tiny, optimized data URI for minimal size.
@@ -48,8 +84,7 @@ export const svgToTinyDataUri = (svgString: string): string => {
  * @returns CSS-optimized SVG data URI with charset specification
  */
 export const svgToCssDataUri = (svgString: string): string => {
-    const cleanSvg = svgString
-        .replaceAll(/<!--[\s\S]*?-->/g, "")
+    const cleanSvg = stripSvgComments(svgString)
         .replaceAll(/\s+/g, " ")
         .trim();
 

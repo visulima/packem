@@ -4,8 +4,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import { preserveDirectivesPlugin } from "../../../src/plugins/preserve-directives";
 
-const USE_DIRECTIVE_REGEX = /^use /;
+// Mirrors packem's real `PRESERVE_DIRECTIVE_REGEX`, which anchors on the
+// surrounding quotes (the plugin tests `directiveRegex.test(`"${value}"`)`).
+const USE_DIRECTIVE_REGEX = /^['"](use \w+)['"]$/;
 const INCLUDE_TSX_REGEX = /\.tsx?$/;
+// renderChunk emits directives as single-quoted, escaped string literals.
 const USE_CLIENT_SERVER_REGEX = /'use client';\n'use server';|'use server';\n'use client';/;
 const LEADING_USE_CLIENT_REGEX = /^'use client';\n/;
 const LEADING_SHEBANG_REGEX = /^#!\/usr\/bin\/env node\n/;
@@ -117,38 +120,54 @@ describe("preserveDirectivesPlugin", () => {
         expect(result).toBeUndefined();
     });
 
-    it("should warn and return undefined on parse errors", () => {
-        expect.assertions(2);
+    it("should strip a shebang without parsing the (possibly invalid) body", () => {
+        expect.assertions(3);
 
+        // The transform hook uses a lightweight prologue scan (NOT `this.parse`)
+        // so it runs under rolldown too. A shebang followed by syntactically
+        // invalid code must still have its shebang captured/stripped, and the hook
+        // must NOT emit a PARSE_ERROR (it never parses).
         const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
         const warn = vi.fn();
-        // Shebang then broken syntax — the shebang strip succeeds but then parse fails.
         const result = callTransform(plugin, "#!/usr/bin/env node\n@@@", "/path/file.js", { warn });
 
-        expect(result).toBeUndefined();
-        expect(warn).toHaveBeenCalledWith(expect.objectContaining({ code: "PARSE_ERROR" }));
+        expect(result?.meta.preserveDirectives.shebang).toBe("#!/usr/bin/env node");
+        expect(result?.code).not.toContain("#!");
+        expect(warn).not.toHaveBeenCalled();
     });
 
-    it("should suppress MODULE_LEVEL_DIRECTIVE rollup warnings", () => {
+    it("should suppress MODULE_LEVEL_DIRECTIVE rollup warnings for preserved directives", () => {
         expect.assertions(1);
 
         const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
-        const onLog = plugin.onLog as (level: string, log: { code: string }) => boolean | undefined;
-        const handled = onLog("warn", { code: "MODULE_LEVEL_DIRECTIVE" });
+        const onLog = plugin.onLog as (level: string, log: { code: string; message?: string }) => boolean | undefined;
+        // Rollup's MODULE_LEVEL_DIRECTIVE message embeds the offending directive in quotes.
+        const handled = onLog("warn", { code: "MODULE_LEVEL_DIRECTIVE", message: `Module level directive "use client" in "x.js" was ignored.` });
 
         expect(handled).toBe(false);
+    });
+
+    it("should NOT suppress MODULE_LEVEL_DIRECTIVE warnings for directives it does not preserve", () => {
+        expect.assertions(1);
+
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
+        const onLog = plugin.onLog as (level: string, log: { code: string; message?: string }) => boolean | undefined;
+        // A non-`use` directive is not matched by the directiveRegex → must warn as usual.
+        const handled = onLog("warn", { code: "MODULE_LEVEL_DIRECTIVE", message: `Module level directive "ngInject" in "x.js" was ignored.` });
+
+        expect(handled).toBeUndefined();
     });
 
     it("should pass other rollup warnings through (return undefined) from onLog", () => {
         expect.assertions(2);
 
         const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
-        const onLog = plugin.onLog as (level: string, log: { code: string }) => boolean | undefined;
+        const onLog = plugin.onLog as (level: string, log: { code: string; message?: string }) => boolean | undefined;
 
         // Different code at warn level → fall through.
         expect(onLog("warn", { code: "OTHER_WARNING" })).toBeUndefined();
         // MODULE_LEVEL_DIRECTIVE but at a non-warn level → fall through.
-        expect(onLog("info", { code: "MODULE_LEVEL_DIRECTIVE" })).toBeUndefined();
+        expect(onLog("info", { code: "MODULE_LEVEL_DIRECTIVE", message: `Module level directive "use client" was ignored.` })).toBeUndefined();
     });
 
     it("should merge multiple distinct directives from a single module into one set", () => {
@@ -202,6 +221,30 @@ describe("preserveDirectivesPlugin", () => {
         const result = callRenderChunk(plugin, "export const x = 1;\n", { fileName: "out.js", moduleIds: ["/path/clean.js"] }, { sourcemap: false });
 
         expect(result).toBeUndefined();
+    });
+
+    it("should NOT retain a directive across a watch rebuild when the second transform drops it", () => {
+        expect.assertions(3);
+
+        const plugin = preserveDirectivesPlugin({ directiveRegex: USE_DIRECTIVE_REGEX, logger: createLogger() });
+
+        // First build: module has `"use client"`.
+        const first = callTransform(plugin, "'use client';\nexport const x = 1;", "/path/a.js");
+
+        expect(first?.meta.preserveDirectives.directives).toContain("use client");
+
+        // Watch rebuild: the SAME module no longer declares the directive. The
+        // closure state for this id must be reset so the directive is not
+        // re-emitted from stale state.
+        const second = callTransform(plugin, "export const x = 2;", "/path/a.js");
+
+        expect(second).toBeUndefined();
+
+        // renderChunk (with an empty meta side-channel) must not hoist a stale
+        // `"use client"` for this chunk.
+        const chunk = callRenderChunk(plugin, "export const x = 2;\n", { fileName: "out.js", moduleIds: ["/path/a.js"] }, { sourcemap: false });
+
+        expect(chunk).toBeUndefined();
     });
 
     it("should recover directives from persisted meta on a transform cache hit (empty side-channel)", () => {

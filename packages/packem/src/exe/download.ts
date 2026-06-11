@@ -1,9 +1,10 @@
 import { Buffer } from "node:buffer";
+import { createHash, randomUUID } from "node:crypto";
 import { chmod, mkdir, rename, rm, writeFile } from "node:fs/promises";
 
 import { isAccessible } from "@visulima/fs";
 import type { Pail } from "@visulima/pail";
-import { dirname, join } from "@visulima/path";
+import { basename, dirname, join } from "@visulima/path";
 import { x } from "tinyexec";
 
 import { getCachedBinaryPath } from "./cache";
@@ -12,6 +13,39 @@ import type { ExeTarget } from "./platform";
 import { getArchiveExtension, getBinaryPathInArchive, getDownloadUrl, resolveNodeVersion } from "./platform";
 
 const debug = createDebug();
+
+/**
+ * Fetches `SHASUMS256.txt` for the given Node.js version and returns the
+ * expected sha256 hex digest for the named archive file.
+ * @param nodeVersion Resolved Node.js version (without the leading `v`).
+ * @param archiveFileName The archive's basename, e.g. `node-v25.7.0-linux-x64.tar.xz`.
+ * @returns The lowercase hex sha256 digest expected for the archive.
+ * @throws If the SHASUMS file can't be fetched or has no entry for the archive.
+ */
+const fetchExpectedChecksum = async (nodeVersion: string, archiveFileName: string): Promise<string> => {
+    const shasumsUrl = `https://nodejs.org/dist/v${nodeVersion}/SHASUMS256.txt`;
+
+    debug("Fetching checksums from: %s", shasumsUrl);
+
+    const response = await fetch(shasumsUrl);
+
+    if (!response.ok) {
+        throw new Error(`Failed to download Node.js checksums: HTTP ${String(response.status)} from ${shasumsUrl}`);
+    }
+
+    const shasums = await response.text();
+
+    // Each line is `<sha256>  <filename>` (two spaces).
+    for (const line of shasums.split("\n")) {
+        const [hash, name] = line.trim().split(/\s+/);
+
+        if (name === archiveFileName && hash) {
+            return hash.toLowerCase();
+        }
+    }
+
+    throw new Error(`No checksum entry for "${archiveFileName}" found in ${shasumsUrl}.`);
+};
 
 const extractBinary = async (archivePath: string, targetBinaryPath: string, target: ExeTarget): Promise<void> => {
     const binaryInArchive = getBinaryPathInArchive(target);
@@ -75,8 +109,25 @@ export const resolveNodeBinary = async (target: ExeTarget, logger: Pail): Promis
     }
 
     const extension = getArchiveExtension(resolvedTarget.platform);
-    const archivePath = `${cachedPath}.download.${extension}`;
     const buffer = Buffer.from(await response.arrayBuffer());
+
+    // Verify integrity against the official SHASUMS256.txt before trusting the
+    // bytes — these get embedded into user executables and cached.
+    const archiveFileName = basename(url);
+    const expectedChecksum = await fetchExpectedChecksum(resolvedTarget.nodeVersion, archiveFileName);
+    const actualChecksum = createHash("sha256").update(buffer).digest("hex");
+
+    if (actualChecksum !== expectedChecksum) {
+        throw new Error(
+            `Checksum mismatch for ${archiveFileName}: expected ${expectedChecksum}, got ${actualChecksum}. The download may be corrupted or tampered with.`,
+        );
+    }
+
+    debug("Checksum verified for %s", archiveFileName);
+
+    // Use a unique temp filename + atomic-style rename so concurrent processes
+    // downloading the same binary don't clobber each other's partial writes.
+    const archivePath = `${cachedPath}.download.${randomUUID()}.${extension}`;
 
     debug("Downloaded %d bytes, writing to: %s", buffer.length, archivePath);
     await writeFile(archivePath, buffer);

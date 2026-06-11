@@ -271,7 +271,7 @@ const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
     }
 
     return {
-        error: `Unable to build .d.ts file for ${id}; This seems like a bug of rollup-plugin-dts. Please report this issue to https://github.com/sxzz/rollup-plugin-dts/issues`,
+        error: `Unable to build .d.ts file for ${id}; This seems like a bug of rollup-plugin-dts. Please report this issue to https://github.com/visulima/packem/issues`,
     };
 };
 

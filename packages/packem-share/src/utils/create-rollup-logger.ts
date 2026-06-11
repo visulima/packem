@@ -1,11 +1,17 @@
 /**
+ * Shape of a single log entry passed to the logger methods: an arbitrary record
+ * of metadata that must include a `message`.
+ */
+type LogEntry = { [key: string]: unknown; message: string };
+
+/**
  * Interface for a Rollup-compatible logger that wraps Rollup's native logging methods
  */
 export interface RollupLogger {
-    debug: (log: { [key: string]: unknown; message: string }) => void;
-    error: (log: { [key: string]: unknown; message: string }) => void;
-    info: (log: { [key: string]: unknown; message: string }) => void;
-    warn: (log: { [key: string]: unknown; message: string }) => void;
+    debug: (log: LogEntry) => void;
+    error: (log: LogEntry) => void;
+    info: (log: LogEntry) => void;
+    warn: (log: LogEntry) => void;
 }
 
 /**
@@ -31,24 +37,24 @@ export interface RollupLogger {
  */
 export const createRollupLogger = (
     context: {
-        debug: (log: { [key: string]: unknown; message: string }) => void;
-        error: (log: { [key: string]: unknown; message: string }) => void;
-        info: (log: { [key: string]: unknown; message: string }) => void;
-        warn: (log: { [key: string]: unknown; message: string }) => void;
+        debug: (log: LogEntry) => void;
+        error: (log: LogEntry) => void;
+        info: (log: LogEntry) => void;
+        warn: (log: LogEntry) => void;
     },
     pluginName: string,
 ): RollupLogger => {
     return {
-        debug: (log: { [key: string]: unknown; message: string }) => {
+        debug: (log: LogEntry) => {
             context.debug({ ...log, plugin: pluginName });
         },
-        error: (log: { [key: string]: unknown; message: string }) => {
+        error: (log: LogEntry) => {
             context.error({ ...log, plugin: pluginName });
         },
-        info: (log: { [key: string]: unknown; message: string }) => {
+        info: (log: LogEntry) => {
             context.info({ ...log, plugin: pluginName });
         },
-        warn: (log: { [key: string]: unknown; message: string }) => {
+        warn: (log: LogEntry) => {
             context.warn({ ...log, plugin: pluginName });
         },
     };

@@ -58,7 +58,7 @@ type PCSSOption = "parser" | "plugin" | "stringifier" | "syntax";
  * inferModeOption(undefined) // { emit: false, extract: false, inject: true }
  * ```
  */
-export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
+export const inferModeOption = (mode: StyleOptions["mode"], logger?: Pick<RollupLogger, "warn">): Mode => {
     const m = Array.isArray(mode) ? mode : ([mode] as const);
 
     if (m[0] && !modes.includes(m[0])) {
@@ -80,6 +80,15 @@ export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
     if (modeName === "inject") {
         // Preserve injector options or function if provided; otherwise enable with defaults
         inject = (m[1] ?? true) as Mode["inject"];
+    }
+
+    // `emit` and `inline` do not accept tuple options; warn so a misplaced
+    // second element is not silently discarded.
+    if ((modeName === "emit" || modeName === "inline") && Array.isArray(mode) && mode[1] !== undefined) {
+        logger?.warn({
+            message: `The "${modeName}" mode does not accept additional options; ignoring the provided tuple option.`,
+            plugin: "css",
+        });
     }
 
     return {

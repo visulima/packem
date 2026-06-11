@@ -1,9 +1,14 @@
-import { join, resolve } from "@visulima/path";
+import { dirname, isAbsolute, join, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Plugin } from "rollup";
 
 // Relative ids (`./`, `../`) — the only specifiers this resolver rewrites.
 const RELATIVE_ID_RE = /^\./;
+
+// A rootDir that is exactly `.` or `..` (optionally with a trailing slash) resolves
+// to the tsconfig directory itself or its parent, which is never a meaningful
+// `rootDirs` mapping. Anything else (`./lib`, `lib`, `../shared`, `src`) is valid.
+const MEANINGLESS_ROOT_DIR_RE = /^\.{1,2}\/?$/;
 
 const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | undefined => {
     if (!tsconfig) {
@@ -22,18 +27,22 @@ const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | 
         return undefined;
     }
 
+    // tsconfig `rootDirs` are resolved relative to the tsconfig file's own directory,
+    // not the process cwd (which may differ when packem runs from a parent dir).
+    // When the tsconfig path is itself relative, anchor it on cwd.
+    const tsconfigDirectory = dirname(tsConfigPath);
+    const baseDirectory = isAbsolute(tsconfigDirectory) ? tsconfigDirectory : resolve(cwd, tsconfigDirectory);
+
     const mappedRootDirectories: string[] = [];
 
     for (const rootDirectory of rootDirs) {
-        if (rootDirectory.startsWith(".")) {
-            throw new Error(`Invalid rootDir value '.' in ${tsConfigPath}.`);
+        if (MEANINGLESS_ROOT_DIR_RE.test(rootDirectory)) {
+            throw new Error(`Invalid rootDir value '${rootDirectory}' in ${tsConfigPath}. Expected a directory path such as "./lib" or "src".`);
         }
 
-        if (rootDirectory.startsWith("..")) {
-            throw new Error(`Invalid rootDir value '..' in ${tsConfigPath}.`);
-        }
-
-        mappedRootDirectories.push(resolve(cwd, rootDirectory));
+        // Relative values (`./lib`, `lib`, `../shared`) resolve against the tsconfig
+        // directory; absolute values are used as-is.
+        mappedRootDirectories.push(isAbsolute(rootDirectory) ? rootDirectory : resolve(baseDirectory, rootDirectory));
     }
 
     return mappedRootDirectories;

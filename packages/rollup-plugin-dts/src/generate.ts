@@ -252,12 +252,25 @@ export const createGeneratePlugin = ({
                     const result = isolatedDeclarationSync(id, code, oxc);
 
                     if (result.errors.length > 0) {
-                        const [error] = result.errors;
+                        const [first] = result.errors;
+                        const total = result.errors.length;
 
-                        // Include codeframe in message so it appears in String(error)
+                        // Report every isolated-declaration violation in a single pass so a file
+                        // with N errors doesn't require N build cycles to surface them all. The
+                        // first error keeps a structured `frame` for editor integrations; the rest
+                        // are appended to the message text.
+                        const header = total === 1 ? "isolated declarations error" : `${total} isolated declarations errors`;
+                        const body = result.errors
+                            .map((error, index) => {
+                                const message = error?.message ?? "Unknown error";
+
+                                return error?.codeframe ? `${index + 1}. ${message}\n${error.codeframe}` : `${index + 1}. ${message}`;
+                            })
+                            .join("\n\n");
+
                         return this.error({
-                            frame: error?.codeframe || undefined,
-                            message: error?.codeframe ? `${error.message}\n${error.codeframe}` : (error?.message ?? "Unknown error"),
+                            frame: first?.codeframe || undefined,
+                            message: `${header} in ${id}:\n\n${body}`,
                         });
                     }
 

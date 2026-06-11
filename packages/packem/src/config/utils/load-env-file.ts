@@ -58,10 +58,24 @@ const loadEnvFileManually = (content: string, prefix: string = "PACKEM_"): Recor
  * // Returns: { "process.env.PACKEM_API_URL": "\"https://api.example.com\"" }
  * ```
  */
-const loadEnvFile = async (envFilePath: string, rootDirectory: string, prefix: string = "PACKEM_"): Promise<Record<string, string>> => {
+interface EnvFileLogger {
+    info: (message: string) => void;
+    warn: (message: string) => void;
+}
+
+const loadEnvFile = async (
+    envFilePath: string,
+    rootDirectory: string,
+    prefix: string = "PACKEM_",
+    logger?: EnvFileLogger,
+): Promise<Record<string, string>> => {
     const resolvedPath = resolve(rootDirectory, envFilePath);
 
     if (!existsSync(resolvedPath)) {
+        // An env file was explicitly requested but doesn't exist — surface it
+        // instead of silently returning no variables.
+        logger?.warn(`Env file not found at "${resolvedPath}"; no environment variables were loaded.`);
+
         return {};
     }
 
@@ -74,12 +88,21 @@ const loadEnvFile = async (envFilePath: string, rootDirectory: string, prefix: s
     if (typeof parseEnv === "function") {
         try {
             const parsed = parseEnv(content);
+            const totalCount = Object.keys(parsed).length;
 
             // Filter by prefix and format keys for Rollup replace plugin
             for (const [key, value] of Object.entries(parsed)) {
                 if (!prefix || key.startsWith(prefix)) {
                     envVariables[`process.env.${key}`] = JSON.stringify(value);
                 }
+            }
+
+            const loadedCount = Object.keys(envVariables).length;
+
+            if (totalCount > 0 && loadedCount === 0 && prefix) {
+                logger?.warn(`Loaded 0 of ${totalCount} variables from "${envFilePath}"; none matched the "${prefix}" prefix.`);
+            } else {
+                logger?.info(`Loaded ${loadedCount} of ${totalCount} variables from "${envFilePath}"${prefix ? ` (prefix "${prefix}")` : ""}.`);
             }
         } catch {
             // If parseEnv fails, fall back to manual parsing

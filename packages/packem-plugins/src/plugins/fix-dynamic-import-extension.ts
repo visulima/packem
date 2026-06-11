@@ -9,7 +9,7 @@ const fixDynamicImportExtension = (): Plugin =>
                 const magicString = new MagicString(code);
                 const extension = outputOptions.format === "es" ? "mjs" : "cjs";
                 // Match .ts extensions but exclude .d.ts (negative lookbehind)
-                const regex = /(import\(.*?)(?<!\.d)(\.ts)(?=['´"`]\))/g;
+                const regex = /(import\(.*?)(?<!\.d)(\.ts)(?=['"`]\))/g;
 
                 let hasChanged = false;
                 let match;

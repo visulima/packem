@@ -5,9 +5,12 @@ import type { SucrasePluginConfig } from "../../../../src/plugins/sucrase";
 import { sucrasePlugin } from "../../../../src/plugins/sucrase";
 
 const callTransform = (plugin: ReturnType<typeof sucrasePlugin>, code: string, id: string) => {
-    const transform = plugin.transform as (this: PluginContext, code: string, id: string) => { code: string; map?: unknown } | undefined;
+    const { transform } = plugin;
+    const handler = (typeof transform === "function" ? transform : transform?.handler) as
+        | ((this: PluginContext, code: string, id: string) => { code: string; map?: unknown } | undefined)
+        | undefined;
 
-    return transform.call({} as PluginContext, code, id);
+    return handler?.call({} as PluginContext, code, id);
 };
 
 const FOO_TS_REGEX = /\.foo\.ts$/;

@@ -357,8 +357,25 @@ const watch = async (
 
     let debounceTimer: ReturnType<typeof setTimeout>;
 
-    const runRestart = async (changedFile: string): Promise<void> => {
+    const runRestart = async (changedFile: string, isConfigChange: boolean): Promise<void> => {
         const logger = getLogger(context);
+
+        // A packem.config.* change can alter `context.options` (bundler,
+        // transformer, output format, externals, …) which the running watch
+        // session was built from. Reloading the full config here would require
+        // re-running the entire jiti/preset/defu pipeline that lives in the CLI
+        // command — too invasive for the watcher. Re-inferring entries off the
+        // stale options would silently keep using the OLD config, so instead we
+        // tell the user a manual restart is required and skip the misleading
+        // "restarting watchers" rebuild.
+        if (isConfigChange) {
+            logger.info({
+                message: `${relative(".", changedFile)} changed. Restart packem to apply configuration changes (the watcher cannot reload packem.config.* in place).`,
+                prefix: "watcher",
+            });
+
+            return;
+        }
 
         logger.info(`${relative(".", changedFile)} changed, restarting watchers...`);
 
@@ -382,11 +399,11 @@ const watch = async (
         }
     };
 
-    const restart = (changedFile: string): void => {
+    const restart = (changedFile: string, isConfigChange: boolean): void => {
         clearTimeout(debounceTimer);
 
         debounceTimer = setTimeout(() => {
-            runRestart(changedFile).catch(() => {
+            runRestart(changedFile, isConfigChange).catch(() => {
                 // runRestart already logs failures via its internal try/catch;
                 // this guard only protects against an unexpected rejection.
             });
@@ -398,13 +415,13 @@ const watch = async (
     // automatically. Adding a listener would override the default and leave
     // the rollup watcher + child onSuccess processes holding the event loop.
     fsWatch(packageJsonPath, () => {
-        restart(packageJsonPath);
+        restart(packageJsonPath, false);
     });
 
     for (const configPath of configCandidates) {
         if (isAccessibleSync(configPath)) {
             fsWatch(configPath, () => {
-                restart(configPath);
+                restart(configPath, true);
             });
             break;
         }

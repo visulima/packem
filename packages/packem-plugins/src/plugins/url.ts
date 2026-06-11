@@ -13,7 +13,6 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { ensureDir } from "@visulima/fs";
 import { basename, dirname, extname, join, relative } from "@visulima/path";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import mime from "mime";
 import type { Plugin } from "rollup";
 
@@ -184,7 +183,7 @@ export const urlPlugin = ({
                 data = `data:${mimetype};base64,${data}`;
             }
 
-            return `export default "${data}"`;
+            return `export default ${JSON.stringify(data)}`;
         },
         name: "packem:url",
     };

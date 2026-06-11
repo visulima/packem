@@ -1,3 +1,5 @@
+import { stripSvgComments } from "./svg-data-uri";
+
 /**
  * Encodes an SVG buffer to a base64 string after cleaning and optimizing the content.
  * @param buffer The SVG buffer to encode
@@ -7,20 +9,16 @@ const svgEncoder = (buffer: Buffer): string => {
     let svgString = buffer.toString("utf8");
 
     // Strip real XML/HTML comments so they are not carried into the inlined,
-    // base64-encoded asset (mirrors the sibling `stripSvgComments` util).
-    svgString = svgString.replaceAll(/<!--[\s\S]*?-->/g, "");
-    // Also strip the literal `//gs` marker some tooling leaves in SVG sources.
-    svgString = svgString.replaceAll("//gs", "");
+    // base64-encoded asset (shared helper, linear scan).
+    svgString = stripSvgComments(svgString);
     // Safe regex that matches only the exact 'class' attribute without backtracking
     // Uses word boundaries and explicit character sets to avoid ReDoS
     // eslint-disable-next-line sonarjs/slow-regex
     svgString = svgString.replaceAll(/\s*\bclass\s*=\s*(?:"[^"]*"|'[^']*')/gi, "");
-    // Clean up multiple spaces that may have been created
-    svgString = svgString.replaceAll(/\s{2,}/g, " ");
-
-    svgString = svgString.replaceAll(/[\n\r\t]/g, " ");
-    svgString = svgString.replaceAll(/\s{2,}/g, " ");
-    svgString = svgString.trim();
+    // Normalize all whitespace (newlines, tabs, runs of spaces) in a single pass,
+    // then trim. Folding the previous separate `\s{2,}` / `[\n\r\t]` / `\s{2,}`
+    // passes into one `\s+` collapse keeps the output identical.
+    svgString = svgString.replaceAll(/\s+/g, " ").trim();
 
     return Buffer.from(svgString, "utf8").toString("base64");
 };

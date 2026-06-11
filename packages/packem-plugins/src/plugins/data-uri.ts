@@ -2,7 +2,6 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { readFile } from "@visulima/fs";
 import { svgToCssDataUri, svgToTinyDataUri } from "@visulima/packem-share";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import mime from "mime";
 import type { Plugin, PluginContext } from "rollup";
 
@@ -21,16 +20,16 @@ const DATA_URI_RE = /\?data-uri/;
  * Supported query parameters:
  *
  * - `?data-uri` - Basic data URI conversion.
- * - `?data-uri and encoding=css` - Use CSS-optimized SVG encoding.
- * - `?data-uri and encoding=tiny` - Use tiny SVG encoding (default).
- * - `?data-uri and srcset` - Encode spaces as %20 for srcset compatibility.
+ * - `?data-uri&amp;encoding=css` - Use CSS-optimized SVG encoding.
+ * - `?data-uri&amp;encoding=tiny` - Use tiny SVG encoding (default).
+ * - `?data-uri&amp;srcset` - Encode spaces as %20 for srcset compatibility.
  *
  * Examples:
  *
  * - `./icon.svg?data-uri` - Tiny SVG encoding.
- * - `./icon.svg?data-uri and encoding=css` - CSS-optimized SVG encoding.
- * - `./icon.svg?data-uri and srcset` - Tiny SVG with srcset compatibility.
- * - `./icon.svg?data-uri and encoding=css and srcset` - CSS encoding with srcset compatibility.
+ * - `./icon.svg?data-uri&amp;encoding=css` - CSS-optimized SVG encoding.
+ * - `./icon.svg?data-uri&amp;srcset` - Tiny SVG with srcset compatibility.
+ * - `./icon.svg?data-uri&amp;encoding=css&amp;srcset` - CSS encoding with srcset compatibility.
  */
 export const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
     const filter = createFilter(options.include ?? [DATA_URI_RE], options.exclude);
@@ -56,7 +55,7 @@ export const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
                 const svgUri = encoding === "css" ? svgToCssDataUri(svg) : svgToTinyDataUri(svg);
                 const uri = srcset ? svgUri.replaceAll(" ", "%20") : svgUri;
 
-                return `export default "${uri}"`;
+                return `export default ${JSON.stringify(uri)}`;
             }
 
             const buf = await readFile(cleanId, { buffer: true });
@@ -64,7 +63,7 @@ export const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
             const prefix = type.startsWith("text/") ? `data:${type};charset=utf-8;base64,` : `data:${type};base64,`;
             const uri = `${prefix}${base64}`;
 
-            return `export default "${uri}"`;
+            return `export default ${JSON.stringify(uri)}`;
         },
         name: "packem:data-uri",
     };

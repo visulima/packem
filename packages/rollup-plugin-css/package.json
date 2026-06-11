@@ -199,12 +199,6 @@
         "stylus": ">=0.64.0"
     },
     "peerDependenciesMeta": {
-        "@ckeditor/typedoc-plugins": {
-            "optional": true
-        },
-        "@swc/core": {
-            "optional": true
-        },
         "@tailwindcss/node": {
             "optional": true
         },
@@ -214,9 +208,6 @@
         "cssnano": {
             "optional": true
         },
-        "esbuild": {
-            "optional": true
-        },
         "icss-utils": {
             "optional": true
         },
@@ -224,9 +215,6 @@
             "optional": true
         },
         "lightningcss": {
-            "optional": true
-        },
-        "oxc-transform": {
             "optional": true
         },
         "postcss": {
@@ -257,21 +245,6 @@
             "optional": true
         },
         "stylus": {
-            "optional": true
-        },
-        "sucrase": {
-            "optional": true
-        },
-        "typedoc": {
-            "optional": true
-        },
-        "typedoc-plugin-markdown": {
-            "optional": true
-        },
-        "typedoc-plugin-rename-defaults": {
-            "optional": true
-        },
-        "typescript": {
             "optional": true
         }
     },

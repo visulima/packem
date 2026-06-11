@@ -10,23 +10,18 @@ import createInitCommand from "./commands/init";
 import createMigrateCommand from "./commands/migrate";
 
 /**
- * Attempts to load and enable V8 compile cache for better performance.
- * Falls back to v8-compile-cache module if Node.js native compile cache is not available.
+ * Enables the V8 compile cache for faster startup.
  * @remarks
- * This is a performance optimization that helps reduce startup time by caching
- * compiled JavaScript code.
+ * Uses Node.js' native `module.enableCompileCache` (always present given the
+ * package's supported engines: Node 22.14+/24.10+). Failures are non-fatal.
  */
 try {
-    // Use node.js 22 new API for better performance.
     // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
     const nodeModule = require("node:module") as { enableCompileCache?: () => unknown };
 
-    if (!nodeModule.enableCompileCache?.()) {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
-        require("v8-compile-cache");
-    }
+    nodeModule.enableCompileCache?.();
 } catch {
-    // We don't have/need to care about v8-compile-cache failed
+    // Enabling the compile cache is a best-effort optimization; ignore failures.
 }
 
 /**

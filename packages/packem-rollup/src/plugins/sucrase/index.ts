@@ -12,20 +12,29 @@ const sucraseTransformPlugin = ({ exclude, include, ...transformOptions }: Sucra
     return <Plugin>{
         name: "packem:sucrase",
 
-        transform(sourcecode, id) {
-            if (!filter(id)) {
-                return undefined;
-            }
+        // Native Rollup hook filtering (Rollup 4.38.0+) lets Rollup skip calling
+        // this hook for non-matching ids before the JS `createFilter` runs. The
+        // precise include/exclude semantics are still enforced by `filter(id)`
+        // below; this is a cheap pre-gate, so it must be at least as permissive.
+        transform: {
+            filter: {
+                id: { exclude: exclude ?? EXCLUDE_REGEXP, include },
+            },
+            handler(sourcecode, id) {
+                if (!filter(id)) {
+                    return undefined;
+                }
 
-            const { code, sourceMap: map } = sucraseTransform(sourcecode, {
-                ...transformOptions,
-                filePath: id,
-                sourceMapOptions: {
-                    compiledFilename: id,
-                },
-            });
+                const { code, sourceMap: map } = sucraseTransform(sourcecode, {
+                    ...transformOptions,
+                    filePath: id,
+                    sourceMapOptions: {
+                        compiledFilename: id,
+                    },
+                });
 
-            return { code, map };
+                return { code, map };
+            },
         },
     };
 };

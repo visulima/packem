@@ -18,7 +18,13 @@ const DEFAULT_THREAD_POOL_SIZE = 4;
  * Uses UV_THREADPOOL_SIZE environment variable if set, otherwise defaults to 4.
  * Leaves one thread available to prevent blocking in certain scenarios.
  */
-const threadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.env.UV_THREADPOOL_SIZE, 10) : DEFAULT_THREAD_POOL_SIZE; // default `libuv` threadpool size
+const parsedThreadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.env.UV_THREADPOOL_SIZE, 10) : Number.NaN;
+const threadPoolSize = Number.isFinite(parsedThreadPoolSize) && parsedThreadPoolSize > 0 ? parsedThreadPoolSize : DEFAULT_THREAD_POOL_SIZE; // default `libuv` threadpool size
+
+// Always leave one thread available (see the node-sass note above) while
+// guaranteeing PQueue receives a concurrency of at least 1. A pool size of 1
+// would otherwise produce a concurrency of 0, which stalls the queue.
+const queueConcurrency = Math.max(1, threadPoolSize - 1);
 
 /**
  * Configuration options for the LoaderManager.
@@ -143,7 +149,7 @@ class LoaderManager {
      * @returns The transformed payload produced by the loader pipeline
      */
     public async process(payload: Payload, context: LoaderContext): Promise<Payload> {
-        this.workQueue ??= new PQueueClass({ concurrency: threadPoolSize - 1 });
+        this.workQueue ??= new PQueueClass({ concurrency: queueConcurrency });
 
         for (const [name, loader] of this.loaders) {
             const loaderContext: LoaderContext = {

@@ -2,7 +2,7 @@ import { copyFile } from "node:fs/promises";
 
 import { ensureDir, isAccessible } from "@visulima/fs";
 import { basename, dirname, extname, join, resolve } from "@visulima/path";
-import type { InputOptions, NormalizedOutputOptions, OutputOptions, Plugin } from "rollup";
+import type { NormalizedOutputOptions, Plugin } from "rollup";
 
 const NODE_EXT_RE = /\.node$/;
 
@@ -30,7 +30,6 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
     // Map<virtual_id, { source_path, output_name }>
     const virtualEntries = new Map<string, { outputName: string; sourcePath: string }>();
     let counter = 0;
-    let distributionDirectory: string | undefined;
 
     return {
         buildStart() {
@@ -88,41 +87,16 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
             const { outputName } = entry;
 
-            // If distributionDirectory is not set yet, try to get it from this context
-            if (!distributionDirectory) {
-                if (this.meta.rollupVersion) {
-                    // We're in a rollup context, but output dir might not be available yet
-                    // Return a placeholder that will be resolved later
-                    return `export default require("./${nativesDirectory}/${outputName}");`;
-                }
-
-                this.error("Output directory not detected. Please ensure Rollup output options are configured.");
-            }
-
-            // Generate the require path relative to the final bundle directory
+            // The require path is always relative to the final bundle directory; the
+            // `.node` file is copied into `<output>/<nativesDirectory>/` during
+            // generateBundle, so this resolves correctly at runtime regardless of
+            // when the output directory becomes known.
             const relativePath = `./${nativesDirectory}/${outputName}`;
 
             return `export default require("${relativePath.replaceAll("\\", "/")}");`;
         },
 
         name: "native-modules",
-
-        options(options) {
-            // Extract output directory from Rollup options
-            const withOutput = options as InputOptions & { output?: OutputOptions | OutputOptions[] };
-
-            if (withOutput.output) {
-                const output = Array.isArray(withOutput.output) ? withOutput.output[0] : withOutput.output;
-
-                if (output?.dir) {
-                    distributionDirectory = output.dir;
-                } else if (output?.file) {
-                    distributionDirectory = dirname(output.file);
-                }
-            }
-
-            return options;
-        },
 
         resolveId: {
             filter: {

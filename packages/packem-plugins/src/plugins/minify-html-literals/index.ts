@@ -64,6 +64,14 @@ export const minifyHTMLLiteralsPlugin = ({
     return {
         name: "packem:minify-html-literals",
         async transform(code: string, id: string) {
+            // Cheap pre-check: the minifier only acts on tagged `html`...`` / `css`...``
+            // template literals. With no default `include`, the filter matches every
+            // module, so skipping ones that contain no such tag avoids spinning up the
+            // full TypeScript parser on irrelevant files.
+            if (!code.includes("html`") && !code.includes("css`")) {
+                return undefined;
+            }
+
             if (filter(id)) {
                 try {
                     const result = await minifyHTMLLiterals(code, {

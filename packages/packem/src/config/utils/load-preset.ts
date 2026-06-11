@@ -49,8 +49,11 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
         }
         default: {
             if (typeof preset === "string") {
+                // `{ default: true }` unwraps `export default definePreset(...)`
+                // so a string preset module resolves to the preset value rather
+                // than a namespace object (which is treated as inert config).
                 // eslint-disable-next-line no-param-reassign
-                preset = await jiti.import(preset) || {};
+                preset = await jiti.import<BuildConfig>(preset, { default: true }) || {};
             }
         }
     }

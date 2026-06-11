@@ -17,22 +17,24 @@ import type { StylusDefinition, StylusLoaderContext, StylusLoaderOptions, Stylus
  * Stylus compiler doesn't support sourcesContent generation, so we manually
  * read the source files and populate this field for proper source map functionality.
  */
-const populateSourcemapContent = (sourcemap: RawSourceMap, basePath: string): string[] | undefined => {
+const populateSourcemapContent = (sourcemap: RawSourceMap, basePath: string): (string | null)[] | undefined => {
     if (sourcemap.sourcesContent) {
         return undefined;
     }
 
-    return sourcemap.sources
-        .map((source) => {
-            const file = normalize(join(basePath, source));
+    // Keep one entry per `sources` index. Missing files become `null`
+    // placeholders so every remaining `sourcesContent` entry stays aligned with
+    // its corresponding `sources` entry (filtering them out would shift the
+    // indices and associate contents with the wrong source).
+    return sourcemap.sources.map((source) => {
+        const file = normalize(join(basePath, source));
 
-            if (!existsSync(file)) {
-                return undefined;
-            }
+        if (!existsSync(file)) {
+            return null;
+        }
 
-            return readFileSync(file);
-        })
-        .filter(Boolean) as string[];
+        return readFileSync(file);
+    });
 };
 
 /**
@@ -216,7 +218,9 @@ const loader: Loader<StylusLoaderOptions> = {
 
         // Populate sourcesContent since Stylus doesn't generate it
         if (style.sourcemap) {
-            style.sourcemap.sourcesContent = populateSourcemapContent(style.sourcemap, basePath);
+            // The sourcemap spec permits `null` entries in `sourcesContent`; the
+            // source-map-js type only models `string[]`, hence the cast.
+            style.sourcemap.sourcesContent = populateSourcemapContent(style.sourcemap, basePath) as string[] | undefined;
         }
 
         return { code: css, map: mm(style.sourcemap).toString() ?? map };

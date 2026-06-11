@@ -246,6 +246,80 @@ describe(generateJsExports, () => {
         });
     });
 
+    describe("inline mode", () => {
+        it("should produce treeshakeable output (moduleSideEffects: false) instead of no-treeshake", () => {
+            expect.assertions(2);
+
+            const result = generateJsExports({
+                ...baseOptions,
+                inline: true,
+            });
+
+            expect(result.moduleSideEffects).toBe(false);
+            expect(result.code).toContain("export default css;");
+        });
+    });
+
+    describe("declaration files", () => {
+        it("should declare `css` for plain CSS with dts and no namedExports", () => {
+            expect.assertions(2);
+
+            const result = generateJsExports({
+                ...baseOptions,
+                dts: true,
+            });
+
+            // The default export references `css`, so the .d.ts must declare it
+            // (regression: previously only declared under `namedExports`).
+            expect(result.types).toContain("declare const css: string;");
+            expect(result.types).toContain("export default css;");
+        });
+
+        it("should escape CSS-module class names that are not valid bare property names", () => {
+            expect.assertions(2);
+
+            const modulesExports = {
+                "weird'name": "weird_abc123",
+            };
+
+            const result = generateJsExports({
+                ...baseOptions,
+                dts: true,
+                modulesExports,
+                supportModules: true,
+            });
+
+            // The embedded single quote is backslash-escaped so the single-quoted
+            // property key stays valid in the generated .d.ts.
+            expect(result.types).toContain(String.raw`'weird\'name': string;`);
+            expect(result.types).not.toContain("'weird'name'");
+        });
+    });
+
+    describe("inject validation", () => {
+        it("should throw for an invalid inject.method identifier", () => {
+            expect.assertions(1);
+
+            expect(() => {
+                generateJsExports({
+                    ...baseOptions,
+                    inject: { method: "not a valid identifier" } as unknown as { method: string },
+                });
+            }).toThrow("`inject.method` must be a valid JavaScript identifier");
+        });
+
+        it("should throw for an empty inject.package", () => {
+            expect.assertions(1);
+
+            expect(() => {
+                generateJsExports({
+                    ...baseOptions,
+                    inject: { package: "  " } as unknown as { package: string },
+                });
+            }).toThrow("`inject.package` must be a non-empty string");
+        });
+    });
+
     describe("error handling", () => {
         it("should throw error for reserved 'inject' keyword with treeshakeable", () => {
             expect.assertions(1);

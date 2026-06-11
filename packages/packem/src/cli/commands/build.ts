@@ -22,6 +22,7 @@ import { createDefuWithHooksMerger } from "../../utils/create-defu-with-hooks-me
 interface BuildCommandOptions {
     analyze?: boolean;
     bundler?: "rolldown" | "rollup";
+    cache?: boolean;
     cjsInterop?: boolean;
     clean?: boolean;
     config?: string;
@@ -140,7 +141,7 @@ const collectExternals = (options: BuildCommandOptions): string[][] => {
  */
 const createBuildCommand = (cli: Cli<Console>): void => {
     cli.addCommand({
-        description: "Demonstrate options required",
+        description: "Build the package using the resolved packem configuration",
 
         execute: async ({ logger, options: rawOptions }): Promise<void> => {
             const options = rawOptions as BuildCommandOptions;
@@ -184,7 +185,10 @@ const createBuildCommand = (cli: Cli<Console>): void => {
             const environments: Record<string, string> = {};
 
             if (envFile) {
-                const envFileVariables = await loadEnvFile(envFile, rootPath, envPrefix);
+                const envFileVariables = await loadEnvFile(envFile, rootPath, envPrefix, {
+                    info: (message: string) => logger.info(message),
+                    warn: (message: string) => logger.warn(message),
+                });
 
                 Object.assign(environments, envFileVariables);
             }
@@ -256,6 +260,11 @@ const createBuildCommand = (cli: Cli<Console>): void => {
                 // --no-validation must override preset validation settings but not user-configured validation
                 if (options.validation === false && !buildConfig.validation) {
                     mergedConfig.validation = false;
+                }
+
+                // --no-cache forces the file cache off regardless of config/preset.
+                if (options.cache === false) {
+                    mergedConfig.fileCache = false;
                 }
 
                 await packem(
@@ -336,11 +345,20 @@ const createBuildCommand = (cli: Cli<Console>): void => {
                 multiple: true,
                 name: "env",
                 type: (input: string) => {
-                    const [key, value] = input.split("=");
+                    // Split only on the first `=` so values that themselves
+                    // contain `=` (e.g. `API_URL=https://x?a=b`) are preserved.
+                    const separatorIndex = input.indexOf("=");
+
+                    if (separatorIndex === -1) {
+                        return {
+                            key: input,
+                            value: "",
+                        };
+                    }
 
                     return {
-                        key,
-                        value,
+                        key: input.slice(0, separatorIndex),
+                        value: input.slice(separatorIndex + 1),
                     };
                 },
             },
@@ -442,7 +460,7 @@ const createBuildCommand = (cli: Cli<Console>): void => {
             },
             {
                 // defaultValue: "browser",
-                description: "Specify the build runtime (nodejs, browser).",
+                description: "Specify the build runtime (node, browser).",
                 name: "runtime",
                 type: (input: string) => {
                     if (input === "node" || input === "browser") {

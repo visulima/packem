@@ -68,9 +68,15 @@ const SSRInjectStyles = () => {
     return (
         <>
             {globalThis[SSR_INJECT_ID].map((module) => (
-                <style id={module.id} key={module.id}>
-                    {module.css}
-                </style>
+                // React escapes text children, so `<style>{module.css}</style>` would
+                // turn `>` into `&gt;` and break the CSS. Use dangerouslySetInnerHTML
+                // to emit the CSS verbatim.
+                //
+                // SECURITY: the CSS is injected as raw HTML. Only do this with CSS you
+                // trust, and guard against a literal `</style>` sequence in the CSS
+                // (e.g. reject/escape it) — otherwise it closes the tag early and
+                // becomes an HTML-injection vector.
+                <style id={module.id} key={module.id} dangerouslySetInnerHTML={{ __html: module.css }} />
             ))}
         </>
     );
@@ -100,7 +106,7 @@ export default Document;
 Type: `string`<br>
 Default: `undefined`
 
-Unique identifier for the style tag. Prevents duplicate injection during SSR hydration.
+Unique identifier for the style tag. Prevents duplicate injection: in the browser, if an element with the same `id` already exists in the document, injection is skipped; during SSR, a module with an already-seen `id` is not stored again.
 
 ### insertAt
 
@@ -109,10 +115,10 @@ Default: `'last'`
 
 Where to insert the style tag:
 
-- `number`: Insert at specific index (0 = first, -1 = last)
+- `number`: Insert at a specific index. `0` inserts as the first child. A negative number counts back from the end and resolves to `children.length + insertAt + 1`, so `-1` appends at the end (after the last child) and `-2` inserts before the last child. Out-of-range positive indices append at the end.
 - `'first'`: Insert as first child
 - `'last'`: Insert as last child (default)
-- `{ before: 'selector' }`: Insert before element matching CSS selector
+- `{ before: 'selector' }`: Insert before the element matching the CSS selector (searched within the container). If no element matches, the style tag is appended at the end instead. An invalid selector throws.
 
 ### singleTag
 
@@ -121,12 +127,14 @@ Default: `false`
 
 Whether to reuse a single style tag for multiple injections with the same configuration.
 
+The cached tag is keyed by the resolved container element **and** the `insertAt` value. Because the tag is created only on the first matching call, the `attributes`, `id`, and `nonce` of later calls that reuse it are ignored — only the CSS of later calls is appended to the existing tag.
+
 ### container
 
 Type: `string`<br>
 Default: `undefined`
 
-CSS selector for the container element. Defaults to `head` if not specified.
+CSS selector for the container element. Defaults to `head` if not specified. If the selector matches no element, an error is thrown (the error message includes the selector).
 
 ### attributes
 
@@ -134,6 +142,8 @@ Type: `Record<string, string>`<br>
 Default: `undefined`
 
 Additional attributes to set on the style tag.
+
+Reserved keys are dropped and cannot be set through this map: `id`, `type`, and `nonce` (these are controlled by the dedicated `id` / `nonce` options), as well as any event-handler attribute matching `on*` (e.g. `onload`, `onclick`) — rejected so the map can never create an executable handler.
 
 ### nonce
 
@@ -146,9 +156,8 @@ Nonce value for CSP (Content Security Policy) compliance.
 
 This library supports the following Node.js versions:
 
-- 20.x
-- 22.x
-- 24.x
+- 22.x (>= 22.14.0)
+- 24.x (>= 24.10.0)
 
 ## Contributing
 

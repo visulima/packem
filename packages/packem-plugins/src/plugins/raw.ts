@@ -21,8 +21,8 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
 
                     // Normalize line endings only on Windows: convert \r\n to \n
                     return process.platform === "win32" ? content.replaceAll("\r\n", "\n") : content;
-                } catch {
-                    this.error(`Failed to read file: ${cleanId}`);
+                } catch (error: unknown) {
+                    this.error(`Failed to read file: ${cleanId}: ${error instanceof Error ? error.message : String(error)}`);
                 }
             }
 

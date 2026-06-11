@@ -27,7 +27,7 @@ export const sourcemapsPlugin = ({ exclude, include }: SourcemapsPluginOptions =
                 code = await readFile(id, { buffer: false });
 
                 this.addWatchFile(id);
-            } catch {
+            } catch (error: unknown) {
                 try {
                     // If reading fails, try again without a query suffix that some plugins use
                     const cleanId = id.replace(QUERY_SUFFIX_RE, "");
@@ -36,10 +36,17 @@ export const sourcemapsPlugin = ({ exclude, include }: SourcemapsPluginOptions =
 
                     this.addWatchFile(cleanId);
                 } catch {
-                    this.warn("Failed reading file");
+                    this.warn(`Failed reading file "${id}": ${error instanceof Error ? error.message : String(error)}`);
 
                     return undefined;
                 }
+            }
+
+            // The second disk read in `loadSourceMap(id)` is only worthwhile when the
+            // file actually carries a sourceMappingURL comment. Skip it for the common
+            // case of modules with no inline/linked map.
+            if (!code.includes("sourceMappingURL")) {
+                return code;
             }
 
             let map: ExistingRawSourceMap;
@@ -54,8 +61,8 @@ export const sourcemapsPlugin = ({ exclude, include }: SourcemapsPluginOptions =
                 }
 
                 map = result as unknown as ExistingRawSourceMap;
-            } catch {
-                this.warn("Failed resolving source map");
+            } catch (error: unknown) {
+                this.warn(`Failed resolving source map for "${id}": ${error instanceof Error ? error.message : String(error)}`);
 
                 return { code };
             }

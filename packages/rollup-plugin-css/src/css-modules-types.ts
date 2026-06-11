@@ -1,4 +1,4 @@
-import { isAccessible, writeFile } from "@visulima/fs";
+import { isAccessible, readFile, writeFile } from "@visulima/fs";
 import { normalize } from "@visulima/path";
 import type { Plugin } from "rollup";
 
@@ -106,15 +106,26 @@ const cssModulesTypesPlugin = (options: StyleOptions, rootDirectory: string): Pl
 
             // Generate and write TypeScript declaration file
             if (await isAccessible(id)) {
-                await writeFile(`${id}.d.ts`, `${dtsComment}\n${types}`);
+                const declarationPath = `${id}.d.ts`;
+                const contents = `${dtsComment}\n${types}`;
 
-                this.info({
-                    message: `Generated types for ${normalize(id).replace(`${rootDirectory}/`, "")}`,
-                    plugin: "css-modules-types",
-                });
+                // Only write when the contents actually changed. Writing the file
+                // unconditionally (and previously watching it) caused a rebuild
+                // loop, as the freshly written `.d.ts` retriggered the watcher.
+                let previousContents: string | undefined;
 
-                // Add declaration file to watch list for proper rebuilds
-                this.addWatchFile(`${id}.d.ts`);
+                if (await isAccessible(declarationPath)) {
+                    previousContents = await readFile(declarationPath);
+                }
+
+                if (previousContents !== contents) {
+                    await writeFile(declarationPath, contents);
+
+                    this.info({
+                        message: `Generated types for ${normalize(id).replace(`${rootDirectory}/`, "")}`,
+                        plugin: "css-modules-types",
+                    });
+                }
             }
 
             return undefined;

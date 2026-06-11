@@ -103,7 +103,7 @@ const removeProperty = (magicString: MagicString, code: string, start: number, e
  *   dangling comma (`,,`) and produce invalid JS; instead remove the property and
  *   its own trailing comma.
  */
-const stripAttributes = (ast: Node, code: string, attributes: string[], trailingComma: boolean): MagicString | undefined => {
+const stripAttributes = (ast: Node, code: string, attributes: string[], trailingComma: boolean, logger: Console): MagicString | undefined => {
     const magicString = new MagicString(code);
     let changed = false;
 
@@ -116,18 +116,27 @@ const stripAttributes = (ast: Node, code: string, attributes: string[], trailing
 
                 for (const object of filteredArguments) {
                     for (const property of object.properties) {
-                        if (
-                            property.type === "Property"
-                            && property.key.type === "Literal"
-                            && property.value.type === "Literal"
-                            && attributes.includes(property.key.value as string)
-                        ) {
-                            const { end, start } = property as PropertyLiteralValue;
-
-                            removeProperty(magicString, code, start, end, trailingComma);
-
-                            changed = true;
+                        if (property.type !== "Property" || property.key.type !== "Literal" || !attributes.includes(property.key.value as string)) {
+                            continue;
                         }
+
+                        if (property.value.type !== "Literal") {
+                            // Only statically-literal values are stripped (a dynamic
+                            // value may have side effects / be needed at runtime).
+                            // Surface the skip so it's diagnosable.
+                            logger.debug({
+                                message: `skipping attribute "${String(property.key.value)}": value is "${property.value.type}", not a literal.`,
+                                prefix: "plugin:jsx-remove-attributes",
+                            });
+
+                            continue;
+                        }
+
+                        const { end, start } = property as PropertyLiteralValue;
+
+                        removeProperty(magicString, code, start, end, trailingComma);
+
+                        changed = true;
                     }
                 }
             }
@@ -153,7 +162,8 @@ export const jsxRemoveAttributes = ({
     attributes,
     logger,
     mode = "transform",
-}: JSXRemoveAttributesPlugin & { logger: Console; mode?: "renderChunk" | "transform" }): Plugin => {
+    sourcemap = true,
+}: JSXRemoveAttributesPlugin & { logger: Console; mode?: "renderChunk" | "transform"; sourcemap?: boolean }): Plugin => {
     if (!Array.isArray(attributes) || attributes.length === 0) {
         throw new Error("[packem:jsx-remove-attributes]: attributes must be a non-empty array of strings.");
     }
@@ -162,7 +172,18 @@ export const jsxRemoveAttributes = ({
         return {
             name: "packem:jsx-remove-attributes",
             renderChunk: {
-                handler(code: string, chunk, { sourcemap }) {
+                handler(code: string, chunk, { sourcemap: chunkSourcemap }) {
+                    // Cheap pre-check: a chunk can only contain a strippable
+                    // attribute if it also contains an automatic-runtime JSX call
+                    // AND at least one of the configured attribute names. Skip the
+                    // (expensive) full parse otherwise.
+                    if (
+                        !(code.includes("jsx(") || code.includes("jsxs(") || code.includes("jsxDEV("))
+                        || !attributes.some((attribute) => code.includes(attribute))
+                    ) {
+                        return undefined;
+                    }
+
                     let ast: Node | undefined;
 
                     try {
@@ -178,13 +199,13 @@ export const jsxRemoveAttributes = ({
                         return undefined;
                     }
 
-                    const magicString = stripAttributes(ast, code, attributes, true);
+                    const magicString = stripAttributes(ast, code, attributes, true, logger);
 
                     if (magicString === undefined) {
                         return undefined;
                     }
 
-                    return { code: magicString.toString(), map: sourcemap ? magicString.generateMap({ hires: true }) : undefined };
+                    return { code: magicString.toString(), map: chunkSourcemap ? magicString.generateMap({ hires: true }) : undefined };
                 },
                 // Run after other renderChunk transforms so we operate on the final
                 // transpiled chunk shape.
@@ -215,13 +236,13 @@ export const jsxRemoveAttributes = ({
                     return undefined;
                 }
 
-                const magicString = stripAttributes(ast, code, attributes, false);
+                const magicString = stripAttributes(ast, code, attributes, false, logger);
 
                 if (magicString === undefined) {
                     return undefined;
                 }
 
-                return { code: magicString.toString(), map: magicString.generateMap({ hires: true }) };
+                return { code: magicString.toString(), map: sourcemap ? magicString.generateMap({ hires: true }) : undefined };
             },
         },
     };

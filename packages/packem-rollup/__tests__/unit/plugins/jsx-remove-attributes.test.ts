@@ -22,6 +22,27 @@ const callTransform = (plugin: ReturnType<typeof jsxRemoveAttributes>, code: str
     return handler?.call(context, code, id);
 };
 
+type RenderChunkContext = {
+    parse: typeof parseAst;
+    warn: (warning: { code: string; message: string }) => void;
+};
+
+const callRenderChunk = (
+    plugin: ReturnType<typeof jsxRemoveAttributes>,
+    code: string,
+    context_?: Partial<RenderChunkContext>,
+) => {
+    const { renderChunk } = plugin;
+    const handler = (typeof renderChunk === "function" ? renderChunk : renderChunk?.handler) as
+        | ((this: RenderChunkContext, code: string, chunk: { fileName: string }, options: { sourcemap: boolean }) => { code: string; map: unknown } | undefined)
+        | undefined;
+    // Track parse calls so "skip parse" tests can assert the parse never ran.
+    const parseSpy = vi.fn(parseAst);
+    const context: RenderChunkContext = { parse: parseSpy as unknown as typeof parseAst, warn: vi.fn(), ...context_ };
+
+    return { parseSpy, result: handler?.call(context, code, { fileName: "chunk.js" }, { sourcemap: false }) };
+};
+
 describe("jsxRemoveAttributes", () => {
     it("should throw if attributes is missing or empty", () => {
         expect.assertions(2);
@@ -83,5 +104,69 @@ describe("jsxRemoveAttributes", () => {
 
         expect(result).toBeUndefined();
         expect(warn).toHaveBeenCalledWith(expect.objectContaining({ code: "PARSE_ERROR" }));
+    });
+
+    describe("renderChunk mode", () => {
+        it("should expose a renderChunk hook (not a transform hook)", () => {
+            expect.assertions(2);
+
+            const plugin = jsxRemoveAttributes({ attributes: ["data-test"], logger: createLogger(), mode: "renderChunk" });
+
+            expect(plugin.renderChunk).toBeDefined();
+            expect(plugin.transform).toBeUndefined();
+        });
+
+        it("should skip the parse for a chunk with no jsx call", () => {
+            expect.assertions(2);
+
+            const plugin = jsxRemoveAttributes({ attributes: ["data-test"], logger: createLogger(), mode: "renderChunk" });
+            const { parseSpy, result } = callRenderChunk(plugin, "const data-test = 1; export const x = 2;\n");
+
+            expect(result).toBeUndefined();
+            expect(parseSpy).not.toHaveBeenCalled();
+        });
+
+        it("should skip the parse for a jsx chunk that lacks any configured attribute", () => {
+            expect.assertions(2);
+
+            const plugin = jsxRemoveAttributes({ attributes: ["data-test"], logger: createLogger(), mode: "renderChunk" });
+            const { parseSpy, result } = callRenderChunk(plugin, `jsx(Component, {\n  "id": "real",\n});\n`);
+
+            expect(result).toBeUndefined();
+            expect(parseSpy).not.toHaveBeenCalled();
+        });
+
+        it("should strip a first-position attribute (multi-line trailing comma)", () => {
+            expect.assertions(2);
+
+            const plugin = jsxRemoveAttributes({ attributes: ["data-test"], logger: createLogger(), mode: "renderChunk" });
+            const code = `jsx(Component, {\n  "data-test": "a",\n  "id": "real",\n});\n`;
+            const { result } = callRenderChunk(plugin, code);
+
+            expect(result?.code).not.toContain("data-test");
+            expect(result?.code).toContain(`"id": "real"`);
+        });
+
+        it("should strip a middle-position attribute (multi-line trailing comma)", () => {
+            expect.assertions(2);
+
+            const plugin = jsxRemoveAttributes({ attributes: ["data-test"], logger: createLogger(), mode: "renderChunk" });
+            const code = `jsxs(Component, {\n  "a": 1,\n  "data-test": "x",\n  "b": 2,\n});\n`;
+            const { result } = callRenderChunk(plugin, code);
+
+            expect(result?.code).not.toContain("data-test");
+            expect(result?.code).toContain(`"b": 2`);
+        });
+
+        it("should strip a last-position attribute (multi-line trailing comma)", () => {
+            expect.assertions(2);
+
+            const plugin = jsxRemoveAttributes({ attributes: ["data-test"], logger: createLogger(), mode: "renderChunk" });
+            const code = `jsxDEV(Component, {\n  "id": "real",\n  "data-test": "x",\n});\n`;
+            const { result } = callRenderChunk(plugin, code);
+
+            expect(result?.code).not.toContain("data-test");
+            expect(result?.code).toContain(`"id": "real"`);
+        });
     });
 });

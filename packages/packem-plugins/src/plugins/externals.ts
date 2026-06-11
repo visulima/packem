@@ -199,7 +199,11 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     const classifiedNames = Object.keys(classifiedDeps);
 
     if (classifiedNames.length > 0) {
-        include.add(new RegExp(`^(?:${classifiedNames.join("|")})(?:/.+)?$`));
+        // Escape each package name so regex metacharacters in names (e.g. the `.` in
+        // `lodash.merge`) match literally instead of matching any character.
+        const escapedNames = classifiedNames.map((name) => name.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`));
+
+        include.add(new RegExp(`^(?:${escapedNames.join("|")})(?:/.+)?$`));
     }
 
     include.add(CSS_STYLE_INJECT_RE);
@@ -207,7 +211,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     if (pkg.peerDependenciesMeta) {
         for (const [key, value] of Object.entries(pkg.peerDependenciesMeta)) {
             if (value && typeof value === "object" && "optional" in value) {
-                include.add(new RegExp(`^${key}(?:/.+)?$`));
+                include.add(new RegExp(`^${key.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}(?:/.+)?$`));
             }
         }
     }
@@ -247,6 +251,13 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     const cacheResolved = new Map<string, boolean>();
 
     return <Plugin>{
+        // Reset the once-per-id log-suppression map so a second build in the same
+        // process (watch rebuild, multi-format build) logs implicit externals again
+        // instead of staying permanently silent after the first build.
+        buildStart() {
+            calledImplicitExternals.clear();
+        },
+
         name: "packem:externals",
 
         // The options hook sets rollup's `external` function — the final arbiter rollup

@@ -7,7 +7,7 @@ import { arrayify } from "@visulima/packem-share/utils";
 import { basename, dirname, join, normalize, relative } from "@visulima/path";
 import type { Plugin } from "rollup";
 
-type FileDesc = { copied: string[]; dest: string[]; timestamp: number; transform?: (content: Buffer, filename: string) => Buffer | string };
+type FileDesc = { copied: string[]; dest: string[]; timestamp: number };
 
 type SingleTargetDesc = {
     dest?: string;
@@ -20,14 +20,14 @@ type MultipleTargetsDesc = SingleTargetDesc | SingleTargetDesc[] | string[] | st
 export type CopyPluginOptions = {
     /**
      * Copy items once. Useful in watch mode.
-     * @default false
+     * @default true
      */
     copyOnce?: boolean;
     exactFileNames?: boolean;
 
     /**
      * Remove the directory structure of copied files.
-     * @default true
+     * @default false
      */
     flatten?: boolean;
     targets: MultipleTargetsDesc;

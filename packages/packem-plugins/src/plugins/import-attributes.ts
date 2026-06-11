@@ -30,7 +30,14 @@ const VIRTUAL_PREFIX = "\0packem-import-attribute/";
 
 // Matches:  import <bindings>? from "path" with { type: "text"|"bytes" }
 // Bindings can include default, namespace, named, side-effect-only forms.
-const STATIC_IMPORT_WITH_ATTR = /(import[\s\S]+?from\s*["'])([^"']+)(["'])\s*with\s*\{\s*type\s*:\s*["'](text|bytes)["']\s*\}/g;
+//
+// The clause between `import` and `from` is bound to characters that legitimately
+// appear in an import clause — identifiers, braces, commas, `as`, whitespace and
+// `$`/`_` — and explicitly NOT `;`, quotes or parentheses. This keeps the gap from
+// the catastrophic `[\s\S]+?` (which could span arbitrarily far, scanning across
+// statements/strings/comments and degrading to polynomial time on files with many
+// imports) while still matching every real binding form.
+const STATIC_IMPORT_WITH_ATTR = /(import[\w$*{},\s]*?from\s*["'])([^"']+)(["'])\s*with\s*\{\s*type\s*:\s*["'](text|bytes)["']\s*\}/g;
 
 // Matches:  import("path", { with: { type: "text"|"bytes" } })
 const DYNAMIC_IMPORT_WITH_ATTR = /(\bimport\s*\(\s*["'])([^"']+)["']\s*,\s*\{\s*with\s*:\s*\{\s*type\s*:\s*["'](text|bytes)["']\s*\}\s*\}\s*\)/g;
@@ -121,8 +128,11 @@ export const importAttributesPlugin = (): Plugin => {
                 return null;
             }
 
-            // Cheap pre-check before running the regex on every source file.
-            if (!code.includes("with") || (!code.includes("text") && !code.includes("bytes"))) {
+            // Cheap pre-check before running the regex on every source file. The
+            // attribute form always contains all of `with`, `type`, and one of
+            // `text`/`bytes`, so requiring every token short-circuits the vast
+            // majority of files before the (now bounded) regex runs.
+            if (!code.includes("with") || !code.includes("type") || (!code.includes("text") && !code.includes("bytes"))) {
                 // eslint-disable-next-line unicorn/no-null
                 return null;
             }

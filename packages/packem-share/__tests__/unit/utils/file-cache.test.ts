@@ -144,4 +144,18 @@ describe("fileCache", () => {
 
         expect(fileCache.get("testFile")).toBeUndefined();
     });
+
+    it("should reject cache keys that traverse outside the cache directory", () => {
+        expect.assertions(3);
+
+        vi.mocked(isAccessibleSync).mockReturnValue(true);
+
+        const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
+
+        expect(() => fileCache.has("../../../etc/passwd")).toThrow("outside the cache directory");
+        expect(() => fileCache.get("../../../etc/passwd")).toThrow("outside the cache directory");
+        expect(() => {
+            fileCache.set("../../../etc/passwd", "data");
+        }).toThrow("outside the cache directory");
+    });
 });

@@ -6,7 +6,7 @@
  * Copyright (c) 2020 EGOIST
  */
 import { findCacheDirSync } from "@visulima/find-cache-dir";
-import { readFileSync } from "@visulima/fs";
+import { readFile } from "@visulima/fs";
 import { join } from "@visulima/path";
 import type { OnResolveArgs, OnResolveResult } from "esbuild";
 import { build as esbuildBuild } from "esbuild";
@@ -96,12 +96,17 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
 
                     build.onLoad({ filter: ALL_FILES_RE, namespace: "optimize-deps" }, async (arguments_) => {
                         const { absolute, resolveDir } = arguments_.pluginData as LoadPluginData;
-                        const sourceCode = readFileSync(absolute);
+                        const sourceCode = await readFile(absolute);
                         const { output } = await parseAsync({ input: [{ code: sourceCode, filename: absolute }] });
                         const exported = output[0]?.exports ?? [];
 
+                        // `JSON.stringify` produces a safely-escaped, quoted JS
+                        // string so resolved paths containing quotes/backslashes
+                        // (esp. on Windows) can't break out of the literal.
+                        const specifier = JSON.stringify(slash(absolute));
+
                         return {
-                            contents: exported.length > 0 ? `export * from '${slash(absolute)}'` : `module.exports = require('${slash(absolute)}')`,
+                            contents: exported.length > 0 ? `export * from ${specifier}` : `module.exports = require(${specifier})`,
                             resolveDir,
                         };
                     });

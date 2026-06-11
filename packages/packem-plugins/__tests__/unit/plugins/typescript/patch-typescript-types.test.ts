@@ -6,6 +6,7 @@ import { patchTypescriptTypes } from "../../../../src/plugins/typescript/patch-t
 
 const UNHANDLED_INTERNAL_REGEX = /has unhandled @internal declarations/;
 const MISSING_IMPORT_REGEX = /does not import "Bar\$1" from "\.\/types\.js"/;
+const MISSING_MODULE_REGEX = /does not import "\.\/missing\.js"/;
 
 type RenderChunkHook = NonNullable<Plugin["renderChunk"]>;
 type RenderChunkHandler = RenderChunkHook extends ObjectHook<infer Handler> ? Handler : RenderChunkHook;
@@ -247,15 +248,19 @@ describe(patchTypescriptTypes, () => {
             expect(result).toBe(`import dep, { } from "./types.js";\nexport type X = dep.Foo;\n`);
         });
 
-        it("warns and sets process.exitCode when the configured module is not imported", () => {
+        it("throws when the configured module is not imported", () => {
             expect.assertions(2);
 
             const code = `export type X = number;\n`;
 
-            runRenderChunk(code, { fileName: "missing-module.d.ts" }, { identifierReplacements: { "./missing.js": { Foo$1: "Foo" } } });
+            // A configured module that the chunk does not import is the same class of
+            // config drift as a missing identifier — fail the build instead of mutating
+            // the global process.exitCode from a warn-and-continue branch.
+            expect(() => runRenderChunk(code, { fileName: "missing-module.d.ts" }, { identifierReplacements: { "./missing.js": { Foo$1: "Foo" } } })).toThrow(
+                MISSING_MODULE_REGEX,
+            );
 
-            expect(mockWarn).toHaveBeenCalledWith(expect.stringContaining(`does not import "./missing.js"`));
-            expect(process.exitCode).toBe(1);
+            expect(process.exitCode).toBe(0);
         });
 
         it("throws when the configured identifier is not present in the matching import", () => {

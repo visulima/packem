@@ -64,12 +64,11 @@ describe("nativeModules plugin", () => {
     });
 
     it("should have required plugin methods", () => {
-        expect.assertions(5);
+        expect.assertions(4);
 
         const plugin = nativeModulesPlugin(mockOptions);
 
         expect(plugin.buildStart).toBeDefined();
-        expect(plugin.options).toBeDefined();
         expect(plugin.resolveId).toBeDefined();
         expect(plugin.load).toBeDefined();
         expect(plugin.generateBundle).toBeDefined();
@@ -125,29 +124,5 @@ describe("nativeModules plugin", () => {
 
         // This should not throw an error even with empty modulesToCopy
         await expect(handler.call(mockContext as unknown as Context, ...([{}, {}, true] as unknown as GenerateBundleArguments))).resolves.toBeUndefined();
-    });
-
-    it("should extract output directory from Rollup options", () => {
-        expect.assertions(1);
-
-        const plugin = nativeModulesPlugin(mockOptions);
-        const handler = getHandler(plugin, "options");
-
-        type Context = ThisParameterType<typeof handler>;
-
-        const result = handler.call(
-            mockContext as unknown as Context,
-            {
-                output: {
-                    dir: "/test/output",
-                },
-            } as Parameters<typeof handler>[0],
-        );
-
-        expect(result).toStrictEqual({
-            output: {
-                dir: "/test/output",
-            },
-        });
     });
 });

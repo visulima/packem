@@ -159,8 +159,10 @@ const resolveImportId = async (options: ImportOptions & { root: string }, result
 
     try {
         resolved = await options.resolve(stmt.uri, base, options.extensions, atRule);
-    } catch {
-        stmt.node.warn(result, `Unable to resolve "${stmt.uri}" from "${base}"`);
+    } catch (error: unknown) {
+        const reason = error instanceof Error ? `: ${error.message}` : "";
+
+        stmt.node.warn(result, `Unable to resolve "${stmt.uri}" from "${base}"${reason}`);
 
         return;
     }

@@ -18,9 +18,18 @@ export const JsonPlugin = (options: RollupJsonOptions): Plugin => {
                 id: JSON_FILE_RE,
             },
             handler(code, id) {
-                const transformHandler = plugin.transform as ((this: unknown, code: string, id: string) => TransformResult) | undefined;
+                // `@rollup/plugin-json`'s `transform` may be the bare function form
+                // or the object form (`{ handler, ... }`); normalize to the callable.
+                const transform = plugin.transform as
+                    | ((this: unknown, code: string, id: string) => TransformResult)
+                    | { handler: (this: unknown, code: string, id: string) => TransformResult }
+                    | undefined;
+                const transformHandler = typeof transform === "function" ? transform : transform?.handler;
                 const result = transformHandler?.call(this, code, id) as { code?: string } | string | null | undefined;
 
+                // `@rollup/plugin-json` emits `export default <json>` for ESM. This
+                // adapter targets CJS interop, so rewrite that leading ESM default
+                // export to a `module.exports = <json>` assignment instead.
                 if (result && typeof result !== "string" && "code" in result && result.code?.startsWith(EXPORT_DEFAULT)) {
                     result.code = result.code.replace(EXPORT_DEFAULT, "module.exports = ");
                 }

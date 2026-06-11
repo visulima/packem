@@ -101,14 +101,15 @@ describe("esbuildPlugin", () => {
         expect(resolveId.call({} as PluginContext, "react")).toBeUndefined();
     });
 
-    it("should capture the rollup root from options({context}) and use it as cwd", () => {
+    it("should not hijack rollup's `options.context` as the optimizeDeps cwd", () => {
         expect.assertions(1);
 
+        // Rollup's `InputOptions.context` is the top-level-`this` value, NOT a
+        // working directory; the plugin must not define an `options` hook that
+        // misuses it as cwd. cwd is derived from `process.cwd()` instead.
         const plugin = esbuildPlugin(baseConfig());
-        const options = plugin.options as (this: PluginContext, options_: { context?: string }) => unknown;
-        const result = options.call({} as PluginContext, { context: "/custom/root" });
 
-        expect(result).toBeUndefined();
+        expect(plugin.options).toBeUndefined();
     });
 
     it("should treat _loaders entries without a leading dot as if they had one", async () => {

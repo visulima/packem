@@ -47,50 +47,39 @@ pnpm add @visulima/packem-share
 
 ## Usage
 
-The package provides multiple import patterns for maximum flexibility:
+All constants, types, and utilities are re-exported from the package root, and are
+also available from dedicated subpath entry points.
 
-### Direct Named Imports
+### Named Imports (root)
 
 ```typescript
-import { arrayify, getHash, FileCache, Environment, Mode } from "@visulima/packem-share";
+import { arrayify, getHash, FileCache } from "@visulima/packem-share";
+import type { Environment, Mode } from "@visulima/packem-share";
 
 // Use utilities directly
 const result = arrayify("single-value"); // ["single-value"]
 const hash = getHash("content");
-const cache = new FileCache("/path", "/cache", "key", logger);
+const cache = new FileCache(cwd, cachePath, hashKey, logger);
 ```
 
-### Module-based Imports
-
-```typescript
-import { constants, types, utils } from "@visulima/packem-share";
-
-// Access grouped exports
-const extensions = constants.DEFAULT_EXTENSIONS;
-const mode: types.Mode = "build";
-const normalized = utils.arrayify([1, 2, 3]);
-```
-
-### Namespace Imports
+### Namespace Import (root)
 
 ```typescript
 import * as PackemShare from "@visulima/packem-share";
 
-// Access everything through namespace
 const result = PackemShare.arrayify("value");
 const hash = PackemShare.getHash("content");
 ```
 
-### Individual Module Imports
+### Subpath Imports
+
+Each group has its own entry point. These are flat re-exports (named exports), not
+namespace objects, so import the specific names you need:
 
 ```typescript
-import * as constants from "@visulima/packem-share/constants";
-import * as types from "@visulima/packem-share/types";
-import * as utils from "@visulima/packem-share/utils";
-
-// Import specific modules
-const extensions = constants.DEFAULT_EXTENSIONS;
-const normalized = utils.arrayify("value");
+import { arrayify, FileCache } from "@visulima/packem-share/utils";
+import { DEFAULT_EXTENSIONS } from "@visulima/packem-share/constants";
+import type { Mode } from "@visulima/packem-share/types";
 ```
 
 ## API Reference
@@ -122,44 +111,77 @@ TypeScript type definitions for the Packem ecosystem:
 ```typescript
 import type { Environment, Mode, Format, Runtime } from "@visulima/packem-share";
 
-type Environment = "production" | "development" | undefined;
+type Environment = "development" | "production" | undefined;
 type Mode = "build" | "jit" | "watch";
 type Format = "cjs" | "esm";
 type Runtime = "browser" | "bun" | "deno" | "edge-light" | "electron" | "node" | "react-native" | "react-server" | "workerd" | undefined;
 ```
+
+Build-pipeline types are also exported: `BuildContext<T>`, `BuildHooks<T>`,
+`BuildContextBuildEntry`, and `BuildContextBuildAssetAndChunk`.
 
 ### Utilities
 
 #### Array Utilities
 
 ```typescript
-import { arrayify, arrayIncludes } from "@visulima/packem-share";
+import { arrayify } from "@visulima/packem-share";
 
-// Convert single values to arrays
+// arrayify<T>(x: T | T[] | null | undefined): T[]
+// Ensures the input is an array; null/undefined become an empty array.
 arrayify("single"); // ["single"]
 arrayify(["already", "array"]); // ["already", "array"]
 arrayify(null); // []
-
-// Array search with RegExp support
-arrayIncludes(["test.js", "test.ts"], /\.ts$/); // true
 ```
 
 #### File System Utilities
 
 ```typescript
-import { FileCache, getChunkFilename, getEntryFileNames, getHash } from "@visulima/packem-share";
+import { FileCache, getChunkFilename, getEntryFileNames, getHash, getCacheHash } from "@visulima/packem-share";
 
-// File caching
+// new FileCache(cwd: string, cachePath: string | undefined, hashKey: string, logger: RollupLogger)
 const cache = new FileCache(cwd, cachePath, hashKey, logger);
-cache.set("key", data);
-const cached = cache.get("key");
+cache.set("key", data, subDirectory?); // store (async write, swallows write errors)
+cache.has("key", subDirectory?); // boolean
+const cached = cache.get<MyType>("key", subDirectory?); // MyType | undefined
+await cache.flush(); // await all in-flight disk writes before exit
 
-// Filename generation
-const chunkName = getChunkFilename("chunk", hash, format);
-const entryNames = getEntryFileNames(entries, format);
+// getChunkFilename(chunk: PreRenderedChunk, extension: string): string
+const chunkName = getChunkFilename(chunk, "mjs");
 
-// Content hashing
+// getEntryFileNames(chunkInfo: PreRenderedAsset, extension: string): string
+const entryName = getEntryFileNames(chunkInfo, "mjs");
+
+// getHash(data: NodeJS.ArrayBufferView | string): string  — SHA-256 hex (user-visible)
 const hash = getHash("file content");
+
+// getCacheHash(data: NodeJS.ArrayBufferView | string): string  — internal SHA-1 base64url cache key
+const cacheKey = getCacheHash("id");
+```
+
+#### File Extension Utilities
+
+```typescript
+import { getOutputExtension, getDtsExtension } from "@visulima/packem-share";
+
+// getOutputExtension<T>(context: BuildContext<T>, format: Format): string  → "js" | "mjs" | "cjs" ...
+// getDtsExtension<T>(context: BuildContext<T>, format: Format): string     → "d.ts" | "d.mts" | "d.cts" ...
+```
+
+#### Import Specifier Utilities
+
+```typescript
+import { parseSpecifier, isBareSpecifier, isFromNodeModules, isOutsideProject } from "@visulima/packem-share";
+
+// parseSpecifier(specifier: string): [packageName: string, subpath: string | undefined]
+parseSpecifier("@org/pkg/sub"); // ["@org/pkg", "sub"]
+
+// isBareSpecifier(id: string): boolean
+isBareSpecifier("react"); // true
+isBareSpecifier("./local"); // false
+
+// isFromNodeModules(filePath: string, cwd?: string): boolean
+// isOutsideProject(filePath: string, cwd?: string): boolean
 ```
 
 #### String and Content Utilities
@@ -167,23 +189,27 @@ const hash = getHash("file content");
 ```typescript
 import { getPackageName, getRegexMatches, replaceContentWithinMarker, svgEncoder, svgToCssDataUri, svgToTinyDataUri, warn } from "@visulima/packem-share";
 
-// Package name extraction
+// getPackageName(id?: string): string
 getPackageName("@scope/package/path"); // "@scope/package"
 getPackageName("package/path"); // "package"
 
-// Regex utilities
-const matches = getRegexMatches(/pattern/g, "text");
+// getRegexMatches(regex: RegExp, source: string): string[]
+// Returns every match (a non-global regex is internally cloned with the `g` flag).
+const matches = getRegexMatches(/from\s'.*';/g, source);
 
-// Content replacement
+// replaceContentWithinMarker(content: string, marker: string, replacement: string): string | undefined
+// Replaces text between <!-- marker --> and <!-- /marker -->; returns undefined if the marker is absent.
 const updated = replaceContentWithinMarker(content, "marker", newContent);
 
-// SVG encoding and data URI generation
-const encoded = svgEncoder(svgBuffer); // Base64 encoding
-const cssUri = svgToCssDataUri(svgContent); // CSS-optimized data URI
-const tinyUri = svgToTinyDataUri(svgContent); // Size-optimized data URI
+// svgEncoder(buffer: Buffer): string  — cleans the SVG and returns base64
+const encoded = svgEncoder(svgBuffer);
+// svgToCssDataUri(svgString: string): string
+const cssUri = svgToCssDataUri(svgContent);
+// svgToTinyDataUri(svgString: string): string
+const tinyUri = svgToTinyDataUri(svgContent);
 
-// Warning utilities
-warn(logger, "Warning message", "prefix");
+// warn(context: { warnings: Set<string> }, message: string): void  — adds a message once
+warn(context, "Warning message");
 ```
 
 #### Performance Utilities
@@ -191,21 +217,30 @@ warn(logger, "Warning message", "prefix");
 ```typescript
 import { memoize, memoizeByKey } from "@visulima/packem-share";
 
-// Function memoization
+// memoize<T>(fn: T, cacheKey?: string | ((...args) => string), cache?: Map<string, ReturnType<T>>): Memoized<T>
+// The returned function also has a `destroy()` method to clear its cache.
 const memoized = memoize(expensiveFunction);
+memoized.destroy();
+
+// memoizeByKey<T>(fn: T): (cacheKey?) => Memoized<T>  — memoized variants sharing one cache
 const keyMemoized = memoizeByKey(expensiveFunction)("cache-key");
 ```
 
 #### Build System Utilities
 
 ```typescript
-import { enhanceRollupError, sortUserPlugins } from "@visulima/packem-share";
+import { createRollupLogger, enhanceRollupError, sortUserPlugins } from "@visulima/packem-share";
+import type { RollupLogger } from "@visulima/packem-share";
 
-// Error enhancement
-const enhanced = enhanceRollupError(error, context);
+// createRollupLogger(context, pluginName: string): RollupLogger
+// Wraps Rollup's logging methods and tags every entry with `plugin: pluginName`.
+const logger = createRollupLogger(this, "my-plugin");
 
-// Plugin sorting
-const [pre, normal, post] = sortUserPlugins(plugins, hookName);
+// enhanceRollupError(error: RollupError): void  — mutates the error in place (no return value)
+enhanceRollupError(error);
+
+// sortUserPlugins(plugins, type: "build" | "dts"): [pre, normal, post]
+const [pre, normal, post] = sortUserPlugins(plugins, "build");
 ```
 
 ## Migration from Individual Packages

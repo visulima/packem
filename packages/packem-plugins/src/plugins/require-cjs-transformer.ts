@@ -8,7 +8,7 @@ import MagicString from "magic-string";
 import { parseSync } from "oxc-parser";
 import type { NormalizedOutputOptions, Plugin, RenderedChunk, ResolvedId, SourceMapInput } from "rollup";
 
-import isPureCJS from "../utils/is-pure-cjs";
+import isPureCJS, { clearPureCjsCache } from "../utils/is-pure-cjs";
 
 const REQUIRE_VAR = `__cjs_require`;
 
@@ -198,6 +198,11 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
 
     return {
         async buildStart() {
+            // Invalidate the shared CJS/ESM classification cache so a watch rebuild
+            // picks up package.json `type` changes / newly installed deps instead of
+            // serving a stale decision from a previous build in this process.
+            clearPureCjsCache();
+
             if (!cjsLexerInitialized) {
                 await init();
                 cjsLexerInitialized = true;

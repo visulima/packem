@@ -73,7 +73,7 @@ const createTsProgramFromParsedConfig = ({
         if (fsSystem.fileExists(id)) {
             debug(`File ${id} exists on disk.`);
             throw new Error(
-                `Unable to load file ${id} from the program. This seems like a bug of rollup-plugin-dts. Please report this issue to https://github.com/sxzz/rollup-plugin-dts/issues`,
+                `Unable to load file ${id} from the program. This seems like a bug of rollup-plugin-dts. Please report this issue to https://github.com/visulima/packem/issues`,
             );
         } else {
             debug(`File ${id} does not exist on disk.`);

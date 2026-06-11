@@ -5,10 +5,10 @@ import postcss from "postcss";
 import type { RawSourceMap } from "source-map-js";
 
 import type { InternalStyleOptions } from "../../types";
+import detectCssModules from "../../utils/detect-css-modules";
 import { generateJsExports } from "../../utils/generate-js-exports";
 import { mm } from "../../utils/sourcemap";
 import type { Loader } from "../types";
-import ensureAutoModules from "../utils/ensure-auto-modules";
 import postcssICSS from "./icss";
 import postcssImport from "./import";
 import loadConfig from "./load-config";
@@ -71,19 +71,8 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
         const config = await loadConfig(this.id, this.cwd as string, this.environment, this.logger, this.options.config);
         const plugins: AcceptedPlugin[] = [];
 
-        let supportModules = false;
-
         // Determine CSS modules support from various sources
-        if (typeof this.options.modules === "boolean") {
-            supportModules = this.options.modules;
-        } else if (typeof this.options.modules === "object") {
-            supportModules = ensureAutoModules(this.options.modules.include, this.id);
-        }
-
-        // Check automatic CSS modules detection
-        if (this.autoModules && this.options.modules === undefined) {
-            supportModules = ensureAutoModules(this.autoModules, this.id);
-        }
+        const supportModules = detectCssModules(this.options.modules, this.autoModules, this.id);
 
         /** CSS modules exports mapping class names to hashed names */
         const modulesExports: Record<string, string> = {};

@@ -21,11 +21,14 @@ describe("url resolver", () => {
     });
 
     it("warns about being unresolved", async () => {
-        expect.assertions(1);
+        expect.assertions(2);
 
         const warning = await validateUrl(".foo{background:url(bg.png)}");
 
-        expect(warning).toMatchSnapshot("warning");
+        // The stable prefix is asserted directly; the appended resolver cause
+        // contains absolute, machine-specific paths so it is not snapshotted.
+        expect(warning).toContain("Unresolved URL `bg.png` in `background:url(bg.png)`");
+        expect(warning).toContain("URL resolver could not resolve");
     });
 
     it("warns about incorrect resolving", async () => {

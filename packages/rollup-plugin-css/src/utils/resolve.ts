@@ -32,10 +32,10 @@ const getResolver = (extensions: string[], symlinks: boolean): ResolverFactory =
  * @param resolver Configured OXC resolver factory instance.
  * @param basedir Base directory to resolve from.
  * @param id Module identifier to resolve.
- * @param userOptions Resolution configuration options (used for debug context).
+ * @param diagnostics Array collecting human-readable failure reasons for each tried path.
  * @returns Absolute path to the resolved module, or `undefined` if it cannot be resolved.
  */
-const tryResolve = (resolver: ResolverFactory, basedir: string, id: string, userOptions: ResolveOptions): string | undefined => {
+const tryResolve = (resolver: ResolverFactory, basedir: string, id: string, diagnostics: string[]): string | undefined => {
     try {
         const { error, path } = resolver.sync(basedir, id);
 
@@ -44,33 +44,12 @@ const tryResolve = (resolver: ResolverFactory, basedir: string, id: string, user
         }
 
         if (error) {
-            // eslint-disable-next-line no-console
-            console.debug(error, {
-                context: [
-                    {
-                        basedir,
-                        caller: userOptions.caller,
-                        extensions: userOptions.extensions,
-                        id,
-                    },
-                ],
-            });
+            diagnostics.push(`"${id}" from "${basedir}": ${error}`);
         }
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
 
-        // eslint-disable-next-line no-console
-        console.debug(message, {
-            context: [
-                {
-                    basedir,
-                    caller: userOptions.caller,
-                    error,
-                    extensions: userOptions.extensions,
-                    id,
-                },
-            ],
-        });
+        diagnostics.push(`"${id}" from "${basedir}": ${message}`);
     }
 
     return undefined;
@@ -113,10 +92,11 @@ export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
     } satisfies ResolveOptions;
 
     const resolver = getResolver(options.extensions, options.symlinks);
+    const diagnostics: string[] = [];
 
     for (const basedir of options.baseDirs) {
         for (const id of ids) {
-            const path = tryResolve(resolver, basedir, id, userOptions);
+            const path = tryResolve(resolver, basedir, id, diagnostics);
 
             if (path) {
                 return path;
@@ -124,7 +104,13 @@ export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
         }
     }
 
-    throw new Error(`${options.caller} could not resolve ${arrayFmt(ids)}`);
+    const details = diagnostics.length > 0 ? `\nTried:\n${diagnostics.map((line) => `  - ${line}`).join("\n")}` : "";
+
+    if (userOptions.logger && diagnostics.length > 0) {
+        userOptions.logger.debug?.({ message: `${options.caller} could not resolve ${arrayFmt(ids)}.${details}` });
+    }
+
+    throw new Error(`${options.caller} could not resolve ${arrayFmt(ids)}.${details}`);
 };
 
 export interface ResolveOptions extends NapiResolveOptions {
@@ -133,4 +119,10 @@ export interface ResolveOptions extends NapiResolveOptions {
 
     /** name of the caller for error message (default to `Resolver`) */
     caller?: string;
+
+    /** optional logger for routing resolution diagnostics */
+    logger?: {
+        debug?: (log: { [key: string]: unknown; message: string }) => void;
+        warn?: (log: { [key: string]: unknown; message: string }) => void;
+    };
 }

@@ -850,6 +850,28 @@ describe("dts plugin", () => {
         expect(warnings.join("\n")).toContain("does not support reliably bundling CommonJS dts input");
     });
 
+    // Regression: `import A = NS.Inner` (entity-name reference, not `= require(...)`) used to
+    // leave raw TS in the fake-JS output and make rollup die with `Expected ',', got '='`.
+    // It must now be rewritten to a type alias so the bundle round-trips.
+    it("handles `import A = NS.Inner` entity-name import-equals without crashing", async () => {
+        expect.assertions(2);
+
+        const { snapshot } = await rolldownBuild([path.resolve(dirname, "fixtures/import-equals-entity.d.ts")], [dts({ dtsInput: true })], {});
+
+        expect(snapshot).not.toContain("import Aliased =");
+        expect(snapshot).toContain("Aliased");
+    });
+
+    // Regression: `export = NS.thing` (non-identifier expression) used to fall through and make
+    // rollup fail with `Expected '{', got '='`. It must now be rewritten to a default export.
+    it("handles `export = NS.thing` non-identifier export-assignment without crashing", async () => {
+        expect.assertions(1);
+
+        const { snapshot } = await rolldownBuild([path.resolve(dirname, "fixtures/export-assignment-entity.d.ts")], [dts({ dtsInput: true })], {});
+
+        expect(snapshot).not.toContain("export = ");
+    });
+
     it("tsgo `enabled: false` disables tsgo", () => {
         expect.assertions(2);
 

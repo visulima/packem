@@ -66,9 +66,24 @@ const isAlreadyPure = (code: string, start: number): boolean => code.slice(Math.
 export const pureNewExpressionPlugin = (options: {
     constructors: string[];
     functions?: (RegExp | string)[];
+    logger?: Console;
     mode?: "renderChunk" | "transform";
     sourcemap?: boolean;
 }): Plugin => {
+    // Dotted constructor names (`Foo.Bar`) and RegExp function/constructor entries
+    // are not supported by the AST name-comparison used here (only the
+    // transform-time `rollup-plugin-pure` handles RegExp). Warn once so a user
+    // whose config is partially ignored can diagnose it, then drop them.
+    const droppedConstructors = options.constructors.filter((c) => c.includes("."));
+    const droppedFunctions = (options.functions ?? []).filter((f) => f instanceof RegExp);
+
+    if ((droppedConstructors.length > 0 || droppedFunctions.length > 0) && options.logger) {
+        options.logger.warn({
+            message: `ignoring unsupported entries — dotted constructor names (${droppedConstructors.join(", ") || "none"}) and ${String(droppedFunctions.length)} RegExp function/constructor matchers are not supported and were skipped.`,
+            prefix: "plugin:pure-new-expression",
+        });
+    }
+
     const constructorSet = new Set(options.constructors.filter((c) => !c.includes(".")));
     // Only string function names are matchable by the dotted-name comparison; the
     // RegExp variants `rollup-plugin-pure` accepts are out of scope for the
@@ -150,6 +165,7 @@ export const pureNewExpressionPlugin = (options: {
                         },
                     });
 
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `changed` is mutated inside the walk() callback closure
                     if (!changed) {
                         return undefined;
                     }
@@ -188,6 +204,7 @@ export const pureNewExpressionPlugin = (options: {
                 }
 
                 const s = new MagicString(code);
+                let changed = false;
 
                 walk(ast, {
                     enter(rawNode) {
@@ -206,18 +223,18 @@ export const pureNewExpressionPlugin = (options: {
                             && typeof node.start === "number"
                         ) {
                             s.prependLeft(node.start, "/* @__PURE__ */ ");
+                            changed = true;
                         }
                     },
                 });
 
-                const transformed = s.toString();
-
-                if (transformed === code) {
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `changed` is mutated inside the walk() callback closure
+                if (!changed) {
                     return undefined;
                 }
 
                 return {
-                    code: transformed,
+                    code: s.toString(),
                     map: options.sourcemap ? s.generateMap({ hires: true }) : undefined,
                 };
             },

@@ -8,6 +8,7 @@ import { isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 
 import type { BuildEntry, InternalBuildOptions } from "../../types";
+import escapeRegExp from "../../utils/escape-regexp";
 
 const LEADING_RELATIVE_SEGMENT_REGEXP = /^\.\.?\//;
 
@@ -67,7 +68,7 @@ const extendEntry = (entry: BuildEntry, context: BuildContext<InternalBuildOptio
         }
 
         // eslint-disable-next-line no-param-reassign
-        entry.name = relativeInput.replace(new RegExp(`^${context.options.sourceDir}/`), "").replace(ENDING_REGEX, "");
+        entry.name = relativeInput.replace(new RegExp(`^${escapeRegExp(context.options.sourceDir)}/`), "").replace(ENDING_REGEX, "");
     }
 
     if (!entry.input) {

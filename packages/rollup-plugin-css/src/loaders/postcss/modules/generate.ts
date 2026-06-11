@@ -15,21 +15,34 @@ const MODULE_SUFFIX_REGEXP = /\.module$/;
  *
  * but PostCSS CSS Modules doesn't seem to transform Grid names
  */
-const generate
-    = (placeholder = "[name]_[local]_[hash:8]") =>
-        (local: string, file: string, css: string): string => {
-            const { base, dir, name } = parse(file);
-            const hash = getHash(`${base}:${css}`);
-            const match = HASH_REGEXP.exec(placeholder);
-            const hashLength = match && Number.parseInt(match[1] as string, 10);
+const generate = (placeholder = "[name]_[local]_[hash:8]") => {
+    // The hash depends only on `(file, css)`, not on the individual `local`
+    // class name. Memoize it so the whole stylesheet is hashed once per file
+    // rather than once per exported class.
+    const hashCache = new Map<string, string>();
 
-            return makeLegalIdentifier(
-                placeholder
-                    .replace("[dir]", basename(dir))
-                    .replace("[name]", name.replace(MODULE_SUFFIX_REGEXP, ""))
-                    .replace("[local]", local)
-                    .replace(HASH_REGEXP, hashLength ? hash.slice(0, hashLength) : hash),
-            );
-        };
+    return (local: string, file: string, css: string): string => {
+        const { base, dir, name } = parse(file);
+        const hashKey = `${file}:${css}`;
+
+        let hash = hashCache.get(hashKey);
+
+        if (hash === undefined) {
+            hash = getHash(`${base}:${css}`);
+            hashCache.set(hashKey, hash);
+        }
+
+        const match = HASH_REGEXP.exec(placeholder);
+        const hashLength = match && Number.parseInt(match[1] as string, 10);
+
+        return makeLegalIdentifier(
+            placeholder
+                .replace("[dir]", basename(dir))
+                .replace("[name]", name.replace(MODULE_SUFFIX_REGEXP, ""))
+                .replace("[local]", local)
+                .replace(HASH_REGEXP, hashLength ? hash.slice(0, hashLength) : hash),
+        );
+    };
+};
 
 export default generate;

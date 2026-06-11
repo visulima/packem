@@ -79,7 +79,9 @@ describe("browserslist-to-esbuild", () => {
     it("should drop browsers that esbuild does not support", () => {
         expect.assertions(1);
 
-        // kaios isn't in the SUPPORTED_ESBUILD_TARGETS set.
+        // kaios isn't in the SUPPORTED_ESBUILD_TARGETS set, and `samsung` uses its own
+        // version numbering (Samsung Internet 15 ≈ Chrome 96), so it is intentionally
+        // dropped rather than relabeled to a misleadingly low `chrome15`.
         expect(browserslistToEsbuild(["kaios 2.5", "samsung 15.0"])).toStrictEqual([]);
     });
 

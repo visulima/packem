@@ -227,6 +227,10 @@ const cssPlugin = (
 
             logger = createRollupLogger(this, "css");
 
+            // Surface mode-option mismatches (e.g. tuple options on `emit`/`inline`)
+            // now that a logger is available.
+            inferModeOption(options.mode, logger);
+
             if (hasPostCssLoader && loaderOptions.postcss) {
                 if (options.postcss?.parser) {
                     loaderOptions.postcss.parser = await ensurePCSSOption(options.postcss.parser, "parser", cwd, logger);
@@ -337,7 +341,7 @@ const cssPlugin = (
                 return chunk.name;
             };
 
-            const moved: string[] = [];
+            const moved = new Set<string>();
 
             if (typeof loaderOptions.extract === "string") {
                 logger.debug({
@@ -350,12 +354,15 @@ const cssPlugin = (
                 for (const chunk of manual) {
                     const chunkIds = traverseImportedModules(chunk.modules, this.getModuleInfo);
 
-                    moved.push(...chunkIds);
+                    for (const id of chunkIds) {
+                        moved.add(id);
+                    }
+
                     ids.push(...chunkIds);
                 }
 
                 for (const chunk of emitted) {
-                    ids.push(...traverseImportedModules(chunk.modules, this.getModuleInfo).filter((id) => !moved.includes(id)));
+                    ids.push(...traverseImportedModules(chunk.modules, this.getModuleInfo).filter((id) => !moved.has(id)));
                 }
 
                 const name = getName(chunks[0] as OutputChunk);
@@ -374,7 +381,9 @@ const cssPlugin = (
                         continue;
                     }
 
-                    moved.push(...ids);
+                    for (const id of ids) {
+                        moved.add(id);
+                    }
 
                     const name = getName(chunk);
 
@@ -382,7 +391,7 @@ const cssPlugin = (
                 }
 
                 for (const chunk of emitted) {
-                    const ids = traverseImportedModules(chunk.modules, this.getModuleInfo).filter((id) => !moved.includes(id));
+                    const ids = traverseImportedModules(chunk.modules, this.getModuleInfo).filter((id) => !moved.has(id));
 
                     if (ids.length === 0) {
                         continue;
@@ -445,7 +454,7 @@ const cssPlugin = (
                 if (extractedData.map && sourceMap) {
                     const fileName = extractedData.name;
 
-                    let assetDirectory = "assert";
+                    let assetDirectory = "assets";
 
                     if (typeof outputOptions.assetFileNames === "string") {
                         assetDirectory = normalize(dirname(outputOptions.assetFileNames));

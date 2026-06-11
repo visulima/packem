@@ -189,7 +189,16 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
 
             const result: unknown = await getHandler(plugin.resolveId).call(this, id, importer, options);
 
-            cache.set(cacheKey, result as Parameters<typeof cache.set>[1], pluginPath);
+            // Most plugins return null/undefined for most ids (didn't handle this
+            // import edge). FileCache serializes `null` to the string "null", so
+            // caching these "misses" writes one useless file per unmatched id — the
+            // same blow-up the load hook avoids. Skip the write; a warm re-run of a
+            // no-op resolveId is a cheap early return.
+            if (result === undefined || result === null) {
+                return result;
+            }
+
+            cache.set(cacheKey, result, pluginPath);
 
             return result as HookReturn<Plugin["resolveId"]>;
         },
@@ -239,8 +248,14 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
 
             if (watchFiles.length > 0) {
                 cache.set(cacheKey, { [PACKEM_WATCH_FILES]: watchFiles, result } satisfies WatchFilesCacheValue, pluginPath);
-            } else {
-                cache.set(cacheKey, result as Parameters<typeof cache.set>[1], pluginPath);
+            } else if (result !== undefined && result !== null) {
+                // A null/undefined return means the plugin didn't transform this module.
+                // FileCache serializes `null` to "null", so caching the "miss" writes a
+                // useless file per unmatched module (most transforms return null for most
+                // ids). Skip the write — re-running a no-op transform is a cheap early
+                // return. (When watch files were captured we still cache, above, so their
+                // invalidation edges survive a warm build.)
+                cache.set(cacheKey, result, pluginPath);
             }
 
             return result as HookReturn<Plugin["transform"]>;

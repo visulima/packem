@@ -1,5 +1,6 @@
 import type { RollupAliasOptions } from "@rollup/plugin-alias";
 import type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
+import type { RollupDynamicImportVariablesOptions } from "@rollup/plugin-dynamic-import-vars";
 import type { RollupJsonOptions } from "@rollup/plugin-json";
 import type { RollupReplaceOptions } from "@rollup/plugin-replace";
 import type { RollupWasmOptions } from "@rollup/plugin-wasm";
@@ -32,37 +33,6 @@ import type { Options as EsbuildOptions } from "./plugins/esbuild/types";
 import type { JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
 import type { SucrasePluginConfig } from "./plugins/sucrase";
 import type { SwcPluginConfig } from "./plugins/swc/types";
-
-interface RollupDynamicImportVariablesOptions {
-    /**
-     * By default, the plugin will not throw errors when target files are not found.
-     * Setting this option to true will result in errors thrown when encountering files which don't exist.
-     * @default false
-     */
-    errorWhenNoFilesFound?: boolean;
-
-    /**
-     * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
-     * should _ignore_.
-     *
-     * By default, no files are ignored.
-     */
-    exclude?: FilterPattern;
-
-    /**
-     * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
-     * should operate on.
-     * By default, all files are targeted.
-     */
-    include?: FilterPattern;
-
-    /**
-     * By default, the plugin quits the build process when it encounters an error.
-     * If you set this option to true, it will throw a warning instead and leave the code untouched.
-     * @default false
-     */
-    warnOnError?: boolean;
-}
 
 /**
  * Legacy `@rollup/plugin-node-resolve` option keys. Module resolution is now

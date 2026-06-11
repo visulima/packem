@@ -3,6 +3,12 @@ const SUPPORTED_ESBUILD_TARGETS = new Set(["chrome", "edge", "es", "firefox", "i
 // https://github.com/eBay/browserslist-config/issues/16#issuecomment-863870093
 const UNSUPPORTED = ["android 4"];
 
+// Only remap mobile browsers whose version numbers match the engine target they
+// map to. `android` (Android WebView) and `ios_saf` (iOS Safari) track their engine
+// versions, so the relabel is faithful. Browsers like `samsung`/`op_mob` use their
+// OWN version numbering (Samsung Internet 15 is ~Chrome 96, not Chrome 15), so
+// relabeling them to `chrome` while keeping the mobile version number would produce
+// a catastrophically low syntax floor — they are intentionally left to drop out.
 const replaces = {
     android: "chrome",
     ios_saf: "ios",
@@ -38,7 +44,12 @@ const browserslistToEsbuild = (browserList: string[]): string[] => {
         // only get the targets supported by esbuild
         .filter(([browserName]) => SUPPORTED_ESBUILD_TARGETS.has(browserName));
 
-    // only get the oldest version, assuming that the older version is the last one in the array:
+    // Collapse to one entry per target, keeping the OLDEST version. Browserslist
+    // emits each browser's versions in descending order (newest first), so the
+    // last `[name, version]` pair for a given name is the oldest; building an
+    // object keyed by name lets each later (older) pair overwrite the earlier
+    // (newer) one, leaving the oldest version per target — which is the syntax
+    // floor esbuild must support.
     listOfBrowsers = Object.entries(Object.fromEntries(listOfBrowsers));
 
     return listOfBrowsers.map(([browserName, version]) => `${browserName}${version}`);

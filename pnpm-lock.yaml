@@ -1968,6 +1968,9 @@ importers:
       defu:
         specifier: catalog:utils
         version: 6.1.7
+      estree-walker:
+        specifier: catalog:dev
+        version: 3.0.3
       fastest-levenshtein:
         specifier: catalog:prod
         version: 1.0.16
@@ -1983,6 +1986,9 @@ importers:
       magic-string:
         specifier: catalog:utils
         version: 0.30.21
+      mime:
+        specifier: catalog:dev
+        version: 4.1.0
       mlly:
         specifier: catalog:prod
         version: 1.8.2
@@ -2341,12 +2347,18 @@ importers:
       clean-css:
         specifier: catalog:style
         version: 5.3.3
+      estree-walker:
+        specifier: catalog:dev
+        version: 3.0.3
       html-minifier-next:
         specifier: catalog:prod
         version: 6.2.7(@swc/core@1.15.40(@swc/helpers@0.5.23))
       magic-string:
         specifier: catalog:utils
         version: 0.30.21
+      mime:
+        specifier: catalog:dev
+        version: 4.1.0
       mlly:
         specifier: catalog:prod
         version: 1.8.2
@@ -2447,18 +2459,12 @@ importers:
       eslint:
         specifier: catalog:lint
         version: 10.4.1(jiti@2.7.0)
-      estree-walker:
-        specifier: catalog:dev
-        version: 3.0.3
       hookable:
         specifier: catalog:dev
         version: 6.1.1
       jiti:
         specifier: catalog:script
         version: 2.7.0
-      mime:
-        specifier: catalog:dev
-        version: 4.1.0
       prettier:
         specifier: catalog:lint
         version: 3.8.3
@@ -2558,6 +2564,9 @@ importers:
 
   packages/packem-rollup:
     dependencies:
+      '@babel/core':
+        specifier: catalog:dev
+        version: 7.29.7
       '@rollup/plugin-alias':
         specifier: catalog:build
         version: 6.0.0(rollup@4.60.4)
@@ -2582,6 +2591,9 @@ importers:
       '@rollup/pluginutils':
         specifier: catalog:build
         version: 5.4.0(rollup@4.60.4)
+      '@swc/types':
+        specifier: catalog:dev
+        version: 0.1.26
       '@visulima/find-cache-dir':
         specifier: catalog:visulima
         version: 3.0.0-alpha.9
@@ -2612,6 +2624,9 @@ importers:
       oxc-resolver:
         specifier: catalog:node
         version: 11.20.0
+      oxc-transform:
+        specifier: catalog:dev
+        version: 0.133.0
       rollup-plugin-import-trace:
         specifier: catalog:build
         version: 1.0.1(rollup@4.60.4)
@@ -2643,9 +2658,6 @@ importers:
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.3
-      '@babel/core':
-        specifier: catalog:dev
-        version: 7.29.7
       '@oxc-parser/binding-linux-x64-gnu':
         specifier: catalog:dev
         version: 0.133.0
@@ -2658,9 +2670,6 @@ importers:
       '@swc/core':
         specifier: catalog:dev
         version: 1.15.40(@swc/helpers@0.5.23)
-      '@swc/types':
-        specifier: catalog:dev
-        version: 0.1.26
       '@total-typescript/ts-reset':
         specifier: catalog:tsc
         version: 0.6.1
@@ -2721,9 +2730,6 @@ importers:
       mime:
         specifier: catalog:dev
         version: 4.1.0
-      oxc-transform:
-        specifier: catalog:dev
-        version: 0.133.0
       p-queue:
         specifier: catalog:dev
         version: 9.3.0

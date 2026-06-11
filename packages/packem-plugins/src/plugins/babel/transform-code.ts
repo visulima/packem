@@ -5,6 +5,20 @@ const tsRE = /\.tsx?$/;
 const COMPILER_ANNOTATION_RE = /['"]use memo['"]/;
 
 /**
+ * Stable key under which the (constant-per-build) transform options are cached in
+ * each worker, so they are sent across the thread boundary once rather than cloned
+ * per file. There is exactly one options object per plugin instance.
+ */
+const OPTIONS_KEY = "babel-options" as const;
+
+/**
+ * Error message a worker throws when it has not yet received the full options for a
+ * given {@link OPTIONS_KEY}. The main thread detects it and retries that single call
+ * with the options payload attached.
+ */
+const MISSING_OPTIONS_SENTINEL = "__packem_babel_missing_options__" as const;
+
+/**
  * Helper function to find React Compiler plugin in Babel plugins array.
  * Used for React Compiler-specific optimizations like annotation mode filtering.
  */
@@ -61,7 +75,12 @@ export interface TransformCodeResult {
 export const transformCode = async (
     sourcecode: string,
     id: string,
-    { filename, generatorOpts, sourceFileName, ...transformOptions }: TransformCodeOptions,
+    // `filename`/`sourceFileName` are intentionally ignored: a single build-wide
+    // value would be applied to EVERY module, silently changing per-file preset
+    // behaviour (Babel keys overrides/`only`/`ignore`/config lookup off `filename`).
+    // The per-module `id` is the correct filename for each transform, so it always
+    // wins. The fields remain accepted for backwards-compatible call sites.
+    { filename: _filename, generatorOpts, sourceFileName: _sourceFileName, ...transformOptions }: TransformCodeOptions,
 ): Promise<TransformCodeResult | undefined> => {
     // Get plugins array (create a copy to avoid mutating the original)
     let plugins: PluginItem[] = [];
@@ -101,7 +120,7 @@ export const transformCode = async (
 
     const result = await babelTransform(sourcecode, {
         ...transformOptions,
-        filename: filename ?? id,
+        filename: id,
         generatorOpts: {
             ...generatorOpts,
             decoratorsBeforeExport: true,
@@ -115,7 +134,7 @@ export const transformCode = async (
             sourceType: "module",
         },
         plugins: plugins.length > 0 ? plugins : [],
-        sourceFileName: sourceFileName ?? id,
+        sourceFileName: id,
     });
 
     if (!result?.code) {
@@ -127,3 +146,5 @@ export const transformCode = async (
         map: result.map ?? undefined,
     };
 };
+
+export { MISSING_OPTIONS_SENTINEL, OPTIONS_KEY };

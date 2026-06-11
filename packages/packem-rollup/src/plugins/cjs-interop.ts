@@ -1,7 +1,114 @@
+import type { Node } from "estree";
 import MagicString from "magic-string";
-import type { NormalizedOutputOptions, Plugin, RenderedChunk, SourceMapInput } from "rollup";
+import type { NormalizedOutputOptions, Plugin, ProgramNode, RenderedChunk, SourceMapInput } from "rollup";
 
-const EXPORTS_DEFAULT_ASSIGNMENT_RE = /(exports(?:\['default'\]|\.default)) = (.*);/i;
+// Cheap gate: only bother parsing when the chunk plausibly assigns to
+// `exports`/`module.exports`. Avoids the parse cost on chunks that can't match.
+const EXPORTS_GATE_RE = /\bexports\b/;
+
+interface MemberLike {
+    computed?: boolean;
+    end?: number;
+    object?: MemberLike & { name?: string };
+    property?: { name?: string; type?: string; value?: unknown };
+    start?: number;
+    type?: string;
+}
+
+interface AssignmentExpressionNode {
+    end?: number;
+    left?: MemberLike;
+    operator?: string;
+    start?: number;
+    type?: string;
+}
+
+// Resolve the static property name of an `exports.name` / `exports["name"]`
+// member, or undefined for a computed/dynamic property.
+const staticPropertyName = (property: MemberLike["property"]): string | undefined => {
+    if (property?.type === "Identifier") {
+        return property.name;
+    }
+
+    if (property?.type === "Literal" && typeof property.value === "string") {
+        return property.value;
+    }
+
+    return undefined;
+};
+
+/**
+ * Classify an assignment LHS. Returns `{ kind: "module" }` for `module.exports`,
+ * `{ kind: "exports", name }` for `exports.name` / `exports["name"]`, or
+ * undefined when the LHS is not a recognized export assignment target.
+ */
+const resolveExportTarget = (left: MemberLike | undefined): { kind: "exports" | "module"; name?: string } | undefined => {
+    if (left?.type !== "MemberExpression" || left.object === undefined) {
+        return undefined;
+    }
+
+    const propertyName = staticPropertyName(left.property);
+
+    if (propertyName === undefined) {
+        return undefined; // computed / dynamic property — leave untouched
+    }
+
+    // `module.exports = ...`
+    if (left.object.type === "Identifier" && left.object.name === "module" && propertyName === "exports") {
+        return { kind: "module" };
+    }
+
+    // `exports.<name> = ...` (NOT `module.exports.<name>`, whose object is a
+    // MemberExpression, which falls through here and is left untouched).
+    if (left.object.type === "Identifier" && left.object.name === "exports") {
+        return { kind: "exports", name: propertyName };
+    }
+
+    return undefined;
+};
+
+// Rewrite a single top-level `exports.<name> = ...` assignment on `transformed`.
+// Returns true when the assignment was the default export (so the caller knows a
+// default was seen and the rewrite is worth emitting).
+const rewriteExportAssignment = (transformed: MagicString, statement: Node): { changed: boolean; sawDefault: boolean } => {
+    const noop = { changed: false, sawDefault: false };
+
+    if ((statement as { type?: string }).type !== "ExpressionStatement") {
+        return noop;
+    }
+
+    const { expression } = statement as unknown as { expression?: AssignmentExpressionNode };
+
+    if (expression?.type !== "AssignmentExpression" || expression.operator !== "=") {
+        return noop;
+    }
+
+    const target = resolveExportTarget(expression.left);
+
+    // `module.exports = ...` is already the CJS default form and needs no rewrite;
+    // the `__esModule` marker is a CallExpression statement that never matches.
+    if (target === undefined || target.kind === "module") {
+        return noop;
+    }
+
+    const left = expression.left as MemberLike;
+
+    if (typeof left.start !== "number" || typeof left.end !== "number") {
+        return noop;
+    }
+
+    if (target.name === "default") {
+        // `exports.default = ...` / `exports["default"] = ...` -> `module.exports`
+        transformed.overwrite(left.start, left.end, "module.exports");
+
+        return { changed: true, sawDefault: true };
+    }
+
+    // `exports.<name> = ...` -> `module.exports.<name>`
+    transformed.overwrite(left.start, left.end, `module.exports.${target.name ?? ""}`);
+
+    return { changed: true, sawDefault: false };
+};
 
 export interface CJSInteropOptions {
     addDefaultProperty?: boolean;
@@ -15,7 +122,7 @@ export const cjsInteropPlugin = ({
 }): Plugin => {
     return {
         name: "packem:cjs-interop",
-        renderChunk: (
+        renderChunk(
             code: string,
             chunk: RenderedChunk,
             options: NormalizedOutputOptions,
@@ -24,71 +131,69 @@ export const cjsInteropPlugin = ({
                 code: string;
                 map: SourceMapInput;
             }
-            | undefined => {
+            | undefined {
             if (!chunk.isEntry) {
                 return undefined;
             }
 
-            if (options.format === "cjs" && options.exports === "auto") {
-                const matches = EXPORTS_DEFAULT_ASSIGNMENT_RE.exec(code);
-
-                if (matches === null || matches.length < 3) {
-                    return undefined;
-                }
-
-                const transformed = new MagicString(code);
-
-                // remove `__esModule` marker property
-                transformed.replace("Object.defineProperty(exports, '__esModule', { value: true });", "");
-
-                // Rewrite every `exports.<name> = ...;` assignment. The default
-                // export is special-cased to collapse straight to `module.exports`
-                // (@see https://github.com/Rich-Harris/magic-string/issues/208).
-                //
-                // All edits are performed through MagicString (overwriting the
-                // matched LHS token on the original code) so the generated
-                // sourcemap stays aligned with the emitted code. We intentionally
-                // do NOT do a post-`toString()` string replace, which would leave
-                // the map describing the pre-replace text.
-                const EXPORTS_ASSIGNMENT_RE = /exports(?:\['default'\]|\.([A-Za-z_$][\w$]*)) = /g;
-
-                let assignmentMatch: RegExpExecArray | null = EXPORTS_ASSIGNMENT_RE.exec(code);
-
-                while (assignmentMatch !== null) {
-                    const tokenStart = assignmentMatch.index;
-                    // The matched token is `exports.<name>` / `exports['default']`,
-                    // i.e. everything before the ` = ` suffix (length 3).
-                    const tokenEnd = tokenStart + assignmentMatch[0].length - 3;
-                    const name = assignmentMatch[1];
-
-                    if (name === undefined || name === "default") {
-                        // `exports['default']` or `exports.default` -> `module.exports`
-                        transformed.overwrite(tokenStart, tokenEnd, "module.exports");
-                    } else {
-                        // `exports.<name>` -> `module.exports.<name>`
-                        transformed.overwrite(tokenStart, tokenEnd, `module.exports.${name}`);
-                    }
-
-                    assignmentMatch = EXPORTS_ASSIGNMENT_RE.exec(code);
-                }
-
-                if (addDefaultProperty) {
-                    // add `module.exports.default = module.exports;`
-                    transformed.append(`\nmodule.exports.default = ${matches[2] as string};`);
-                }
-
-                logger.debug({
-                    message: `Applied CommonJS interop to entry chunk ${chunk.fileName}.`,
-                    prefix: "plugin:cjs-interop",
-                });
-
-                return {
-                    code: transformed.toString(),
-                    map: transformed.generateMap({ hires: true }),
-                };
+            if (options.format !== "cjs" || options.exports !== "auto") {
+                return undefined;
             }
 
-            return undefined;
+            if (!EXPORTS_GATE_RE.test(code)) {
+                return undefined;
+            }
+
+            let ast: ProgramNode;
+
+            try {
+                ast = this.parse(code);
+            } catch {
+                return undefined;
+            }
+
+            const transformed = new MagicString(code);
+            let changed = false;
+            let sawDefault = false;
+
+            // Only top-level statements are rewritten — assignments inside string
+            // literals or comments never reach the AST, and nested assignments
+            // (inside functions) are not entry-level CJS exports.
+            for (const statement of (ast as unknown as { body: Node[] }).body) {
+                const outcome = rewriteExportAssignment(transformed, statement);
+
+                changed = changed || outcome.changed;
+                sawDefault = sawDefault || outcome.sawDefault;
+            }
+
+            if (!sawDefault) {
+                // Nothing to collapse to a default export → leave the chunk as-is,
+                // matching the previous behaviour of bailing without a default.
+                return undefined;
+            }
+
+            if (addDefaultProperty) {
+                // Re-expose the (now default) module.exports under `.default` so
+                // both `require(x)` and `require(x).default` resolve to it. Use the
+                // literal RHS `module.exports` rather than re-evaluating the original
+                // assignment's RHS, which could be a non-identifier expression.
+                transformed.append("\nmodule.exports.default = module.exports;");
+                changed = true;
+            }
+
+            if (!changed) {
+                return undefined;
+            }
+
+            logger.debug({
+                message: `Applied CommonJS interop to entry chunk ${chunk.fileName}.`,
+                prefix: "plugin:cjs-interop",
+            });
+
+            return {
+                code: transformed.toString(),
+                map: transformed.generateMap({ hires: true }),
+            };
         },
     };
 };

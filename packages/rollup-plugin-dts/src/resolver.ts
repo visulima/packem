@@ -67,6 +67,12 @@ const createDtsResolvePlugin = ({
 
                     // Couldn't find types despite being on the bundle list — fall through
                     // to the regular path so the normal "unresolvable → external" logic runs.
+                    // The user explicitly asked to inline this package's types, so warn instead
+                    // of silently externalizing — otherwise they get an unexpected dangling
+                    // `import ... from "<pkg>"` with no indication why the inline didn't happen.
+                    this.warn(
+                        `Could not resolve declaration (.d.ts) types for "${id}" (requested via the \`resolve\` option, imported from ${importer}); it will be left external. Ensure the package ships types or provides a \`types\` condition in its exports.`,
+                    );
                 }
 
                 // Get Rollup's resolution first for fallback and policy checks
@@ -81,7 +87,12 @@ const createDtsResolvePlugin = ({
 
                 // If resolution failed, error or externalize
                 if (!dtsResolution) {
-                    // Auto-export unresolvable packages
+                    // Auto-export unresolvable packages. Surface a debug-level diagnostic so an
+                    // unexpected externalization of a bare specifier is traceable rather than silent.
+                    if (!isFilePath(id)) {
+                        this.warn(`Could not resolve declaration (.d.ts) types for bare specifier "${id}" (imported from ${importer}); leaving it external.`);
+                    }
+
                     return isFilePath(id) ? null : external;
                 }
 

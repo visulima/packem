@@ -8,47 +8,37 @@ const cssVariableName = "css";
 
 /** Set of reserved JavaScript keywords to avoid conflicts */
 const reservedWords = new Set([
-    // JavaScript reserved keywords
-    "abstract",
+    // ECMAScript reserved keywords
     "arguments",
     "await",
-    "boolean",
     "break",
-    "byte",
     "case",
     "catch",
-    "char",
     "class",
     "const",
-    "continue", // Current CSS variable name
+    "continue",
+    // Current CSS variable name
     cssVariableName,
     "debugger",
     "default",
     "delete",
     "do",
-    "double",
     "else",
     "enum",
     "eval",
     "export",
     "extends",
     "false",
-    "final",
     "finally",
-    "float",
     "for",
     "function",
-    "goto",
     "if",
     "implements",
     "import",
     "in",
     "instanceof",
-    "int",
     "interface",
     "let",
-    "long",
-    "native",
     "new",
     "null",
     "package",
@@ -56,21 +46,16 @@ const reservedWords = new Set([
     "protected",
     "public",
     "return",
-    "short",
     "static",
     "super",
     "switch",
-    "synchronized",
     "this",
     "throw",
-    "throws",
-    "transient",
     "true",
     "try",
     "typeof",
     "var",
     "void",
-    "volatile",
     "while",
     "with",
     "yield",
@@ -118,7 +103,22 @@ const appendNamedExports = ({ dts, dtsOutput, namedExports, output, outputExport
     }
 };
 
+/**
+ * Builds the `interface ModulesExports { ... }` declaration block for the given
+ * export map. Property names are single-quoted (matching the surrounding code
+ * style) with backslashes and quotes escaped, so class names containing those
+ * characters still produce a valid declaration file.
+ */
+const buildModulesExportsInterface = (modulesExports: Record<string, string>): string =>
+    `\ninterface ModulesExports {
+${Object.keys(modulesExports)
+    .map((key) => `  '${key.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}': string;`)
+    .join("\n")}
+}\n`;
+
 interface AppendModulesDtsOptions {
+    cssDeclared: boolean;
+    cssVariableName: string;
     defaultExport: string;
     dtsOutput: string[];
     inject?: JsExportOptions["inject"];
@@ -130,17 +130,26 @@ interface AppendModulesDtsOptions {
 /**
  * Pushes ModulesExports interface declarations and a default export into `dtsOutput`.
  */
-const appendModulesDts = ({ defaultExport, dtsOutput, inject, modulesExports, modulesVariableName, supportModules }: AppendModulesDtsOptions): void => {
+const appendModulesDts = ({
+    cssDeclared,
+    cssVariableName: cssVName,
+    defaultExport,
+    dtsOutput,
+    inject,
+    modulesExports,
+    modulesVariableName,
+    supportModules,
+}: AppendModulesDtsOptions): void => {
     if (supportModules) {
         dtsOutput.push(
-            `\ninterface ModulesExports {
-${Object.keys(modulesExports)
-    .map((key) => `  '${key}': string;`)
-    .join("\n")}
-}\n`,
+            buildModulesExportsInterface(modulesExports),
             typeof inject === "object" && inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "",
             `declare const ${modulesVariableName}: ModulesExports;`,
         );
+    } else if (!cssDeclared) {
+        // The default export references `css`; ensure it is declared so the
+        // generated declaration file does not reference an undeclared identifier.
+        dtsOutput.push(`declare const ${cssVName}: string;`);
     }
 
     dtsOutput.push(defaultExport);
@@ -173,6 +182,14 @@ const applyInject = ({ cssVariableName: cssVName, id, inject, modulesExports, mo
 
     const packageName = typeof inject === "object" && inject.package ? inject.package : "@visulima/css-style-inject";
     const methodName = typeof inject === "object" && inject.method ? inject.method : "cssStyleInject";
+
+    if (typeof packageName !== "string" || packageName.trim().length === 0) {
+        throw new TypeError(`\`inject.package\` must be a non-empty string, received: ${JSON.stringify(packageName)}`);
+    }
+
+    if (!/^[$A-Z_a-z][\w$]*$/.test(methodName)) {
+        throw new Error(`\`inject.method\` must be a valid JavaScript identifier, received: ${JSON.stringify(methodName)}`);
+    }
 
     output.unshift(`import { ${methodName} as ${injectorName} } from "${packageName}";`);
 
@@ -300,14 +317,7 @@ const generateInlineExports = ({
         dtsOutput.push(`declare const ${cssVName}: string;`);
 
         if (supportModules) {
-            dtsOutput.push(
-                `\ninterface ModulesExports {
-${Object.keys(modulesExports)
-    .map((key) => `  '${key}': string;`)
-    .join("\n")}
-}\n`,
-                `declare const ${modulesVariableName}: ModulesExports;`,
-            );
+            dtsOutput.push(buildModulesExportsInterface(modulesExports), `declare const ${modulesVariableName}: ModulesExports;`);
         }
 
         dtsOutput.push(defaultExport);
@@ -456,7 +466,16 @@ export const generateJsExports = ({
     output.push(defaultExport);
 
     if (dts) {
-        appendModulesDts({ defaultExport, dtsOutput, inject, modulesExports, modulesVariableName, supportModules });
+        appendModulesDts({
+            cssDeclared: Boolean(namedExports),
+            cssVariableName,
+            defaultExport,
+            dtsOutput,
+            inject,
+            modulesExports,
+            modulesVariableName,
+            supportModules,
+        });
     }
 
     appendNamedExports({ dts, dtsOutput, namedExports, output, outputExports });

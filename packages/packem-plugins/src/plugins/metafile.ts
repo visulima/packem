@@ -24,7 +24,7 @@ const metafilePlugin = (): Plugin =>
                 }
             }
 
-            if (Array.isArray(deps) && deps.length === 0) {
+            if (deps.length === 0) {
                 return;
             }
 

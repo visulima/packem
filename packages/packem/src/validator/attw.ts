@@ -8,7 +8,7 @@ import { blue, bold, dim, green, red, yellow } from "@visulima/colorize";
 import type { NormalizedPackageJson } from "@visulima/package";
 import { ensurePackages } from "@visulima/package";
 import type { BuildContext } from "@visulima/packem-share/types";
-import { join } from "@visulima/path";
+import { basename, isAbsolute, join } from "@visulima/path";
 import { createTable } from "@visulima/tabular";
 import { ROUNDED_BORDER } from "@visulima/tabular/style";
 
@@ -295,8 +295,39 @@ const buildProblemMessage = (analysis: Analysis, ignoreResolutions: string[], de
     return `Are the types wrong problems found:\n\n${table.toString()}\n\n${summaryTexts.join("\n\n")}`;
 };
 
+interface PackResult {
+    filename: string;
+    files?: {
+        path: string;
+    }[];
+    name?: string;
+    version?: string;
+}
+
+/**
+ * Extracts the tarball filename from `<pm> pack --json` stdout.
+ *
+ * npm and yarn emit a JSON **array** of pack results (yarn after
+ * {@link fixYarnStdout} normalisation), where `filename` is only a basename.
+ * pnpm emits a single JSON **object** with an absolute `filename`. Handle both
+ * shapes by unwrapping the first element of an array.
+ * @param stdout Already package-manager-normalised JSON string.
+ * @returns The reported tarball filename (basename for npm/yarn, absolute for pnpm).
+ */
+const parsePackFilename = (stdout: string): string => {
+    const parsed = JSON.parse(stdout) as PackResult | PackResult[] | undefined;
+
+    const result = Array.isArray(parsed) ? parsed[0] : parsed;
+
+    if (!result?.filename) {
+        throw new Error(`Invalid npm pack output format: ${stdout}`);
+    }
+
+    return result.filename;
+};
+
 const packPackage = async (packageManager: string, temporaryDirectory: string, rootDirectory: string): Promise<string> => {
-    let destination = `--pack-destination ${temporaryDirectory}`;
+    let destination = `--pack-destination "${temporaryDirectory}"`;
 
     if (packageManager === "yarn") {
         destination = `--out "${join(temporaryDirectory, "package.tgz")}"`;
@@ -325,22 +356,13 @@ const packPackage = async (packageManager: string, temporaryDirectory: string, r
         stdout = fixYarnStdout(stdout);
     }
 
-    const parsed = JSON.parse(stdout) as
-        | {
-            filename: string;
-            files: {
-                path: string;
-            }[];
-            name: string;
-            version: string;
-        }
-        | undefined;
+    const filename = parsePackFilename(stdout);
 
-    if (!parsed?.filename) {
-        throw new Error(`Invalid npm pack output format: ${stdout}`);
-    }
-
-    return parsed.filename;
+    // npm and yarn report only the tarball's basename (relative to the
+    // `--pack-destination`/`--out` directory), while pnpm reports an absolute
+    // path. Resolve the basename against the temp dir; trust an absolute path
+    // as-is.
+    return isAbsolute(filename) ? filename : join(temporaryDirectory, basename(filename));
 };
 
 const reportAnalysis = (
@@ -431,6 +453,10 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
 
     const temporaryDirectory = await mkdtemp(join(tmpdir(), "packem-attw-"));
 
+    const cleanupTemporaryDirectory = async (): Promise<void> => {
+        await rm(temporaryDirectory, { force: true, recursive: true }).catch(() => {});
+    };
+
     let attwCore: typeof import("@arethetypeswrong/core");
 
     try {
@@ -441,12 +467,24 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
             prefix: "attw",
         });
 
+        await cleanupTemporaryDirectory();
+
         return;
     }
 
-    const packageManager = await resolvePackageManager(pm, context.options.rootDir);
+    let packageManager: string | undefined;
+
+    try {
+        packageManager = await resolvePackageManager(pm, context.options.rootDir);
+    } catch (error) {
+        await cleanupTemporaryDirectory();
+
+        throw error;
+    }
 
     if (packageManager === undefined) {
+        await cleanupTemporaryDirectory();
+
         throw new Error("Could not detect a package manager to run the attw check.");
     }
 
@@ -481,8 +519,9 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
 
         throw error;
     } finally {
-        await rm(temporaryDirectory, { force: true, recursive: true }).catch(() => {});
+        await cleanupTemporaryDirectory();
     }
 };
 
+export { parsePackFilename };
 export default attw;

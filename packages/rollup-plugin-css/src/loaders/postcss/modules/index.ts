@@ -41,7 +41,7 @@ export interface ModulesOptions {
      * - `[name]`: The file name of the asset excluding any extension.
      * - `[local]`: The original value of the selector.
      * - `[hash(:&lt;num>)]`: A hash based on the name and content of the asset (with optional length).
-     * @default "[name]_[local]__[hash:8]"
+     * @default "[name]_[local]_[hash:8]"
      */
     generateScopedName?: string | ((name: string, file: string, css: string) => string);
 

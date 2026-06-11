@@ -1,5 +1,5 @@
 import { isAccessibleSync, readFileSync, writeFile } from "@visulima/fs";
-import { join, toNamespacedPath } from "@visulima/path";
+import { join, resolve, sep, toNamespacedPath } from "@visulima/path";
 import stringify from "safe-stable-stringify";
 
 import type { RollupLogger } from "./create-rollup-logger";
@@ -59,7 +59,15 @@ class FileCache {
 
     #isEnabled = true;
 
-    readonly #memoryCache = new Map<string>();
+    // Explicit value type instead of relying on the `ts-reset` augmentation that
+    // would let `new Map<string>()` default the value to `unknown`.
+    // eslint-disable-next-line @typescript-eslint/consistent-generic-constructors -- the annotation documents the value type without depending on ts-reset
+    readonly #memoryCache: Map<string, unknown> = new Map();
+
+    // Memoizes `getFilePath` results keyed by `name + "\0" + subDirectory`. The
+    // cache-plugin access pattern is `has(k) ? get(k) : compute()`, which would
+    // otherwise run the cwd-stripping/path-join string work twice per probe.
+    readonly #filePathCache = new Map<string, string>();
 
     // In-flight async disk writes from `set()`. The build doesn't await individual
     // writes (it would block on tens of thousands of files on a large cold build);
@@ -276,18 +284,64 @@ class FileCache {
      * @returns The complete file path for the cache entry
      */
     private getFilePath(name: string, subDirectory?: string): string {
-        // Strip both the namespaced and plain `cwd`: incoming ids are usually
-        // not namespaced, so on Windows only the plain form matches, while a
-        // namespaced id (if one is ever passed) is handled by the first replace.
-        let optimizedName = name.replaceAll(this.#namespacedCwd, "");
+        const memoKey = `${name} ${subDirectory ?? ""}`;
+        const memoized = this.#filePathCache.get(memoKey);
+
+        if (memoized !== undefined) {
+            return memoized;
+        }
+
+        // Strip the `cwd` prefix only when the id is genuinely under it. A
+        // substring `replaceAll` would also strip `cwd` appearing mid-path or
+        // collide with a sibling dir sharing the prefix (`/a/b` vs `/a/bc/...`),
+        // so use an explicit prefix check (`cwd + sep`) then slice.
+        let optimizedName = this.#stripCwdPrefix(name, this.#namespacedCwd);
 
         if (this.#cwd !== this.#namespacedCwd) {
-            optimizedName = optimizedName.replaceAll(this.#cwd, "");
+            optimizedName = this.#stripCwdPrefix(optimizedName, this.#cwd);
         }
 
         optimizedName = optimizedName.replaceAll(":", "-");
 
-        return join(this.#cachePath as string, this.#hashKey, subDirectory?.replaceAll(":", "-") ?? "", toNamespacedPath(optimizedName));
+        const cacheRoot = this.#cachePath as string;
+        const filePath = join(cacheRoot, this.#hashKey, subDirectory?.replaceAll(":", "-") ?? "", toNamespacedPath(optimizedName));
+
+        // Defend against path traversal: a `..` segment in `name`/`subDirectory`
+        // could escape the cache directory. Confirm the resolved path stays under
+        // the resolved cache root; throw otherwise so a malicious/unexpected key
+        // never reads or writes outside the cache.
+        const resolvedRoot = resolve(cacheRoot);
+        const resolvedPath = resolve(filePath);
+
+        if (resolvedPath !== resolvedRoot && !resolvedPath.startsWith(resolvedRoot + sep)) {
+            throw new Error(`FileCache: cache key resolves outside the cache directory: ${name}`);
+        }
+
+        this.#filePathCache.set(memoKey, filePath);
+
+        return filePath;
+    }
+
+    /**
+     * Removes a leading `prefix` from `value` only when `value` is exactly the
+     * prefix or sits under it (`prefix + sep`), avoiding the substring collisions
+     * a naive `replaceAll` would cause.
+     */
+    // eslint-disable-next-line class-methods-use-this
+    #stripCwdPrefix(value: string, prefix: string): string {
+        if (prefix === "") {
+            return value;
+        }
+
+        if (value === prefix) {
+            return "";
+        }
+
+        if (value.startsWith(prefix + sep)) {
+            return value.slice(prefix.length);
+        }
+
+        return value;
     }
 }
 

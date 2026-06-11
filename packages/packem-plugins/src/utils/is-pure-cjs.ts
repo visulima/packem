@@ -13,6 +13,15 @@ let initted = false;
 const packageJsonCache: FindPackageJsonCache = new Map();
 
 /**
+ * Clears the shared package.json classification cache. Call this on a watch
+ * rebuild so edits to a package's `type` field (or a freshly installed dependency)
+ * are picked up instead of serving a stale CJS/ESM decision from a previous build.
+ */
+export const clearPureCjsCache = (): void => {
+    packageJsonCache.clear();
+};
+
+/**
  * Determines if a module is a pure CommonJS module by checking various indicators.
  * @param id The module ID to check
  * @param importer The importer context (can be a file path or Rollup plugin context)

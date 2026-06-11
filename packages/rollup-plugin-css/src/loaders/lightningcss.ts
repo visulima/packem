@@ -3,9 +3,9 @@ import { transform } from "lightningcss";
 
 import type { LightningCSSOptions } from "../types";
 import browserslistToTargets from "../utils/browserslist-targets";
+import detectCssModules from "../utils/detect-css-modules";
 import { generateJsExports } from "../utils/generate-js-exports";
 import type { Loader } from "./types";
-import ensureAutoModules from "./utils/ensure-auto-modules";
 
 const compareEntries = ([a]: [string, unknown], [b]: [string, unknown]): number => {
     if (a < b) {
@@ -32,8 +32,13 @@ const compareEntries = ([a]: [string, unknown], [b]: [string, unknown]): number 
  * Entries are sorted alphabetically to work around
  * https://github.com/parcel-bundler/lightningcss/issues/291.
  */
-const normalizeModulesExports = (exports: CSSModuleExports): Record<string, string> => {
+const normalizeModulesExports = (
+    exports: CSSModuleExports,
+    id: string,
+    logger?: { warn: (log: { message: string; plugin?: string }) => void },
+): Record<string, string> => {
     const normalized: Record<string, string> = {};
+    const droppedComposes = new Set<string>();
 
     const sortedEntries = Object.entries(exports).toSorted(compareEntries);
 
@@ -43,10 +48,22 @@ const normalizeModulesExports = (exports: CSSModuleExports): Record<string, stri
         for (const composed of entry.composes) {
             if (composed.type === "local" || composed.type === "global") {
                 parts.push(composed.name);
+            } else if (composed.type === "dependency") {
+                droppedComposes.add(name);
             }
         }
 
         normalized[name] = parts.join(" ");
+    }
+
+    if (droppedComposes.size > 0 && logger) {
+        logger.warn({
+            message:
+                `lightningcss dropped cross-file \`composes\` for ${[...droppedComposes].map((n) => `\`${n}\``).join(", ")} in ${id}. ` +
+                `The generated class names will be missing the composed names. ` +
+                `Use the postcss loader if you rely on cross-file \`composes from "..."\`.`,
+            plugin: "lightningcss",
+        });
     }
 
     return normalized;
@@ -66,17 +83,7 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
     name: "lightningcss",
 
     process({ code, map }) {
-        let supportModules = false;
-
-        if (typeof this.options.modules === "boolean") {
-            supportModules = this.options.modules;
-        } else if (typeof this.options.modules === "object") {
-            supportModules = ensureAutoModules(this.options.modules.include, this.id);
-        }
-
-        if (this.autoModules && this.options.modules === undefined) {
-            supportModules = ensureAutoModules(this.autoModules, this.id);
-        }
+        const supportModules = detectCssModules(this.options.modules, this.autoModules, this.id);
 
         const result = transform({
             ...this.options,
@@ -98,7 +105,7 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
 
         // Extract module exports (if any). Non-module CSS leaves `result.exports`
         // undefined and we fall through with an empty mapping.
-        const modulesExports: Record<string, string> = result.exports ? normalizeModulesExports(result.exports) : {};
+        const modulesExports: Record<string, string> = result.exports ? normalizeModulesExports(result.exports, this.id, this.logger) : {};
 
         const jsExportResult = generateJsExports({
             css,

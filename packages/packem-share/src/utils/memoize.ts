@@ -9,6 +9,10 @@ import stringify from "safe-stable-stringify";
 
 type CacheKeyResolver = string | ((...arguments_: any[]) => string);
 
+// NUL separator used to join the fast-path primitive key parts; it cannot appear
+// in a normal module id. Hoisted so it isn't reallocated on every memoized call.
+const KEY_SEPARATOR = String.fromCodePoint(0);
+
 /**
  * A memoized function with an additional `destroy` method to clear its cache.
  */
@@ -41,13 +45,12 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
         }
 
         // Fast path for the common case (resolveId/transform helpers keyed by a
-        // string/number id): build the key from primitive args directly,
-        // avoiding the cost of safe-stable-stringify. Each value is prefixed
-        // with its type so distinct shapes (e.g. "1" vs 1) never collide, and
-        // values are joined with a NUL separator that cannot appear in a normal
-        // module id. The arity prefix disambiguates differing argument counts.
-        const separator = String.fromCodePoint(0);
-
+        // string/number id): build the key from primitive args directly in a
+        // single pass, avoiding the cost of safe-stable-stringify. Each value is
+        // prefixed with its type so distinct shapes (e.g. "1" vs 1) never
+        // collide, joined with a NUL separator that cannot appear in a normal
+        // module id, and prefixed with the arity to disambiguate argument counts.
+        let key = String(arguments_.length);
         let allPrimitive = true;
 
         for (const argument of arguments_) {
@@ -58,12 +61,19 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
 
                 break;
             }
+
+            key += `${KEY_SEPARATOR}${type}:${String(argument)}`;
         }
 
         if (allPrimitive) {
-            return `${String(arguments_.length)}${separator}${arguments_.map((argument) => `${typeof argument}:${String(argument)}`).join(separator)}`;
+            return key;
         }
 
+        // Slow path: non-primitive args fall back to (stable) JSON. NOTE: this
+        // assumes the arguments are serializable — functions and symbols are
+        // dropped by the serializer, so two calls differing only in a function/
+        // symbol argument would collide on the same cache key. Callers that pass
+        // non-serializable args should supply an explicit `cacheKey` resolver.
         return stringify({ args: arguments_ }) ?? JSON.stringify(arguments_);
     };
 

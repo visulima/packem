@@ -14,7 +14,7 @@ vi.mock(import("esbuild"), () => {
 
 vi.mock(import("@visulima/fs"), () => {
     return {
-        readFileSync: vi.fn(),
+        readFile: vi.fn(),
     };
 });
 
@@ -26,7 +26,7 @@ vi.mock(import("rs-module-lexer"), () => {
 
 const { findCacheDirSync } = await import("@visulima/find-cache-dir");
 const { build: esbuildBuild } = await import("esbuild");
-const { readFileSync } = await import("@visulima/fs");
+const { readFile } = await import("@visulima/fs");
 
 const rsModuleLexer = await import("rs-module-lexer");
 
@@ -175,7 +175,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
         vi.mocked(findCacheDirSync).mockReset();
         vi.mocked(esbuildBuild).mockReset();
         vi.mocked(esbuildBuild).mockImplementation(() => ({ errors: [], warnings: [] }) as never);
-        vi.mocked(readFileSync).mockReset();
+        vi.mocked(readFile).mockReset();
         vi.mocked(rsModuleLexer.parseAsync).mockReset();
     });
 
@@ -273,7 +273,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
         expect(result).toBeUndefined();
     });
 
-    it("should emit `export * from '<absolute>'` contents for a module that has named exports", async () => {
+    it("should emit `export * from \"<absolute>\"` contents for a module that has named exports", async () => {
         expect.assertions(1);
 
         const { onLoad } = await captureInnerPluginHandlers({
@@ -282,7 +282,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             sourceMap: false,
         });
 
-        vi.mocked(readFileSync).mockReturnValueOnce("export const a = 1;");
+        vi.mocked(readFile).mockResolvedValueOnce("export const a = 1;");
         vi.mocked(rsModuleLexer.parseAsync).mockResolvedValueOnce({ output: [{ exports: ["a"], filename: "/abs/react.js", imports: [] }] } as never);
 
         const result = await onLoad({
@@ -290,10 +290,10 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: "/abs/react.js", resolveDir: "/virtual/src" },
         });
 
-        expect(result).toStrictEqual({ contents: "export * from '/abs/react.js'", resolveDir: "/virtual/src" });
+        expect(result).toStrictEqual({ contents: "export * from \"/abs/react.js\"", resolveDir: "/virtual/src" });
     });
 
-    it("should emit `module.exports = require('<absolute>')` for a module with no named exports", async () => {
+    it("should emit `module.exports = require(\"<absolute>\")` for a module with no named exports", async () => {
         expect.assertions(1);
 
         const { onLoad } = await captureInnerPluginHandlers({
@@ -302,7 +302,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             sourceMap: false,
         });
 
-        vi.mocked(readFileSync).mockReturnValueOnce("module.exports = 1;");
+        vi.mocked(readFile).mockResolvedValueOnce("module.exports = 1;");
         vi.mocked(rsModuleLexer.parseAsync).mockResolvedValueOnce({ output: [{ exports: [], filename: "/abs/react.js", imports: [] }] } as never);
 
         const result = await onLoad({
@@ -310,7 +310,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: "/abs/react.js", resolveDir: "/virtual/src" },
         });
 
-        expect(result).toStrictEqual({ contents: "module.exports = require('/abs/react.js')", resolveDir: "/virtual/src" });
+        expect(result).toStrictEqual({ contents: "module.exports = require(\"/abs/react.js\")", resolveDir: "/virtual/src" });
     });
 
     it("should normalize Windows-style backslashes in the absolute path to forward slashes", async () => {
@@ -322,7 +322,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             sourceMap: false,
         });
 
-        vi.mocked(readFileSync).mockReturnValueOnce("export const a = 1;");
+        vi.mocked(readFile).mockResolvedValueOnce("export const a = 1;");
         vi.mocked(rsModuleLexer.parseAsync).mockResolvedValueOnce({
             output: [{ exports: ["a"], filename: String.raw`C:\abs\react.js`, imports: [] }],
         } as never);
@@ -332,6 +332,6 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: String.raw`C:\abs\react.js`, resolveDir: String.raw`C:\tmp\src` },
         });
 
-        expect(result?.contents).toBe("export * from 'C:/abs/react.js'");
+        expect(result?.contents).toBe("export * from \"C:/abs/react.js\"");
     });
 });

@@ -12,12 +12,13 @@ describe(svgEncoder, () => {
         expect(svgEncoder(Buffer.from(svgInput, "utf8"))).toBe(expectedOutput);
     });
 
-    it("should remove '//gs' comments", () => {
+    it("should preserve literal '//gs' text in the SVG", () => {
         expect.assertions(1);
 
+        // `//gs` is ordinary SVG content (e.g. part of a URL host like
+        // `https://gstatic.com`) and must not be stripped.
         const svgInput = "<svg>//gs<path d='M0 0 H10 V10 H0 Z'/></svg>";
-        const cleanedSvg = "<svg><path d='M0 0 H10 V10 H0 Z'/></svg>";
-        const expectedOutput = Buffer.from(cleanedSvg).toString("base64");
+        const expectedOutput = Buffer.from(svgInput).toString("base64");
 
         expect(svgEncoder(Buffer.from(svgInput, "utf8"))).toBe(expectedOutput);
     });
@@ -81,7 +82,7 @@ describe(svgEncoder, () => {
                 />
             </svg>
         `;
-        const cleanedSvg = "<svg version=\"1.1\"> <rect x=\"0\" y=\"0\" width=\"100\" height=\"100\" /> <path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /> </svg>";
+        const cleanedSvg = "//gs <svg version=\"1.1\"> <rect x=\"0\" y=\"0\" width=\"100\" height=\"100\" /> <path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /> </svg>";
         const expectedOutput = Buffer.from(cleanedSvg).toString("base64");
 
         expect(svgEncoder(Buffer.from(svgInput, "utf8"))).toBe(expectedOutput);
@@ -102,7 +103,9 @@ describe(svgEncoder, () => {
         // This test ensures that the regex for class removal is not too greedy
         // and doesn't mess with path data that might coincidentally look like a class attribute.
         const svgInput = String.raw`<svg><path d="M0 0 class=\'test\' //gs still here"></path></svg>`;
-        const cleanedSvg = String.raw`<svg><path d="M0 0 class=\'test\' still here"></path></svg>`;
+        // `//gs` is preserved (it is part of the path data, not a marker); the
+        // escaped `class=\'...\'` inside attribute values is also left intact.
+        const cleanedSvg = String.raw`<svg><path d="M0 0 class=\'test\' //gs still here"></path></svg>`;
         const expectedOutput = Buffer.from(cleanedSvg).toString("base64");
 
         expect(svgEncoder(Buffer.from(svgInput, "utf8"))).toBe(expectedOutput);

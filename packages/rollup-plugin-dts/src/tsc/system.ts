@@ -7,20 +7,58 @@ const debug = createDebug("rollup-plugin-dts:tsc-system");
  * A system that writes files to both memory and disk. It will try read files
  * from memory firstly and fallback to disk if not found.
  */
-export const createFsSystem = (files: Map<string, string>): ts.System => {
+// Collect every ancestor directory of a file path (using POSIX-normalized separators so
+// the membership test in `directoryExists` is consistent regardless of platform).
+const ancestorDirectories = (filePath: string): string[] => {
+    const normalized = filePath.replaceAll("\\", "/");
+    const directories: string[] = [];
+    let directory = normalized.slice(0, Math.max(0, normalized.lastIndexOf("/")));
+
+    while (directory.includes("/")) {
+        directories.push(directory);
+
+        directory = directory.slice(0, directory.lastIndexOf("/"));
+    }
+
+    if (directory) {
+        directories.push(directory);
+    }
+
+    return directories;
+};
+
+// Maintain a Set of known in-memory directories incrementally instead of scanning every
+// key on each `directoryExists` call (TS calls it constantly — O(files) per call is a real
+// cost). Storing exact directory paths and matching by membership also guards against the
+// prefix bug where `directoryExists("/a/bar")` previously matched `/a/barn/x.d.ts`.
+const createSystem = (files: Map<string, string>, persistToDisk: boolean): ts.System => {
+    const knownDirectories = new Set<string>();
+
+    for (const filePath of files.keys()) {
+        for (const directory of ancestorDirectories(filePath)) {
+            knownDirectories.add(directory);
+        }
+    }
+
+    const trackDirectories = (filePath: string) => {
+        for (const directory of ancestorDirectories(filePath)) {
+            knownDirectories.add(directory);
+        }
+    };
+
     return {
         ...ts.sys,
 
         deleteFile(fileName, ...arguments_) {
             files.delete(fileName);
-            ts.sys.deleteFile?.(fileName, ...arguments_);
+
+            if (persistToDisk) {
+                ts.sys.deleteFile?.(fileName, ...arguments_);
+            }
         },
 
-        // Copied from
-        // eslint-disable-next-line no-secrets/no-secrets -- Source attribution URL is intentional
-        // https://github.com/microsoft/TypeScript-Website/blob/b0e9a5c0/packages/typescript-vfs/src/index.ts#L532C1-L534C8
         directoryExists(directory) {
-            if ([...files.keys()].some((path) => path.startsWith(directory))) {
+            if (knownDirectories.has(directory.replaceAll("\\", "/"))) {
                 return true;
             }
 
@@ -61,23 +99,17 @@ export const createFsSystem = (files: Map<string, string>): ts.System => {
 
         writeFile(path, data, ...arguments_) {
             files.set(path, data);
-            ts.sys.writeFile(path, data, ...arguments_);
+            trackDirectories(path);
+
+            if (persistToDisk) {
+                ts.sys.writeFile(path, data, ...arguments_);
+            }
         },
     };
 };
+
+export const createFsSystem = (files: Map<string, string>): ts.System => createSystem(files, true);
 
 // A system that only writes files to memory. It will read files from both
 // memory and disk.
-export const createMemorySystem = (files: Map<string, string>): ts.System => {
-    return {
-        ...createFsSystem(files),
-
-        deleteFile(fileName) {
-            files.delete(fileName);
-        },
-
-        writeFile(path, data) {
-            files.set(path, data);
-        },
-    };
-};
+export const createMemorySystem = (files: Map<string, string>): ts.System => createSystem(files, false);

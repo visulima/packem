@@ -26,9 +26,9 @@ export interface BuildHooks<T> {
     "rollup:options": (context: BuildContext<T>, options: RollupOptions) => Promise<void> | void;
     "rollup:watch": (context: BuildContext<T>, watcher: RollupWatcher) => Promise<void> | void;
 
-    // @deprecated Use "builder:before" instead
+    /** @deprecated Use "builder:before" instead */
     "typedoc:before": (context: BuildContext<T>) => Promise<void> | void;
-    // @deprecated Use "builder:done" instead
+    /** @deprecated Use "builder:done" instead */
     "typedoc:done": (context: BuildContext<T>) => Promise<void> | void;
 
     "validate:before": (context: BuildContext<T>) => Promise<void> | void;

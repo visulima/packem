@@ -1,7 +1,6 @@
 /**
  * Modified copy of https://github.com/vitejs/vite/blob/main/packages/vite/rollup.dts.config.ts#L64
  */
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { walk } from "estree-walker";
 import MagicString from "magic-string";
 import { findStaticImports } from "mlly";
@@ -52,13 +51,12 @@ function replaceConfusingTypeNames(
     for (const moduleName of Object.keys(identifierReplacements ?? {})) {
         const matchingImport = imports.find((importDeclaration) => importDeclaration.specifier === moduleName && importDeclaration.imports.includes("{"));
 
-        // Validate that `identifierReplacements` is not outdated if there's no match
+        // Validate that `identifierReplacements` is not outdated if there's no match.
+        // This is the same class of config drift as the per-identifier check below
+        // (line ~69), so fail the build the same way instead of silently mutating the
+        // global `process.exitCode` from a "warn and continue" branch.
         if (!matchingImport) {
-            this.warn(`${chunk.fileName} does not import "${moduleName}" for replacement`);
-
-            process.exitCode = 1;
-
-            continue;
+            throw new Error(`${chunk.fileName} does not import "${moduleName}" for replacement`);
         }
 
         const replacements = identifierReplacements?.[moduleName] ?? {};
@@ -233,6 +231,12 @@ export type PatchTypesOptions = {
  */
 export const patchTypescriptTypes = (options: PatchTypesOptions, logger: Console): Plugin => {
     return {
+        // Reset the once-per-file warning-suppression map so a second build in the
+        // same process (watch rebuild, multi-format build) surfaces confusing-identifier
+        // warnings again instead of staying silent after the first build.
+        buildStart() {
+            calledDtsFiles.clear();
+        },
         name: "packem:patch-types",
         renderChunk(code, chunk) {
             // eslint-disable-next-line no-param-reassign

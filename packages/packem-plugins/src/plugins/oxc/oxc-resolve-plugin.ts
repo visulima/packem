@@ -7,6 +7,46 @@ import type { Plugin } from "rollup";
 
 import type { OXCResolveOptions } from "./types";
 
+// Virtual / null-byte module ids are owned by the plugin that emitted them and are
+// never resolvable on disk.
+const VIRTUAL_ID_RE = /^\0/;
+
+/**
+ * Derives the `moduleSideEffects` predicate for a resolved module from the owning
+ * package.json `sideEffects` field. Extracted from the resolver handler to keep the
+ * handler's branching within the cognitive-complexity budget.
+ *
+ * Defaults to *true* (module has side effects → not stripped) when no `sideEffects`
+ * field is declared, matching rollup's / `@rollup/plugin-node-resolve`'s convention:
+ * only an explicit `sideEffects: false` opts a package into aggressive tree-shaking.
+ */
+const buildSideEffectsPredicate = (
+    packageSideEffects: boolean | string[] | undefined,
+    packageRoot: string,
+): (location: string) => boolean => {
+    if (typeof packageSideEffects === "boolean") {
+        return () => packageSideEffects;
+    }
+
+    if (Array.isArray(packageSideEffects)) {
+        const finalPackageSideEffects = packageSideEffects.map((sideEffect) => {
+            /*
+             * The array accepts simple glob patterns to the relevant files... Patterns like .css, which do not include a /, will be treated like **\/.css.
+             * https://webpack.js.org/guides/tree-shaking/
+             */
+            if (sideEffect.includes("/")) {
+                return sideEffect;
+            }
+
+            return `**/${sideEffect}`;
+        });
+
+        return createFilter(finalPackageSideEffects, undefined, { resolve: packageRoot });
+    }
+
+    return (_: string) => true;
+};
+
 const oxcResolvePlugin = (options: OXCResolveOptions, rootDirectory: string, logger: Console, tsconfigPath?: string): Plugin => {
     const { ignoreSideEffectsForRoot, ...userOptions } = options;
 
@@ -28,7 +68,22 @@ const oxcResolvePlugin = (options: OXCResolveOptions, rootDirectory: string, log
     return <Plugin>{
         name: "oxc-resolve",
         resolveId: {
+            // Virtual ids (`\0...`) are owned by the emitting plugin (commonjs interop,
+            // import-attributes, native-modules, …) and are not real filesystem paths.
+            // Skip them natively so they never hit the oxc resolver, which would fail and
+            // emit a noisy debug log for every virtual module.
+            filter: {
+                id: {
+                    exclude: VIRTUAL_ID_RE,
+                },
+            },
             async handler(source, importer, resolveOptions) {
+                // Defensive: even with the native filter, guard against virtual ids that
+                // some bundlers may still route here (filter forwarding varies).
+                if (source.startsWith("\0")) {
+                    return undefined;
+                }
+
                 const { isEntry } = resolveOptions;
                 const resolveDirectory = isEntry || !importer ? dirname(source) : dirname(importer);
 
@@ -48,13 +103,7 @@ const oxcResolvePlugin = (options: OXCResolveOptions, rootDirectory: string, log
                     return undefined;
                 }
 
-                // Default to *true* (module has side effects → not stripped) when the
-                // owning package.json declares no `sideEffects` field. This matches
-                // rollup's / `@rollup/plugin-node-resolve`'s convention: only an explicit
-                // `sideEffects: false` (handled below) opts a package into aggressive
-                // tree-shaking. Defaulting to `false` here silently tree-shook
-                // side-effect-only imports such as `import "./styles.css"`, dropping CSS
-                // from the bundle entirely.
+                // See buildSideEffectsPredicate for the default-to-true rationale.
                 let hasModuleSideEffects: (location: string) => boolean = (_: string) => true;
 
                 try {
@@ -65,33 +114,12 @@ const oxcResolvePlugin = (options: OXCResolveOptions, rootDirectory: string, log
                     const packageRoot = dirname(path);
 
                     if (!ignoreSideEffectsForRoot || rootDirectory !== packageRoot) {
-                        const packageSideEffects = packageJson.sideEffects;
-
-                        if (typeof packageSideEffects === "boolean") {
-                            hasModuleSideEffects = () => packageSideEffects;
-                        } else if (Array.isArray(packageSideEffects)) {
-                            const finalPackageSideEffects = packageSideEffects.map((sideEffect) => {
-                                /*
-                                 * The array accepts simple glob patterns to the relevant files... Patterns like .css, which do not include a /, will be treated like **\/.css.
-                                 * https://webpack.js.org/guides/tree-shaking/
-                                 */
-                                if (sideEffect.includes("/")) {
-                                    return sideEffect;
-                                }
-
-                                return `**/${sideEffect}`;
-                            });
-
-                            hasModuleSideEffects = createFilter(finalPackageSideEffects, undefined, {
-                                resolve: packageRoot,
-                            });
-                        }
+                        hasModuleSideEffects = buildSideEffectsPredicate(packageJson.sideEffects, packageRoot);
                     }
                 } catch (catchError: unknown) {
                     const errorMessage = catchError instanceof Error ? catchError.message : String(catchError);
 
-                    // eslint-disable-next-line no-console
-                    console.debug(errorMessage, {
+                    logger.debug(errorMessage, {
                         context: [
                             {
                                 basedir: resolveDirectory,

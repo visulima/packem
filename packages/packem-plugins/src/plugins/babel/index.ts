@@ -12,7 +12,7 @@ import type { Pool } from "workerpool";
 import workerpool from "workerpool";
 
 import type { TransformCodeOptions } from "./transform-code";
-import { transformCode } from "./transform-code";
+import { MISSING_OPTIONS_SENTINEL, OPTIONS_KEY, transformCode } from "./transform-code";
 
 /** Default number of matched files before the worker pool is created. */
 const DEFAULT_PARALLEL_THRESHOLD = 20;
@@ -112,6 +112,13 @@ export interface BabelPluginConfig extends Omit<TransformOptions, "exclude" | "f
     include?: FilterPattern;
 
     /**
+     * Optional logger used to surface diagnostics — e.g. why parallel mode fell back
+     * to in-process transforms (non-serializable option, missing worker script). When
+     * omitted, fallbacks happen silently (preserving prior behaviour).
+     */
+    logger?: Pick<Console, "debug" | "warn">;
+
+    /**
      * Run Babel transforms in parallel across a worker pool.
      * `false` always transforms in-process; `true`/`undefined` auto-enables workers
      * once the build crosses `parallelThreshold` matched files (so small builds never
@@ -133,26 +140,29 @@ export interface BabelPluginConfig extends Omit<TransformOptions, "exclude" | "f
 
 export const babelTransformPlugin = ({
     exclude,
-    filename,
     generatorOpts,
     include,
+    logger,
     parallel = true,
     parallelThreshold = DEFAULT_PARALLEL_THRESHOLD,
-    sourceFileName,
     ...transformOptions
 }: BabelPluginConfig): Plugin => {
     const filter = createFilter(include, exclude ?? EXCLUDE_REGEXP);
 
-    // The constant per-build portion of the transform options. `filename`/
-    // `sourceFileName` are filled in per file (always strings, always serializable),
-    // so this object is sufficient for the one-time serializability check.
-    const baseTransformOptions: TransformCodeOptions = { ...transformOptions, filename, generatorOpts, sourceFileName };
+    // The constant per-build portion of the transform options. Any build-wide
+    // `filename`/`sourceFileName` that flows in via `...transformOptions` is
+    // intentionally ignored downstream: transformCode derives both from each module's
+    // `id`, so a single build-wide value never leaks into every module's Babel run
+    // (which would change per-file preset/override behaviour).
+    const baseTransformOptions: TransformCodeOptions = { ...transformOptions, generatorOpts };
 
     let matchedCount = 0;
     let workerPool: Pool | undefined;
     // Once true, parallel mode is permanently off for this build (opted out,
-    // non-serializable options, or worker script not found).
-    let parallelDisabled = parallel === false;
+    // non-serializable options, or worker script not found). `parallel <= 0` (or
+    // `false`) means "disabled" — a worker count of 0 would otherwise be treated as a
+    // pool size and break.
+    let parallelDisabled = parallel === false || (typeof parallel === "number" && parallel <= 0);
 
     const ensurePool = (): Pool | undefined => {
         if (parallelDisabled) {
@@ -169,8 +179,14 @@ export const babelTransformPlugin = ({
             return undefined;
         }
 
-        if (findNonSerializableOption(baseTransformOptions as Record<string, unknown>) !== undefined) {
+        const nonSerializableKey = findNonSerializableOption(baseTransformOptions as Record<string, unknown>);
+
+        if (nonSerializableKey !== undefined) {
             parallelDisabled = true;
+
+            logger?.warn(
+                `[packem:babel] Parallel transforms disabled: the Babel option "${nonSerializableKey}" is not serializable across a worker thread (e.g. a function plugin/preset or a function-form babel config). Falling back to in-process transforms.`,
+            );
 
             return undefined;
         }
@@ -180,10 +196,16 @@ export const babelTransformPlugin = ({
         if (!script) {
             parallelDisabled = true;
 
+            logger?.debug(
+                "[packem:babel] Parallel transforms disabled: the worker script was not found on disk (running from source, or the build did not copy it into dist/babel-runtime/). Falling back to in-process transforms.",
+            );
+
             return undefined;
         }
 
-        const maxWorkers = typeof parallel === "number" ? parallel : Math.min(cpus().length, DEFAULT_MAX_WORKERS);
+        // Clamp to >= 1: `cpus()` can return `[]` in some containers, making
+        // `Math.min(cpus().length, cap)` zero, which would create a 0-worker pool.
+        const maxWorkers = typeof parallel === "number" ? Math.max(1, parallel) : Math.max(1, Math.min(cpus().length, DEFAULT_MAX_WORKERS));
 
         workerPool = workerpool.pool(script, { maxWorkers, workerType: "thread" });
 
@@ -215,11 +237,24 @@ export const babelTransformPlugin = ({
             const pool = ensurePool();
 
             if (pool) {
-                // The worker runs the identical transformCode routine; a per-file
-                // `filename`/`sourceFileName` default is applied inside it from `id`.
-                return pool.exec("transform", [sourcecode, id, baseTransformOptions]) as Promise<
-                    { code: string; map: TransformOptions["inputSourceMap"] } | undefined
-                >;
+                // The transform options are constant for the whole build, so they are
+                // sent (and structured-cloned) once per worker keyed by `OPTIONS_KEY`,
+                // not re-cloned for every file. Each worker caches them in module scope
+                // and subsequent calls pass only `(code, id, OPTIONS_KEY)`. Because
+                // workerpool round-robins and we cannot target a worker, a worker that
+                // has not yet seen the key throws MISSING_OPTIONS_SENTINEL; we retry that
+                // single call once with the full payload attached.
+                type PoolResult = { code: string; map: TransformOptions["inputSourceMap"] } | undefined;
+
+                try {
+                    return (await pool.exec("transform", [sourcecode, id, OPTIONS_KEY])) as PoolResult;
+                } catch (error: unknown) {
+                    if (error instanceof Error && error.message.includes(MISSING_OPTIONS_SENTINEL)) {
+                        return (await pool.exec("transform", [sourcecode, id, OPTIONS_KEY, baseTransformOptions])) as PoolResult;
+                    }
+
+                    throw error;
+                }
             }
 
             const result = await transformCode(sourcecode, id, baseTransformOptions);

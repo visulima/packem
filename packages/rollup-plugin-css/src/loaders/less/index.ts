@@ -56,7 +56,10 @@ const loader: Loader<LESSLoaderOptions> = {
             plugins.push(...this.options.plugins);
         }
 
-        // Compile Less to CSS with source map generation
+        // Compile Less to CSS with source map generation. The map is always
+        // produced so the downstream loader chain can trace the final output back
+        // to the original Less source even when the loader-level `useSourcemap`
+        // flag is not set; the final emit step decides whether to keep it.
         const result: Less.RenderOutput = await (less.render.bind(less) as (input: string, options: Less.Options) => Promise<Less.RenderOutput>)(code, {
             ...this.options,
             filename: this.id,
