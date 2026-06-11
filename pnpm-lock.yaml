@@ -3244,6 +3244,9 @@ importers:
       publint:
         specifier: catalog:lint
         version: 0.3.21
+      rolldown:
+        specifier: catalog:build
+        version: 1.0.3
       rollup:
         specifier: catalog:build
         version: 4.60.4
