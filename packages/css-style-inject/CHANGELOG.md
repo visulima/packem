@@ -1,3 +1,9 @@
+## @visulima/css-style-inject [1.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.17...@visulima/css-style-inject@1.0.0-alpha.18) (2026-06-12)
+
+### Bug Fixes
+
+* resolve package audit findings across the monorepo ([2800d68](https://github.com/visulima/packem/commit/2800d68c00de2ff488b51ad90179731b929b9642))
+
 ## @visulima/css-style-inject [1.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.16...@visulima/css-style-inject@1.0.0-alpha.17) (2026-06-04)
 
 ### Bug Fixes
