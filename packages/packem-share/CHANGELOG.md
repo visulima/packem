@@ -1,3 +1,9 @@
+## @visulima/packem-share [1.0.0-alpha.50](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.49...@visulima/packem-share@1.0.0-alpha.50) (2026-06-12)
+
+### Bug Fixes
+
+* resolve package audit findings across the monorepo ([2800d68](https://github.com/visulima/packem/commit/2800d68c00de2ff488b51ad90179731b929b9642))
+
 ## @visulima/packem-share [1.0.0-alpha.49](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.48...@visulima/packem-share@1.0.0-alpha.49) (2026-06-04)
 
 ### Bug Fixes
