@@ -107,6 +107,44 @@ export const test = 'hello';`;
         `);
     });
 
+    it("dedupes a bare __cjs_require even when rollup deconflicted the createRequire call", async () => {
+        expect.assertions(3);
+
+        const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, {
+            debug: vi.fn<() => void>(),
+            error: vi.fn<() => void>(),
+            info: vi.fn<() => void>(),
+            warn: vi.fn<() => void>(),
+        } as unknown as Console);
+
+        // Simulates a bundled dependency whose own packem-built dist already shipped a
+        // `const __cjs_require = ...createRequire...(...)` shim. Rollup keeps one such
+        // declaration with the bare name but renames the `createRequire` import to a
+        // deconflicted `createRequire$2`. The renderChunk preamble then prepends a second
+        // bare `const __cjs_require = __cjs_createRequire(import.meta.url);`, so the output
+        // must collapse back to a single declaration or esbuild fails with
+        // "The symbol __cjs_require has already been declared".
+        const code = `const __cjs_require = createRequire$2(import.meta.url);
+import typescript from 'typescript';
+
+export const test = typescript;`;
+
+        const result = (await getRenderChunkHandler(plugin).call(
+            { debug: vi.fn<() => void>() } as unknown as ThisParameterType<RenderChunkHandler>,
+            code,
+            { fileName: "test.js" } as RenderedChunk,
+            { format: "es" } as Parameters<RenderChunkHandler>[2],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            {} as any,
+        )) as RenderChunkResult;
+
+        const declarationCount = [...result.code.matchAll(/const\s+__cjs_require\s*=/g)].length;
+
+        expect(result.code).toContain("const __cjs_require = __cjs_createRequire(import.meta.url);");
+        expect(result.code).not.toContain("createRequire$2");
+        expect(declarationCount).toBe(1);
+    });
+
     it("plugin handles node:process import with runtime helpers", async () => {
         expect.assertions(5);
 
