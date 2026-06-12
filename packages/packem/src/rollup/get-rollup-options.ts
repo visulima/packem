@@ -71,7 +71,8 @@ const MTS_EXTENSION_REGEX = /\.mts$/;
 export const BABEL_DEFAULT_INCLUDE_REGEX = /\.(?:m|c)?(?:j|t)sx?$/;
 // eslint-disable-next-line import/exports-last -- consumed by the shared bundler builder
 export const PRESERVE_DIRECTIVE_REGEX = /^['|"](use (\w+))['|"]$/;
-const SCRIPT_OR_JSON_EXTENSION_REGEX = /\.(?:[cm]?jsx?|[cm]?tsx?|json)$/;
+// eslint-disable-next-line import/exports-last -- consumed by getRolldownDtsOptions in get-rolldown-options.ts
+export const SCRIPT_OR_JSON_EXTENSION_REGEX = /\.(?:[cm]?jsx?|[cm]?tsx?|json)$/;
 
 const regExpOrStringToString = (pattern: RegExp | string): string => {
     if (pattern instanceof RegExp) {
@@ -81,7 +82,8 @@ const regExpOrStringToString = (pattern: RegExp | string): string => {
     return pattern;
 };
 
-const computeDtsResolveKey = (dtsResolve: boolean | (string | RegExp)[]): string => {
+// eslint-disable-next-line import/exports-last -- consumed by getRolldownDtsOptions in get-rolldown-options.ts
+export const computeDtsResolveKey = (dtsResolve: boolean | (string | RegExp)[]): string => {
     if (typeof dtsResolve === "boolean") {
         return String(dtsResolve);
     }
@@ -468,7 +470,8 @@ export const createNodeResolver = (context: BuildContext<InternalBuildOptions>):
     );
 };
 
-const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOptions>): boolean => {
+// eslint-disable-next-line import/exports-last -- consumed by getRolldownDtsOptions in get-rolldown-options.ts
+export const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOptions>): boolean => {
     // If the circular dependency warning is from node_modules, ignore it
     if (warning.code === "CIRCULAR_DEPENDENCY" && CIRCULAR_NODE_MODULES_REGEX.test(warning.message)) {
         return true;
@@ -637,128 +640,128 @@ export const buildPurePlugins = (
     const userPureFunctions: (RegExp | string)[] = context.options.rollup.pure.functions ?? [];
 
     const pureFunctions: (RegExp | string)[] = [
-            // Common utility functions
-            "Object.defineProperty",
-            "Object.assign",
-            "Object.create",
-            "Object.freeze",
-            "Object.seal",
-            "Object.setPrototypeOf",
-            "Object.getOwnPropertyDescriptor",
-            "Object.getOwnPropertyDescriptors",
-            "Object.getPrototypeOf",
-            "Object.hasOwnProperty",
-            "Object.isExtensible",
-            "Object.isFrozen",
-            "Object.isSealed",
+        // Common utility functions
+        "Object.defineProperty",
+        "Object.assign",
+        "Object.create",
+        "Object.freeze",
+        "Object.seal",
+        "Object.setPrototypeOf",
+        "Object.getOwnPropertyDescriptor",
+        "Object.getOwnPropertyDescriptors",
+        "Object.getPrototypeOf",
+        "Object.hasOwnProperty",
+        "Object.isExtensible",
+        "Object.isFrozen",
+        "Object.isSealed",
 
-            // Symbol functions - commonly used in libraries but safe to tree-shake when unused
-            "Symbol",
-            "Symbol.for",
-            "Symbol.keyFor",
-            "Symbol.iterator",
-            "Symbol.asyncIterator",
-            "Symbol.hasInstance",
-            "Symbol.isConcatSpreadable",
-            "Symbol.species",
-            "Symbol.toPrimitive",
-            "Symbol.toStringTag",
+        // Symbol functions - commonly used in libraries but safe to tree-shake when unused
+        "Symbol",
+        "Symbol.for",
+        "Symbol.keyFor",
+        "Symbol.iterator",
+        "Symbol.asyncIterator",
+        "Symbol.hasInstance",
+        "Symbol.isConcatSpreadable",
+        "Symbol.species",
+        "Symbol.toPrimitive",
+        "Symbol.toStringTag",
 
-            // Proxy constructor - safe when unused
-            "Proxy",
+        // Proxy constructor - safe when unused
+        "Proxy",
 
-            // Reflect methods - typically pure
-            "Reflect.apply",
-            "Reflect.construct",
-            "Reflect.defineProperty",
-            "Reflect.deleteProperty",
-            "Reflect.get",
-            "Reflect.getOwnPropertyDescriptor",
-            "Reflect.getPrototypeOf",
-            "Reflect.has",
-            "Reflect.isExtensible",
-            "Reflect.ownKeys",
-            "Reflect.preventExtensions",
-            "Reflect.set",
-            "Reflect.setPrototypeOf",
+        // Reflect methods - typically pure
+        "Reflect.apply",
+        "Reflect.construct",
+        "Reflect.defineProperty",
+        "Reflect.deleteProperty",
+        "Reflect.get",
+        "Reflect.getOwnPropertyDescriptor",
+        "Reflect.getPrototypeOf",
+        "Reflect.has",
+        "Reflect.isExtensible",
+        "Reflect.ownKeys",
+        "Reflect.preventExtensions",
+        "Reflect.set",
+        "Reflect.setPrototypeOf",
 
-            // WeakMap/WeakSet constructors - safe when unused
-            "WeakMap",
-            "WeakSet",
-            "WeakRef",
+        // WeakMap/WeakSet constructors - safe when unused
+        "WeakMap",
+        "WeakSet",
+        "WeakRef",
 
-            // Array methods that don't mutate
-            "Array.from",
-            "Array.of",
-            "Array.isArray",
+        // Array methods that don't mutate
+        "Array.from",
+        "Array.of",
+        "Array.isArray",
 
-            // Number methods
-            "Number.isFinite",
-            "Number.isInteger",
-            "Number.isNaN",
-            "Number.isSafeInteger",
-            "Number.parseFloat",
-            "Number.parseInt",
+        // Number methods
+        "Number.isFinite",
+        "Number.isInteger",
+        "Number.isNaN",
+        "Number.isSafeInteger",
+        "Number.parseFloat",
+        "Number.parseInt",
 
-            // String methods
-            "String.fromCharCode",
-            "String.fromCodePoint",
-            "String.raw",
+        // String methods
+        "String.fromCharCode",
+        "String.fromCodePoint",
+        "String.raw",
 
-            // Date constructor when used for static methods
-            "Date.now",
-            "Date.parse",
-            "Date.UTC",
+        // Date constructor when used for static methods
+        "Date.now",
+        "Date.parse",
+        "Date.UTC",
 
-            // Math methods (all are pure)
-            "Math.abs",
-            "Math.acos",
-            "Math.acosh",
-            "Math.asin",
-            "Math.asinh",
-            "Math.atan",
-            "Math.atan2",
-            "Math.atanh",
-            "Math.cbrt",
-            "Math.ceil",
-            "Math.clz32",
-            "Math.cos",
-            "Math.cosh",
-            "Math.exp",
-            "Math.expm1",
-            "Math.floor",
-            "Math.fround",
-            "Math.hypot",
-            "Math.imul",
-            "Math.log",
-            "Math.log10",
-            "Math.log1p",
-            "Math.log2",
-            "Math.max",
-            "Math.min",
-            "Math.pow",
-            "Math.random",
-            "Math.round",
-            "Math.sign",
-            "Math.sin",
-            "Math.sinh",
-            "Math.sqrt",
-            "Math.tan",
-            "Math.tanh",
-            "Math.trunc",
+        // Math methods (all are pure)
+        "Math.abs",
+        "Math.acos",
+        "Math.acosh",
+        "Math.asin",
+        "Math.asinh",
+        "Math.atan",
+        "Math.atan2",
+        "Math.atanh",
+        "Math.cbrt",
+        "Math.ceil",
+        "Math.clz32",
+        "Math.cos",
+        "Math.cosh",
+        "Math.exp",
+        "Math.expm1",
+        "Math.floor",
+        "Math.fround",
+        "Math.hypot",
+        "Math.imul",
+        "Math.log",
+        "Math.log10",
+        "Math.log1p",
+        "Math.log2",
+        "Math.max",
+        "Math.min",
+        "Math.pow",
+        "Math.random",
+        "Math.round",
+        "Math.sign",
+        "Math.sin",
+        "Math.sinh",
+        "Math.sqrt",
+        "Math.tan",
+        "Math.tanh",
+        "Math.trunc",
 
-            // JSON methods
-            "JSON.parse",
-            "JSON.stringify",
+        // JSON methods
+        "JSON.parse",
+        "JSON.stringify",
 
-            // Common library patterns
-            "require.resolve",
-            "Buffer.from",
-            "Buffer.alloc",
-            "Buffer.allocUnsafe",
-            "Buffer.isBuffer",
+        // Common library patterns
+        "require.resolve",
+        "Buffer.from",
+        "Buffer.alloc",
+        "Buffer.allocUnsafe",
+        "Buffer.isBuffer",
 
-            ...userPureFunctions,
+        ...userPureFunctions,
     ];
 
     // Constructors annotated as pure on `new X()`. rollup-plugin-pure only handles
@@ -884,8 +887,8 @@ const dedupeResolvePatterns = (merged: (string | RegExp)[]): (string | RegExp)[]
     return deduped;
 };
 
-// eslint-disable-next-line sonarjs/function-return-type -- the tri-state return is the deliberate dts-plugin `resolve` contract: false = disable, true = inline all, array = specific patterns
-const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean | (string | RegExp)[] => {
+// eslint-disable-next-line import/exports-last, sonarjs/function-return-type -- exports-last: consumed by getRolldownDtsOptions in get-rolldown-options.ts. function-return-type: the tri-state return is the deliberate dts-plugin `resolve` contract (false = disable, true = inline all, array = specific patterns).
+export const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean | (string | RegExp)[] => {
     const userResolve = context.options.rollup.dts?.resolve;
 
     // User explicitly disabled → respect it
@@ -945,12 +948,13 @@ const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsR
         // This overrides any userDtsOptions.resolve from the spread above.
         resolve: dtsResolve,
         tsconfig: context.tsconfig?.path,
-    }) as unknown as Plugin[];
+    });
 };
 
 // Avoid create multiple dts plugins instance and parsing the same tsconfig multi times,
 // This will avoid memory leak and performance issue.
-const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlugin);
+
+export const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlugin);
 
 export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);

@@ -1,10 +1,46 @@
-import type { FileCache } from "@visulima/packem-share";
-import type { BuildContext } from "@visulima/packem-share/types";
-import type { OutputOptions, RollupOptions } from "rollup";
+import { cachingPlugin, resolveAliases, resolveFileUrlPlugin } from "@visulima/packem-plugins";
+import { externalsPlugin } from "@visulima/packem-plugins/plugin/externals";
+import { fixDtsDefaultCjsExportsPlugin } from "@visulima/packem-plugins/plugin/fix-dts-default-cjs-exports";
+import { licensePlugin } from "@visulima/packem-plugins/plugin/license";
+import resolveImplicitExternalsPlugin from "@visulima/packem-plugins/plugin/resolve-implicit-externals";
+import { removeShebangPlugin } from "@visulima/packem-plugins/plugin/shebang";
+import {
+    patchTypescriptTypesPlugin,
+    resolveTsconfigPathsPlugin,
+    resolveTsconfigRootDirectoriesPlugin,
+    resolveTypescriptMjsCtsPlugin,
+} from "@visulima/packem-plugins/typescript";
+import type { AliasResolverObject, RollupReplaceOptions } from "@visulima/packem-rollup";
+import { alias as aliasPlugin, importTrace, replace as replacePlugin } from "@visulima/packem-rollup";
+import { cjsInteropPlugin } from "@visulima/packem-rollup/plugin/cjs-interop";
+import type { BuildContext, FileCache } from "@visulima/packem-share";
+import { sortUserPlugins } from "@visulima/packem-share/utils";
+import { resolve } from "@visulima/path";
+import type { OutputOptions, Plugin, RollupLog, RollupOptions } from "rollup";
 
 import { createJsBuildOptions } from "../bundler/get-build-options";
-import { getOxcTransformerConfig, resolveNodeTarget } from "../rollup/get-rollup-options";
+import {
+    computeDtsResolve,
+    computeDtsResolveKey,
+    createNodeResolver,
+    getLogger,
+    getOxcTransformerConfig,
+    memoizeDtsPluginByKey,
+    resolveNodeTarget,
+    SCRIPT_OR_JSON_EXTENSION_REGEX,
+    sharedOnWarn,
+} from "../rollup/get-rollup-options";
 import type { InternalBuildOptions } from "../types";
+import cloneReplaceOptions from "../utils/clone-replace-options";
+
+// Module-scope regex constants used inside the rolldown DTS plugins. Defined
+// here (not inside the plugin factories) so they are compiled once rather than
+// recreated on every renderChunk/transform call.
+// eslint-disable-next-line sonarjs/slow-regex -- anchored per-line match (`^…$` with `m`); the leading `\s*` cannot overlap the literal `//#`, so matching is linear, not backtracking-prone.
+const REGION_COMMENT_RE = /^\s*\/\/#(?:end)?region\b.*$/gm;
+const MULTI_NEWLINE_RE = /\n{2,}/g;
+const LEADING_WHITESPACE_RE = /^\s+/;
+const CJS_MJS_RE = /\.[cm]js$/;
 
 /**
  * Rolldown 1.0 removed native CSS bundling (rolldown#4271) and rejects any module
@@ -63,7 +99,6 @@ const getRolldownTransformOptions = (context: BuildContext<InternalBuildOptions>
  * The cast is intentional: `transform` is not part of rollup's `RollupOptions`,
  * and `bundler/build.ts` already treats rolldown options as an open record.
  */
-// eslint-disable-next-line import/prefer-default-export -- paired with src/rollup/get-rollup-options.ts which exports as named; keep both APIs symmetric
 export const getRolldownOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const options = await createJsBuildOptions(context, fileCache, "rolldown");
 
@@ -73,7 +108,7 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
     // overrides win, so spread any existing `moduleTypes` last.
     (options as Record<string, unknown>).moduleTypes = {
         ...ROLLDOWN_CSS_MODULE_TYPES,
-        ...((options as { moduleTypes?: Record<string, string> }).moduleTypes ?? {}),
+        ...(options as { moduleTypes?: Record<string, string> }).moduleTypes,
     };
 
     // Rolldown's `output.minify` defaults to `'dce-only'` (no identifier/whitespace
@@ -91,6 +126,266 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
             };
         });
     }
+
+    return options;
+};
+
+/**
+ * Strip `//#region …` and `//#endregion` comments that rolldown injects into
+ * emitted chunks (including `.d.ts` chunks). These comments carry
+ * worktree-sensitive absolute paths — omitting them keeps emitted declarations
+ * machine-independent and snapshot-stable.
+ *
+ * After removing the region markers, normalize whitespace to match rollup's DTS
+ * output format:
+ *
+ * - Collapse runs of 2+ newlines into one (region markers leave empty lines behind; `rollup-plugin-dts` never emits blank lines between declarations).
+ * - Remove leading blank lines (rolldown wraps the whole chunk in a region block that leaves a leading blank line after stripping).
+ * - Ensure a single trailing newline.
+ *
+ * The strip runs as a `renderChunk` output-stage plugin so it applies to every
+ * `write()` call individually, matching the per-extension write loop in
+ * `build-types.ts`.
+ */
+
+export const stripRolldownRegionCommentsPlugin = (): Plugin => {
+    return {
+        name: "packem:strip-rolldown-region-comments",
+        renderChunk(code) {
+            // 1. Remove region comment lines (the markers contain path-sensitive content).
+            let stripped = code.replaceAll(REGION_COMMENT_RE, "");
+
+            // 2. Collapse all runs of 2+ newlines into a single newline. Rolldown's
+            //    region markers leave empty lines behind; `rollup-plugin-dts` never
+            //    emits blank lines between declaration statements, so squashing runs is
+            //    safe and keeps rolldown's output format-compatible with rollup's.
+            stripped = stripped.replaceAll(MULTI_NEWLINE_RE, "\n");
+
+            // 3. Remove any remaining leading whitespace/blank lines.
+            stripped = stripped.replace(LEADING_WHITESPACE_RE, "");
+
+            // 4. Ensure a single trailing newline.
+            stripped = `${stripped.trimEnd()}\n`;
+
+            if (stripped === code) {
+                return undefined;
+            }
+
+            // map: undefined — DTS chunks carry no sourcemap, matching the repo's
+            // other declaration transforms (fix-dts-default-cjs-exports, shebang).
+            return { code: stripped, map: undefined };
+        },
+    };
+};
+
+/**
+ * Build the rolldown variant of the DTS options. Mirrors `getRollupDtsOptions`
+ * from `get-rollup-options.ts` but adapts for rolldown:
+ *
+ * - Drops `treeshake.preset` (rolldown emits a warning for it; `moduleSideEffects` is preserved).
+ * - Omits the `output` array (the per-extension write loop in `build-types.ts` drives output directly).
+ * - Has no serializable cache (rolldown manages its own incremental state).
+ * - Appends `stripRolldownRegionCommentsPlugin()` to remove worktree-path region comments injected by rolldown.
+ *
+ * Hook names (`rollup:dts:options`, `rollup:dts:build`, `rollup:dts:done`) are
+ * kept identical so user hooks fire for both backends without duplication.
+ */
+
+export const getRolldownDtsOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
+    const resolvedAliases = resolveAliases(context.pkg, context.options);
+    const dtsResolve = computeDtsResolve(context);
+    const nodeResolver = createNodeResolver(context);
+
+    // Mirror the memoization key from getRollupDtsOptions — same cache-busting
+    // rationale (parallel sibling builds must not share one plugin instance).
+    const resolveKey = computeDtsResolveKey(dtsResolve);
+    const entriesKey = context.options.entries
+        .map((entry) => entry.name ?? "")
+        .filter((name) => name !== "")
+        .toSorted((a, b) => a.localeCompare(b))
+        .join(",");
+    const uniqueProcessId = `dts-plugin:rolldown:${String(process.pid)}${context.tsconfig?.path ?? ""}:${resolveKey}:${entriesKey}`;
+
+    const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "dts");
+
+    const options: RollupOptions = {
+        input: Object.fromEntries(
+            context.options.entries
+                .filter((entry) => entry.name !== undefined)
+                .map((entry) => [entry.name as string, resolve(context.options.rootDir, entry.input)]),
+        ),
+
+        logLevel: context.options.debug ? "debug" : "info",
+
+        onLog: (level: "debug" | "info" | "warn", log: RollupLog) => {
+            // Suppress EMPTY_BUNDLE in the log handler (same as rollup path)
+            if (log.code === "EMPTY_BUNDLE") {
+                return;
+            }
+
+            const format = log.stack ? `${log.message}\n${log.stack}` : log.message;
+            const prefix = `dts${log.plugin ? `:plugin:${log.plugin}` : ""}`;
+            const logger = getLogger(context);
+
+            if (level === "info") {
+                logger.info({ message: format, prefix });
+            } else if (level === "warn") {
+                logger.warn({ message: format, prefix });
+            } else {
+                logger.debug({ message: format, prefix });
+            }
+        },
+
+        onwarn(warning: RollupLog, rollupWarn: (warning: RollupLog) => void) {
+            if (sharedOnWarn(warning, context)) {
+                return;
+            }
+
+            if (warning.code === "EMPTY_BUNDLE") {
+                return;
+            }
+
+            if (warning.code === "CIRCULAR_DEPENDENCY") {
+                return;
+            }
+
+            if (!warning.code) {
+                rollupWarn(warning);
+            }
+        },
+
+        plugins: [
+            importTrace(),
+
+            cachingPlugin(resolveFileUrlPlugin(), fileCache),
+            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
+
+            externalsPlugin(context, {
+                dtsResolve,
+                forTypes: true,
+                skipUnlistedWarnings: true,
+            }),
+
+            // Prevent rolldown from loading non-source files (e.g. raw data, images, styles)
+            // imported from TS during the DTS build — the DTS plugin short-circuits everything
+            // through its transform hook, but load runs first and needs a stub for other ids.
+            <Plugin>{
+                load(id: string) {
+                    if (!SCRIPT_OR_JSON_EXTENSION_REGEX.test(id)) {
+                        return "";
+                    }
+
+                    return undefined;
+                },
+                name: "packem:ignore-files",
+            },
+
+            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, getLogger(context), context.tsconfig), fileCache),
+            context.tsconfig
+            && context.options.rollup.tsconfigPaths
+            && cachingPlugin(
+                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, getLogger(context), context.options.rollup.tsconfigPaths),
+                fileCache,
+            ),
+
+            resolveImplicitExternalsPlugin(context),
+
+            context.options.rollup.replace
+            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap }) as RollupReplaceOptions),
+
+            context.options.rollup.alias
+            && aliasPlugin({
+                customResolver: nodeResolver as AliasResolverObject,
+                ...context.options.rollup.alias,
+                entries: resolvedAliases,
+            }),
+
+            ...prePlugins,
+
+            nodeResolver,
+
+            ...normalPlugins,
+
+            ...await memoizeDtsPluginByKey(uniqueProcessId)(context, dtsResolve),
+
+            context.options.emitCJS && fixDtsDefaultCjsExportsPlugin(),
+
+            context.options.cjsInterop
+            && context.options.emitCJS
+            && cjsInteropPlugin({
+                ...context.options.rollup.cjsInterop,
+                logger: getLogger(context),
+            }),
+
+            context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, getLogger(context)), fileCache),
+
+            removeShebangPlugin(),
+
+            ...postPlugins,
+
+            context.options.rollup.license !== false
+            && context.options.rollup.license?.path
+            && typeof context.options.rollup.license.dtsTemplate === "function"
+            && licensePlugin({
+                licenseFilePath: context.options.rollup.license.path,
+                licenseTemplate: context.options.rollup.license.dtsTemplate,
+                logger: getLogger(context),
+                marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
+                mode: "types",
+                packageName: context.pkg.name,
+            }),
+
+            // Rolldown-CJS-compat: rolldown infers `.cjs`/`.mjs` module types by extension
+            // and fails with PARSE_ERROR when the DTS plugin's transform emits `export {}`
+            // for these files (rolldown treats `.cjs` as CommonJS and rejects ESM syntax).
+            // Re-stubbing the transform output as empty after the DTS plugin runs lets
+            // rolldown parse the file as CJS without error (empty module → no exports).
+            // rollup doesn't have this issue because it is extension-agnostic when parsing
+            // transform hook results.
+            <Plugin>{
+                name: "packem:rolldown-cjs-mjs-dts-compat",
+                transform(_code: string, id: string) {
+                    // Only intercept the extension types rolldown can't parse as ESM.
+                    if (CJS_MJS_RE.test(id)) {
+                        return { code: "" };
+                    }
+
+                    return undefined;
+                },
+            },
+
+            // Strip rolldown's worktree-path region comments from declaration chunks.
+            // This MUST be last so it sees the fully-rendered output of every other plugin.
+            stripRolldownRegionCommentsPlugin(),
+        ].filter(Boolean),
+
+        preserveEntrySignatures: "strict",
+
+        // No `output` array: the per-extension write loop in build-types.ts
+        // drives each write() call directly. The rollup path also leaves `output`
+        // unused during one-shot builds (it is only consumed by the watch path).
+
+        // No `cache`: rolldown has no serializable cache.
+
+        // Rolldown warns on `treeshake.preset` (Step 0 probe) but we keep the
+        // side-effects flag which is the semantically important setting for DTS.
+        treeshake: {
+            moduleSideEffects: true,
+        },
+    };
+
+    // Rolldown infers module types from file extensions: `.cjs` → CJS, `.mts` → ESM.
+    // For DTS builds, `.cts` and `.mts` are TypeScript source files that the DTS
+    // plugin transforms. Rolldown must treat their transform output as TypeScript
+    // (which the DTS plugin handles) rather than as CJS (which would reject `export`).
+    // Override `.cts` and `.mts` to `"ts"` so rolldown routes them through the
+    // TypeScript transform pipeline; `.cjs`/`.mjs` stubs are handled by the
+    // packem:rolldown-cjs-mjs-dts-compat plugin above.
+    // Cast: `moduleTypes` is rolldown-specific; not in rollup's RollupOptions.
+    (options as Record<string, unknown>).moduleTypes = {
+        ".cts": "ts",
+        ".mts": "ts",
+    };
 
     return options;
 };

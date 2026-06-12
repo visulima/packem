@@ -14,7 +14,7 @@ import { PACKEM_CONFIG_FILES } from "../config/utils/find-packem-file";
 import loadPackageJson from "../config/utils/load-package-json";
 import prepareEntries from "../config/utils/prepare-entries";
 import { getRolldownWatch } from "../rolldown/get-rolldown";
-import { getRolldownOptions } from "../rolldown/get-rolldown-options";
+import { getRolldownDtsOptions, getRolldownOptions } from "../rolldown/get-rolldown-options";
 import type { InternalBuildOptions } from "../types";
 import { getRollupDtsOptions } from "./get-rollup-options";
 
@@ -236,7 +236,7 @@ const configureRolldownWatchOptions = (context: BuildContext<InternalBuildOption
         }
 
         if (userWatch.exclude !== undefined) {
-            exclude.push(...(Array.isArray(userWatch.exclude) ? userWatch.exclude : [userWatch.exclude]));
+            exclude.push(...Array.isArray(userWatch.exclude) ? userWatch.exclude : [userWatch.exclude]);
         }
     }
 
@@ -273,9 +273,8 @@ const watch = async (
         let bundleUseCache: boolean;
 
         if (isRolldown) {
-            // Rolldown bundle watcher (native). DTS, when enabled, still watches
-            // through rollup below — @visulima/rollup-plugin-dts isn't
-            // rolldown-compatible yet.
+            // Rolldown bundle watcher (native). DTS watching, when enabled, also
+            // runs natively through rolldown below (see the declaration block).
             const rolldownWatch = await getRolldownWatch();
             const rolldownOptions = await getRolldownOptions(context, fileCache);
 
@@ -288,7 +287,7 @@ const watch = async (
             (rolldownOptions as Record<string, unknown>).watch = configureRolldownWatchOptions(context);
 
             bundleWatcher = rolldownWatch(rolldownOptions) as unknown as RollupWatcher;
-            bundleOptions = rolldownOptions as { input?: Record<string, string> | string | string[] };
+            bundleOptions = rolldownOptions;
             // Rolldown manages its own incremental state; there is no rollup-style
             // serializable `cache`, so cache reuse is disabled for this watcher.
             bundleUseCache = false;
@@ -331,16 +330,36 @@ const watch = async (
         watchers.push(bundleWatcher);
 
         if (context.options.declaration) {
-            const rollupWatch = await getRollupWatch();
-            const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
+            let dtsWatcher: RollupWatcher;
+            let dtsUseCache: boolean;
 
-            if (useCache) {
-                rollupDtsOptions.cache = fileCache.get(`dts-${WATCH_CACHE_KEY}`);
+            if (isRolldown) {
+                // Rolldown DTS watcher: uses the rolldown-native watch path, mirroring
+                // the bundle watcher branch above. No serializable cache (rolldown
+                // manages its own incremental state). The DTS options builder already
+                // appends the region-comment strip plugin.
+                const rolldownDtsWatch = await getRolldownWatch();
+                const rolldownDtsOptions = await getRolldownDtsOptions(context, fileCache);
+
+                await context.hooks.callHook("rollup:dts:options", context, rolldownDtsOptions);
+
+                (rolldownDtsOptions as Record<string, unknown>).watch = configureRolldownWatchOptions(context);
+
+                dtsWatcher = rolldownDtsWatch(rolldownDtsOptions) as unknown as RollupWatcher;
+                dtsUseCache = false;
+            } else {
+                const rollupWatch = await getRollupWatch();
+                const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
+
+                if (useCache) {
+                    rollupDtsOptions.cache = fileCache.get(`dts-${WATCH_CACHE_KEY}`);
+                }
+
+                await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);
+
+                dtsWatcher = rollupWatch(rollupDtsOptions);
+                dtsUseCache = useCache;
             }
-
-            await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);
-
-            const dtsWatcher = rollupWatch(rollupDtsOptions);
 
             await context.hooks.callHook("rollup:watch", context, dtsWatcher);
 
@@ -348,7 +367,7 @@ const watch = async (
                 context,
                 fileCache,
                 mode: "types",
-                useCache,
+                useCache: dtsUseCache,
                 watcher: dtsWatcher,
             });
 

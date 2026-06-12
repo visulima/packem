@@ -3587,4 +3587,63 @@ throw new Error('line 9');
         expect(dCtsContent).toMatch(CTS_TYPE_REGEX);
         expect(dCtsContent).not.toMatch(FROM_MTS_REGEX);
     });
+
+    it.runIf(isRolldown)(
+        "should emit declaration files without //#region comments when using rolldown bundler",
+        async () => {
+            // Regression guard for plan 015: rolldown natively injects //#region <path>
+            // and //#endregion comments into emitted chunks including .d.ts files.
+            // packem's stripRolldownRegionCommentsPlugin must remove them so that:
+            //   1. The emitted d.ts is machine-independent (no worktree-path content).
+            //   2. Snapshots remain stable across worktree locations.
+            expect.assertions(6);
+
+            await writeFile(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                [
+                    "export interface RolldownDtsConfig {",
+                    "  name: string;",
+                    "  value: number;",
+                    "}",
+                    "",
+                    "export function build(config: RolldownDtsConfig): RolldownDtsConfig {",
+                    "  return config;",
+                    "}",
+                    "",
+                ].join("\n"),
+            );
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: { typescript: "*" },
+                exports: {
+                    ".": {
+                        import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                        require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
+                    },
+                },
+                main: "./dist/index.cjs",
+                module: "./dist/index.mjs",
+            });
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+            expect(binProcess.exitCode).toBe(0);
+
+            const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+            // Declarations must be present.
+            expect(dTsContent).toContain("RolldownDtsConfig");
+            expect(dTsContent).toContain("build");
+
+            // No //#region or //#endregion comments (worktree-path sensitive).
+            expect(dTsContent).not.toContain("//#region");
+            expect(dTsContent).not.toContain("//#endregion");
+
+            // No absolute paths leaking into the output.
+            expect(dTsContent).not.toContain(temporaryDirectoryPath);
+        },
+    );
 });
