@@ -1,3 +1,16 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.53](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.52...@visulima/rollup-plugin-css@1.0.0-alpha.53) (2026-06-12)
+
+### Bug Fixes
+
+* resolve package audit findings across the monorepo ([2800d68](https://github.com/visulima/packem/commit/2800d68c00de2ff488b51ad90179731b929b9642))
+* **rollup-plugin-css:** survive rollup cache restores so watch mode can keep its cache ([8de1655](https://github.com/visulima/packem/commit/8de1655c56085be0bab7ddeddd70ad8a25c18da1))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.50
+* **@visulima/css-style-inject:** upgraded to 1.0.0-alpha.18
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.52](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.51...@visulima/rollup-plugin-css@1.0.0-alpha.52) (2026-06-04)
 
 ### Bug Fixes
