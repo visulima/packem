@@ -445,7 +445,7 @@
         "cssnano": "7.1.0",
         "deeks": "^3.1.1",
         "detect-indent": "^7.0.1",
-        "esbuild": "^0.25.9",
+        "esbuild": "^0.28.0",
         "eslint": "9.33.0",
         "estree-walker": "^3.0.3",
         "execa": "^9.6.0",
@@ -488,7 +488,7 @@
     "peerDependencies": {
         "@swc/core": ">=1.11.29",
         "cssnano": ">=7.0.6",
-        "esbuild": ">=0.20.2",
+        "esbuild": ">=0.28.1",
         "icss-utils": ">=5.1.0",
         "less": ">=4.2.0",
         "lightningcss": ">=1.27.0",
