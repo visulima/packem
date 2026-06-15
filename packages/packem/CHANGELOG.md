@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.89](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.88...@visulima/packem@2.0.0-alpha.89) (2026-06-15)
+
+### Bug Fixes
+
+* **packem:** emit a single __cjs_getBuiltinModule helper in bundled output ([de09df0](https://github.com/visulima/packem/commit/de09df0bfc078885f61538d9f27445343e48e93a))
+
 ## @visulima/packem [2.0.0-alpha.88](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.87...@visulima/packem@2.0.0-alpha.88) (2026-06-12)
 
 ### Features
