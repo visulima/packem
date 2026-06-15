@@ -30,10 +30,14 @@ const GET_BUILTIN_MODULE_DECLARATION = `const __cjs_getBuiltinModule = (module) 
 };`;
 
 const REGEX_PATTERNS = {
-    builtin: /const\s+__cjs_getBuiltinModule\s*=\s*\(module\)\s*=>\s*\{[\s\S]*?\};\s*/g,
+    // `\(\w*\)` (not the literal `(module)`) so a copy whose arrow param rollup
+    // deconflicted to e.g. `(module2)` is still recognised as a duplicate. The leading
+    // `__cjs_getBuiltinModule\s*=` still excludes `$N`-suffixed names (`__cjs_getBuiltinModule$1 =`),
+    // which are distinct symbols referenced elsewhere and must survive.
+    builtin: /const\s+__cjs_getBuiltinModule\s*=\s*\(\w*\)\s*=>\s*\{[\s\S]*?\};\s*/g,
     import: /import\s*\{\s*createRequire(?:\s+as\s+__cjs_createRequire)?\s*\}\s*from\s*["']node:module["'];?\s*/g,
     process: /const\s+__cjs_getProcess\s*=\s*typeof\s+globalThis[^;]*;\s*/g,
-    require: /const\s+__cjs_require\s*=\s*(?:__cjs_)?createRequire\s*\([^)]*\);\s*/g,
+    require: /const\s+__cjs_require\s*=\s*(?:__cjs_)?createRequire(?:\$\w+)?\s*\([^)]*\);\s*/g,
 } as const;
 
 const DEFAULT_EXCLUDE = [/node_modules/, /\.d\.[cm]?ts$/];

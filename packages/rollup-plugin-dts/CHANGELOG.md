@@ -1,3 +1,18 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.33...@visulima/rollup-plugin-dts@1.0.0-alpha.34) (2026-06-12)
+
+### Features
+
+* **rollup-plugin-dts:** support rolldown via virtual-module guard and a rolldown test lane ([8e2b95d](https://github.com/visulima/packem/commit/8e2b95d7b1b45dfa14803dd2830948d52a7f3153))
+
+### Bug Fixes
+
+* resolve package audit findings across the monorepo ([2800d68](https://github.com/visulima/packem/commit/2800d68c00de2ff488b51ad90179731b929b9642))
+* **rollup-plugin-dts:** fail fast when the tsc worker fork or tsgo run fails ([e40c119](https://github.com/visulima/packem/commit/e40c119d89583eb0bb9ab3c2d53ba0e260c55b6e))
+
+### Tests
+
+* **rollup-plugin-dts:** satisfy eslint rules in tsgo spawn tests ([d816d6c](https://github.com/visulima/packem/commit/d816d6c363804d8c50becf2754bfab8873f2d79f))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.33](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.32...@visulima/rollup-plugin-dts@1.0.0-alpha.33) (2026-06-04)
 
 ### Bug Fixes

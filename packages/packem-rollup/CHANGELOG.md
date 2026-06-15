@@ -1,3 +1,21 @@
+## @visulima/packem-rollup [1.0.0-alpha.73](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.72...@visulima/packem-rollup@1.0.0-alpha.73) (2026-06-12)
+
+### Features
+
+* **packem:** run preserve-directives/jsx/pure plugins under rolldown + native rolldown watch ([3087190](https://github.com/visulima/packem/commit/3087190f011f85e881c7a2dc5b0579360741ac67))
+
+### Bug Fixes
+
+* **packem-rollup:** handle first-position attribute in jsx-remove-attributes ([5b36f50](https://github.com/visulima/packem/commit/5b36f504c4548cf2f85e6293cb0cbb94dc01d769))
+* **packem:** enable chunk-per-export splitting under rolldown ([8eb4e67](https://github.com/visulima/packem/commit/8eb4e679ed044487d3d1c1a86956ca5ee856501b))
+* resolve package audit findings across the monorepo ([2800d68](https://github.com/visulima/packem/commit/2800d68c00de2ff488b51ad90179731b929b9642))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.50
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.34
+
 ## @visulima/packem-rollup [1.0.0-alpha.72](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.71...@visulima/packem-rollup@1.0.0-alpha.72) (2026-06-04)
 
 ### Bug Fixes

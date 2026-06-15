@@ -1,3 +1,41 @@
+## @visulima/packem [2.0.0-alpha.89](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.88...@visulima/packem@2.0.0-alpha.89) (2026-06-15)
+
+### Bug Fixes
+
+* **packem:** emit a single __cjs_getBuiltinModule helper in bundled output ([de09df0](https://github.com/visulima/packem/commit/de09df0bfc078885f61538d9f27445343e48e93a))
+
+## @visulima/packem [2.0.0-alpha.88](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.87...@visulima/packem@2.0.0-alpha.88) (2026-06-12)
+
+### Features
+
+* **packem:** run preserve-directives/jsx/pure plugins under rolldown + native rolldown watch ([3087190](https://github.com/visulima/packem/commit/3087190f011f85e881c7a2dc5b0579360741ac67))
+
+### Bug Fixes
+
+* **packem-rollup:** handle first-position attribute in jsx-remove-attributes ([5b36f50](https://github.com/visulima/packem/commit/5b36f504c4548cf2f85e6293cb0cbb94dc01d769))
+* **packem:** enable chunk-per-export splitting under rolldown ([8eb4e67](https://github.com/visulima/packem/commit/8eb4e679ed044487d3d1c1a86956ca5ee856501b))
+* **packem:** keep watch mode alive when onSuccess fails ([a413637](https://github.com/visulima/packem/commit/a413637503dc156f8f30d81efb47921658fe1b20))
+* resolve package audit findings across the monorepo ([2800d68](https://github.com/visulima/packem/commit/2800d68c00de2ff488b51ad90179731b929b9642))
+* **rollup-plugin-css:** survive rollup cache restores so watch mode can keep its cache ([8de1655](https://github.com/visulima/packem/commit/8de1655c56085be0bab7ddeddd70ad8a25c18da1))
+
+### Code Refactoring
+
+* **packem:** extract shared dependency-cache load/persist helpers ([00e2e79](https://github.com/visulima/packem/commit/00e2e7954bc0dae1c633ba8c570c793849a4ffff))
+
+### Tests
+
+* **packem:** accept backtick-quoted inlined values in package-json-exports ([084196e](https://github.com/visulima/packem/commit/084196e5f1f238d114b88eaaf589e7c6f48ada88))
+* **packem:** fail fast when updating snapshots without PACKEM_TEST_BUNDLER ([a0a490c](https://github.com/visulima/packem/commit/a0a490cbb04c2aff973fc81fd79b3a2cf4ecf0e2))
+* **packem:** regenerate rolldown snapshots to match native rolldown output ([15331f4](https://github.com/visulima/packem/commit/15331f4513bba3dddb574cfa7b0aaa1302d16fab)), closes [/#region](https://github.com/visulima///issues/region)
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.50
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.53
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.34
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.73
+
 ## @visulima/packem [2.0.0-alpha.87](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.86...@visulima/packem@2.0.0-alpha.87) (2026-06-04)
 
 ### Bug Fixes

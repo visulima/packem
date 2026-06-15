@@ -427,4 +427,68 @@ export const mainIndex2 = () => ({
 
         expect(sharedMjsContent).toMatchSnapshot("shared");
     });
+
+    it("dedupes the __cjs_getBuiltinModule helper when a bundled dep already ships it with a renamed param", async () => {
+        expect.assertions(3);
+
+        // A bundled dependency whose own (already packem-built) dist ships the builtin
+        // interop helper. Because `module` collided at that dep's chunk scope, rollup had
+        // deconflicted the arrow param to `module2`. The dep is bundled verbatim (the
+        // require-cjs plugin excludes node_modules), so this declaration is carried into
+        // the final chunk untouched. `loadOs` keeps it from being tree-shaken away.
+        writeFileSync(
+            `${temporaryDirectoryPath}/node_modules/cjs-helper-dep/package.json`,
+            JSON.stringify({ main: "index.js", name: "cjs-helper-dep", type: "module", version: "1.0.0" }),
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/node_modules/cjs-helper-dep/index.js`,
+            `const __cjs_getBuiltinModule = (module2) => {
+    return globalThis.process.getBuiltinModule(module2);
+};
+
+export const loadOs = () => __cjs_getBuiltinModule("node:os");
+`,
+        );
+
+        // The entry imports a builtin (so the renderChunk preamble prepends a *fresh*
+        // \`const __cjs_getBuiltinModule = (module) => {...}\`) and pulls in the dep's
+        // \`(module2)\` copy. Without param-agnostic dedup both land at top level and the
+        // output crashes at load: "Identifier '__cjs_getBuiltinModule' has already been declared".
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.js`,
+            `import os from "node:os";
+import { loadOs } from "cjs-helper-dep";
+
+export const result = () => [os, loadOs()];
+`,
+        );
+
+        await createPackageJson(temporaryDirectoryPath, {
+            exports: { ".": { import: "./dist/index.mjs" } },
+            type: "module",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                rollup: {
+                    requireCJS: {
+                        builtinNodeModules: true,
+                    },
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const declarationCount = [...mjsContent.matchAll(/const __cjs_getBuiltinModule = \(/g)].length;
+
+        // Exactly one top-level helper declaration survives — the param-renamed dep copy
+        // is recognised as a duplicate and removed.
+        expect(declarationCount).toBe(1);
+        expect(mjsContent).not.toContain("(module2)");
+    });
 });
