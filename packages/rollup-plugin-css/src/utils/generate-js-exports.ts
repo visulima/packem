@@ -112,7 +112,7 @@ const appendNamedExports = ({ dts, dtsOutput, namedExports, output, outputExport
 const buildModulesExportsInterface = (modulesExports: Record<string, string>): string =>
     `\ninterface ModulesExports {
 ${Object.keys(modulesExports)
-    .map((key) => `  '${key.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}': string;`)
+    .map((key) => `  '${key.replaceAll("\\", String.raw`\\`).replaceAll("'", String.raw`\'`)}': string;`)
     .join("\n")}
 }\n`;
 
@@ -165,6 +165,10 @@ interface ApplyInjectOptions {
     saferId: (identifier: string) => string;
 }
 
+// Matches a valid JavaScript identifier (first char `$`, `_`, or a letter; rest
+// word chars or `$`). Module-scoped so it is compiled once, not on every call.
+const RE_VALID_JS_IDENTIFIER = /^[$_a-z][\w$]*$/i;
+
 /**
  * Builds the injected variant of the CSS exports and pushes generated code into `output`.
  */
@@ -187,7 +191,7 @@ const applyInject = ({ cssVariableName: cssVName, id, inject, modulesExports, mo
         throw new TypeError(`\`inject.package\` must be a non-empty string, received: ${JSON.stringify(packageName)}`);
     }
 
-    if (!/^[$A-Z_a-z][\w$]*$/.test(methodName)) {
+    if (!RE_VALID_JS_IDENTIFIER.test(methodName)) {
         throw new Error(`\`inject.method\` must be a valid JavaScript identifier, received: ${JSON.stringify(methodName)}`);
     }
 

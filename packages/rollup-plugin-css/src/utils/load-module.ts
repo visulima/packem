@@ -43,6 +43,10 @@ const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): 
             return undefined;
         }
 
+        // `loaded` is Map<string, unknown>, so `cached` narrows to `{}` here and has no
+        // `.default`; the assertion is required by tsc to read the optional CJS interop
+        // default (the rule flags it as redundant, which is a false positive for `unknown`).
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const cachedModule = cached as { default?: unknown } | undefined;
 
         return cachedModule?.default ?? cachedModule;
