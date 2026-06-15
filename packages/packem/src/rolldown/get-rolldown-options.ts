@@ -15,11 +15,11 @@ import { alias as aliasPlugin, importTrace, replace as replacePlugin } from "@vi
 import { cjsInteropPlugin } from "@visulima/packem-rollup/plugin/cjs-interop";
 import type { BuildContext, FileCache } from "@visulima/packem-share";
 import { sortUserPlugins } from "@visulima/packem-share/utils";
-import { resolve } from "@visulima/path";
 import type { OutputOptions, Plugin, RollupLog, RollupOptions } from "rollup";
 
 import { createJsBuildOptions } from "../bundler/get-build-options";
 import {
+    buildInputMap,
     computeDtsResolve,
     computeDtsResolveKey,
     createNodeResolver,
@@ -36,9 +36,9 @@ import cloneReplaceOptions from "../utils/clone-replace-options";
 // Module-scope regex constants used inside the rolldown DTS plugins. Defined
 // here (not inside the plugin factories) so they are compiled once rather than
 // recreated on every renderChunk/transform call.
-// eslint-disable-next-line sonarjs/slow-regex -- anchored per-line match (`^…$` with `m`); the leading `\s*` cannot overlap the literal `//#`, so matching is linear, not backtracking-prone.
-const REGION_COMMENT_RE = /^\s*\/\/#(?:end)?region\b.*$/gm;
-const MULTI_NEWLINE_RE = /\n{2,}/g;
+// Matches a single rolldown region marker line (no `g`/`m` flags so it stays
+// stateless for repeated `.test()` calls in the line-based filter below).
+const REGION_MARKER_RE = /^\s*\/\/#(?:end)?region\b/;
 const LEADING_WHITESPACE_RE = /^\s+/;
 const CJS_MJS_RE = /\.[cm]js$/;
 
@@ -139,7 +139,7 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
  * After removing the region markers, normalize whitespace to match rollup's DTS
  * output format:
  *
- * - Collapse runs of 2+ newlines into one (region markers leave empty lines behind; `rollup-plugin-dts` never emits blank lines between declarations).
+ * - Drop region marker lines and only the blank lines they leave behind (the markers carry path-sensitive content; their removal otherwise leaves stray blanks). Intentional blank-line structure elsewhere in the declarations is preserved.
  * - Remove leading blank lines (rolldown wraps the whole chunk in a region block that leaves a leading blank line after stripping).
  * - Ensure a single trailing newline.
  *
@@ -152,19 +152,39 @@ export const stripRolldownRegionCommentsPlugin = (): Plugin => {
     return {
         name: "packem:strip-rolldown-region-comments",
         renderChunk(code) {
-            // 1. Remove region comment lines (the markers contain path-sensitive content).
-            let stripped = code.replaceAll(REGION_COMMENT_RE, "");
+            // 1. Drop region marker lines plus only the blank lines they introduce.
+            //    A blank line is removed when it sits directly next to a marker (the
+            //    artifact rolldown leaves around its `//#region`/`//#endregion`
+            //    wrappers); blank lines elsewhere are left untouched so we don't
+            //    rewrite intentional declaration structure.
+            const lines = code.split("\n");
+            const kept: string[] = [];
 
-            // 2. Collapse all runs of 2+ newlines into a single newline. Rolldown's
-            //    region markers leave empty lines behind; `rollup-plugin-dts` never
-            //    emits blank lines between declaration statements, so squashing runs is
-            //    safe and keeps rolldown's output format-compatible with rollup's.
-            stripped = stripped.replaceAll(MULTI_NEWLINE_RE, "\n");
+            for (let index = 0; index < lines.length; index += 1) {
+                const line = lines[index];
 
-            // 3. Remove any remaining leading whitespace/blank lines.
+                if (REGION_MARKER_RE.test(line)) {
+                    continue;
+                }
+
+                if (line.trim() === "") {
+                    const previousIsMarker = index > 0 && REGION_MARKER_RE.test(lines[index - 1]);
+                    const nextIsMarker = index < lines.length - 1 && REGION_MARKER_RE.test(lines[index + 1]);
+
+                    if (previousIsMarker || nextIsMarker) {
+                        continue;
+                    }
+                }
+
+                kept.push(line);
+            }
+
+            let stripped = kept.join("\n");
+
+            // 2. Remove any remaining leading whitespace/blank lines.
             stripped = stripped.replace(LEADING_WHITESPACE_RE, "");
 
-            // 4. Ensure a single trailing newline.
+            // 3. Ensure a single trailing newline.
             stripped = `${stripped.trimEnd()}\n`;
 
             if (stripped === code) {
@@ -209,11 +229,7 @@ export const getRolldownDtsOptions = async (context: BuildContext<InternalBuildO
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "dts");
 
     const options: RollupOptions = {
-        input: Object.fromEntries(
-            context.options.entries
-                .filter((entry) => entry.name !== undefined)
-                .map((entry) => [entry.name as string, resolve(context.options.rootDir, entry.input)]),
-        ),
+        input: buildInputMap(context),
 
         logLevel: context.options.debug ? "debug" : "info",
 
@@ -249,9 +265,7 @@ export const getRolldownDtsOptions = async (context: BuildContext<InternalBuildO
                 return;
             }
 
-            if (!warning.code) {
-                rollupWarn(warning);
-            }
+            rollupWarn(warning);
         },
 
         plugins: [

@@ -6,6 +6,6 @@ const REGEXP_SPECIAL_CHARACTERS_REGEX = /[.*+?^${}()|[\]\\]/g;
  * @param value Raw string (e.g. a user-configured directory name).
  * @returns The string with all regex special characters backslash-escaped.
  */
-const escapeRegExp = (value: string): string => value.replace(REGEXP_SPECIAL_CHARACTERS_REGEX, "\\$&");
+const escapeRegExp = (value: string): string => value.replaceAll(REGEXP_SPECIAL_CHARACTERS_REGEX, String.raw`\$&`);
 
 export default escapeRegExp;

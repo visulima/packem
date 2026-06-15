@@ -186,8 +186,12 @@ const createBuildCommand = (cli: Cli<Console>): void => {
 
             if (envFile) {
                 const envFileVariables = await loadEnvFile(envFile, rootPath, envPrefix, {
-                    info: (message: string) => logger.info(message),
-                    warn: (message: string) => logger.warn(message),
+                    info: (message: string) => {
+                        logger.info(message);
+                    },
+                    warn: (message: string) => {
+                        logger.warn(message);
+                    },
                 });
 
                 Object.assign(environments, envFileVariables);

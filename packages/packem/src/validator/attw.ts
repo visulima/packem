@@ -305,7 +305,7 @@ interface PackResult {
 }
 
 /**
- * Extracts the tarball filename from `<pm> pack --json` stdout.
+ * Extracts the tarball filename from `&lt;pm> pack --json` stdout.
  *
  * npm and yarn emit a JSON **array** of pack results (yarn after
  * {@link fixYarnStdout} normalisation), where `filename` is only a basename.

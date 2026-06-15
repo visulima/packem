@@ -508,7 +508,8 @@ export const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalB
     return warning.code === "MIXED_EXPORTS" && (context.options.cjsInterop ?? false);
 };
 
-const buildInputMap = (context: BuildContext<InternalBuildOptions>): Record<string, string> => {
+// eslint-disable-next-line import/exports-last -- consumed by the rolldown DTS options builder
+export const buildInputMap = (context: BuildContext<InternalBuildOptions>): Record<string, string> => {
     const input: Record<string, string> = {};
 
     for (const entry of context.options.entries) {

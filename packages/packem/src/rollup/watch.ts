@@ -222,7 +222,7 @@ const configureWatchOptions = (context: BuildContext<InternalBuildOptions>, curr
  * takes glob `include`/`exclude` filters only. We default to excluding the noise
  * directories and forward the user's glob `include`/`exclude` if they set any.
  * (package.json / packem.config.* / tsconfig changes are handled separately by
- * the fs.watch restart below, since they are not part of the module graph.)
+ * the fs.watch restart below, since they are not part of the module graph).
  */
 const configureRolldownWatchOptions = (context: BuildContext<InternalBuildOptions>): Record<string, unknown> => {
     const exclude: (string | RegExp)[] = ["**/.git/**", "**/node_modules/**", "**/test-results/**"];
@@ -250,6 +250,9 @@ const watch = async (
     runOnsuccess: () => Promise<void>,
     doOnSuccessCleanup: () => Promise<void>,
 ): Promise<void> => {
+    // Watch-mode caching is always enabled today; kept as a single named flag so
+    // the rollup cache-restore gating points below stay explicit (the rolldown
+    // branches set their own cache flag to false instead).
     const useCache = true;
 
     // Only `.close()` is used across both backends' watchers, so a structural
@@ -301,6 +304,7 @@ const watch = async (
                 return;
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- useCache is a feature flag, intentionally always-on today; the guard marks the cache-restore toggle point.
             if (useCache) {
                 rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
             }
@@ -351,6 +355,7 @@ const watch = async (
                 const rollupWatch = await getRollupWatch();
                 const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
 
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- useCache is a feature flag, intentionally always-on today; the guard marks the cache-restore toggle point.
                 if (useCache) {
                     rollupDtsOptions.cache = fileCache.get(`dts-${WATCH_CACHE_KEY}`);
                 }
