@@ -1,9 +1,10 @@
 import { spawn } from "node:child_process";
-import { mkdtemp } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import type { TsConfigJson } from "@visulima/tsconfig";
 import { createDebug } from "obug";
 
 const debug = createDebug("rollup-plugin-dts:tsgo");
@@ -58,7 +59,32 @@ export const getTsgoPathFromNodeModules = (): string => {
     return getExePath();
 };
 
-export const runTsgo = async (rootDirectory: string, tsconfig?: string, sourcemap?: boolean, tsgoPath?: string): Promise<string> => {
+/**
+ * Build the argument list for the `tsgo` binary.
+ *
+ * Kept as a pure function so the flag wiring can be unit-tested without spawning a process.
+ */
+export const buildTsgoArgs = (project: string | undefined, tsgoDist: string, rootDirectory: string, sourcemap?: boolean): string[] => [
+    "--noEmit",
+    "false",
+    "--declaration",
+    "--emitDeclarationOnly",
+    ...project ? ["-p", project] : [],
+    "--outDir",
+    tsgoDist,
+    "--rootDir",
+    rootDirectory,
+    "--noCheck",
+    ...sourcemap ? ["--declarationMap"] : [],
+];
+
+export const runTsgo = async (
+    rootDirectory: string,
+    tsconfig?: string,
+    sourcemap?: boolean,
+    tsgoPath?: string,
+    tsconfigRaw?: TsConfigJson,
+): Promise<string> => {
     debug("[tsgo] rootDir", rootDirectory);
 
     let tsgo: string;
@@ -75,23 +101,39 @@ export const runTsgo = async (rootDirectory: string, tsconfig?: string, sourcema
 
     debug("[tsgo] tsgoDist", tsgoDist);
 
-    const args = [
-        "--noEmit",
-        "false",
-        "--declaration",
-        "--emitDeclarationOnly",
-        ...tsconfig ? ["-p", tsconfig] : [],
-        "--outDir",
-        tsgoDist,
-        "--rootDir",
-        rootDirectory,
-        "--noCheck",
-        ...sourcemap ? ["--declarationMap"] : [],
-    ];
+    // tsgo reads `compilerOptions` solely from the project file passed via `-p`, so
+    // plugin-level `compilerOptions` / `tsconfigRaw` overrides were previously ignored.
+    // Honor them by writing a temporary project that `extends` the user's tsconfig and
+    // overlays the merged options. The temp file lives next to the original config so any
+    // relative `baseUrl` / `paths` / `include` inherited from the base resolve identically.
+    // See sxzz/rolldown-plugin-dts#238.
+    let project = tsconfig;
+    let temporaryProject: string | undefined;
+
+    if (tsconfigRaw && Object.keys(tsconfigRaw.compilerOptions ?? {}).length > 0) {
+        const baseDirectory = tsconfig ? path.dirname(tsconfig) : rootDirectory;
+        const { compilerOptions, ...rest } = tsconfigRaw;
+
+        temporaryProject = path.join(baseDirectory, `tsconfig.tsgo-${path.basename(tsgoDist)}.json`);
+
+        const merged = tsconfig ? { compilerOptions, extends: tsconfig } : { ...rest, compilerOptions };
+
+        await writeFile(temporaryProject, JSON.stringify(merged), "utf8");
+        debug("[tsgo] wrote temp project %s", temporaryProject);
+        project = temporaryProject;
+    }
+
+    const args = buildTsgoArgs(project, tsgoDist, rootDirectory, sourcemap);
 
     debug("[tsgo] args %o", args);
 
-    await spawnAsync(tsgo, args, { stdio: "inherit" });
+    try {
+        await spawnAsync(tsgo, args, { stdio: "inherit" });
+    } finally {
+        if (temporaryProject) {
+            await rm(temporaryProject, { force: true }).catch(() => {});
+        }
+    }
 
     return tsgoDist;
 };

@@ -13,7 +13,7 @@ import { createDebug } from "obug";
 import { isolatedDeclarationSync, transformSync } from "oxc-transform";
 import type { ExistingRawSourceMap, Plugin, SourceMapInput } from "rollup";
 
-import { filenameToDts, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE, replaceTemplateName, resolveTemplateFunction } from "./filename";
+import { dtsEntryFileName, filenameToDts, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
 import type { TscContext } from "./tsc/context";
 import { createContext, globalContext, invalidateContextFile } from "./tsc/context";
@@ -32,6 +32,8 @@ export interface TsModule {
     /** `.ts` file name */
     id: string;
     isEntry: boolean;
+    /** `true` when the source is a `.js`/`.jsx` file (declarations come from JSDoc). */
+    jsFile: boolean;
 }
 /** dts filename -> ts module */
 export type DtsMap = Map<string, TsModule>;
@@ -136,7 +138,7 @@ export const createGeneratePlugin = ({
             // isWatch = this.meta.watchMode
 
             if (tsgo) {
-                tsgoDist = await runTsgo(rootDir, tsconfig, sourcemap, tsgo.path);
+                tsgoDist = await runTsgo(rootDir, tsconfig, sourcemap, tsgo.path, tsconfigRaw);
             } else if (!oxc) {
                 // tsc
                 if (parallel) {
@@ -169,20 +171,28 @@ export const createGeneratePlugin = ({
                 }
             }
 
-            if (!Array.isArray(options.input)) {
-                for (const [name, id] of Object.entries(options.input)) {
-                    debug("resolving input alias %s -> %s", name, id);
-                    let resolved = await this.resolve(id);
+            // Normalize both input shapes into `[explicitName, id]` pairs so the
+            // resolution logic lives in a single loop. Object inputs carry an explicit
+            // output name (the map key); array inputs have none, so the name is derived
+            // from the resolved basename below — matching the name rollup would assign so
+            // the emitted `.d.ts` chunk lines up with its `.js` sibling.
+            const inputEntries: [string | undefined, string][] = Array.isArray(options.input)
+                ? options.input.map((id) => [undefined, id])
+                : Object.entries(options.input).map(([name, id]) => [name, id]);
 
-                    if (!id.startsWith("./")) {
-                        resolved ||= await this.resolve(`./${id}`);
-                    }
+            for (const [explicitName, id] of inputEntries) {
+                debug("resolving input %s (alias %s)", id, explicitName ?? "<derived>");
+                let resolved = await this.resolve(id);
 
-                    const resolvedId = resolved?.id || id;
-
-                    debug("resolved input alias %s -> %s", id, resolvedId);
-                    inputAliasMap.set(resolvedId, name);
+                if (!id.startsWith("./")) {
+                    resolved ||= await this.resolve(`./${id}`);
                 }
+
+                const resolvedId = resolved?.id || id;
+                const name = explicitName ?? path.basename(resolvedId).replace(RE_TS, "").replace(RE_JS, "");
+
+                debug("resolved input %s -> %s (%s)", id, resolvedId, name);
+                inputAliasMap.set(resolvedId, name);
             }
         },
 
@@ -219,11 +229,23 @@ export const createGeneratePlugin = ({
                 if (!dtsMap.has(dtsId))
                     return;
 
-                const { code, id } = dtsMap.get(dtsId)!;
+                const { code, id, jsFile } = dtsMap.get(dtsId)!;
                 let dtsCode: string | undefined;
                 let map: SourceMapInput | undefined;
 
                 debug("generate dts %s from %s", dtsId, id);
+
+                // A `.js` source whose declarations are wanted (`emitJs`) but that already
+                // ships a hand-written sibling `.d.ts` should use that file verbatim instead
+                // of regenerating one from JSDoc. `dtsId` for a `.js` input resolves to the
+                // sibling `.d.ts` path on disk, so returning here lets rollup load the real
+                // file. Ported from sxzz/rolldown-plugin-dts (commit 8b91ec6): skip emit
+                // dts for js when a sibling dts already exists.
+                if (jsFile && existsSync(dtsId)) {
+                    debug("dts file already exists for %s, skipping generation", id);
+
+                    return;
+                }
 
                 if (tsgo) {
                     if (RE_VUE.test(id))
@@ -373,24 +395,20 @@ export { __json_default_export as default }`;
                     const nameTemplate = resolveTemplateFunction(entryFileNames || "[name].js", chunk);
 
                     if (chunk.name.endsWith(".d")) {
-                        if (RE_DTS.test(nameTemplate)) {
-                            return replaceTemplateName(nameTemplate, chunk.name.slice(0, -2));
-                        }
+                        // chunk.name carries a `.d` suffix ("foo.d"), so a `[name]` template
+                        // already inherits it. dtsEntryFileName handles the JS/DTS extension.
+                        return dtsEntryFileName(nameTemplate, chunk.name, true) ?? nameTemplate;
+                    }
 
-                        if (RE_JS.test(nameTemplate)) {
-                            return nameTemplate.replace(RE_JS, ".$1ts");
-                        }
-                    } else if (emitDtsOnly) {
+                    if (emitDtsOnly) {
                         // If this chunk's facade module is a .d.ts file, it is a direct DTS
                         // entry (no .ts source). Give it a proper DTS extension so
-                        // generateBundle does not delete it.
+                        // generateBundle does not delete it. chunk.name has no `.d` suffix here.
                         if (chunk.facadeModuleId && RE_DTS.test(chunk.facadeModuleId)) {
-                            if (RE_DTS.test(nameTemplate)) {
-                                return replaceTemplateName(nameTemplate, chunk.name);
-                            }
+                            const dtsName = dtsEntryFileName(nameTemplate, chunk.name, false);
 
-                            if (RE_JS.test(nameTemplate)) {
-                                return nameTemplate.replace(RE_JS, ".$1ts");
+                            if (dtsName !== undefined) {
+                                return dtsName;
                             }
                         }
 
@@ -434,7 +452,7 @@ export { __json_default_export as default }`;
                             // Populate dtsMap directly from the source file so the load hook can serve it.
                             const code = readFileSync(tsId, "utf8");
 
-                            dtsMap.set(absoluteId, { code, id: tsId, isEntry: true });
+                            dtsMap.set(absoluteId, { code, id: tsId, isEntry: true, jsFile: RE_JS.test(tsId) });
                             entryIds.add(tsId);
                             debug("populated dtsMap from source for cached re-resolution: %s (via %s)", absoluteId, tsId);
                             break;
@@ -494,7 +512,8 @@ export { __json_default_export as default }`;
                 if (filter && !filter(id))
                     return;
 
-                const shouldEmit = !RE_JS.test(id) || emitJs;
+                const jsFile = RE_JS.test(id);
+                const shouldEmit = !jsFile || emitJs;
 
                 if (shouldEmit) {
                     // `entry` only *filters* rollup's detected entry points — it never
@@ -504,7 +523,7 @@ export { __json_default_export as default }`;
                     const isEntry = entryMatcher ? rollupIsEntry && entryMatcher(path.relative(cwd, id)) : rollupIsEntry;
                     const dtsId = filenameToDts(id);
 
-                    dtsMap.set(dtsId, { code, id, isEntry });
+                    dtsMap.set(dtsId, { code, id, isEntry, jsFile });
                     debug("register dts source: %s", id);
 
                     if (isEntry) {

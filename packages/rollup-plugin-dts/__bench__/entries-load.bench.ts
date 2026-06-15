@@ -18,7 +18,7 @@ const buildFixture = (moduleCount: number): { dtsMap: DtsMap; entryIds: Set<stri
         // ~25% of modules are entries, matching a typical multi-entry monorepo package.
         const isEntry = index % 4 === 0;
 
-        dtsMap.set(dtsId, { code: "export const x = 1;", id, isEntry });
+        dtsMap.set(dtsId, { code: "export const x = 1;", id, isEntry, jsFile: false });
 
         if (isEntry) {
             entryIds.add(id);

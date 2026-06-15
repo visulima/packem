@@ -85,6 +85,22 @@ describe("dts plugin", () => {
         expect(snapshot).toMatchSnapshot();
     });
 
+    // Regression for sxzz/rolldown-plugin-dts#208: a fixed-string `entryFileNames`
+    // (no `[name]` placeholder) must still carry the full `.d.<x>ts` extension.
+    it("fixed-string entryFileNames keeps the .d extension (#208)", async () => {
+        expect.assertions(1);
+
+        const { chunks } = await rollupBuild(
+            path.resolve(dirname, "fixtures/basic.ts"),
+            [dts({ emitDtsOnly: true })],
+            {},
+            { entryFileNames: "index.mjs" },
+        );
+        const fileNames = chunks.map((chunk) => chunk.fileName);
+
+        expect(fileNames.some((name) => name.endsWith(".d.mts"))).toBe(true);
+    });
+
     it("isolated declaration error", async () => {
         expect.assertions(2);
 

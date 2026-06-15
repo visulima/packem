@@ -350,6 +350,49 @@ describe("tsc", () => {
         });
     });
 
+    // Regression for sxzz/rolldown-plugin-dts#258/#259: a get/set accessor inside a
+    // type literal must not crash the tsc afterDeclarations transform.
+    it("accessor in type literal does not crash (#258)", async () => {
+        expect.assertions(3);
+
+        const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/accessor-type-literal.ts"), [
+            dts({
+                compilerOptions: { isolatedDeclarations: false },
+                emitDtsOnly: true,
+                oxc: false,
+            }),
+        ]);
+
+        // The get/set accessors must survive the stripPrivateFields transform with their
+        // shape intact — not merely appear somewhere as bare substrings.
+        expect(snapshot).toContain("get count(): number");
+        expect(snapshot).toContain("set count(value: number)");
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    // Regression for sxzz/rolldown-plugin-dts#254: `declaration: false` combined with
+    // `sourcemap` must not crash with a bare "Debug Failure"; declarations are forced on.
+    it("declaration:false + sourcemap does not crash (#254)", async () => {
+        expect.assertions(3);
+
+        const { chunks, snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/basic.ts"), [
+            dts({
+                compilerOptions: { declaration: false, isolatedDeclarations: false },
+                emitDtsOnly: true,
+                oxc: false,
+                sourcemap: true,
+            }),
+        ]);
+
+        // The crash was in the sourcemap path (getSourceMappingURL), so assert the
+        // declaration sourcemap was actually produced, not just that emit happened.
+        const sourcemap = findSourceMapChunk(chunks, "basic.d.ts.map");
+
+        expect(sourcemap.sources.length).toBeGreaterThan(0);
+        expect(snapshot).toContain("declare");
+        expect(snapshot).toMatchSnapshot();
+    });
+
     it("rename infer", async () => {
         expect.assertions(1);
 
