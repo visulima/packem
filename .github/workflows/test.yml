@@ -139,7 +139,7 @@ jobs:
 
             - name: "Upload code coverage to codecov"
               if: "matrix.os == 'ubuntu-latest' && matrix.node_version == 22"
-              uses: "anolilab/workflows/step/codecov@6051ae1b9d5a59de0f7bf40aedb9775e86034287" # v19.0.2
+              uses: "anolilab/workflows/step/codecov@acba5fb15ac98ad23dec1ad233e40e1bb79c1dae" # v19.0.4
               with:
                   run-lint: "needs.files-changed.outputs.codecov == 'true'"
                   codecov-token: "${{ secrets.CODECOV_TOKEN }}"
