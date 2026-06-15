@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-use-before-define, sonarjs/cognitive-complexity, no-param-reassign, no-console, unicorn/no-null, jsdoc/match-description, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unnecessary-condition -- this module wraps `tsc --build` orchestration; the helper functions are hoisted as expressions to match the orchestration flow, console.warn is intended user-facing diagnostic output, and `options` is mutated to patch user compiler options before passing to ts.createProgram */
+/* eslint-disable @typescript-eslint/no-use-before-define, sonarjs/cognitive-complexity, no-param-reassign, no-console, jsdoc/match-description, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unnecessary-condition -- this module wraps `tsc --build` orchestration; the helper functions are hoisted as expressions to match the orchestration flow, console.warn is intended user-facing diagnostic output, and `options` is mutated to patch user compiler options before passing to ts.createProgram */
 import { createDebug } from "obug";
 import type { ExistingRawSourceMap } from "rollup";
 import ts from "typescript";
@@ -42,7 +42,7 @@ const buildProjects = (fsSystem: ts.System, tsconfig: string, force: boolean, so
         projects.map((project) => project.tsconfigPath),
     );
 
-    const host = ts.createSolutionBuilderHost(fsSystem, createProgramWithPatchedCompilerOptions);
+    const host = ts.createSolutionBuilderHost(fsSystem, createProgramFactory(sourcemap));
     const builder = ts.createSolutionBuilder(host, [tsconfig], {
         force,
         verbose: true,
@@ -174,8 +174,16 @@ const patchCompilerOptions = (
     return options;
 };
 
-const createProgramWithPatchedCompilerOptions: ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram> = (rootNames, options, ...arguments_) =>
-    ts.createEmitAndSemanticDiagnosticsBuilderProgram(rootNames, patchCompilerOptions(options ?? {}, null), ...arguments_);
+// The solution builder re-parses each project's tsconfig and hands us the raw
+// compiler options, so the `declarationMap` we set on `parsedConfig.options` in
+// `collectProjectGraph` (used for `getOutputFileNames`) never reaches the program
+// that actually emits. We must re-apply the same patch here with the `sourcemap`
+// flag, otherwise tsc emits `.d.ts` but not `.d.ts.map` and the final sourcemap
+// chains back to the intermediate `.d.ts` instead of the original `.ts`
+// (sxzz/rolldown-plugin-dts#255).
+const createProgramFactory = (sourcemap: boolean): ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram> =>
+    (rootNames, options, ...arguments_) =>
+        ts.createEmitAndSemanticDiagnosticsBuilderProgram(rootNames, patchCompilerOptions(options ?? {}, { force: true, sourcemap, tsconfigPath: "" }), ...arguments_);
 
 // Emit file using `tsc --build` mode.
 const tscEmitBuild = (tscOptions: TscOptions): TscResult => {

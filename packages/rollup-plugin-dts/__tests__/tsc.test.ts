@@ -113,10 +113,36 @@ describe("tsc", () => {
         expect(sourcemap.sourceRoot).toBeOneOf([false, undefined]);
         expect(sourcemap.sources).toMatchInlineSnapshot(`
       [
-        "../src/index.d.ts",
+        "../src/index.ts",
       ]
     `);
         expect(snapshot).toMatchSnapshot();
+    });
+
+    // Regression for sxzz/rolldown-plugin-dts#255: with `build: true`, the `.d.ts.map`
+    // `sources` must point back to the original `.ts` (so "Go to Definition" lands on
+    // source) rather than the intermediate generated `.d.ts`. The solution builder
+    // re-parses the tsconfig, so `declarationMap` has to be re-applied to the emitting
+    // program (see createProgramFactory in src/tsc/emit-build.ts).
+    it("compiler project sourcemap maps to original .ts (build: true) (#255)", async () => {
+        expect.assertions(1);
+
+        const root = path.resolve(dirname, "fixtures/deep-source-map");
+        const { chunks } = await rolldownBuild(
+            [path.resolve(root, "src/index.ts")],
+            [
+                dts({
+                    build: true,
+                    sourcemap: true,
+                    tsconfig: path.resolve(root, "tsconfig.json"),
+                }),
+            ],
+            {},
+            { dir: path.resolve(root, "dist") },
+        );
+        const sourcemap = findSourceMapChunk(chunks, "index.d.ts.map");
+
+        expect(sourcemap.sources).toStrictEqual(["../src/index.ts"]);
     });
 
     it("composite projects sourcemap #80", async () => {
@@ -257,7 +283,7 @@ describe("tsc", () => {
         expect(snapshot).toMatchSnapshot();
     });
 
-    it.fails("jsdoc in js", async () => {
+    it("jsdoc in js", async () => {
         expect.assertions(1);
 
         const root = path.resolve(dirname, "fixtures/jsdoc-js");
@@ -348,6 +374,49 @@ describe("tsc", () => {
 
             expect(snapshot).toMatchSnapshot();
         });
+    });
+
+    // Regression for sxzz/rolldown-plugin-dts#258/#259: a get/set accessor inside a
+    // type literal must not crash the tsc afterDeclarations transform.
+    it("accessor in type literal does not crash (#258)", async () => {
+        expect.assertions(3);
+
+        const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/accessor-type-literal.ts"), [
+            dts({
+                compilerOptions: { isolatedDeclarations: false },
+                emitDtsOnly: true,
+                oxc: false,
+            }),
+        ]);
+
+        // The get/set accessors must survive the stripPrivateFields transform with their
+        // shape intact — not merely appear somewhere as bare substrings.
+        expect(snapshot).toContain("get count(): number");
+        expect(snapshot).toContain("set count(value: number)");
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    // Regression for sxzz/rolldown-plugin-dts#254: `declaration: false` combined with
+    // `sourcemap` must not crash with a bare "Debug Failure"; declarations are forced on.
+    it("declaration:false + sourcemap does not crash (#254)", async () => {
+        expect.assertions(3);
+
+        const { chunks, snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/basic.ts"), [
+            dts({
+                compilerOptions: { declaration: false, isolatedDeclarations: false },
+                emitDtsOnly: true,
+                oxc: false,
+                sourcemap: true,
+            }),
+        ]);
+
+        // The crash was in the sourcemap path (getSourceMappingURL), so assert the
+        // declaration sourcemap was actually produced, not just that emit happened.
+        const sourcemap = findSourceMapChunk(chunks, "basic.d.ts.map");
+
+        expect(sourcemap.sources.length).toBeGreaterThan(0);
+        expect(snapshot).toContain("declare");
+        expect(snapshot).toMatchSnapshot();
     });
 
     it("rename infer", async () => {

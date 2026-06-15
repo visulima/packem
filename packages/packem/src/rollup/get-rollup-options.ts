@@ -40,6 +40,7 @@ import { minVersion } from "semver";
 import type { InternalBuildOptions } from "../types";
 import cloneReplaceOptions from "../utils/clone-replace-options";
 import isDeclarationOnlyName from "../utils/is-declaration-only";
+import resolveBannerFooter from "../utils/resolve-banner-footer";
 
 /**
  * Structural view of the Pail logger.
@@ -925,12 +926,23 @@ const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsR
 
     const userDtsOptions: DtsOptions = context.options.rollup.dts ?? {};
 
+    // First-class declaration banner/footer. `@visulima/rollup-plugin-dts`
+    // emits declarations as assets, so rollup's `output.banner` can't reach
+    // them — the plugin prepends/appends via its own renderChunk instead.
+    // Only the `dts` branch of the option applies; a bare value targets JS.
+    const dtsBanner = resolveBannerFooter(context.options.banner, "dts");
+    const dtsFooter = resolveBannerFooter(context.options.footer, "dts");
+
     // @visulima/rollup-plugin-dts re-bundles its own copy of rollup's `Plugin`
     // type whose `SourceDescription.ast` (`ProgramNode`) differs structurally
     // from rollup 4's; the runtime objects are interchangeable but TS rejects
     // the assignment without a cast to bridge the two declarations.
 
     return dts({
+        // Top-level banner/footer; an explicit `rollup.dts.banner`/`footer` in
+        // the spread below takes precedence.
+        banner: dtsBanner,
+        footer: dtsFooter,
         ...userDtsOptions,
         compilerOptions: {
             ...userDtsOptions.compilerOptions,

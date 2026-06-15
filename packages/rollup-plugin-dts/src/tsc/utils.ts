@@ -17,7 +17,12 @@ const stripPrivateFields: ts.TransformerFactory<ts.SourceFile | ts.Bundle> = (co
             );
         }
 
-        return ts.visitEachChild(node, visitor, context);
+        // Pass `undefined` instead of the live `context`. Declaration transforms
+        // don't hoist, and reusing the transformation context makes `visitEachChild`
+        // re-enter the lexical environment for get/set accessors inside a
+        // function-like return type (e.g. `(): { get x(): T }`), crashing tsc with
+        // "Lexical environment is suspended". See sxzz/rolldown-plugin-dts#258/#259.
+        return ts.visitEachChild(node, visitor, undefined);
     };
 
     return (sourceFile) => ts.visitNode(sourceFile, visitor, ts.isSourceFile);

@@ -12,12 +12,21 @@ const isSourceFile = (id: string) => RE_TS.test(id) || RE_VUE.test(id) || RE_JSO
 
 const createDtsResolvePlugin = ({
     cwd,
+    emitJs,
     resolve,
     resolver,
     sideEffects,
     tsconfig,
     tsconfigRaw,
-}: Pick<OptionsResolved, "cwd" | "tsconfig" | "tsconfigRaw" | "resolve" | "resolver" | "sideEffects">): Plugin => {
+}: Pick<OptionsResolved, "cwd" | "tsconfig" | "tsconfigRaw" | "resolve" | "resolver" | "sideEffects" | "emitJs">): Plugin => {
+    // When `emitJs` is on (JSDoc/`allowJs` declarations), a local `.js` file that a
+    // `.d.ts` re-exports from must be redirected to its generated `.d.ts`, exactly
+    // like a `.ts` source. Without this, rollup links to the raw `.js` (which the
+    // generate plugin stubs to `export { }`), so the re-exported binding goes
+    // missing — sxzz/rolldown-plugin-dts "jsdoc in js". node_modules `.js` is
+    // excluded: those follow the normal external / sibling-`.d.ts` policy.
+    const isRedirectableJs = (id: string): boolean => emitJs && RE_JS.test(id) && !RE_NODE_MODULES.test(id);
+
     const dtsResolver = new ResolverFactory({
         conditionNames: ["types", "typings", "import", "require"],
         mainFields: ["types", "typings", "module", "main"],
@@ -119,9 +128,10 @@ const createDtsResolvePlugin = ({
                     };
                 }
 
-                if (isSourceFile(dtsResolution)) {
-                    // It's a .ts/.vue source file, so we load it to ensure its .d.ts is generated,
-                    // then redirect the import to the future .d.ts path
+                if (isSourceFile(dtsResolution) || isRedirectableJs(dtsResolution)) {
+                    // It's a .ts/.vue source file (or a local .js when emitJs is on), so we
+                    // load it to ensure its .d.ts is generated, then redirect the import to
+                    // the future .d.ts path.
                     await this.load({ id: dtsResolution });
 
                     return {
@@ -223,8 +233,13 @@ const createDtsResolvePlugin = ({
             }
         }
 
-        if (!dtsPath || !isSourceFile(dtsPath)) {
-            if (rollupResolution && isFilePath(rollupResolution.id) && isSourceFile(rollupResolution.id) && !rollupResolution.external) {
+        if (!dtsPath || !(isSourceFile(dtsPath) || isRedirectableJs(dtsPath))) {
+            if (
+                rollupResolution
+                && isFilePath(rollupResolution.id)
+                && (isSourceFile(rollupResolution.id) || isRedirectableJs(rollupResolution.id))
+                && !rollupResolution.external
+            ) {
                 return rollupResolution.id;
             }
 

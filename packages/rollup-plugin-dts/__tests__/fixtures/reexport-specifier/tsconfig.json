@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "isolatedDeclarations": true,
+        "declaration": true
+    },
+    "include": ["./src"]
+}

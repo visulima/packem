@@ -62,6 +62,38 @@ describe("dts plugin", () => {
         expect(snapshot).matchSnapshot();
     });
 
+    // Regression for sxzz/rolldown-plugin-dts#227: when a consumer imports from a
+    // dependency that re-exports a type, the emitted declaration must reference the
+    // dependency the consumer actually depends on — not the type's origin package.
+    describe("re-export specifier resolution (#227)", () => {
+        const root = path.resolve(dirname, "fixtures/reexport-specifier");
+
+        it("keeps the written specifier for a directly imported type", async () => {
+            expect.assertions(2);
+
+            const { snapshot } = await rollupBuild(path.resolve(root, "src/index.ts"), [
+                dts({ emitDtsOnly: true, oxc: true, tsconfig: path.resolve(root, "tsconfig.json") }),
+            ]);
+
+            expect(snapshot).toContain("from 'design-system'");
+            expect(snapshot).not.toContain("inner-lib");
+        });
+
+        it("rewrites an inferred origin specifier to the re-exporting dependency", async () => {
+            expect.assertions(2);
+
+            // No explicit annotation: TS infers the type and synthesizes
+            // `import("inner-lib").InnerType` (the origin). The fix rewrites it to the
+            // `design-system` dependency the source imports.
+            const { snapshot } = await rollupBuild(path.resolve(root, "src/infer.ts"), [
+                dts({ emitDtsOnly: true, oxc: false, tsconfig: path.resolve(root, "tsconfig.infer.json") }),
+            ]);
+
+            expect(snapshot).toContain("import(\"design-system\").InnerType");
+            expect(snapshot).not.toContain("inner-lib");
+        });
+    });
+
     // Test alias mapping based on rollup input option
     it("input alias", async () => {
         expect.assertions(5);
@@ -83,6 +115,22 @@ describe("dts plugin", () => {
         expect(fileNames).toContain("output2/index.js");
 
         expect(snapshot).toMatchSnapshot();
+    });
+
+    // Regression for sxzz/rolldown-plugin-dts#208: a fixed-string `entryFileNames`
+    // (no `[name]` placeholder) must still carry the full `.d.<x>ts` extension.
+    it("fixed-string entryFileNames keeps the .d extension (#208)", async () => {
+        expect.assertions(1);
+
+        const { chunks } = await rollupBuild(
+            path.resolve(dirname, "fixtures/basic.ts"),
+            [dts({ emitDtsOnly: true })],
+            {},
+            { entryFileNames: "index.mjs" },
+        );
+        const fileNames = chunks.map((chunk) => chunk.fileName);
+
+        expect(fileNames.some((name) => name.endsWith(".d.mts"))).toBe(true);
     });
 
     it("isolated declaration error", async () => {
@@ -625,6 +673,30 @@ describe("dts plugin", () => {
         );
 
         expect(snapshot).toMatchSnapshot();
+    });
+
+    // Regression for sxzz/rolldown-plugin-dts#231: with a single entry whose imports
+    // form a chain (index -> a -> b), emitDtsOnly must keep traversing transitively so
+    // every module emits its own declaration. Upstream replaces transformed modules with
+    // an `export {}` stub, which severs traversal and drops `b.d.ts`.
+    it("emitDtsOnly keeps transitive module traversal (#231)", async () => {
+        expect.assertions(4);
+
+        const { chunks } = await rollupBuild(
+            path.resolve(dirname, "fixtures/transitive-emit/index.ts"),
+            [dts({ emitDtsOnly: true })],
+            {},
+            { preserveModules: true },
+        );
+
+        const fileNames = chunks.map((chunk) => chunk.fileName);
+
+        // index -> a -> b must each produce a declaration; the transitive `b` is the one
+        // upstream drops.
+        expect(fileNames).toStrictEqual(expect.arrayContaining(["a.d.ts", "b.d.ts", "index.d.ts"]));
+        expect(fileNames.some((name) => name.endsWith("a.d.ts"))).toBe(true);
+        expect(fileNames.some((name) => name.endsWith("b.d.ts"))).toBe(true);
+        expect(chunks.every((chunk) => chunk.fileName.endsWith(".d.ts"))).toBe(true);
     });
 
     it("infer type parameter", async () => {

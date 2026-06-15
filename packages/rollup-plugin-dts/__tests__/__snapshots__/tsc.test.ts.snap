@@ -1,5 +1,21 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`tsc > accessor in type literal does not crash (#258) 1`] = `
+"// accessor-type-literal.d.ts
+declare function createCounter(): {
+  get count(): number;
+  set count(value: number);
+};
+interface Box {
+  readonly handle: {
+    get value(): string;
+    set value(next: string);
+  };
+}
+export { Box, createCounter };
+"
+`;
+
 exports[`tsc > arktype 1`] = `
 "// arktype.d.ts
 declare const test: any;
@@ -32,7 +48,7 @@ export { a };
 //# sourceMappingURL=index.d.ts.map
 
 // index.d.ts.map
-{"version":3,"file":"index.d.ts","sources":["../src/index.d.ts"],"names":[],"mappings":"cAAqBA,CAAC;"}
+{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"cAAaA,CAAC;"}
 // index.js
 const a = 1;
 
@@ -85,6 +101,31 @@ export { input2 };
 "
 `;
 
+exports[`tsc > declaration:false + sourcemap does not crash (#254) 1`] = `
+"// basic.d.ts
+declare const foo: number;
+type SomeType<T> = T;
+type FooType = string;
+interface Interface {}
+declare function fn(argument0: SomeType<FooType>, opt: Interface): void;
+declare enum Enum {
+  A = 0,
+  B = 1,
+  C = 2,
+}
+declare class Cls {
+  foo: string;
+  fn(e: Enum): void;
+}
+export { Cls, Enum, fn, foo };
+//# sourceMappingURL=basic.d.ts.map
+
+// basic.d.ts.map
+{"version":3,"file":"basic.d.ts","sources":["__tests__/fixtures/basic.ts"],"names":[],"mappings":"cAAaA,GAAgB;AAAA,KAExBC,QAAQ,MAAMC,CAAC;AAAA,KACfC,OAAO;AAAA,UACFC,SAAS;AAAA,iBAEHC,EAAEA,CAACC,SAA4B,EAAjBL,QAAQ,CAACE,OAAO,GAAGI,GAAc,EAATH,SAAS;AAAA,aAEnDI,IAAI;EACZC,CAAC;EACDC,CAAC;EACDC,CAAC;AAAA;AAAA,cAGQC,GAAG;EACZZ,GAAG;EAEHK,EAAEA,CAACQ,CAAO,EAAJL,IAAI;AAAA;"}
+// basic.js.map
+{"version":3,"file":"basic.js","sources":[],"sourcesContent":[],"names":[],"mappings":""}"
+`;
+
 exports[`tsc > import JSON 1`] = `
 "// index.d.ts
 declare const _exports: string[];
@@ -122,6 +163,22 @@ function fn() {
 var jsdoc = fn();
 
 export { jsdoc as default, fn };
+"
+`;
+
+exports[`tsc > jsdoc in js 1`] = `
+"// main.d.ts
+/**
+ * @returns {string}
+ */
+declare function bar(): string;
+/**
+ * Does bar.
+ * @param {string} baz
+ * @returns {void}
+ */
+declare function foo(baz: string): void;
+export { bar, foo };
 "
 `;
 

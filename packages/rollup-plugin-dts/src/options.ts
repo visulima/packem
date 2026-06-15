@@ -267,7 +267,8 @@ export interface Options extends GeneralOptions, TscOptions {
      * To use this option, make sure `@typescript/native-preview` is installed as a dependency.
      *
      * **Note:** This option is not yet recommended for production environments.
-     * `tsconfigRaw` and `isolatedDeclarations` options will be ignored when this option is enabled.
+     * `tsconfigRaw` and `compilerOptions` are applied (written to a temporary project that
+     * extends your `tsconfig.json`), but `isolatedDeclarations` is ignored — it is an oxc-only concept.
      *
      * Pass `true` to use the bundled tsgo binary, or an object with `path` to specify a custom binary path.
      */

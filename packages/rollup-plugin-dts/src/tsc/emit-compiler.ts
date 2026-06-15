@@ -43,6 +43,14 @@ const createTsProgramFromParsedConfig = ({
         // @ts-expect-error TypeScript-only fields are not in ts.CompilerOptions typing
         $configRaw: parsedConfig.raw as unknown,
         $rootDir: baseDirectory,
+        // Generating `.d.ts` is the entire purpose of this path, so a user
+        // `declaration: false` (carried in via `parsedConfig.options`) must never win.
+        // Beyond skipping emit, `declaration: false` combined with `declarationMap: true`
+        // (which `resolveOptions` sets whenever `dts.sourcemap` is on) makes tsc crash
+        // with a bare "Debug Failure" in `getSourceMappingURL`. Mirror the build path's
+        // `patchCompilerOptions` guard. See sxzz/rolldown-plugin-dts#254.
+        declaration: true,
+        emitDeclarationOnly: true,
     };
 
     const rootNames = [...new Set([id, ...entries ?? parsedConfig.fileNames].map((f) => fsSystem.resolvePath(f)))];
@@ -181,8 +189,17 @@ const tscEmitCompiler = (tscOptions: TscOptions): TscResult => {
         true,
     );
 
-    if (emitSkipped && diagnostics.length > 0) {
-        return { error: ts.formatDiagnostics(diagnostics, formatHost) };
+    // Only surface genuine errors — `Warning`/`Message`/`Suggestion` diagnostics must not
+    // fail the build (partial fix for sxzz/rolldown-plugin-dts#92). Note: declarations are
+    // emitted with `forceDtsEmit`, so pre-emit type errors (e.g. an externalized dependency
+    // that tsc can't resolve during dts generation) are intentionally NOT propagated here —
+    // doing so would defeat the forced-emit design this plugin relies on.
+    if (emitSkipped) {
+        const errors = diagnostics.filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
+
+        if (errors.length > 0) {
+            return { error: ts.formatDiagnostics(errors, formatHost) };
+        }
     }
 
     // If TypeScript skipped emitting because the file is already a .d.ts (e.g. a
