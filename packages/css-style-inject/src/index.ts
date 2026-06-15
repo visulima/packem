@@ -13,6 +13,10 @@ declare global {
 // be garbage-collected, and gives O(1) lookup per call.
 const singleTagCache = new WeakMap<Element, Record<string, HTMLStyleElement>>();
 
+// Matches event-handler attribute names (`on*`, e.g. `onload`). Module-scoped so
+// it is compiled once rather than on every attribute iteration.
+const RE_EVENT_HANDLER_ATTRIBUTE = /^on/i;
+
 export const SSR_INJECT_ID = "__styleInject_SSR_MODULES";
 
 /**
@@ -65,7 +69,7 @@ export const cssStyleInject = (
 
     const container
         = typeof options.container === "string"
-            ? (document.querySelector(options.container) as HTMLElement | null)
+            ? document.querySelector<HTMLElement>(options.container)
             // Prefer the native `document.head` (fast path in real browsers); fall back to
             // a `head` lookup for environments/test doubles where `document.head` is absent.
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- lib.dom types `document.head` as non-null, but it is genuinely absent in SSR/test-double environments; the fallback is load-bearing.
@@ -89,7 +93,7 @@ export const cssStyleInject = (
             // Event-handler attributes (on*, e.g. onload) are rejected so the
             // attributes map can never create an executable handler.
             Object.entries(options.attributes).forEach(([key, value]) => {
-                if (key === "id" || key === "type" || key === "nonce" || /^on/i.test(key)) {
+                if (key === "id" || key === "type" || key === "nonce" || RE_EVENT_HANDLER_ATTRIBUTE.test(key)) {
                     return;
                 }
 
