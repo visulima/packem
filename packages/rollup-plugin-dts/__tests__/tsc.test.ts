@@ -113,18 +113,18 @@ describe("tsc", () => {
         expect(sourcemap.sourceRoot).toBeOneOf([false, undefined]);
         expect(sourcemap.sources).toMatchInlineSnapshot(`
       [
-        "../src/index.d.ts",
+        "../src/index.ts",
       ]
     `);
         expect(snapshot).toMatchSnapshot();
     });
 
-    // Known failure tracking sxzz/rolldown-plugin-dts#255: with `build: true`, the
-    // `.d.ts.map` `sources` should point back to the original `.ts` (so "Go to Definition"
-    // lands on source), but they currently point to the intermediate generated `.d.ts`.
-    // The `build: false` path above already maps to `../src/index.ts` correctly. Flip this
-    // to a normal `it` once the build-mode sourcemap chain is fixed.
-    it.fails("compiler project sourcemap maps to original .ts (build: true) (#255)", async () => {
+    // Regression for sxzz/rolldown-plugin-dts#255: with `build: true`, the `.d.ts.map`
+    // `sources` must point back to the original `.ts` (so "Go to Definition" lands on
+    // source) rather than the intermediate generated `.d.ts`. The solution builder
+    // re-parses the tsconfig, so `declarationMap` has to be re-applied to the emitting
+    // program (see createProgramFactory in src/tsc/emit-build.ts).
+    it("compiler project sourcemap maps to original .ts (build: true) (#255)", async () => {
         expect.assertions(1);
 
         const root = path.resolve(dirname, "fixtures/deep-source-map");
@@ -283,7 +283,7 @@ describe("tsc", () => {
         expect(snapshot).toMatchSnapshot();
     });
 
-    it.fails("jsdoc in js", async () => {
+    it("jsdoc in js", async () => {
         expect.assertions(1);
 
         const root = path.resolve(dirname, "fixtures/jsdoc-js");

@@ -48,7 +48,7 @@ export { a };
 //# sourceMappingURL=index.d.ts.map
 
 // index.d.ts.map
-{"version":3,"file":"index.d.ts","sources":["../src/index.d.ts"],"names":[],"mappings":"cAAqBA,CAAC;"}
+{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"cAAaA,CAAC;"}
 // index.js
 const a = 1;
 
@@ -163,6 +163,22 @@ function fn() {
 var jsdoc = fn();
 
 export { jsdoc as default, fn };
+"
+`;
+
+exports[`tsc > jsdoc in js 1`] = `
+"// main.d.ts
+/**
+ * @returns {string}
+ */
+declare function bar(): string;
+/**
+ * Does bar.
+ * @param {string} baz
+ * @returns {void}
+ */
+declare function foo(baz: string): void;
+export { bar, foo };
 "
 `;
 
