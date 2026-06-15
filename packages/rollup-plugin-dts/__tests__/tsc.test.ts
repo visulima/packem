@@ -119,6 +119,32 @@ describe("tsc", () => {
         expect(snapshot).toMatchSnapshot();
     });
 
+    // Known failure tracking sxzz/rolldown-plugin-dts#255: with `build: true`, the
+    // `.d.ts.map` `sources` should point back to the original `.ts` (so "Go to Definition"
+    // lands on source), but they currently point to the intermediate generated `.d.ts`.
+    // The `build: false` path above already maps to `../src/index.ts` correctly. Flip this
+    // to a normal `it` once the build-mode sourcemap chain is fixed.
+    it.fails("compiler project sourcemap maps to original .ts (build: true) (#255)", async () => {
+        expect.assertions(1);
+
+        const root = path.resolve(dirname, "fixtures/deep-source-map");
+        const { chunks } = await rolldownBuild(
+            [path.resolve(root, "src/index.ts")],
+            [
+                dts({
+                    build: true,
+                    sourcemap: true,
+                    tsconfig: path.resolve(root, "tsconfig.json"),
+                }),
+            ],
+            {},
+            { dir: path.resolve(root, "dist") },
+        );
+        const sourcemap = findSourceMapChunk(chunks, "index.d.ts.map");
+
+        expect(sourcemap.sources).toStrictEqual(["../src/index.ts"]);
+    });
+
     it("composite projects sourcemap #80", async () => {
         expect.assertions(2);
 

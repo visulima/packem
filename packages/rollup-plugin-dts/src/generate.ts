@@ -15,6 +15,7 @@ import type { ExistingRawSourceMap, Plugin, SourceMapInput } from "rollup";
 
 import { dtsEntryFileName, filenameToDts, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
+import { createReexportSpecifierRewriter } from "./reexport-specifier";
 import type { TscContext } from "./tsc/context";
 import { createContext, globalContext, invalidateContextFile } from "./tsc/context";
 import type { TscOptions, TscResult } from "./tsc/index";
@@ -110,6 +111,11 @@ export const createGeneratePlugin = ({
      * ])
      */
     const inputAliasMap = new Map<string, string>();
+
+    // Rewrites inferred origin-package specifiers back to the dependency the source
+    // imports (sxzz/rolldown-plugin-dts#227). Created once so its resolution/parse
+    // caches persist across module loads.
+    const rewriteReexportSpecifiers = createReexportSpecifierRewriter(tsconfig);
 
     // let isWatch = false
     let childProcess: ChildProcess | undefined;
@@ -376,6 +382,13 @@ declare namespace __json_default_export {
 export { __json_default_export as default }`;
                         }
                     }
+                }
+
+                // Point inferred origin-package specifiers back at the dependency the
+                // source imports (sxzz/rolldown-plugin-dts#227). Skipped for `.js`
+                // inputs, whose declarations carry no source-level import context here.
+                if (dtsCode && !jsFile) {
+                    dtsCode = rewriteReexportSpecifiers(dtsCode, id, code);
                 }
 
                 return {
