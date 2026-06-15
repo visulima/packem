@@ -89,6 +89,39 @@ export default defineConfig({
 })
 ```
 
+#### banner / footer
+
+Prepend (`banner`) or append (`footer`) text to the build output — useful for
+license headers, runtime directives, or shims. The values map onto Rollup/Rolldown's
+`output.banner` / `output.footer`, so both bundler backends honour them and they apply
+to **both** the CommonJS and ESM bundles.
+
+```typescript
+export default defineConfig({
+  // A bare string (or function) targets the JS output only:
+  banner: "/*! my-lib v1.0.0 | MIT */",
+  footer: (chunk) => `/* built ${chunk.fileName} */`,
+})
+```
+
+Use the object form to target the JavaScript bundle (`js`) and the generated
+declaration files (`dts`) independently:
+
+```typescript
+export default defineConfig({
+  banner: {
+    js: "'use client';",
+    dts: "// AUTO-GENERATED — do not edit",
+  },
+})
+```
+
+<Callout type="info">
+A bare `banner`/`footer` value never touches the declaration files — opt declarations in
+explicitly via the `{ dts }` form. An explicit `rollup.dts.banner`/`footer` takes
+precedence over the top-level option.
+</Callout>
+
 ### Entry Points
 
 #### Automatic Detection

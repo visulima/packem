@@ -54,6 +54,7 @@ import {
 } from "../rollup/get-rollup-options";
 import type { InternalBuildOptions } from "../types";
 import cloneReplaceOptions from "../utils/clone-replace-options";
+import resolveBannerFooter from "../utils/resolve-banner-footer";
 
 // JS-build option construction is one shared (base) pipeline with two
 // backend-specialised entry points:
@@ -142,6 +143,12 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
 
     const { pureNewExpressionPluginInstance, purePluginInstance, rolldownPurePluginInstance } = buildPurePlugins(context);
 
+    // First-class banner/footer. The resolved JS values map straight onto
+    // `output.banner`/`output.footer`, which both the rollup and rolldown
+    // backends honour (rolldown implements the rollup output contract).
+    const jsBanner = resolveBannerFooter(context.options.banner, "js");
+    const jsFooter = resolveBannerFooter(context.options.footer, "js");
+
     const options: RollupOptions = {
         ...baseRollupOptions(context, "build"),
 
@@ -153,6 +160,7 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
+                banner: jsBanner,
                 chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "cjs"), usePreserveModules),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
@@ -162,6 +170,7 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                 extend: true,
                 // turn off live bindings support (exports.* getters for re-exports)
                 externalLiveBindings: false,
+                footer: jsFooter,
                 format: "cjs",
                 freeze: false,
                 generatedCode: {
@@ -188,6 +197,7 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
+                banner: jsBanner,
                 chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "esm"), usePreserveModules),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
@@ -197,6 +207,7 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                 extend: true,
                 // turn off live bindings support (exports.* getters for re-exports)
                 externalLiveBindings: false,
+                footer: jsFooter,
                 format: "esm",
                 freeze: false,
                 generatedCode: {

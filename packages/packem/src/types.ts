@@ -8,7 +8,7 @@ import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } fro
 import type { FileCache } from "@visulima/packem-share/utils";
 import type { StyleOptions } from "@visulima/rollup-plugin-css";
 import type { JitiOptions } from "jiti";
-import type { Plugin } from "rollup";
+import type { Plugin, RenderedChunk } from "rollup";
 import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
 import type { ExeOptions } from "./exe";
@@ -125,11 +125,39 @@ export type InferEntriesResult = {
     warnings: string[];
 };
 
+/**
+ * A banner/footer value. Either a static string or a function receiving the
+ * rendered chunk and returning the text to prepend/append. Passed straight
+ * through to Rollup/Rolldown `output.banner` / `output.footer`, so both
+ * bundler backends honour it.
+ */
+export type BannerFooterValue = string | ((chunk: RenderedChunk) => Promise<string> | string);
+
+/**
+ * Banner/footer configuration. A bare string or function targets the JavaScript
+ * output only. Use the object form to target the JavaScript bundle (`js`) and/or
+ * the generated declaration files (`dts`) independently.
+ * @example
+ * ```ts
+ * banner: "/* @license MIT *\/",                 // js only
+ * banner: { js: "'use client';", dts: "// types" } // per output
+ * ```
+ */
+export type BannerFooterOption = BannerFooterValue | { dts?: BannerFooterValue; js?: BannerFooterValue };
+
 export interface BuildOptions {
     /** Path alias mappings for module resolution */
     alias: Record<string, string>;
     /** Whether to analyze bundle size and dependencies */
     analyze?: boolean;
+
+    /**
+     * Text to prepend to the build output. Maps to Rollup/Rolldown
+     * `output.banner` and is applied to both the CommonJS and ESM bundles.
+     * A bare string/function targets the JS output; use `{ js, dts }` to also
+     * prepend a header to the generated declaration files.
+     */
+    banner?: BannerFooterOption;
     /** Browser targets for transpilation (e.g., ['chrome 58', 'firefox 57']) */
     browserTargets?: string[];
 
@@ -199,6 +227,14 @@ export interface BuildOptions {
     failOnWarn?: boolean;
     /** Whether to enable file caching for faster rebuilds */
     fileCache?: boolean;
+
+    /**
+     * Text to append to the build output. Maps to Rollup/Rolldown
+     * `output.footer` and is applied to both the CommonJS and ESM bundles.
+     * A bare string/function targets the JS output; use `{ js, dts }` to also
+     * append text to the generated declaration files.
+     */
+    footer?: BannerFooterOption;
 
     /**
      * Array of export keys to ignore during entry inference.
