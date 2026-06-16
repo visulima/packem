@@ -303,7 +303,7 @@ describe(generateJsExports, () => {
             expect(() => {
                 generateJsExports({
                     ...baseOptions,
-                    inject: { method: "not a valid identifier" } as unknown as { method: string },
+                    inject: { method: "not a valid identifier" },
                 });
             }).toThrow("`inject.method` must be a valid JavaScript identifier");
         });
@@ -314,7 +314,7 @@ describe(generateJsExports, () => {
             expect(() => {
                 generateJsExports({
                     ...baseOptions,
-                    inject: { package: "  " } as unknown as { package: string },
+                    inject: { package: "  " },
                 });
             }).toThrow("`inject.package` must be a non-empty string");
         });

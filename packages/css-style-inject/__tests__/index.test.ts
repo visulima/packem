@@ -29,14 +29,14 @@ const mockElement: {
 };
 
 const mockDocument = {
-    // `document.head` is the real fast path; the mock provides it so the
-    // default-container test exercises that path rather than the fallback.
-    head: mockElement,
     createElement: vi.fn(() => mockElement),
     createTextNode: vi.fn(() => {
         return { nodeType: 3, textContent: "" };
     }),
     getElementById: vi.fn(),
+    // `document.head` is the real fast path; the mock provides it so the
+    // default-container test exercises that path rather than the fallback.
+    head: mockElement,
     querySelector: vi.fn(),
     querySelectorAll: vi.fn(() => [mockElement]),
 };

@@ -932,12 +932,6 @@ const packem = async (
 
         await ensureBundlerInstalled(requestedBundler, rootDirectory, logger);
 
-        // Rolldown still depends on rollup for DTS until the dts plugin is
-        // rolldown-compatible. Pull rollup in so the DTS path doesn't crash.
-        if (requestedBundler === "rolldown" && context.options.declaration) {
-            await ensureBundlerInstalled("rollup", rootDirectory, logger);
-        }
-
         if (context.options.transformerName) {
             await ensureTransformerInstalled(context.options.transformerName, rootDirectory, logger);
         }
@@ -1034,17 +1028,6 @@ const packem = async (
         if (mode === "watch") {
             if (context.options.rollup.watch === false) {
                 throw new Error("Rollup watch is disabled. You should check your packem config.");
-            }
-
-            // Rolldown now drives its own native watch (see rollup/watch.ts). The
-            // bundle watcher is rolldown; only DTS watching still runs through
-            // rollup, since @visulima/rollup-plugin-dts isn't rolldown-compatible
-            // yet. Surface that one residual fallback when declarations are on.
-            if (context.options.bundler === "rolldown" && context.options.declaration) {
-                logger.info({
-                    message: "Declaration (DTS) watching runs through rollup; the bundle watcher is rolldown.",
-                    prefix: "bundler",
-                });
             }
 
             await rollupWatch(context, fileCache, runBuilder, runOnsuccess, doOnSuccessCleanup);

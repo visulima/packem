@@ -2,7 +2,7 @@ import ensureAutoModules from "../loaders/utils/ensure-auto-modules";
 import type { AutoModules } from "../types";
 
 /** Shape of a loader's `modules` option (boolean toggle or object with an `include` matcher). */
-export type ModulesOption = boolean | { include?: AutoModules } | undefined;
+type ModulesOption = boolean | { include?: AutoModules } | undefined;
 
 /**
  * Resolves whether CSS modules processing should be enabled for a file, applying
@@ -33,3 +33,4 @@ const detectCssModules = (modules: ModulesOption, autoModules: AutoModules | und
 };
 
 export default detectCssModules;
+export type { ModulesOption };

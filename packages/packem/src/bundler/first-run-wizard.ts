@@ -49,7 +49,7 @@ const promptBundler = async (): Promise<BundlerName> => {
         message: "Which bundler do you want to use?",
         options: [
             { hint: "stable, full feature set, supports DTS", label: "rollup", value: "rollup" },
-            { hint: "experimental, fast — falls back to rollup for DTS", label: "rolldown", value: "rolldown" },
+            { hint: "experimental, fast", label: "rolldown", value: "rolldown" },
         ],
     });
 
@@ -134,13 +134,7 @@ export const runFirstRunWizard = async (rootDirectory: string): Promise<void> =>
     // skipped (and no transformer engine is installed) when rolldown is chosen.
     const transformer = bundler === "rolldown" ? undefined : await promptTransformer();
 
-    // Rollup is required for DTS regardless of bundler choice, since
-    // @visulima/rollup-plugin-dts isn't rolldown-compatible yet.
     const toInstall: string[] = [bundler];
-
-    if (bundler === "rolldown") {
-        toInstall.push("rollup");
-    }
 
     if (transformer) {
         toInstall.push(TRANSFORMER_PACKAGE[transformer]);

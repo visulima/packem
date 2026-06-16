@@ -27,6 +27,17 @@ const tryImport = async <T>(
     }
 };
 
+// Returns the value only when it is callable, otherwise undefined — used to
+// pick a named factory export off an optional-peer module without tripping the
+// no-extra-parens / no-confusing-arrow conflict a ternary arrow body would.
+const pickFunction = <T>(value: T | undefined): T | undefined => {
+    if (typeof value === "function") {
+        return value;
+    }
+
+    return undefined;
+};
+
 const NOT_INSTALLED_MESSAGE = "Rolldown is not installed. Please install '@rolldown/node' or 'rolldown' to use bundler: 'rolldown'.";
 
 /**
@@ -39,14 +50,14 @@ export const getRolldownBuild = async (): Promise<RolldownBuild> => {
     // Literal-string imports keep packem's own bundler (rollup-plugin-dynamic-import-vars)
     // happy when self-building.
     // @ts-ignore optional peer dependency
-    const fromNode = await tryImport(() => import("@rolldown/node"), (m) => (typeof m.rolldown === "function" ? m.rolldown : undefined));
+    const fromNode = await tryImport(() => import("@rolldown/node"), (m) => pickFunction(m.rolldown));
 
     if (fromNode) {
         return fromNode;
     }
 
     // @ts-ignore optional peer dependency
-    const fromCore = await tryImport(() => import("rolldown"), (m) => (typeof m.rolldown === "function" ? m.rolldown : undefined));
+    const fromCore = await tryImport(() => import("rolldown"), (m) => pickFunction(m.rolldown));
 
     if (fromCore) {
         return fromCore;
@@ -62,14 +73,14 @@ export const getRolldownBuild = async (): Promise<RolldownBuild> => {
  */
 export const getRolldownWatch = async (): Promise<RolldownWatch> => {
     // @ts-ignore optional peer dependency
-    const fromNode = await tryImport(() => import("@rolldown/node"), (m) => (typeof m.watch === "function" ? m.watch : undefined));
+    const fromNode = await tryImport(() => import("@rolldown/node"), (m) => pickFunction(m.watch));
 
     if (fromNode) {
         return fromNode;
     }
 
     // @ts-ignore optional peer dependency
-    const fromCore = await tryImport(() => import("rolldown"), (m) => (typeof m.watch === "function" ? m.watch : undefined));
+    const fromCore = await tryImport(() => import("rolldown"), (m) => pickFunction(m.watch));
 
     if (fromCore) {
         return fromCore;

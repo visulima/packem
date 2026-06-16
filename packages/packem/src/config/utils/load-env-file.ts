@@ -63,12 +63,40 @@ interface EnvFileLogger {
     warn: (message: string) => void;
 }
 
-const loadEnvFile = async (
-    envFilePath: string,
-    rootDirectory: string,
-    prefix: string = "PACKEM_",
-    logger?: EnvFileLogger,
-): Promise<Record<string, string>> => {
+/**
+ * Parses .env content with Node.js' built-in `util.parseEnv`, filters by prefix
+ * and formats keys for the Rollup replace plugin. Split out of {@link loadEnvFile}
+ * to keep that function's cognitive complexity within bounds.
+ * @param content Raw text read from the .env file.
+ * @param prefix Only keys starting with this string are kept (empty keeps all).
+ * @param envFilePath Original path, used only for log messages.
+ * @param logger Optional logger for the load summary.
+ * @returns Record of environment variables with keys formatted as "process.env.KEY".
+ */
+const parseEnvWithNative = (content: string, prefix: string, envFilePath: string, logger?: EnvFileLogger): Record<string, string> => {
+    const parsed = parseEnv(content);
+    const totalCount = Object.keys(parsed).length;
+    const envVariables: Record<string, string> = {};
+
+    // Filter by prefix and format keys for Rollup replace plugin
+    for (const [key, value] of Object.entries(parsed)) {
+        if (!prefix || key.startsWith(prefix)) {
+            envVariables[`process.env.${key}`] = JSON.stringify(value);
+        }
+    }
+
+    const loadedCount = Object.keys(envVariables).length;
+
+    if (totalCount > 0 && loadedCount === 0 && prefix) {
+        logger?.warn(`Loaded 0 of ${String(totalCount)} variables from "${envFilePath}"; none matched the "${prefix}" prefix.`);
+    } else {
+        logger?.info(`Loaded ${String(loadedCount)} of ${String(totalCount)} variables from "${envFilePath}"${prefix ? ` (prefix "${prefix}")` : ""}.`);
+    }
+
+    return envVariables;
+};
+
+const loadEnvFile = async (envFilePath: string, rootDirectory: string, prefix: string = "PACKEM_", logger?: EnvFileLogger): Promise<Record<string, string>> => {
     const resolvedPath = resolve(rootDirectory, envFilePath);
 
     if (!existsSync(resolvedPath)) {
@@ -81,39 +109,19 @@ const loadEnvFile = async (
 
     const { readFile } = await import("node:fs/promises");
     const content = await readFile(resolvedPath, "utf8");
-    const envVariables: Record<string, string> = {};
 
-    // Use Node.js built-in util.parseEnv if available (Node.js >= 20.12.0)
-    // This parses the file content without modifying process.env
-    if (typeof parseEnv === "function") {
-        try {
-            const parsed = parseEnv(content);
-            const totalCount = Object.keys(parsed).length;
-
-            // Filter by prefix and format keys for Rollup replace plugin
-            for (const [key, value] of Object.entries(parsed)) {
-                if (!prefix || key.startsWith(prefix)) {
-                    envVariables[`process.env.${key}`] = JSON.stringify(value);
-                }
-            }
-
-            const loadedCount = Object.keys(envVariables).length;
-
-            if (totalCount > 0 && loadedCount === 0 && prefix) {
-                logger?.warn(`Loaded 0 of ${totalCount} variables from "${envFilePath}"; none matched the "${prefix}" prefix.`);
-            } else {
-                logger?.info(`Loaded ${loadedCount} of ${totalCount} variables from "${envFilePath}"${prefix ? ` (prefix "${prefix}")` : ""}.`);
-            }
-        } catch {
-            // If parseEnv fails, fall back to manual parsing
-            return loadEnvFileManually(content, prefix);
-        }
-    } else {
-        // Fallback to manual parsing for older Node.js versions
+    // Use Node.js built-in util.parseEnv if available (Node.js >= 20.12.0); it
+    // parses the content without mutating process.env. Older Node.js versions —
+    // and any parseEnv failure — fall back to manual parsing.
+    if (typeof parseEnv !== "function") {
         return loadEnvFileManually(content, prefix);
     }
 
-    return envVariables;
+    try {
+        return parseEnvWithNative(content, prefix, envFilePath, logger);
+    } catch {
+        return loadEnvFileManually(content, prefix);
+    }
 };
 
 export default loadEnvFile;

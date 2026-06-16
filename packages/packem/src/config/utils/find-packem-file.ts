@@ -22,7 +22,7 @@ const findPackemFile = async (rootDirectory: string, configPath = ""): Promise<s
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
         }
 
-        if (!(await isAccessible(resolvedConfigPath))) {
+        if (!await isAccessible(resolvedConfigPath)) {
             throw new Error(`The packem config file "${configPath}" could not be found at "${resolvedConfigPath}".`);
         }
 

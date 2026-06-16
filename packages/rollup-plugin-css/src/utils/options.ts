@@ -84,7 +84,7 @@ export const inferModeOption = (mode: StyleOptions["mode"], logger?: Pick<Rollup
 
     // `emit` and `inline` do not accept tuple options; warn so a misplaced
     // second element is not silently discarded.
-    if ((modeName === "emit" || modeName === "inline") && Array.isArray(mode) && mode[1] !== undefined) {
+    if ((modeName === "emit" || modeName === "inline") && m[1] !== undefined) {
         logger?.warn({
             message: `The "${modeName}" mode does not accept additional options; ignoring the provided tuple option.`,
             plugin: "css",

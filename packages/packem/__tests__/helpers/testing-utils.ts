@@ -11,6 +11,19 @@ import { createPackemConfig, createTsConfig, execPackem, installPackage } from "
 
 const LEADING_SLASH_REGEX = /^\//;
 
+// Machine-specific absolute path leaking into rolldown's `//#region` markers for
+// inlined node_modules deps, e.g. `../../home/<user>/.../packem/node_modules/.pnpm/`.
+// Locally that climbs out to `…/packem/…`; on CI it is `…/runner/work/packem/packem/…`.
+// Collapse the volatile prefix to a stable `<root>` token so the snapshot is portable.
+const ROLLDOWN_PNPM_STORE_PATH_REGEX = /(?:\.\.\/)+\S*?\/node_modules\/\.pnpm\//g;
+
+// Rolldown's shared-chunk filenames carry a content hash. The hash itself is
+// deterministic, but for chunks that inline node_modules code it is derived from
+// content that embeds the machine-specific `//#region` path above, so it shifts
+// between machines/CI. Replace the 8-char hash with a fixed token so the
+// reference compares equal regardless of where the bundle was produced.
+const ROLLDOWN_SHARED_CHUNK_HASH_REGEX = /(packem_shared\/[\w$.-]+?-)[\w-]{8}(\.[cm]?js)/g;
+
 export interface CreateJobOptions {
     directory: string;
 }
@@ -151,4 +164,21 @@ export const normalizeBundleOutput = (content: string): string => {
     normalized = normalized.replaceAll(/\n{3,}/g, "\n\n");
 
     return normalized;
+};
+
+/**
+ * Normalize rolldown bundle output that embeds machine-specific or
+ * non-deterministic fragments so a raw `toMatchSnapshot` stays portable across
+ * machines and runs. Only active when the rolldown backend is selected; for
+ * rollup (the CI-checked `.snap` gate) this is a pass-through, so wrapping an
+ * assertion with it never disturbs the rollup baseline.
+ */
+export const normalizeRolldownOutput = (content: string): string => {
+    if (process.env.PACKEM_TEST_BUNDLER !== "rolldown") {
+        return content;
+    }
+
+    return content
+        .replaceAll(ROLLDOWN_PNPM_STORE_PATH_REGEX, "<root>/node_modules/.pnpm/")
+        .replaceAll(ROLLDOWN_SHARED_CHUNK_HASH_REGEX, "$1[HASH]$2");
 };

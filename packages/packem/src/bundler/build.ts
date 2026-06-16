@@ -127,7 +127,7 @@ const buildWithRolldown = async (
     // `rollupOptions` here is produced by getRolldownOptions, which already applies
     // the rolldown `moduleTypes` CSS override (see ROLLDOWN_CSS_MODULE_TYPES), so it
     // can be passed straight through.
-    const bundle = await rolldown(rollupOptions as unknown as Record<string, unknown>);
+    const bundle = await rolldown(rollupOptions);
 
     try {
         persistDependenciesCache(context, fileCache, subDirectory);

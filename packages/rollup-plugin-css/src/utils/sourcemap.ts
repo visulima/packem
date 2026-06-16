@@ -5,8 +5,11 @@ import { SourceMapConsumer } from "source-map-js";
 
 import { DATA_URI_REGEXP } from "../loaders/postcss/constants";
 
-// eslint-disable-next-line regexp/no-misleading-capturing-group, regexp/no-super-linear-backtracking, sonarjs/slow-regex
+// The capturing group is consumed by `getMap` below via a `.source`-cloned regex,
+// which the regexp plugin cannot trace, so no-unused-capturing-group is a false positive.
+// eslint-disable-next-line regexp/no-misleading-capturing-group, regexp/no-super-linear-backtracking, regexp/no-unused-capturing-group, sonarjs/slow-regex
 const mapBlockRe = /(?:\n|\r\n)?\/\*[#*@]+\s*sourceMappingURL\s*=\s*(\S+)\s*\*+\//g;
+// eslint-disable-next-line regexp/no-unused-capturing-group -- group consumed via the `.source`-cloned regex in getMap
 const mapLineRe = /(?:\n|\r\n)?\/\/[#@]+\s*sourceMappingURL\s*=\s*(\S+)\s*/g;
 
 class MapModifier {
@@ -113,6 +116,7 @@ export const getMap = (code: string, id?: string): string | undefined => {
     // Use non-global clones for the single-match `.exec` so the module-level
     // `/g` regexes' `lastIndex` does not persist across `getMap` calls (which
     // would otherwise cause it to skip or miss matches on subsequent invocations).
+    // eslint-disable-next-line regexp/no-misleading-capturing-group, regexp/no-super-linear-backtracking -- re-analysis of the same intentional mapBlockRe pattern (already accepted at its definition)
     const blockRe = new RegExp(mapBlockRe.source, mapBlockRe.flags.replace("g", ""));
     const lineRe = new RegExp(mapLineRe.source, mapLineRe.flags.replace("g", ""));
 

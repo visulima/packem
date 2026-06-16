@@ -30,6 +30,8 @@ const populateSourcemapContent = (sourcemap: RawSourceMap, basePath: string): (s
         const file = normalize(join(basePath, source));
 
         if (!existsSync(file)) {
+            // `null` is the source-map spec value for a missing `sourcesContent` entry.
+            // eslint-disable-next-line unicorn/no-null -- spec-mandated sourcesContent sentinel
             return null;
         }
 

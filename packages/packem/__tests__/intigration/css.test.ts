@@ -11,7 +11,7 @@ import type { OutputOptions } from "rollup";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { PackemConfigProperties } from "../helpers";
-import { createPackageJson, createPackemConfig, execPackem, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackem, installPackage, normalizeRolldownOutput } from "../helpers";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "css");
 
@@ -306,7 +306,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         const result = (await build(data)) as WriteResult;
 
         for (const f of result.js()) {
-            expect(f).toMatchSnapshot("js");
+            expect(normalizeRolldownOutput(f)).toMatchSnapshot("js");
         }
 
         const optionMode: StyleOptions["mode"] = typeof data.styleOptions === "object" ? data.styleOptions.mode : (data as StringWriteData).mode;
@@ -340,7 +340,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         const result = (await build(data)) as WriteResult;
 
         for (const f of result.js()) {
-            expect(f).toMatchSnapshot("js");
+            expect(normalizeRolldownOutput(f)).toMatchSnapshot("js");
         }
 
         const optionMode: StyleOptions["mode"] = typeof data.styleOptions === "object" ? data.styleOptions.mode : (data as StringWriteData).mode;
@@ -1880,7 +1880,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         })) as WriteResult;
 
         for (const f of result.js()) {
-            expect(f).toMatchSnapshot("js");
+            expect(normalizeRolldownOutput(f)).toMatchSnapshot("js");
         }
 
         expect(result.isCss()).toBe(false);
