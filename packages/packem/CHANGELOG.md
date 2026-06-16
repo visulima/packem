@@ -1,3 +1,18 @@
+## @visulima/packem [2.0.0-alpha.91](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.90...@visulima/packem@2.0.0-alpha.91) (2026-06-16)
+
+### Bug Fixes
+
+* **packem:** reject size helpers on read-stream errors ([12c9e18](https://github.com/visulima/packem/commit/12c9e18a6a728360503546a3cec878291906f2f9))
+
+### Performance Improvements
+
+* **packem:** use a map for build-entry lookup in the size loop ([a2d18ac](https://github.com/visulima/packem/commit/a2d18ace4963be0cff4192d15e09a8fc14f65754))
+
+### Documentation
+
+* **packem:** align option and guide pages with current API ([65f76d8](https://github.com/visulima/packem/commit/65f76d8c9aed552a1bd604f7d65af8a076cdd6e6))
+* **packem:** document the rolldown bundler backend in the readme ([d49fc7d](https://github.com/visulima/packem/commit/d49fc7dc86f63e887f903375c26c93fc681f0b96))
+
 ## @visulima/packem [2.0.0-alpha.90](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.89...@visulima/packem@2.0.0-alpha.90) (2026-06-16)
 
 ### Features
