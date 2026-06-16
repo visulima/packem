@@ -12,20 +12,63 @@ Each example is a complete, working project you can use as a starting point. Pic
 | Example | What it builds |
 |---------|---------------|
 | [Basic TypeScript Library](/docs/examples/basic-library) | A simple utility package with ESM output and `.d.ts` declarations |
+| [TypeScript Library](/docs/examples/basic-typescript) | A TypeScript library with ESM + CJS output and declarations |
+| [JavaScript Package](/docs/examples/basic-javascript) | A modern, zero-config JavaScript package |
 | [Dual Package (ESM + CJS)](/docs/examples/dual-package) | A library that ships both ESM and CJS for maximum compatibility |
+| [CLI Tool](/docs/examples/cli-tool) | A package with `bin` executables and auto hashbang insertion |
+| [Multiple Exports](/docs/examples/multi-exports) | Multiple entry points via `package.json#exports` subpaths |
 | [React Component Library](/docs/examples/react-library) | React components with CSS Modules, Server Components, and Storybook |
 | [Monorepo](/docs/examples/monorepo) | Multiple packages in a single workspace with shared configuration |
+
+## Transformers
+
+| Example | What it covers |
+|---------|---------------|
+| [esbuild](/docs/examples/transformers/esbuild) | Fast bundling with the esbuild transformer |
+| [swc](/docs/examples/transformers/swc) | Rust-powered compilation with swc (decorators, legacy TS) |
+| [OXC](/docs/examples/transformers/oxc) | The experimental next-generation OXC toolchain |
+| [sucrase](/docs/examples/transformers/sucrase) | Lightweight, fast alternative to Babel |
+
+## CSS
+
+| Example | What it covers |
+|---------|---------------|
+| [Basic CSS](/docs/examples/css/basic) | Plain CSS with PostCSS, injection and extraction |
+| [Sass/SCSS](/docs/examples/css/sass) | Sass preprocessing with variables and mixins |
+| [Less](/docs/examples/css/less) | Less compilation |
+| [Stylus](/docs/examples/css/stylus) | Stylus preprocessing |
+| [CSS Modules](/docs/examples/css/modules) | Scoped class names with automatic CSS Modules |
+| [PostCSS](/docs/examples/css/postcss) | Advanced PostCSS configuration with plugins |
+| [Lightning CSS](/docs/examples/css/lightningcss) | Fast CSS processing/minification with Lightning CSS |
+
+## React
+
+| Example | What it covers |
+|---------|---------------|
+| [React Library](/docs/examples/react/library) | A React component library with TypeScript |
+| [CSS Modules](/docs/examples/react/css-modules) | React components with scoped CSS Modules |
+| [Server Components](/docs/examples/react/server-components) | RSC and client components with directive handling |
+| [Tailwind CSS](/docs/examples/react/tailwind) | React components with Tailwind CSS via PostCSS |
 
 ## Configuration recipes
 
 | Example | What it covers |
 |---------|---------------|
 | [Extra Conditions](/docs/examples/configuration/extra-conditions) | Custom export conditions in `package.json` validation |
+| [Bundle Size Limits](/docs/examples/configuration/bundle-limits) | Bundle size validation and per-file limits |
+| [Package.json Validation](/docs/examples/configuration/package-validation) | Full `package.json` field validation setup |
+| [Dependency Validation](/docs/examples/configuration/dependency-validation) | Detect unused, hoisted, and duplicated dependencies |
 
 ## Advanced
 
 | Example | What it covers |
 |---------|---------------|
+| [Multi-Runtime](/docs/examples/advanced/multi-runtime) | Conditional exports for node, browser, edge, and react-server |
+| [Dynamic Imports](/docs/examples/advanced/dynamic-imports) | Code splitting via dynamic `import()` |
+| [Shared Modules](/docs/examples/advanced/shared-modules) | Shared chunks between bundles |
+| [WebAssembly](/docs/examples/advanced/webassembly) | Bundling `.wasm` modules |
+| [Custom Plugins](/docs/examples/advanced/custom-plugins) | Adding custom Rollup plugins via the `plugins` option |
+| [Bundle Analysis](/docs/examples/advanced/bundle-analysis) | Visualize and analyze bundle size |
 | [Minify HTML Literals](/docs/examples/advanced/minify-html-literals) | Automatically minify HTML and CSS inside template literals |
 | [require-cjs-transformer](/docs/examples/advanced/require-cjs-transformer) | Transform ESM imports of CJS packages for better runtime performance |
 

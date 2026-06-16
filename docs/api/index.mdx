@@ -11,11 +11,11 @@ Use Packem programmatically, write custom plugins, or hook into the build lifecy
 
 | Package | Description | Docs |
 |---------|-------------|------|
-| `@visulima/packem` | Bundler core, CLI, and configuration API | — |
+| `@visulima/packem` | Bundler core, CLI, and configuration API | [API](/docs/api/packem) |
 | `@visulima/packem-rollup` | Rollup plugins and transformer integrations | [API](/docs/api/packem-rollup) |
-| `@visulima/rollup-plugin-css` | CSS processing and optimization plugin | — |
-| `@visulima/css-style-inject` | Runtime CSS injection utility | — |
-| `@visulima/packem-share` | Shared types, utilities, and constants | — |
+| `@visulima/rollup-plugin-css` | CSS processing and optimization plugin | [API](/docs/api/rollup-plugin-css) |
+| `@visulima/css-style-inject` | Runtime CSS injection utility | [API](/docs/api/css-style-inject) |
+| `@visulima/packem-share` | Shared types, utilities, and constants | [API](/docs/api/packem-share) |
 
 ## Programmatic usage
 
@@ -50,7 +50,11 @@ See the [plugins option](/docs/options/plugins) for configuration details.
 
 ## Specialized APIs
 
+- [packem](/docs/api/packem) — The main package: CLI commands, the `defineConfig` API, and transformer subpaths.
 - [packem-rollup](/docs/api/packem-rollup) — Rollup plugins and transformer integration APIs.
+- [rollup-plugin-css](/docs/api/rollup-plugin-css) — CSS plugin, loaders, and minifiers.
+- [css-style-inject](/docs/api/css-style-inject) — Runtime CSS injection utility.
+- [packem-share](/docs/api/packem-share) — Shared types, utilities, and constants.
 - [require-cjs-transformer](/docs/api/require-cjs-transformer) — Transform ESM imports of CJS packages for better performance.
 - [native-modules-plugin](/docs/api/native-modules-plugin) — Automatic handling of Node.js native addons.
 

@@ -29,18 +29,25 @@ export default defineConfig({
 | [source-dir](/docs/options/source-dir) | Source directory for entry point resolution |
 | [root-dir](/docs/options/root-dir) | Project root directory |
 | [name](/docs/options/name) | Package name override |
+| [package-exports](/docs/options/package-exports) | How `package.json#exports` drives entries and validation |
 
 ## Build behavior
 
 | Option | Description |
 |--------|-------------|
 | [bundler](/docs/options/bundler) | Bundler backend: Rollup (default) or experimental Rolldown |
+| [transformers](/docs/options/transformers) | Choose the code transformer (esbuild, swc, OXC, sucrase) |
 | [target](/docs/options/target) | JavaScript compilation target (ES2020, ESNext, etc.) |
+| [platform](/docs/options/platform) | Target runtime/environment (node, browser, edge) |
 | [declaration-files](/docs/options/declaration-files) | TypeScript `.d.ts` generation and isolated declarations |
 | [minify](/docs/options/minify) | Minification with terser, esbuild, or oxc |
+| [tree-shaking](/docs/options/tree-shaking) | Dead-code elimination via `rollup.treeshake` |
 | [source-maps](/docs/options/source-maps) | Source map generation |
 | [externals](/docs/options/externals) | External dependency handling |
 | [alias](/docs/options/alias) | Module path aliases |
+| [shims](/docs/options/shims) | ESM/CJS interop shims (`cjsInterop`, `rollup.shim`) |
+| [unbundle](/docs/options/unbundle) | Preserve source file structure instead of bundling |
+| [cleaning](/docs/options/cleaning) | Clean the output directory before building |
 | [barrel](/docs/options/barrel) | Barrel file optimization |
 
 ## Plugins and hooks
@@ -57,6 +64,7 @@ export default defineConfig({
 |--------|-------------|
 | [watch](/docs/options/watch) | Watch mode and file watching |
 | [debug](/docs/options/debug) | Debug output and diagnostics |
+| [silent-mode](/docs/options/silent-mode) | Logging verbosity controls |
 | [analyze](/docs/options/analyze) | Bundle analysis and visualization |
 | [on-success](/docs/options/on-success) | Post-build commands |
 | [fail-on-warn](/docs/options/fail-on-warn) | Treat warnings as errors |
