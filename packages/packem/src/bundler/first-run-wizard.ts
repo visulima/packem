@@ -49,7 +49,7 @@ const promptBundler = async (): Promise<BundlerName> => {
         message: "Which bundler do you want to use?",
         options: [
             { hint: "stable, full feature set, supports DTS", label: "rollup", value: "rollup" },
-            { hint: "experimental, fast", label: "rolldown", value: "rolldown" },
+            { hint: "fast, native DTS", label: "rolldown", value: "rolldown" },
         ],
     });
 
