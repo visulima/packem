@@ -1,0 +1,128 @@
+---
+title: Dynamic Imports
+description: Code splitting with dynamic imports
+---
+
+# Dynamic Imports
+
+Packem supports dynamic `import()` expressions and uses them as code-split points. Modules loaded with `import()` are emitted into separate chunks that are only fetched when the importing code actually runs, keeping the initial bundle small.
+
+## Overview
+
+Because Packem builds on Rollup, any `import()` call in your source becomes a code-splitting boundary. This is useful for:
+
+- Lazy-loading heavy or rarely used features
+- Splitting optional functionality out of the main entry
+- Reducing startup cost for CLIs and servers
+
+:::note
+Dynamic imports are a supported, first-class feature of Packem (see the feature list in the package README).
+:::
+
+## Project Structure
+
+```
+dynamic-imports-example/
+├── src/
+│   ├── index.ts
+│   ├── heavy-feature.ts
+│   └── reporter.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Source Files
+
+**src/heavy-feature.ts**
+```typescript
+// A large module we only want to load on demand
+export function runHeavyFeature(input: string): string {
+  // ...imagine a lot of code here
+  return `processed: ${input}`
+}
+```
+
+**src/index.ts**
+```typescript
+export async function maybeRun(flag: boolean, input: string) {
+  if (!flag) {
+    return input
+  }
+
+  // Loaded lazily — emitted into its own chunk
+  const { runHeavyFeature } = await import('./heavy-feature')
+
+  return runHeavyFeature(input)
+}
+```
+
+## Configuration
+
+No special option is required — dynamic `import()` is split automatically.
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  declaration: true,
+  sourcemap: true
+})
+```
+
+**package.json**
+```json
+{
+  "name": "@myorg/dynamic-imports",
+  "version": "1.0.0",
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2"
+  }
+}
+```
+
+## Build Output
+
+The dynamically imported module is placed in its own chunk and referenced via `import()` in the output:
+
+```bash
+$ packem build
+
+dist/index.mjs            # entry — keeps the import() call
+dist/heavy-feature.mjs    # split chunk, loaded on demand
+```
+
+```javascript
+// dist/index.mjs (simplified)
+export async function maybeRun(flag, input) {
+  if (!flag) return input
+  const { runHeavyFeature } = await import('./heavy-feature.mjs')
+  return runHeavyFeature(input)
+}
+```
+
+## Notes
+
+- Each unique dynamic import target becomes a separate chunk; shared dependencies between chunks are hoisted automatically by Rollup.
+- If you want code shared across multiple bundles without a separate entry, prefer the [Shared Modules](/docs/examples/advanced/shared-modules) convention instead.
+- Use [Bundle Analysis](/docs/examples/advanced/bundle-analysis) to confirm how your code splits across chunks.
+
+## Related
+
+- [Shared Modules](/docs/examples/advanced/shared-modules)
+- [Bundle Analysis](/docs/examples/advanced/bundle-analysis)
+- [Tree Shaking](/docs/options/tree-shaking)

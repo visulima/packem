@@ -1,0 +1,115 @@
+---
+title: Bundle Analysis
+description: Analyze and optimize bundle size
+---
+
+# Bundle Analysis
+
+Packem ships two complementary ways to understand what ends up in your bundle: a visual treemap report via the `analyze` option, and machine-readable build metadata via the `metafile` flag.
+
+## Overview
+
+- **`analyze`** — generates a `packem-bundle-analyze.html` treemap showing the makeup of your bundle (module sizes, gzip and brotli sizes).
+- **`metafile`** — produces JSON metadata about the build that you can feed into external analysis tools.
+
+:::note
+`analyze` conflicts with watch mode — it runs during a one-off build, not while watching.
+:::
+
+## Visual Bundle Report
+
+Enable the visualizer through the `analyze` option (or the `--analyze` CLI flag). Packem writes `packem-bundle-analyze.html` at build time.
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  analyze: true
+})
+```
+
+```bash
+# Or via the CLI
+packem build --analyze
+```
+
+The generated report includes gzip and brotli sizes by default and is titled "Packem Visualizer".
+
+### Customizing the Visualizer
+
+You can pass options to the underlying visualizer through `rollup.visualizer` (it accepts `rollup-plugin-visualizer` options). Set it to `false` to suppress the report even when `analyze` is on.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  analyze: true,
+  rollup: {
+    visualizer: {
+      // Treemap, sunburst, network, list or raw-data
+      template: 'sunburst',
+      gzipSize: true,
+      brotliSize: true
+    }
+  }
+})
+```
+
+:::note
+Packem always forces the output `filename` to `packem-bundle-analyze.html` and the `title` to "Packem Visualizer"; other visualizer options are passed through.
+:::
+
+## Metafile
+
+Pass the `--metafile` flag to make Packem emit build metadata in JSON format. You can feed the output into analysis tools like [bundle buddy](https://www.bundle-buddy.com/rollup) to see which modules take up space.
+
+```bash
+packem build --metafile
+```
+
+Files are written as `metafile-{bundleName}-{format}.json`, for example `metafile-test-cjs.json` and `metafile-test-es.json`.
+
+:::note
+The metafile feature is experimental. Enabling `metafile` or `analyze` also turns on source map generation, since both rely on source map data.
+:::
+
+## package.json
+
+```json
+{
+  "name": "@myorg/analyze-example",
+  "version": "1.0.0",
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build",
+    "analyze": "packem build --analyze",
+    "meta": "packem build --metafile"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2"
+  }
+}
+```
+
+## Notes
+
+- `analyze` produces a human-readable HTML treemap; `metafile` produces JSON for tooling — use them together for a full picture.
+- Because both imply source maps, expect `.map` files (or inline maps) in the output when either is enabled.
+- Use the analysis to spot accidentally bundled dependencies, then externalize them or split with [Dynamic Imports](/docs/examples/advanced/dynamic-imports).
+
+## Related
+
+- [Optimization Guide](/docs/guide/optimization)
+- [Dynamic Imports](/docs/examples/advanced/dynamic-imports)
+- [Duplicate packages](/docs/options/detect-duplicated)

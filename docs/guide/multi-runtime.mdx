@@ -1,0 +1,101 @@
+---
+title: Multi-Runtime
+description: Target multiple runtimes with conditional exports
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Multi-Runtime
+
+Packem can target multiple runtimes from a single build: **default**, **node**, **browser**, **edge-light**, and **react-server**. Runtime-specific output is driven by the conditional `exports` map in your `package.json`, together with a source-file naming convention that lets you provide a different implementation per runtime.
+
+## Runtime-specific source files
+
+Special platforms such as `react-server`, `react-native`, and `edge-light` may need different exports or different code paths. Packem provides an override source-file convention: name a source file after the export condition and Packem builds it as a separate bundle.
+
+For example, this `exports` map produces three distinct bundles:
+
+```json
+{
+  "exports": {
+    "react-server": "./dist/react-server.mjs",
+    "edge-light": "./dist/edge-light.mjs",
+    "import": "./dist/index.mjs"
+  }
+}
+```
+
+Each condition is matched to its own source file under `src` (for example `src/index.react-server.ts` for the `react-server` condition), so you can ship a tailored implementation for each runtime.
+
+<Callout type="info">
+The `edge-light` export injects `process.env.EdgeRuntime` as `true`; for all other runtimes it evaluates to `false`. You can branch on it in your code to remove runtime-incompatible paths.
+</Callout>
+
+## The `runtime` option
+
+The global build runtime can also be set in your config or via the CLI. The `init` command writes a `runtime` value into the generated config:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  runtime: 'node', // 'node' | 'browser'
+})
+```
+
+Or from the command line:
+
+```bash
+packem build --runtime browser
+```
+
+<Callout type="info">
+The `--runtime` CLI flag accepts `node` or `browser`. The finer-grained `react-server`, `edge-light`, and `react-native` runtimes are selected through the conditional `exports` map and source-file convention described above.
+</Callout>
+
+## `production` and `development` conditions
+
+If you separate `production` and `development` exports conditions, Packem injects `process.env.NODE_ENV` for you (when present), so you do not need to inject it manually:
+
+```json
+{
+  "exports": {
+    "development": "./dist/index.development.mjs",
+    "production": "./dist/index.production.mjs"
+  }
+}
+```
+
+- When the `production` condition is defined and the file ends with `*.production.*`, the bundle is **minified**.
+- When the `development` condition is defined and the file ends with `*.development.*`, the bundle is **not minified**.
+
+## Sharing modules across runtimes
+
+Modules that must exist as a single instance across multiple runtime bundles (for example a React context shared between `default` and `react-server`) use the shared module convention `[name].shared-runtime.[ext]`:
+
+```js
+// src/util.shared-runtime.js
+export function sharedUtil() {
+  /* ... */
+}
+```
+
+```js
+// src/index.js
+import { sharedUtil } from './util.shared-runtime'
+```
+
+```js
+// src/index.react-server.js
+import { sharedUtil } from './util.shared-runtime'
+```
+
+The shared module is bundled into a separate chunk referenced by every runtime bundle. See [React Support](/docs/guide/react) for the React-specific use of this convention.
+
+## Next steps
+
+- [Package.json Setup](/docs/guide/package-json) — how exports conditions map to entries.
+- [React Support](/docs/guide/react) — react-server and client/server boundaries.
+- [Multi-Runtime example](/docs/examples/advanced/multi-runtime) — a complete project.

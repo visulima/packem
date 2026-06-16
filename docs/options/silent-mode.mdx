@@ -1,0 +1,54 @@
+---
+title: Silent Mode
+description: Control logging and output verbosity
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Silent Mode
+
+<Callout type="warning">
+Packem has **no** `silent` config option and **no** `--silent` CLI flag. Logging verbosity is controlled by the `debug` option / `--debug` behaviour and the environment flags described below.
+</Callout>
+
+Build output verbosity in Packem is driven by a debug/verbose toggle rather than a "silent" switch. The only verbosity-related control that exists in the config is `debug`.
+
+## `debug`
+
+The `debug` option enables verbose logging. It is part of `BuildOptions`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  debug: true,
+})
+```
+
+When enabled, Packem emits additional `logger.debug(...)` output (for example, where the config file was found) and passes `debug` through to [jiti](https://github.com/unjs/jiti), which loads your config and entry files.
+
+## Environment flags
+
+The `--production` and `--development` CLI flags (mutually exclusive) set the build [environment](/docs/options/platform), which in turn affects defaults such as minification. They do not silence logging, but they are the primary way to switch a build's mode from the command line:
+
+```bash
+packem build --production
+packem build --development
+```
+
+## What does not exist
+
+For accuracy, note the following are **not** available:
+
+- No `silent: true` config key.
+- No `--silent` or `--quiet` CLI flag.
+- No `logLevel` / `verbosity` config option.
+
+If you need quieter output, the practical lever is to leave `debug` off (its default), which suppresses the verbose debug stream.
+
+---
+
+## Related Options
+
+- [Platform](/docs/options/platform) - `environment` and the `--production` / `--development` flags
+- [Watch Mode](/docs/options/watch) - Development workflow logging

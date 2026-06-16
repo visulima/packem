@@ -1,0 +1,124 @@
+---
+title: WebAssembly
+description: Bundle and use WebAssembly modules
+---
+
+# WebAssembly
+
+Packem can import and bundle `.wasm` modules. WebAssembly support is provided through the `rollup.wasm` option, which is backed by `@rollup/plugin-wasm` and accepts its full option set.
+
+## Overview
+
+When enabled, `.wasm` files imported from your source are inlined or copied as part of the build, letting you instantiate compiled WebAssembly directly from JavaScript/TypeScript.
+
+:::note
+WebAssembly modules are a supported feature of Packem (see the feature list in the package README). Support is configured via `rollup.wasm`.
+:::
+
+## Project Structure
+
+```
+wasm-example/
+├── src/
+│   ├── index.ts
+│   └── add.wasm
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Source Files
+
+**src/index.ts**
+```typescript
+// Import the compiled WebAssembly module
+import addModule from './add.wasm'
+
+export async function add(a: number, b: number): Promise<number> {
+  const instance = await addModule()
+  return (instance.exports.add as (a: number, b: number) => number)(a, b)
+}
+```
+
+## Configuration
+
+Enable WebAssembly handling through the `rollup.wasm` option. Passing an empty object turns it on with defaults; you can pass any `@rollup/plugin-wasm` option (such as `sync` or `maxFileSize`).
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  declaration: true,
+  rollup: {
+    // Enable .wasm bundling (backed by @rollup/plugin-wasm)
+    wasm: {}
+  }
+})
+```
+
+### Inlining Smaller Modules
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    wasm: {
+      // Inline modules under this size; emit larger ones as separate files
+      maxFileSize: 10_000,
+      // Synchronously instantiate (Node-only, no async wrapper)
+      sync: ['src/add.wasm']
+    }
+  }
+})
+```
+
+To disable WebAssembly handling explicitly, set `rollup.wasm` to `false`.
+
+**package.json**
+```json
+{
+  "name": "@myorg/wasm-example",
+  "version": "1.0.0",
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2"
+  }
+}
+```
+
+## Build Output
+
+```bash
+$ packem build
+
+dist/index.mjs        # JS entry, instantiates the wasm module
+dist/index.d.ts       # type declarations
+```
+
+## Notes
+
+- `rollup.wasm` accepts the full `RollupWasmOptions` shape from `@rollup/plugin-wasm`; the most common options are `sync`, `maxFileSize`, `targetEnv`, and `publicPath`.
+- Small modules can be inlined as base64 (via `maxFileSize`) to avoid a separate fetch; larger ones are emitted as standalone `.wasm` files.
+- Combine with [Bundle Analysis](/docs/examples/advanced/bundle-analysis) to see how WebAssembly assets contribute to your output size.
+
+## Related
+
+- [Bundle Analysis](/docs/examples/advanced/bundle-analysis)
+- [@visulima/packem-rollup API](/docs/api/packem-rollup)
+- [Plugins](/docs/options/plugins)

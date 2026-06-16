@@ -1,0 +1,91 @@
+---
+title: Platform
+description: Target runtime platforms
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Platform
+
+Packem does **not** have a literal `platform` option. Instead, the runtime platform a build targets is controlled by three real options on `BuildOptions`:
+
+- `runtime?: Runtime` — the runtime environment (Node, browser, edge, etc.)
+- `environment?: Environment` — `"production"` or `"development"`
+- `browserTargets?: string[]` — browserslist queries used when transpiling for browsers
+
+<Callout type="warning">
+The option names on this page — `runtime`, `environment`, and `browserTargets` — are the real fields. There is no `platform` key.
+</Callout>
+
+## `runtime`
+
+`runtime` selects the target runtime. The accepted values of the `Runtime` type are:
+
+```typescript
+type Runtime =
+  | "browser"
+  | "bun"
+  | "deno"
+  | "edge-light"
+  | "electron"
+  | "node"
+  | "react-native"
+  | "react-server"
+  | "workerd"
+  | undefined;
+```
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  runtime: 'node',
+})
+```
+
+### CLI flag
+
+A `--runtime` flag exists on `packem build`, but it is **narrower** than the config option — it accepts only `node` or `browser`:
+
+```bash
+packem build --runtime node
+packem build --runtime browser
+```
+
+Any other value is rejected. To target `edge-light`, `workerd`, `deno`, and the other runtimes, set `runtime` in your config file.
+
+## `environment`
+
+`environment` selects the build environment. The `Environment` type is:
+
+```typescript
+type Environment = "production" | "development" | undefined;
+```
+
+The environment also influences other defaults — for example, [minification](/docs/options/minify) defaults to `true` in `production` and `false` otherwise. On the CLI, `--production` and `--development` (which conflict with each other) set the environment:
+
+```bash
+packem build --production
+packem build --development
+```
+
+## `browserTargets`
+
+`browserTargets` is an array of [browserslist](https://github.com/browserslist/browserslist) queries used to drive transpilation for browser builds. It defaults to the resolved result of `browserslist()` (i.e. your `.browserslistrc` or `package.json#browserslist`).
+
+```typescript
+export default defineConfig({
+  runtime: 'browser',
+  browserTargets: ['chrome 58', 'firefox 57'],
+})
+```
+
+When the global runtime is `"node"`, `browserTargets` is cleared, but the resolved value is preserved internally (`resolvedBrowserTargets`) so that individual browser-runtime entries in an otherwise Node package keep their intended targets.
+
+---
+
+## Related Options
+
+- [Target](/docs/options/target) - JavaScript language/feature targets
+- [Transformers](/docs/options/transformers) - The engine that performs transpilation
+- [Bundler](/docs/options/bundler) - Choose the bundler backend

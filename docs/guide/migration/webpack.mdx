@@ -1,0 +1,178 @@
+---
+title: From Webpack
+description: Migrate from Webpack to Packem
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# From Webpack
+
+Webpack is an application bundler tuned for shipping apps to a browser. Packem is a **library bundler** tuned for publishing packages to npm. If you have been using Webpack to build a library, migrating means trading `webpack.config.js` — entry, output, loaders, externals, plugins — for a package.json-driven build with a small `packem.config.ts`.
+
+<Callout type="info">
+There is no `packem migrate` path for Webpack. The `migrate` command only rewrites `tsup`, `unbuild`, and `bunchee` projects. Migrate from Webpack by hand using the mapping below.
+</Callout>
+
+## Concept mapping
+
+| Webpack concept | Packem equivalent |
+|-----------------|-------------------|
+| `entry: './src/index.ts'` | Inferred from `package.json` `exports`, `main`, `module`, `bin` |
+| `output.path` | `outDir` config option (default `dist`) |
+| `output.filename` | Output names follow the `exports` map and file extensions |
+| `output.library` / `libraryTarget: 'commonjs2'` / `'module'` | Export conditions: `require` → CJS, `import` → ESM |
+| `module.rules` with `babel-loader` / `ts-loader` | The `transformer` option (esbuild/swc/OXC/sucrase) |
+| `module.rules` with `css-loader` / `style-loader` | Built-in CSS support via `rollup.css` loaders |
+| `resolve.alias` | `alias` config option (also inferred from tsconfig `paths`) |
+| `resolve.extensions` | Handled automatically |
+| `externals` | `externals` option; `dependencies`/`peerDependencies` external by default |
+| `DefinePlugin` / `EnvironmentPlugin` | `--env.KEY=value` / `envFile` (compile-time replacement) |
+| `TerserPlugin` / `optimization.minimize` | `minify: true` or `--minify` |
+| `devtool: 'source-map'` | `sourcemap: true` or `--sourcemap` |
+| `target: 'node' \| 'web'` | `runtime: 'node' \| 'browser'` or `--runtime` |
+| `watch: true` | `--watch` |
+| `.d.ts` via a separate tsc/plugin step | `declaration` option (built in) |
+| Code splitting / dynamic `import()` | Supported automatically |
+
+## Step-by-step
+
+### 1. Declare your output through package.json
+
+A library-mode Webpack config:
+
+```javascript
+// webpack.config.js
+module.exports = {
+  entry: './src/index.ts',
+  output: {
+    path: __dirname + '/dist',
+    filename: 'index.js',
+    library: { type: 'module' },
+  },
+  experiments: { outputModule: true },
+  externals: ['react'],
+  module: {
+    rules: [{ test: /\.tsx?$/, use: 'ts-loader' }],
+  },
+}
+```
+
+Becomes a `package.json` that describes the public API. The `library`/`output` block is replaced by the `exports` conditions, and `externals: ['react']` is unnecessary once `react` is a declared dependency:
+
+```json
+{
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "packem build"
+  }
+}
+```
+
+To ship both CJS and ESM (the `libraryTarget: 'commonjs2'` + module case), use dual conditions:
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/index.d.mts", "default": "./dist/index.mjs" },
+      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+    }
+  }
+}
+```
+
+### 2. Replace loaders with a transformer
+
+`ts-loader`, `babel-loader`, and `swc-loader` all collapse into a single transformer choice:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/swc'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+})
+```
+
+esbuild is the fastest default; swc is closest to a Babel-heavy setup (decorators, custom transforms).
+
+### 3. Move CSS rules into the CSS loaders
+
+Webpack `css-loader` / `style-loader` / `sass-loader` chains map to Packem's built-in CSS loaders configured under `rollup.css`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import sassLoader from '@visulima/packem/css/loader/sass'
+import sourceMapLoader from '@visulima/packem/css/loader/sourcemap'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      loaders: [postcssLoader, sassLoader, sourceMapLoader],
+    },
+  },
+})
+```
+
+### 4. Translate aliases and externals
+
+`resolve.alias` becomes the `alias` option (Packem also reads tsconfig `paths` automatically). `externals` becomes the `externals` option — but remember that declared dependencies are external by default:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  alias: {
+    '@components': './src/components',
+  },
+  externals: ['some-undeclared-peer'],
+})
+```
+
+### 5. Translate DefinePlugin and optimization
+
+`DefinePlugin` constants become compile-time env injection:
+
+```bash
+packem build --env.NODE_ENV=production --env.API_URL=https://api.example.com
+```
+
+`optimization.minimize` / `TerserPlugin` become `minify`, and `devtool` becomes `sourcemap`:
+
+```typescript
+export default defineConfig({
+  transformer,
+  minify: true,
+  sourcemap: true,
+})
+```
+
+## Gotchas
+
+- **Packem builds libraries, not apps.** There is no dev server, HTML templating, asset hashing for deployment, or HMR. If you were using Webpack to serve an application, Packem is not a drop-in replacement for that part of your toolchain — keep Webpack/Vite for the app and use Packem for publishable packages.
+- **No `entry`/`output` configuration.** Entries come from `package.json` exports/bin; output names and formats come from export conditions and extensions. Add non-public entries via the `entries` config option if needed.
+- **Externals are inverted from app builds.** In Webpack app builds you bundle everything; in a library you externalize dependencies. Packem externalizes `dependencies`/`peerDependencies` by default — only inline with `--no-external` when you truly need a self-contained bundle.
+- **CSS defaults to injection.** Packem's default CSS mode is `inject` (CSS embedded in JS, added to `<head>` at runtime). For a separate `.css` file (like `MiniCssExtractPlugin`), use extract mode in the CSS loader options.
+- **Declarations are first-class.** Drop any separate `tsc --emitDeclarationOnly` step or dts plugin — set `declaration: true` (or just add a `types` field to `package.json` and Packem auto-detects it).
+
+## Next steps
+
+- [CSS Processing](/docs/guide/css) — Sass, Less, Stylus, PostCSS, and CSS Modules.
+- [Transformers](/docs/guide/transformers) — Choosing between esbuild, swc, OXC, and sucrase.
+- [Multi-Runtime](/docs/guide/multi-runtime) — Browser, node, and edge conditional exports.

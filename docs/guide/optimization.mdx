@@ -1,0 +1,140 @@
+---
+title: Optimization
+description: Bundle analysis and performance optimization
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Optimization
+
+Packem ships several built-in mechanisms for keeping bundles small and fast: minification, tree shaking, and bundle analysis. This guide covers how to enable each one.
+
+## Minification
+
+The `minify` option toggles minification of the JavaScript output:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  minify: true,
+})
+```
+
+Or from the command line:
+
+```bash
+packem build --minify
+```
+
+<Callout type="info">
+When `--minify` is passed and `--sourcemap` is not specified, source maps are enabled by default. When building with `--production` (or `NODE_ENV=production`), minification is enabled automatically.
+</Callout>
+
+### Condition-driven minification
+
+If your `package.json` defines `production` and `development` export conditions, Packem minifies the matching outputs automatically:
+
+- A file ending in `*.production.*` for the `production` condition is **minified**.
+- A file ending in `*.development.*` for the `development` condition is **not minified**.
+
+```json
+{
+  "exports": {
+    "development": "./dist/index.development.mjs",
+    "production": "./dist/index.production.mjs"
+  }
+}
+```
+
+See [Multi-Runtime](/docs/guide/multi-runtime) for the full conditional-exports behavior and the [Minify option](/docs/options/minify) for details.
+
+## Tree shaking
+
+Dead-code elimination is handled by Rollup. You can tune its behavior with `rollup.treeshake`, which is passed straight through to Rollup's `treeshake` option:
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    treeshake: {
+      moduleSideEffects: 'no-external',
+      propertyReadSideEffects: false,
+    },
+  },
+})
+```
+
+Marking your package as side-effect free in `package.json` lets consumers' bundlers shake it harder:
+
+```json
+{
+  "sideEffects": false
+}
+```
+
+### Removing dead code with environment variables
+
+Pass compile-time environment variables with the `--env` flag. Packem replaces matching references and lets Rollup strip the now-unreachable branches:
+
+```bash
+packem build --env.NODE_ENV=production
+```
+
+This replaces `process.env.NODE_ENV` with `'production'` and removes the code guarded by other values.
+
+## Bundle analysis
+
+Pass `--analyze` to generate a visual report of your bundle makeup as `packem-bundle-analyze.html`:
+
+```bash
+packem build --analyze
+```
+
+The report includes gzip and brotli sizes for each module. You can also set the option in config:
+
+```typescript
+export default defineConfig({
+  transformer,
+  analyze: true,
+})
+```
+
+<Callout type="info">
+`--analyze` enables source maps so the analyzer can attribute bytes accurately.
+</Callout>
+
+### Metafile
+
+For machine-readable build metadata, pass `--metafile`. Packem writes a JSON file per bundle (for example `metafile-<name>-cjs.json` and `metafile-<name>-es.json`) that you can feed to analysis tools such as [bundle buddy](https://www.bundle-buddy.com/rollup):
+
+```bash
+packem build --metafile
+```
+
+## Unbundle mode
+
+For some libraries, preserving the source file structure (one output file per module) produces better tree shaking for consumers than a single bundled file. Enable it with `unbundle`:
+
+```typescript
+export default defineConfig({
+  transformer,
+  unbundle: true,
+})
+```
+
+Or via the CLI:
+
+```bash
+packem build --unbundle
+```
+
+See [Unbundle](/docs/options/unbundle) for details.
+
+## Next steps
+
+- [Minify option](/docs/options/minify) — the minification reference.
+- [Plugins](/docs/guide/plugins) — add analysis plugins like the visualizer.
+- [CLI Reference](/docs/guide/cli) — every build flag.

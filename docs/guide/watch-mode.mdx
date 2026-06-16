@@ -1,0 +1,115 @@
+---
+title: Watch Mode
+description: Development workflow with hot reloading
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Watch Mode
+
+Watch mode rebuilds your package whenever a source file changes, giving you a fast inner development loop. Enable it with the `--watch` flag:
+
+```bash
+packem build --watch
+```
+
+A common pattern is to wire it into a `dev` script:
+
+```json
+{
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  }
+}
+```
+
+## What gets watched
+
+Packem watches your source directory plus the files that define the build:
+
+- everything under your `src` (source) directory
+- `package.json`
+- `packem.config.*`
+- `tsconfig.json` and `tsconfig.*.json`
+
+`.git`, `node_modules`, and `test-results` directories are ignored.
+
+When TypeScript declaration generation is enabled, Packem starts a second watcher for the `.d.ts` build so declarations are regenerated alongside the JavaScript output.
+
+## Rebuild on config and package.json changes
+
+Rollup's own watcher rebuilds with the same options it started with — it cannot pick up new entry points. To handle this, Packem additionally watches `package.json` and your `packem.config.*`:
+
+- When **`package.json`** changes, Packem closes the watchers, re-infers entries from the updated file, and restarts watching. This is how new entry points are picked up.
+- When **`packem.config.*`** changes, Packem prints a notice asking you to restart `packem`, because the watcher cannot reload the config in place (a config change can alter the bundler, transformer, output format, externals, and more).
+
+<Callout type="warning">
+After editing `packem.config.ts` in watch mode, stop and restart `packem build --watch` for the changes to take effect.
+</Callout>
+
+## Run a command after each build
+
+Use `--onSuccess` to run a command after every successful build — useful for restarting a server during development:
+
+```bash
+packem build --watch --onSuccess "node dist/index.js"
+```
+
+`onSuccess` can also be a function that returns a `Promise`. This form requires `packem.config.ts` instead of the CLI flag:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  async onSuccess() {
+    // Start a long-running task, like a server
+  },
+})
+```
+
+You can return a cleanup function from `onSuccess`; Packem runs it before the next rebuild:
+
+```typescript
+import http from 'node:http'
+
+export default defineConfig({
+  transformer,
+  onSuccess() {
+    const server = http.createServer((request, res) => {
+      res.end('Hello World!')
+    })
+
+    server.listen(3000)
+
+    return () => {
+      server.close()
+    }
+  },
+})
+```
+
+To control how the child process started by `onSuccess` is terminated, use `--killSignal` (`SIGTERM` or `SIGKILL`).
+
+## Customizing the watcher
+
+You can extend the watch configuration through `rollup.watch`, which accepts Rollup's `WatcherOptions`. Any `include` patterns you add are merged with Packem's defaults:
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    watch: {
+      include: ['extra-dir/**/*'],
+    },
+  },
+})
+```
+
+## Next steps
+
+- [Watch option](/docs/options/watch) — the option reference.
+- [On Success](/docs/options/on-success) — post-build commands.
+- [CLI Reference](/docs/guide/cli) — every build flag.

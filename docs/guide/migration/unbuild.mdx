@@ -1,0 +1,183 @@
+---
+title: From unbuild
+description: Migrate from unbuild to Packem
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# From unbuild
+
+[unbuild](https://github.com/unjs/unbuild) and Packem share a lineage: both are Rollup-based library bundlers that lean on `package.json` and a `build.config` style file, and both can infer entries automatically. Migrating is mostly a one-to-one translation of unbuild's `BuildConfig` into Packem's `defineConfig`, with Packem doing even more inference from your `exports` map.
+
+Packem ships a `migrate` command that handles the `package.json` rewrites for you.
+
+## Run the automated migration
+
+From your project root:
+
+```bash
+packem migrate
+```
+
+This will:
+
+- Replace `unbuild` in your `dependencies`, `devDependencies`, and `peerDependencies` with `@visulima/packem`.
+- Rewrite `scripts` that invoke `unbuild` to call `packem build` instead.
+- Detect a `build.config.*` file and warn you that it needs a manual conversion (it is **not** auto-converted).
+
+Preview without writing anything:
+
+```bash
+packem migrate --dry-run
+```
+
+<Callout type="warning">
+`packem migrate` modifies files in place and uncommitted changes can be lost. Commit first, or use `--dry-run`.
+</Callout>
+
+## Option mapping
+
+unbuild's `build.config.ts` exports a `BuildConfig`. Most fields have a direct Packem counterpart:
+
+| unbuild `BuildConfig` | Packem equivalent |
+|-----------------------|-------------------|
+| `entries: ['src/index']` | Inferred from `package.json` `exports`/`main`/`module`/`bin`, or the `entries` option |
+| `entries` with mkdist (`{ builder: 'mkdist', input: 'src/' }`) | `unbundle: true` (preserves the source file structure) |
+| `declaration: true` | `declaration: true` (also auto-detected from a `types` field) |
+| `declaration: 'compatible' \| 'node16'` | `declaration: 'compatible' \| 'node16'` (same values) |
+| `clean: true` | On by default; disable with `--no-clean` |
+| `sourcemap: true` | `sourcemap: true` or `--sourcemap` |
+| `rollup.emitCJS` / `cjsBridge` | Express CJS output via a `require` condition in `exports`; `cjsInterop: true` for interop |
+| `rollup.inlineDependencies` | `--no-external` (inline) or curate `externals` |
+| `externals: [...]` | `externals` option; `dependencies`/`peerDependencies` external by default |
+| `alias` | `alias` option (also inferred from tsconfig `paths`) |
+| `replace` | `--env.KEY=value` / `envFile` for env constants |
+| `hooks` | `hooks` option |
+| `failOnWarn` | Covered by the built-in validator (`validation`) |
+| `preset` | `preset` option |
+| `outDir` | `outDir` option (default `dist`) |
+| Per-entry `outDir` / `format` | Per-entry settings via the `entries` array |
+
+## Step-by-step
+
+### 1. Translate build.config.ts
+
+A common unbuild config:
+
+```typescript
+// build.config.ts
+import { defineBuildConfig } from 'unbuild'
+
+export default defineBuildConfig({
+  entries: ['src/index'],
+  declaration: true,
+  clean: true,
+  rollup: {
+    emitCJS: true,
+  },
+})
+```
+
+The `emitCJS` flag and the explicit entry both move into `package.json` — a `require` condition produces the CJS output, and the `"."` export plus `src/index.ts` replace the `entries` list:
+
+```json
+{
+  "files": ["dist"],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/index.d.mts", "default": "./dist/index.mjs" },
+      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+    }
+  },
+  "scripts": {
+    "build": "packem build"
+  }
+}
+```
+
+Then `packem.config.ts` only needs a transformer; `declaration` is auto-detected from the `types` field, and `clean` is already the default:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+})
+```
+
+<Callout type="info">
+Unlike unbuild, Packem requires a `transformer` (under the default Rollup backend). esbuild is the recommended default.
+</Callout>
+
+### 2. Keep explicit entries when you need them
+
+If you relied on unbuild's `entries` array for entries outside your public `exports`, use Packem's `entries` option. It accepts a string or a richer object with per-entry `declaration`, `runtime`, `cjs`/`esm`, and `outDir`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  entries: [
+    'src/index.ts',
+    { input: 'src/cli.ts', executable: true },
+  ],
+})
+```
+
+### 3. Map the mkdist builder to unbundle
+
+unbuild's `mkdist` builder transpiles a directory file-by-file without bundling. Packem's equivalent is **unbundle mode**, which preserves the source file structure instead of bundling into single files:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  unbundle: true,
+})
+```
+
+Or per build: `packem build --unbundle`.
+
+### 4. Carry over hooks, aliases, and externals
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  alias: {
+    '~': './src',
+  },
+  externals: ['some-undeclared-peer'],
+  hooks: {
+    // Same lifecycle-hook idea as unbuild's `hooks`
+  },
+})
+```
+
+### 5. Delete build.config.ts
+
+Once `packem build` produces the same `dist/`, remove `build.config.ts`.
+
+## Gotchas
+
+- **A transformer is required.** unbuild picks its compiler for you; Packem makes it an explicit choice under the default Rollup backend. Add `transformer` to your config or the build will refuse to run.
+- **`emitCJS` → export conditions.** There is no `emitCJS` flag. Dual output comes from having both `import` and `require` conditions (or `.mjs`/`.cjs` extensions) in `package.json`.
+- **mkdist becomes `unbundle`.** If you used the mkdist builder for unbundled, directory-preserving output, switch to `unbundle: true` rather than expecting a bundled single file.
+- **Inlining dependencies is opt-in.** unbuild's `inlineDependencies` has no single equivalent — declared deps are external by default; use `--no-external` to inline everything, or curate `externals`.
+- **Config conversion is manual.** `packem migrate` rewrites `package.json` only and warns about `build.config.*`. Translate the config yourself using the table above.
+
+## Next steps
+
+- [Configuration](/docs/guide/configuration) — Full option reference.
+- [Unbundle](/docs/options/unbundle) — Preserve source file structure (the mkdist equivalent).
+- [Entry](/docs/options/entry) — Configure explicit entry points.

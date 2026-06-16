@@ -1,0 +1,53 @@
+---
+title: Cleaning
+description: Clean output directory before build
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Cleaning
+
+The `clean` option controls whether Packem empties the output directory before each build, so that stale artifacts from previous builds are not left behind.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  clean: true,
+})
+```
+
+## Default
+
+`clean` defaults to `true` — the output directory is cleaned before every build.
+
+## Disabling cleaning
+
+Set `clean: false` to keep existing files in the output directory:
+
+```typescript
+export default defineConfig({
+  clean: false,
+})
+```
+
+## CLI flag
+
+There is a `--no-clean` flag on `packem build` that disables cleaning for a single build without editing the config file:
+
+```bash
+packem build --no-clean
+```
+
+The flag is described as "Do not clean the dist directory before building". There is no separate `--clean` flag — cleaning is on by default, and `--no-clean` opts out.
+
+<Callout type="info">
+The directory that gets cleaned is the resolved output directory (the `outDir` option, which defaults to your tsconfig `outDir` or `dist`).
+</Callout>
+
+---
+
+## Related Options
+
+- [Output Directory](/docs/options/output-directory) - Where build artifacts are written
+- [Watch Mode](/docs/options/watch) - Rebuild on file changes

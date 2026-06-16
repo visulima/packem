@@ -1,0 +1,239 @@
+---
+title: Server Components
+description: Server and client components with proper bundling
+---
+
+# Server Components
+
+Build a library that ships both React Server Components and Client Components. Packem preserves the `"use client"` and `"use server"` directives and scopes the client/server boundaries so app bundlers like Next.js can integrate them correctly.
+
+## Overview
+
+This example demonstrates:
+
+- Library directives `"use client"` and `"use server"`
+- How Packem preserves and hoists directives in the output
+- A dedicated `react-server` runtime bundle via an input-source override
+- Conditional exports that point app bundlers at the right entry
+
+## How Packem Handles Directives
+
+From the Packem behavior:
+
+- If you use `"use client"` or `"use server"` in an **entry file**, the directive is preserved on top and the entry's output becomes a client component.
+- If you use `"use client"` or `"use server"` in a file that is a **dependency** of an entry, that file is split into a separate chunk and the directive is hoisted to the top of that chunk.
+
+This means client and server boundaries stay properly scoped: when the library is integrated into an app such as Next.js, the app bundler can transform the client components and server actions correctly.
+
+## Project Structure
+
+```
+react-rsc-lib/
+├── src/
+│   ├── Counter.tsx              # client component
+│   ├── actions.ts              # server actions
+│   ├── ServerInfo.tsx          # server component
+│   ├── index.ts                # default runtime entry
+│   └── index.react-server.ts   # react-server runtime entry
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Component Implementation
+
+**src/Counter.tsx** — a client component
+
+```tsx
+'use client'
+
+import React from 'react'
+
+export function Counter() {
+  const [count, setCount] = React.useState(0)
+
+  return (
+    <button onClick={() => setCount((c) => c + 1)}>
+      Count: {count}
+    </button>
+  )
+}
+```
+
+**src/actions.ts** — server actions
+
+```typescript
+'use server'
+
+export async function submitForm(data: FormData) {
+  const name = data.get('name')
+  // ...persist on the server
+  return { ok: true, name }
+}
+```
+
+**src/ServerInfo.tsx** — a server component (no directive needed)
+
+```tsx
+import React from 'react'
+
+export async function ServerInfo() {
+  const now = new Date().toISOString()
+
+  return <p>Rendered on the server at {now}</p>
+}
+```
+
+**src/index.ts** — the default entry
+
+```typescript
+export { Counter } from './Counter'
+export { submitForm } from './actions'
+export { ServerInfo } from './ServerInfo'
+```
+
+**src/index.react-server.ts** — the `react-server` runtime entry
+
+This override file is bundled separately for the `react-server` condition. Here you can expose a server-safe surface (for example omitting client-only components):
+
+```typescript
+export { submitForm } from './actions'
+export { ServerInfo } from './ServerInfo'
+```
+
+<Callout type="info">
+The input-source override convention is `src/index.react-server.{ext}`. Packem builds it into a distinct `react-server` bundle that you wire up through the `react-server` export condition.
+</Callout>
+
+## Configuration
+
+### package.json
+
+The `react-server` condition is a special platform condition. Place it before the generic `import`/`require` conditions so app bundlers running in the server layer resolve it first:
+
+```json
+{
+  "name": "@myorg/react-rsc",
+  "version": "1.0.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-server": "./dist/index.react-server.js",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+### Packem Configuration
+
+The `react` preset handles the JSX/Babel setup. Packem detects the directives in your source and the `react-server` override entry from the `exports` map automatically:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'react',
+  transformer,
+  sourcemap: true,
+  declaration: true,
+})
+```
+
+### TypeScript Configuration
+
+**tsconfig.json**
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## Building
+
+```bash
+npm run build
+```
+
+### Output Structure
+
+```
+dist/
+├── index.js                 # default runtime entry (client boundary preserved)
+├── index.cjs
+├── index.d.ts
+├── index.react-server.js    # react-server runtime bundle
+└── ...chunks/               # hoisted "use client" / "use server" chunks
+```
+
+The `"use client"` directive from `Counter.tsx` is preserved at the top of its chunk, and the `"use server"` directive from `actions.ts` is hoisted to the top of the server-action chunk, so consuming bundlers can identify each boundary.
+
+## Shared Modules Across Runtimes
+
+When the default and `react-server` bundles need to share a single instance of a module (for example a React context), use the shared module convention `[name].shared-runtime.{ext}`:
+
+```tsx
+'use client'
+
+// src/app-context.shared-runtime.ts
+import React from 'react'
+
+export const AppContext = React.createContext(null)
+```
+
+Import it from both entries:
+
+```typescript
+// src/index.ts
+import { AppContext } from './app-context.shared-runtime'
+
+// src/index.react-server.ts
+import { AppContext } from './app-context.shared-runtime'
+```
+
+Packem bundles `app-context.shared-runtime` into a single chunk shared across both runtime bundles, ensuring only one instance exists.
+
+## Next Steps
+
+- Read the [Multi-Runtime guide](/docs/guide/multi-runtime) for more runtime conditions
+- Set up a plain [React Library](/docs/examples/react/library)
+- Add [CSS Modules](/docs/examples/react/css-modules) for scoped client styles

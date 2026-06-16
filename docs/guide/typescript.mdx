@@ -1,0 +1,151 @@
+---
+title: TypeScript
+description: TypeScript support and configuration
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
+
+# TypeScript
+
+Packem has first-class TypeScript support. It compiles `.ts` and `.tsx` files with your chosen [transformer](/docs/guide/transformers) and bundles `.d.ts` declaration files automatically — including the extension-matched `.d.mts` / `.d.cts` variants that modern module resolution requires.
+
+## Declaration generation
+
+Declaration output is controlled by the `declaration` option. It accepts a boolean or one of two string modes:
+
+| Value | Behavior |
+| --- | --- |
+| `"compatible"` (or `true`) | `src/index.ts` generates `dist/index.d.mts`, `dist/index.d.cts`, and `dist/index.d.ts`. |
+| `"node16"` | `src/index.ts` generates `dist/index.d.mts` and `dist/index.d.cts`. |
+| `false` | Disable declaration generation. |
+| `undefined` | Auto-detect from `package.json`: if a `types` field is present it becomes `"compatible"`, otherwise `false`. |
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  declaration: 'compatible',
+})
+```
+
+<Callout type="info">
+Leave `declaration` unset and Packem will turn it on automatically whenever your `package.json` has a `types` field. See [Declaration Files](/docs/options/declaration-files) for the full reference.
+</Callout>
+
+## Matching declarations to extensions
+
+When you ship `.mjs`/`.cjs` outputs with `node16` (or newer) module resolution, TypeScript expects declaration files whose extension matches the JavaScript file. Packem generates `.d.mts` for ESM and `.d.cts` for CommonJS so the types resolve correctly per condition:
+
+```json
+{
+  "files": ["dist"],
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+### Hybrid (Node 10 + Node 16) resolution
+
+To support both legacy and modern resolvers, keep a `types` field for Node 10 and the extension-matched declarations in `exports`:
+
+```json
+{
+  "files": ["dist"],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+You can additionally generate a `typesVersions` map for Node 10 compatibility:
+
+```typescript
+export default defineConfig({
+  transformer,
+  node10Compatibility: {
+    typeScriptVersion: '>=5.0',
+    writeToPackageJson: true,
+  },
+})
+```
+
+## Isolated declarations (TypeScript 5.5+)
+
+Declaration generation runs on top of [`@visulima/rollup-plugin-dts`](/docs/api/packem-rollup). Enable TypeScript's isolated declarations feature in your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "isolatedDeclarations": true
+  }
+}
+```
+
+With this set, Packem uses oxc's `isolatedDeclarationSync` to emit `.d.ts` files without running full type inference — no extra configuration required. Isolated declarations are significantly faster because they avoid whole-program type analysis, at the cost of requiring explicit type annotations on exported symbols.
+
+<Callout type="warning">
+Isolated declaration support requires TypeScript 5.5 or higher and is considered experimental.
+</Callout>
+
+## tsconfig.json
+
+Packem reads your `tsconfig.json`. Path aliases declared under `compilerOptions.paths` are inferred automatically.
+
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+
+<Callout type="warning">
+Aliases are not supported in type declaration generation. If you need type support across your modules, do not use aliases for those imports.
+</Callout>
+
+You can point Packem at a specific tsconfig with the `--tsconfig` CLI flag:
+
+```bash
+packem build --tsconfig tsconfig.build.json
+```
+
+## Type checking and transformers
+
+Most transformers (esbuild, swc, OXC, sucrase) strip types without performing full type checking, which is what makes them fast. For type safety, run `tsc --noEmit` as a separate step in your CI pipeline. See [Transformers](/docs/guide/transformers) for the trade-offs of each compiler.
+
+## Declarations-only builds
+
+To emit only declaration files without building the JavaScript output, use the `dtsOnly` option or the `--dts-only` CLI flag:
+
+```bash
+packem build --dts-only
+```
+
+## Next steps
+
+- [Declaration Files](/docs/options/declaration-files) — the full declaration reference.
+- [Transformers](/docs/guide/transformers) — choose the compiler for your project.
+- [Package.json Setup](/docs/guide/package-json) — wiring up the `types` field.

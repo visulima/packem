@@ -1,0 +1,184 @@
+---
+title: CLI Reference
+description: Complete command-line interface documentation
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# CLI Reference
+
+Packem exposes four commands: `build`, `init`, `add`, and `migrate`. Run them through your package manager, for example `npx packem build` or `pnpm exec packem build`.
+
+## `packem build`
+
+Build the package using the resolved packem configuration.
+
+```bash
+packem build [options]
+```
+
+### General options
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--dir <path>` | string | The directory to build. Defaults to `.`. |
+| `--config <path>` | string | Use a custom config file. |
+| `--tsconfig <path>` | string | Path to the `tsconfig.json` file. |
+| `-t, --target <env>` | string | Environments to support. The `target` in `tsconfig.json` is added automatically; defaults to the current Node.js version. |
+
+### Output options
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--minify` | boolean | Minify the output. |
+| `--sourcemap` | boolean | Generate source maps (experimental). |
+| `--dts-only` | boolean | Only generate `.d.ts` files. |
+| `--no-clean` | boolean | Do not clean the `dist` directory before building. |
+| `--unbundle` | boolean | Preserve the source file structure instead of bundling into a single file. |
+| `--exe` | boolean | Bundle the output into a standalone executable via Node.js SEA (requires Node.js >= 25.7.0, single entry). |
+| `--runtime <runtime>` | `node` \| `browser` | Specify the build runtime. |
+| `--bundler <bundler>` | `rollup` \| `rolldown` | Specify the bundler to use. |
+| `--cjsInterop` | boolean | CJS interop mode — can export default and named exports (experimental). |
+
+### Development options
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--watch` | boolean | Watch for changes and rebuild. Conflicts with `--jit`. |
+| `--jit` | boolean | Stub the package for JIT compilation. Conflicts with `--watch`. |
+| `--onSuccess <command>` | string | Execute a command after a successful build (especially useful in watch mode). |
+| `--killSignal <signal>` | `SIGTERM` \| `SIGKILL` | Signal used to kill the `onSuccess` child process. |
+
+### Environment options
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--production` | boolean | Run in the production environment. Conflicts with `--development`. |
+| `--development` | boolean | Run in the development environment. Conflicts with `--production`. |
+| `--env.<KEY>=<value>` | repeatable | Compile-time environment variables, e.g. `--env.NODE_ENV=production`. |
+| `--env-file <path>` | string | Path to a `.env` file to load environment variables from. |
+| `--env-prefix <prefix>` | string | Prefix for environment variables loaded from the `.env` file. Defaults to `PACKEM_`. |
+
+<Callout type="info">
+CLI environment variables override values loaded from a `.env` file. The `--env` flag splits on the first `=`, so values that contain `=` (such as URLs with query strings) are preserved.
+</Callout>
+
+### Analysis options
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--analyze` | boolean | Visualize and analyze the bundle (writes `packem-bundle-analyze.html`). Conflicts with `--watch`. |
+| `--metafile` | boolean | Generate a metadata JSON file per bundle (experimental). |
+| `--typedoc` | boolean | Generate type documentation. |
+| `--license <path>` | string | Path to the license file. |
+
+### Dependency options
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--external <list>` | repeatable | Mark a dependency as external. Comma-separated, e.g. `--external lodash,react`. |
+| `--no-external` | boolean | Do not bundle external dependencies. |
+
+### Other flags
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--no-validation` | boolean | Disable output validation. |
+| `--no-cache` | boolean | Disable the file cache. |
+
+<Callout type="info">
+`--no-validation` overrides validation supplied by a preset, but not validation you set explicitly in `packem.config.ts`.
+</Callout>
+
+### Examples
+
+```bash
+# Build for production (minifies automatically)
+packem build --production
+
+# Watch with development environment
+packem build --watch --development
+
+# Inject a compile-time variable
+packem build --env.API_URL=https://api.example.com
+
+# Use the experimental rolldown bundler
+packem build --bundler rolldown
+```
+
+## `packem init`
+
+Initialize packem configuration. Runs an interactive wizard that detects your project and writes a `packem.config.ts` (or `.js`) file.
+
+```bash
+packem init [options]
+```
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--dir <path>` | string | The directory to initialize. Defaults to `.`. |
+| `--transformer <name>` | `esbuild` \| `swc` \| `sucrase` | Choose a transformer. |
+| `--runtime <runtime>` | `node` \| `browser` | Specify the build runtime. |
+| `--css` | boolean | Set up CSS support. |
+| `--css-minifier` | boolean | Set up a CSS minifier. |
+| `--typescript` | boolean | Use TypeScript. |
+
+The wizard asks about TypeScript, the build runtime, the transformer, and optional CSS loaders/minifiers, installs the matching dependencies, and writes the config file.
+
+## `packem add`
+
+Add an optional feature to an existing packem project. The feature is passed as an argument and the command edits your existing config file in place.
+
+```bash
+packem add <feature> [options]
+```
+
+Supported features: `typedoc`, `react`, `solid`, `preact`, `vue`, `svelte`, `css`.
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--dir <path>` | string | The project directory. Defaults to `.`. |
+| `--config <path>` | string | Use a custom config file. |
+
+Framework features (`react`, `solid`, `preact`, `vue`, `svelte`) add the matching preset to your config and install the required dependencies. `css` runs an interactive loader/minifier selection. `typedoc` wires up the TypeDoc builder.
+
+```bash
+npx packem add react
+npx packem add css
+npx packem add typedoc
+```
+
+<Callout type="info">
+If the git working tree has uncommitted changes, `add` asks for confirmation before editing the config, since the edit cannot be cleanly undone otherwise.
+</Callout>
+
+## `packem migrate`
+
+Migrate a project from another bundler (tsup, unbuild, bunchee) to packem. The command rewrites bundler dependencies and `package.json` build scripts to use packem.
+
+```bash
+packem migrate [options]
+```
+
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--cwd <path>` | string | The directory to migrate. Defaults to `.`. |
+| `--dry-run` | boolean | Preview changes without applying them. |
+
+<Callout type="warning">
+`migrate` modifies your files and warns that uncommitted changes may be lost. Use `--dry-run` first to preview the changes. Bundler config files (such as `tsup.config.ts`) are reported but not migrated automatically — they require manual conversion to `packem.config.ts`.
+</Callout>
+
+```bash
+# Preview the migration
+packem migrate --dry-run
+
+# Apply the migration
+packem migrate
+```
+
+## Next steps
+
+- [Getting Started](/docs/guide/getting-started) — install packem and run your first build.
+- [Watch Mode](/docs/guide/watch-mode) — the development workflow.
+- [Configuration](/docs/guide/configuration) — configure the build.

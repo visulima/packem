@@ -1,0 +1,200 @@
+---
+title: Build Errors
+description: Common build failures and solutions
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Build Errors
+
+When a Packem build throws or exits with code 1, the message almost always names the exact misconfiguration. This page maps the real errors Packem emits to their fixes: failing on warnings, transformer/bundler mismatches, unknown transformers, and externalization failures.
+
+## Build fails because of warnings
+
+### Problem
+
+The build prints warnings and then exits with:
+
+```
+Exiting with code (1). You can change this behavior by setting `failOnWarn: false`.
+```
+
+### Cause
+
+Packem collects warnings during the build (`Build is done with some warnings:` followed by the list). When `failOnWarn` is enabled, any accumulated warning turns into a non-zero exit at the end.
+
+### Solution
+
+Either fix the warnings the build reports, or disable the fail-on-warn behavior:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  failOnWarn: false
+})
+```
+
+<Callout type="warning">
+Prefer fixing warnings over silencing them. Many warnings (missing `package.json` fields, unused dependencies, incorrect export condition order) point at problems that break consumers of your published package.
+</Callout>
+
+## `transformer` set together with `bundler: "rolldown"`
+
+### Problem
+
+The build refuses to start with:
+
+```
+The `transformer` option is not supported when `bundler: "rolldown"`. Rolldown uses its own oxc-based transform — remove `transformer` from your packem config.
+```
+
+### Cause
+
+The experimental Rolldown backend ships its own oxc-based transform and always uses it. The `esbuild`/`swc`/`sucrase`/`oxc` transformer adapters only apply under the default `"rollup"` bundler. Setting both is a configuration mistake, so Packem refuses to build rather than silently ignoring the option.
+
+### Solution
+
+When using Rolldown, omit `transformer` entirely:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  bundler: 'rolldown'
+  // no `transformer` here
+})
+```
+
+To keep a transformer, stay on the default Rollup backend (drop the `bundler` option or set `bundler: "rollup"`).
+
+<Callout type="info">
+Even with `bundler: "rolldown"`, `.d.ts` generation still routes through Rollup. Rollup is pulled in automatically when Rolldown is combined with `declaration: true`.
+</Callout>
+
+## Unknown or missing transformer
+
+### Problem
+
+The build throws:
+
+```
+Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase
+```
+
+### Cause
+
+Under the default Rollup backend a transformer is required, and the one you configured could not be resolved — usually because the transformer package is not installed, or the import is wrong.
+
+### Solution
+
+Import a transformer and pass it as the `transformer` option:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer
+})
+```
+
+Make sure the backing package is installed (for example `esbuild`, `@swc/core`, or `sucrase`). If you run the interactive init and pass an invalid name, you will see `Invalid transformer, please choose one of 'swc', 'sucrase' or 'esbuild'`.
+
+## Externalization / unresolved module errors
+
+### Problem
+
+The build fails resolving an import:
+
+```
+Failed to resolve the module "left-pad" imported by "src/index.ts"
+Is the module installed? Note:
+ ↳ to inline a module into your bundle, install it to "devDependencies".
+ ↳ to depend on a module via import/require, install it to "dependencies".
+```
+
+### Cause
+
+By default an unresolved import (`UNRESOLVED_IMPORT`) is a hard error. Packem externalizes everything in `dependencies` and `peerDependencies` automatically; anything else must be resolvable on disk to be bundled.
+
+### Solution
+
+Place the module where it belongs:
+
+- Install under `devDependencies` to **bundle** it into the output.
+- Install under `dependencies` / `peerDependencies` to keep it **external**.
+
+To downgrade unresolved imports from error to warning, set `unresolvedImportBehavior`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    resolve: {
+      unresolvedImportBehavior: 'warn'
+    }
+  }
+})
+```
+
+## Duplicate entry names
+
+### Problem
+
+The build throws:
+
+```
+Duplicate rollup input name "index" — one maps to "...", another to "...". Each entry must have a unique name.
+```
+
+### Cause
+
+Two entries resolved to the same output name but point at different source files. Rollup needs a unique name per input.
+
+### Solution
+
+Give the colliding entries distinct names (or distinct output subpaths in your `package.json` `exports`) so each maps to one source file.
+
+## Output extension map errors
+
+### Problem
+
+The build throws one of:
+
+```
+Invalid output extension map: <key> must be "cjs" or "esm"
+Invalid output extension map: <key> must not start with a dot. Example: "cjs": "c.js", "esm": "m.js"
+Invalid output extension map: <key> must be different from the other key
+```
+
+### Cause
+
+`outputExtensionMap` only accepts the keys `cjs` and `esm`, the extension values must not start with a dot, and the two extensions must differ.
+
+### Solution
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  outputExtensionMap: {
+    cjs: 'c.js',
+    esm: 'm.js'
+  }
+})
+```
+
+## Related
+
+- [Common Issues](/docs/guide/troubleshooting/common-issues)
+- [TypeScript Problems](/docs/guide/troubleshooting/typescript)
+- [Transformers](/docs/guide/transformers)
+- [Bundler](/docs/options/bundler)

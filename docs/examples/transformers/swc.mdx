@@ -1,0 +1,107 @@
+---
+title: swc
+description: Rust-powered compilation with swc
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# swc Transformer
+
+The **swc** transformer is a Rust-powered alternative to esbuild with the most comprehensive transformation feature set. It is the best choice when you need decorators — both legacy (`experimentalDecorators`) and the modern stage 3 syntax.
+
+## Overview
+
+This example shows how to build a library that uses decorators with the swc transformer. swc options are exposed through `rollup.swc`, including the full `jsc` (JavaScript compiler) configuration.
+
+swc handles:
+
+- TypeScript and modern JavaScript transformation
+- Legacy and stage 3 decorators, with optional decorator metadata
+- JSX for React, Preact, and other runtimes
+- Minification
+
+<Callout type="info">
+Packem automatically externalizes `@swc/helpers` when the swc transformer is active (swc emits imports from it with `externalHelpers: true`). Make sure `@swc/helpers` is available to consumers of your package.
+</Callout>
+
+## When to Use
+
+- Projects using decorators (legacy or stage 3)
+- Code that relies on `emitDecoratorMetadata` (e.g. dependency injection frameworks)
+- Applications where build performance is critical and you want the broadest feature coverage
+
+## Project Setup
+
+### TypeScript Configuration
+
+Decorator behavior is driven by your `tsconfig.json`. Packem reads these flags and configures swc accordingly:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}
+```
+
+### Packem Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/swc'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    swc: {
+      jsc: {
+        // Keep original class names through the transform
+        keepClassNames: true,
+        parser: {
+          syntax: 'typescript',
+          // Enable legacy decorator parsing (mirrors experimentalDecorators)
+          decorators: true
+        },
+        transform: {
+          // Use the legacy (TypeScript) decorator implementation
+          legacyDecorator: true,
+          // Emit design:type metadata for reflection
+          decoratorMetadata: true
+        }
+      }
+    }
+  }
+})
+```
+
+<Callout type="info">
+Most of the `jsc` block is derived from your tsconfig automatically — `parser.decorators` follows `experimentalDecorators`, `transform.legacyDecorator` follows `experimentalDecorators`, and `transform.decoratorMetadata` follows `emitDecoratorMetadata`. The example above shows the keys explicitly so you can see what Packem configures; you only need to override them when you want different behavior.
+</Callout>
+
+### Minimal Configuration
+
+For projects without special requirements, the transformer alone is enough — Packem applies sensible swc defaults from your tsconfig:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/swc'
+
+export default defineConfig({
+  transformer
+})
+```
+
+## Building
+
+```bash
+packem build
+```
+
+## Notes
+
+- swc options are a `jsc`-based configuration object passed via `rollup.swc`; the `configFile`, `filename`, and `swcrc` keys are managed by Packem and cannot be set.
+- By default Packem enables `jsc.externalHelpers`, `jsc.keepClassNames`, and `jsc.loose`, and sets the React/JSX options from your tsconfig.
+- `sourceMaps` is controlled by the top-level `sourcemap` option and passed through to swc.
+- Minification is wired to the top-level `minify` option.

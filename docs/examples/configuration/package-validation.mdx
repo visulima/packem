@@ -1,0 +1,115 @@
+---
+title: Package.json Validation
+description: Complete package.json validation setup
+---
+
+# Package.json Validation
+
+Packem validates your `package.json` to make sure the fields needed to publish a working package are configured correctly. This example shows the full `validation.packageJson` shape and what each toggle controls.
+
+## Overview
+
+This example demonstrates:
+- Enabling validation for individual `package.json` fields
+- Allowing custom export conditions and extra export extensions
+- Turning specific checks on or off
+
+## Configuration
+
+```typescript
+// packem.config.ts
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+    transformer,
+    validation: {
+        packageJson: {
+            // Validate individual fields
+            name: true,
+            main: true,
+            module: true,
+            types: true,
+            typesVersions: true,
+            exports: true,
+            files: true,
+            bin: true,
+            dependencies: true,
+            engines: true,
+            sideEffects: true,
+
+            // Allow custom export conditions without warnings
+            extraConditions: ["custom-bundler", "my-framework"],
+
+            // Allow extra file extensions in the exports field
+            allowedExportExtensions: [".css", ".wasm"],
+        },
+    },
+})
+```
+
+## Available checks
+
+Every field below is an individual boolean toggle under `validation.packageJson`:
+
+| Option | Description |
+| --- | --- |
+| `name` | Validate the `name` field |
+| `main` | Validate the `main` field |
+| `module` | Validate the `module` field |
+| `types` | Validate the `types` field |
+| `typesVersions` | Validate the `typesVersions` field |
+| `exports` | Validate the `exports` field |
+| `files` | Validate the `files` field |
+| `bin` | Validate the `bin` field |
+| `dependencies` | Validate dependencies |
+| `engines` | Validate the `engines` field |
+| `sideEffects` | Validate the `sideEffects` field |
+| `extraConditions` | `string[]` of extra export conditions to treat as valid |
+| `allowedExportExtensions` | `string[]` of additional file extensions allowed in `exports` |
+
+## What this does
+
+- Packem checks that the enabled fields exist and point at files the build actually produces.
+- `exports` validation flags unknown export conditions. Add custom ones to `extraConditions` so they don't warn (see the [Extra Conditions](/docs/examples/configuration/extra-conditions) example).
+- `allowedExportExtensions` lets non-JS outputs (such as `.css` or `.wasm`) appear in `exports` without triggering an "unexpected extension" warning.
+
+## Disabling a specific check
+
+Set any field toggle to `false` to skip just that check while keeping the rest:
+
+```typescript
+validation: {
+    packageJson: {
+        // Validate everything except the engines field
+        name: true,
+        main: true,
+        types: true,
+        exports: true,
+        engines: false,
+    },
+}
+```
+
+## Disabling all validation
+
+To turn off every validator (package.json, bundle size, and dependencies) set `validation` to `false`:
+
+```typescript
+export default defineConfig({
+    transformer,
+    validation: false,
+})
+```
+
+You can also pass `--no-validation` on the CLI:
+
+```bash
+packem build --no-validation
+```
+
+## Related Examples
+
+- [Extra Conditions](/docs/examples/configuration/extra-conditions) - Configure custom export conditions
+- [Dependency Validation](/docs/examples/configuration/dependency-validation) - Validate dependencies and detect issues
+- [Bundle Size Limits](/docs/examples/configuration/bundle-limits) - Set up bundle size validation and limits

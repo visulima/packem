@@ -1,0 +1,166 @@
+---
+title: TypeScript Problems
+description: TypeScript-specific troubleshooting
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# TypeScript Problems
+
+Declaration generation in Packem runs on top of [`@visulima/rollup-plugin-dts`](https://github.com/visulima/packem/tree/main/packages/rollup-plugin-dts). This page covers the things that go wrong with TypeScript builds: declarations not appearing, isolated-declarations requirements, missing tsconfig, and path mapping.
+
+## No `.d.ts` files generated
+
+### Problem
+
+The JavaScript bundles build fine, but no `.d.ts`, `.d.mts`, or `.d.cts` files appear in your output.
+
+### Cause
+
+Packem only generates declarations when something asks for them. With the `auto` preset, declaration generation is enabled when your `package.json` references types — that means one of:
+
+- a `types` field, or
+- a `types` condition inside `exports`, or
+- a declaration file path (`*.d.ts` / `*.d.mts` / `*.d.cts`) referenced in your output paths.
+
+If none of these are present, the `declaration` option resolves to `false` and no declarations are emitted.
+
+### Solution
+
+Add a `types` field (or `types` condition) to `package.json` so Packem knows you want declarations:
+
+```json
+{
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+Or enable it explicitly in your config:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  declaration: true
+})
+```
+
+The `declaration` option accepts `true`, `false`, `"compatible"`, or `"node16"`. Use `"node16"` (or matching `.d.mts` / `.d.cts` outputs) when you publish under modern `module`/`moduleResolution` so the declaration extension matches the JS condition.
+
+## Missing tsconfig.json
+
+### Problem
+
+The build fails with:
+
+```
+Cannot build declaration files without a tsconfig.json
+```
+
+### Cause
+
+Declaration generation requires a TypeScript program, which Packem builds from your `tsconfig.json`. When `declaration` is enabled but no `tsconfig.json` is found at the project root, it cannot proceed.
+
+### Solution
+
+Add a `tsconfig.json` to your project root. A minimal one is enough:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "isolatedModules": true
+  }
+}
+```
+
+## isolatedModules warning
+
+### Problem
+
+Packem prints a warning about `isolatedModules` even though the build succeeds:
+
+```
+'compilerOptions.isolatedModules' is not enabled in tsconfig.
+Because none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.
+To mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.
+```
+
+### Cause
+
+The transformers Packem uses (esbuild, swc, sucrase, oxc) operate file-by-file and are not type-aware. Constructs that rely on cross-file type information — such as re-exporting a type without `export type` — can mis-compile silently. The `isolatedModules` flag makes your IDE and `tsc` flag those constructs ahead of time.
+
+### Solution
+
+Set `isolatedModules` in `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "isolatedModules": true
+  }
+}
+```
+
+## Isolated declarations (TypeScript 5.5+)
+
+### Problem
+
+You enabled `isolatedDeclarations` and want to know why it behaves differently, or it isn't being used.
+
+### Cause
+
+When `"isolatedDeclarations": true` is set in `tsconfig.json`, Packem uses oxc's `isolatedDeclarationSync` to emit `.d.ts` files **without** running full type inference. This is faster but stricter: every exported value must have an explicit, inferable type annotation, otherwise TypeScript's isolated-declarations rules reject it. This feature requires **TypeScript 5.5 or higher**.
+
+### Solution
+
+If you are on TypeScript below 5.5, isolated declarations are not available — remove `isolatedDeclarations` from your tsconfig and Packem falls back to full declaration generation. If you are on 5.5+ and hit isolated-declaration errors, add explicit return-type and export annotations to the symbols TypeScript complains about:
+
+```typescript
+// Rejected under isolatedDeclarations — return type is inferred
+export function make() {
+  return { a: 1 }
+}
+
+// Accepted — explicit annotation
+export function make(): { a: number } {
+  return { a: 1 }
+}
+```
+
+<Callout type="info">
+Isolated declarations is an experimental feature. Enable it only when your codebase already annotates its public API explicitly.
+</Callout>
+
+## tsconfig paths and aliases
+
+### Problem
+
+Path aliases like `@/utils` resolve in your editor but the declaration build does not pick them up.
+
+### Cause
+
+Packem forwards your tsconfig `baseUrl` and `paths` for module resolution during the JS build. Declaration generation, however, does **not** support aliases — alias rewriting is not applied inside the type declarations.
+
+### Solution
+
+Use real relative paths in code that needs type declarations, or avoid aliases for your published surface area. As the project README states:
+
+> Aliases are not supported in type declaration generation. If you need type support, do not use aliases.
+
+## Related
+
+- [Common Issues](/docs/guide/troubleshooting/common-issues)
+- [Build Errors](/docs/guide/troubleshooting/build-errors)
+- [Declaration Files](/docs/options/declaration-files)

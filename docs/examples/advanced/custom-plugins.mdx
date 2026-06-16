@@ -1,0 +1,116 @@
+---
+title: Custom Plugins
+description: Extend Packem with custom Rollup plugins
+---
+
+# Custom Plugins
+
+Packem exposes a top-level `plugins` option so you can inject your own Rollup plugins into the build pipeline. Each entry controls *when* the plugin runs (`enforce`) and *which* pipeline it applies to (`type`).
+
+## Overview
+
+The `plugins` option takes an array of objects with the following shape:
+
+- `plugin` — the Rollup plugin instance (required).
+- `enforce` — `"pre"` or `"post"`, similar to webpack loaders, to adjust application order. Omit it to run with the default group.
+- `type` — `"build"` (default) or `"dts"`. A `dts` plugin only runs while declaration files are generated.
+
+### Resolution order
+
+Packem resolves plugins in this order:
+
+- Alias
+- User plugins with `enforce: 'pre'`
+- Rollup core plugins
+- User plugins without an `enforce` value
+- Rollup build plugins
+- User plugins with `enforce: 'post'`
+- Rollup post-build plugins (minify, manifest, copy, reporting)
+
+## Configuration
+
+**packem.config.ts**
+```typescript
+import { optimizeLodashImports } from '@optimize-lodash/rollup-plugin'
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  plugins: [
+    {
+      enforce: 'pre',
+      plugin: optimizeLodashImports()
+      // type: "build" -> default value
+    }
+  ]
+})
+```
+
+## Targeting the Declaration Pipeline
+
+Set `type: 'dts'` to run a plugin only when declaration files are generated:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import type { Plugin } from 'rollup'
+
+const stripInternalComments = (): Plugin => ({
+  name: 'strip-internal-comments',
+  renderChunk(code) {
+    return code.replace(/\/\*\* @internal \*\/[\s\S]*?\n/g, '')
+  }
+})
+
+export default defineConfig({
+  transformer,
+  declaration: true,
+  plugins: [
+    {
+      type: 'dts',
+      plugin: stripInternalComments()
+    }
+  ]
+})
+```
+
+## Multiple Plugins with Ordering
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import replace from '@rollup/plugin-replace'
+import { visualizer } from 'rollup-plugin-visualizer'
+
+export default defineConfig({
+  transformer,
+  plugins: [
+    {
+      // runs before Rollup core plugins
+      enforce: 'pre',
+      plugin: replace({
+        preventAssignment: true,
+        values: { __VERSION__: '1.0.0' }
+      })
+    },
+    {
+      // runs after build plugins, before post-build reporting
+      enforce: 'post',
+      plugin: visualizer({ filename: 'stats.html' })
+    }
+  ]
+})
+```
+
+## Notes
+
+- `plugin` accepts any standard Rollup `Plugin` instance, so the entire Rollup plugin ecosystem is available.
+- Use `enforce: 'pre'` for transforms that must run before Packem's core resolution, and `enforce: 'post'` for output-stage plugins.
+- A `type: 'dts'` plugin is skipped entirely when declarations are not being generated.
+
+## Related
+
+- [Plugins Option](/docs/options/plugins)
+- [Plugins Guide](/docs/guide/plugins)
+- [Bundle Analysis](/docs/examples/advanced/bundle-analysis)

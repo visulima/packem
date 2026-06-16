@@ -1,0 +1,117 @@
+---
+title: React Support
+description: React components and server components
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# React Support
+
+Packem builds React component libraries, including **Server Components**, **Client Components**, and **server actions**. It understands the `"use client"` and `"use server"` directives and scopes the client/server boundaries correctly so the consuming app's bundler (such as Next.js) can transform them as intended.
+
+## Quick setup
+
+The fastest way to enable React is the `add` command:
+
+```bash
+npx packem add react
+```
+
+This will:
+
+- Add `preset: 'react'` to your config.
+- Install `react`, `react-dom`, and the Babel dependencies.
+- Detect TypeScript and add `@types/react` and `@types/react-dom` if TypeScript is installed (or prompt you to add TypeScript if it is not).
+
+## Manual configuration
+
+The React preset configures Babel for JSX transformation:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'react',
+  transformer,
+})
+```
+
+For more control you can configure Babel directly through `rollup.babel`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  externals: ['react', 'react-dom'],
+  rollup: {
+    babel: {
+      presets: [
+        ['@babel/preset-react', { runtime: 'automatic' }],
+      ],
+    },
+  },
+})
+```
+
+<Callout type="info">
+When Babel is used with React, it runs **before** your main transformer (esbuild/swc/etc.), turning JSX into JavaScript. TypeScript syntax is parsed by the transformer's parser plugins, not transformed by Babel. See [Plugins](/docs/guide/plugins) for more on the Babel pipeline, including parallel transforms.
+</Callout>
+
+## Server and Client Components
+
+Packem supports building server components and server actions with the library directives `"use client"` and `"use server"`. It generates the corresponding chunks for client and server, scoping the boundaries properly. When the library is integrated into an app such as Next.js, the app bundler can transform the client components and server actions correctly.
+
+How directives are handled:
+
+- If `"use client"` or `"use server"` appears in an **entry file**, it is preserved at the top and that entry's output file becomes a client component.
+- If `"use client"` or `"use server"` appears in a file that is used as a **dependency** of an entry, that file is split into a separate chunk and the directive is hoisted to the top of that chunk.
+
+```tsx
+// src/button.tsx
+'use client'
+
+import { useState } from 'react'
+
+export function Button() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+
+The directive on the entry above is preserved in the output, marking `dist/button.js` as a client component.
+
+## Shared modules across runtimes
+
+When you build multiple runtime bundles (for example `default` and `react-server` together), some modules must remain a single shared instance across both. Use the shared module convention `[name].shared-runtime.[ext]` so the module is bundled into one chunk shared by every runtime bundle:
+
+```js
+'use client'
+
+// src/app-context.shared-runtime.js
+export const AppContext = React.createContext(null)
+```
+
+```js
+// src/index.js
+import { AppContext } from './app-context.shared-runtime'
+```
+
+```js
+// src/index.react-server.js
+import { AppContext } from './app-context.shared-runtime'
+```
+
+`app-context.shared-runtime` is bundled into a separate chunk with only one instance, shared among the different runtime bundles. See [Multi-Runtime](/docs/guide/multi-runtime) for how the `react-server` and other runtime entries are wired up.
+
+## CSS in React libraries
+
+Packem processes CSS Modules and preprocessors imported by your components. See the [CSS Processing](/docs/guide/css) guide and the [React with CSS Modules](/docs/examples/react/css-modules) example.
+
+## Next steps
+
+- [Multi-Runtime](/docs/guide/multi-runtime) — react-server, edge-light, and other runtime bundles.
+- [Plugins](/docs/guide/plugins) — the Babel pipeline and presets.
+- [Server Components example](/docs/examples/react/server-components) — a full setup.

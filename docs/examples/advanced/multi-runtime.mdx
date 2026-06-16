@@ -1,0 +1,139 @@
+---
+title: Multi-Runtime
+description: Target multiple runtimes with conditional exports
+---
+
+# Multi-Runtime
+
+Packem can build a single source tree into runtime-specific bundles by reacting to the special export conditions in your `package.json`. Conditions like `node`, `browser`, `react-server`, and `edge-light` are treated as distinct platforms, each with its own input source file and output bundle.
+
+## Overview
+
+Packem supports the following runtimes out of the box:
+
+- `default`
+- `node`
+- `browser`
+- `react-server`
+- `edge-light`
+
+For special platform conditions such as `react-server` and `edge-light`, Packem provides an *override input source file convention*: name a source file with the runtime suffix and Packem will compile it as a separate bundle for that condition.
+
+:::note
+The `edge-light` export injects a `process.env.EdgeRuntime` variable that is `true`; for every other runtime it resolves to `false`.
+:::
+
+## Project Structure
+
+```
+multi-runtime-example/
+├── src/
+│   ├── index.ts                 # default / import condition
+│   ├── index.react-server.ts    # react-server condition
+│   └── index.edge-light.ts      # edge-light condition
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Source Files
+
+**src/index.ts**
+```typescript
+export function getRuntime(): string {
+  return 'node'
+}
+```
+
+**src/index.react-server.ts**
+```typescript
+// Compiled into a dedicated react-server bundle
+export function getRuntime(): string {
+  return 'react-server'
+}
+```
+
+**src/index.edge-light.ts**
+```typescript
+// process.env.EdgeRuntime is true in this bundle
+export function getRuntime(): string {
+  return process.env.EdgeRuntime ? 'edge-light' : 'node'
+}
+```
+
+## Configuration
+
+The conditional exports map drives the whole build. Packem reads it, matches the special conditions to the suffixed source files, and emits one bundle per condition.
+
+**package.json**
+```json
+{
+  "name": "@myorg/multi-runtime",
+  "version": "1.0.0",
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "react-server": "./dist/index.react-server.mjs",
+      "edge-light": "./dist/index.edge-light.mjs",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2"
+  }
+}
+```
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  declaration: true
+})
+```
+
+## Per-Entry Runtime
+
+When you configure entries explicitly, each entry carries its own `runtime` value. The supported runtimes are `browser`, `bun`, `deno`, `edge-light`, `electron`, `node`, `react-native`, `react-server`, and `workerd`.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  entries: [
+    { input: 'src/index.ts', runtime: 'node' },
+    { input: 'src/index.edge-light.ts', runtime: 'edge-light' }
+  ]
+})
+```
+
+## Build Output
+
+```bash
+$ packem build
+
+dist/index.mjs                 # default / node
+dist/index.react-server.mjs    # react-server condition
+dist/index.edge-light.mjs      # edge-light condition (EdgeRuntime === true)
+```
+
+## Notes
+
+- Only the special platform conditions (`react-server`, `react-native`, `edge-light`) get their own input override file; the remaining conditions resolve against the default source.
+- Combine this with [Shared Modules](/docs/examples/advanced/shared-modules) when several runtime bundles must share a single instance of a module.
+- See the [Multi-Runtime guide](/docs/guide/multi-runtime) for the full conditional-exports reference.
+
+## Related
+
+- [Multi-Runtime Guide](/docs/guide/multi-runtime)
+- [Shared Modules](/docs/examples/advanced/shared-modules)
+- [Package Exports](/docs/options/package-exports)

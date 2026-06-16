@@ -1,0 +1,99 @@
+---
+title: esbuild
+description: Fast bundling with esbuild transformer
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# esbuild Transformer
+
+The **esbuild** transformer is the recommended choice for most Packem projects. Written in Go, it offers the best balance of speed, TypeScript support, and stability.
+
+## Overview
+
+This example shows how to build a TypeScript library using the esbuild transformer and how to tune the esbuild-specific options that Packem exposes through `rollup.esbuild`.
+
+esbuild handles:
+
+- TypeScript and modern JavaScript transformation (type stripping, down-leveling)
+- JSX (React, Preact, and other runtimes)
+- Tree shaking and source maps
+
+<Callout type="info">
+esbuild transforms each file as it passes through Rollup (the default `bundler`). Type checking is **not** performed during transformation — run `tsc --noEmit` separately for type validation.
+</Callout>
+
+## When to Use
+
+- Most TypeScript and JavaScript libraries
+- React applications and component libraries
+- Large codebases that need fast rebuilds in watch mode
+
+## Project Setup
+
+### Directory Structure
+
+```
+my-lib/
+├── src/
+│   └── index.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+### Packem Configuration
+
+The transformer is selected by importing it and assigning it to `transformer`. esbuild-specific options live under `rollup.esbuild`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    esbuild: {
+      // Optionally preserve symbol names during minification
+      // (off by default — opt in only if you rely on runtime name reflection)
+      keepNames: true,
+      // Override the character set of the output
+      charset: 'utf8',
+      // Map custom extensions to esbuild loaders
+      loaders: {
+        '.json': 'json'
+      }
+    }
+  }
+})
+```
+
+<Callout type="info">
+`target` is resolved automatically from your `tsconfig.json` `compilerOptions.target` and the build runtime, so you usually do not need to set it manually. You can still override it via `rollup.esbuild.target`.
+</Callout>
+
+### Minimal Configuration
+
+When you do not need to customize anything, the transformer alone is enough — Packem provides sensible esbuild defaults (JSX from your tsconfig, tree shaking, smaller source maps):
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer
+})
+```
+
+## Building
+
+```bash
+packem build
+```
+
+## Notes
+
+- `keepNames` defaults to `false`. It wraps every named function/closure in an `Object.defineProperty` call, which can slow down closure-heavy code in published builds — opt in only when you need runtime `.name` reflection.
+- `keepNames` is also forced off automatically when minification is disabled or the tsconfig target is `es5`, because combining it with repeated transforms breaks tree shaking.
+- Source maps follow the top-level `sourcemap` option; esbuild's `sourcesContent` is disabled by default to keep maps small.
+- esbuild does not type-check. Pair it with `tsc --noEmit` in CI for type safety.

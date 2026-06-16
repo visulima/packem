@@ -1,0 +1,259 @@
+---
+title: React Library
+description: React component library with TypeScript
+---
+
+# React Library
+
+Create a production-ready React component library with TypeScript, externalized React, and optimized bundling for both server and client environments.
+
+## Overview
+
+This example demonstrates:
+
+- React component library setup with the `react` preset
+- TypeScript with React types and declaration generation
+- React and React DOM externalized (kept out of the bundle as peer dependencies)
+- Tree-shakable, dual ESM + CJS output
+- `"use client"` directive support for interactive components
+
+## Project Structure
+
+```
+react-ui-lib/
+├── src/
+│   ├── components/
+│   │   ├── Button.tsx
+│   │   └── Card.tsx
+│   └── index.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Component Implementation
+
+**src/components/Button.tsx**
+
+```tsx
+'use client'
+
+import React from 'react'
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary'
+  children: React.ReactNode
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant = 'primary', children, ...props }, ref) => {
+    return (
+      <button ref={ref} data-variant={variant} {...props}>
+        {children}
+      </button>
+    )
+  }
+)
+
+Button.displayName = 'Button'
+```
+
+**src/components/Card.tsx**
+
+```tsx
+import React from 'react'
+
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+}
+
+export const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ children, ...props }, ref) => {
+    return (
+      <div ref={ref} {...props}>
+        {children}
+      </div>
+    )
+  }
+)
+
+Card.displayName = 'Card'
+```
+
+**src/index.ts**
+
+```typescript
+export { Button } from './components/Button'
+export type { ButtonProps } from './components/Button'
+
+export { Card } from './components/Card'
+export type { CardProps } from './components/Card'
+```
+
+## Configuration
+
+### package.json
+
+```json
+{
+  "name": "@myorg/react-ui",
+  "version": "1.0.0",
+  "description": "Modern React component library",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+<Callout type="info">
+Because `react` and `react-dom` are declared as `peerDependencies`, Packem automatically treats them as external and keeps them out of your bundle. They are resolved from the consuming application at runtime.
+</Callout>
+
+### Packem Configuration
+
+**Quick setup (recommended)**
+
+Use the `add` command to configure React and install the required dependencies:
+
+```bash
+npx packem add react
+```
+
+**packem.config.ts — string preset**
+
+The simplest way to enable React is the `react` string preset:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'react',
+  transformer,
+  sourcemap: true,
+  declaration: true,
+})
+```
+
+**packem.config.ts — preset function**
+
+For more control, use `createReactPreset`. Set `compiler: true` to enable the React Compiler:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createReactPreset } from '@visulima/packem/config/preset/react'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createReactPreset({
+    // Enable React Compiler for automatic optimizations
+    compiler: false,
+    // Additional Babel presets (optional)
+    presets: [],
+    // Additional Babel plugins (optional)
+    plugins: [],
+  }),
+  transformer,
+  sourcemap: true,
+  declaration: true,
+})
+```
+
+### TypeScript Configuration
+
+**tsconfig.json**
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## Building
+
+```bash
+npm run build
+```
+
+### Output Structure
+
+```
+dist/
+├── index.js       # ESM entry
+├── index.cjs      # CJS entry
+└── index.d.ts     # TypeScript declarations
+```
+
+## Usage
+
+```tsx
+import { Button, Card } from '@myorg/react-ui'
+
+function App() {
+  return (
+    <Card>
+      <Button variant="primary" onClick={() => alert('Clicked!')}>
+        Click me
+      </Button>
+    </Card>
+  )
+}
+```
+
+## Key Features
+
+### External Dependencies
+
+React and React DOM are externalized through the `peerDependencies` field, so they are never bundled into your library.
+
+### Directive Support
+
+Components that opt into client-side interactivity can declare `"use client"` at the top of the file. Packem preserves the directive in the output. See [Server Components](/docs/examples/react/server-components) for the full directive and `react-server` workflow.
+
+## Next Steps
+
+- Add [CSS Modules](/docs/examples/react/css-modules) for scoped component styling
+- Add [Tailwind CSS](/docs/examples/react/tailwind) via PostCSS
+- Build [Server Components](/docs/examples/react/server-components) with `"use client"` / `"use server"` directives

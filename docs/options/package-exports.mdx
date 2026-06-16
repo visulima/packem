@@ -1,0 +1,70 @@
+---
+title: Package Exports
+description: Automatic package.json exports
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Package Exports
+
+Packem treats your `package.json#exports` map as the source of truth for what your package ships. It reads the `exports` field to **infer build entries**, and it **validates** the field against the Node.js specification after building.
+
+<Callout type="info">
+Packem derives entries from the `exports` you declare — you describe the public surface of your package in `package.json`, and Packem figures out which source files map to each entry.
+</Callout>
+
+## Entry inference from `exports`
+
+During entry inference, Packem walks the `exports` map (via `extractExportFilenames`) and pairs each declared output path with a matching source file. Conditional keys such as `import`, `require`, and `types`, plus subpath patterns (e.g. `"./*"`), are all understood. A `package.json` like this:
+
+```json
+{
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./utils": {
+      "import": "./dist/utils.mjs",
+      "require": "./dist/utils.cjs"
+    }
+  }
+}
+```
+
+tells Packem to build two entries (`index` and `utils`) and to emit ESM, CJS, and declaration output for them.
+
+## Validating `exports`
+
+After the build, Packem validates the `exports` field according to the [Node.js packages specification](https://nodejs.org/api/packages.html#exports) (conditional exports, subpath exports, and the exports sugar form). You can toggle this through the validation options:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  validation: {
+    packageJson: {
+      exports: true, // set to false to skip exports validation
+    },
+  },
+})
+```
+
+## Related export options
+
+Two adjacent options shape how entry inference and validation treat the `exports` map. Each has its own dedicated page:
+
+- **`ignoreExportKeys`** — an array of export keys to skip during entry inference, useful for excluding keys that only point at images or other non-JavaScript assets, e.g. `["images", "assets", "icons"]`. See [Ignore Export Keys](/docs/options/ignore-export-keys).
+- **`validation.packageJson.allowedExportExtensions`** — extra file extensions to treat as valid inside the `exports` field during validation. See [Allowed Export Extensions](/docs/options/allowed-export-extensions).
+
+You can also widen the set of accepted conditional-export keys during validation with `validation.packageJson.extraConditions` (e.g. `["custom", "my-bundler"]`).
+
+---
+
+## Related Options
+
+- [Ignore Export Keys](/docs/options/ignore-export-keys) - Exclude keys from entry inference
+- [Allowed Export Extensions](/docs/options/allowed-export-extensions) - Extra extensions for exports validation
+- [Declaration Files](/docs/options/declaration-files) - `.d.ts` output referenced by `types` conditions
+- [Shims](/docs/options/shims) - ESM/CJS interop for the emitted entries

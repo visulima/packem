@@ -1,0 +1,203 @@
+---
+title: CSS Modules
+description: Scoped CSS with automatic class names
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# CSS Modules
+
+CSS Modules give you locally scoped class names, eliminating naming collisions.
+Packem handles them through [`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css)
+and can generate scoped names automatically for `*.module.css` files.
+
+## Overview
+
+This example demonstrates:
+
+- Enabling CSS Modules for `*.module.*` files via `autoModules`
+- Customizing scoped name generation
+- Importing scoped class names into TypeScript
+- Generating companion `.d.ts` files for type-safe class names
+
+## Setup
+
+CSS Modules build on PostCSS, so install `postcss`:
+
+```bash
+npm install --save-dev postcss
+```
+
+### Directory Structure
+
+```
+my-package/
+├── src/
+│   ├── Button.ts
+│   └── Button.module.css
+├── package.json
+└── packem.config.ts
+```
+
+### Source Files
+
+**src/Button.module.css**
+
+```css
+.button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.secondary {
+  background-color: #6c757d;
+  color: white;
+}
+```
+
+**src/Button.ts**
+
+```typescript
+import styles from './Button.module.css'
+
+export function createButton(variant: 'primary' | 'secondary' = 'primary') {
+  const button = document.createElement('button')
+  button.className = `${styles.button} ${styles[variant]}`
+  button.textContent = 'Click me'
+  return button
+}
+```
+
+## Configuration
+
+Enable CSS Modules with the `autoModules` option. It accepts a boolean, a
+regular expression, or a function. When `true`, it applies to files named
+`[name].module.[ext]` (for example `Button.module.css`).
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      autoModules: true,
+    },
+  },
+})
+```
+
+To restrict CSS Modules to a custom pattern, pass a regular expression:
+
+```typescript
+css: {
+  loaders: [postcssLoader],
+  autoModules: /\.module\./,
+}
+```
+
+### Customizing Scoped Names
+
+Module behavior is configured through `postcss.modules`. The
+`generateScopedName` placeholder controls the emitted class names (default
+`"[name]_[local]_[hash:8]"`).
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      postcss: {
+        modules: {
+          generateScopedName: '[name]__[local]___[hash:base64:5]',
+          exportGlobals: true,
+        },
+      },
+    },
+  },
+})
+```
+
+Available `modules` options:
+
+- `generateScopedName` — placeholder string or function for scoped name generation
+- `mode` — default scoping mode (`"local"`, default)
+- `exportGlobals` — export global class names
+- `failOnWrongOrder` — fail on wrong composition order
+- `include` — files to treat as CSS Modules
+
+<Callout type="info">
+You can also enable modules through `postcss.modules` directly (set it to `true`
+or an options object) instead of using `autoModules`.
+</Callout>
+
+## Type-Safe Class Names
+
+Set the `dts` option to generate companion `.d.ts` files alongside your CSS
+Modules, giving you IntelliSense and compile-time checks for class names.
+
+```typescript
+css: {
+  mode: 'extract',
+  loaders: [postcssLoader],
+  autoModules: true,
+  dts: true,
+}
+```
+
+This emits a declaration file next to each module:
+
+```typescript
+// src/Button.module.css.d.ts (auto-generated)
+declare const button: string
+declare const primary: string
+declare const secondary: string
+
+interface ModulesExports {
+  button: string
+  primary: string
+  secondary: string
+}
+
+declare const styles: ModulesExports
+export default styles
+export { button, primary, secondary }
+```
+
+## Named Exports
+
+Enable `namedExports` to export each class as a named binding alongside the
+default export:
+
+```typescript
+css: {
+  loaders: [postcssLoader],
+  autoModules: true,
+  namedExports: true,
+}
+```
+
+## Building
+
+```bash
+packem build
+```
+
+## Related
+
+- [Basic CSS](/docs/examples/css/basic)
+- [React with CSS Modules](/docs/examples/react/css-modules)
+- [CSS Processing guide](/docs/guide/css)

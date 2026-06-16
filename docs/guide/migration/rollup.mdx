@@ -1,0 +1,171 @@
+---
+title: From Rollup
+description: Migrate from plain Rollup configuration
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# From Rollup
+
+Packem is built **on top of Rollup**. Migrating from a hand-written `rollup.config.js` is less about replacing your bundler and more about deleting boilerplate: Packem automates the parts you used to wire up by hand — entry detection, multi-format output, declaration generation, externalization, and plugin ordering — while still letting raw Rollup options pass straight through.
+
+<Callout type="info">
+There is no `packem migrate` path for plain Rollup. The `migrate` command only rewrites `tsup`, `unbuild`, and `bunchee` projects. For Rollup, follow the manual steps below.
+</Callout>
+
+## What Packem automates
+
+| Plain Rollup config | Packem |
+|---------------------|--------|
+| `input: 'src/index.ts'` | Inferred from `package.json` `exports`, `main`, `module`, `bin` |
+| `output: [{ format: 'es' }, { format: 'cjs' }]` | Inferred from export conditions (`import`/`require`) and extensions (`.mjs`/`.cjs`) |
+| `output.dir` / `output.file` | `outDir` config option (default `dist`) |
+| `@rollup/plugin-typescript` / `@rollup/plugin-esbuild` | The `transformer` option (esbuild/swc/OXC/sucrase) |
+| `rollup-plugin-dts` for `.d.ts` | `declaration` option (built in via `@visulima/rollup-plugin-dts`) |
+| `@rollup/plugin-node-resolve` + `@rollup/plugin-commonjs` | Built in (oxc-based resolution) |
+| `external: [...]` | `externals` option; `dependencies`/`peerDependencies` external by default |
+| `@rollup/plugin-replace` for env | `--env.KEY=value` / `envFile` |
+| `output.banner` / `output.footer` | `banner` / `footer` options |
+| Manual `plugins: [...]` | `plugins` option (with `enforce: 'pre' \| 'post'`) |
+| Any remaining Rollup option | The `rollup` passthrough option |
+
+## Step-by-step
+
+### 1. Replace input/output with package.json exports
+
+A typical dual-format Rollup config:
+
+```javascript
+// rollup.config.js
+import esbuild from 'rollup-plugin-esbuild'
+import dts from 'rollup-plugin-dts'
+
+export default [
+  {
+    input: 'src/index.ts',
+    output: [
+      { file: 'dist/index.mjs', format: 'es' },
+      { file: 'dist/index.cjs', format: 'cjs' },
+    ],
+    plugins: [esbuild()],
+    external: ['react'],
+  },
+  {
+    input: 'src/index.ts',
+    output: { file: 'dist/index.d.ts', format: 'es' },
+    plugins: [dts()],
+  },
+]
+```
+
+Becomes this `package.json` — the two output objects and the separate dts pass both collapse into the `exports` map:
+
+```json
+{
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "packem build"
+  }
+}
+```
+
+### 2. Pick a transformer
+
+Whatever plugin handled TypeScript/JSX in your Rollup config maps to a transformer:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+})
+```
+
+The matching `external: ['react']` is unnecessary if `react` is in your `dependencies` or `peerDependencies` — those are externalized automatically.
+
+### 3. Keep your custom Rollup plugins
+
+Plugins that have no Packem equivalent go in the `plugins` option. Use `enforce` to control ordering relative to Packem's built-in plugins, and `type: 'dts'` to run a plugin only during declaration generation:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import { optimizeLodashImports } from '@optimize-lodash/rollup-plugin'
+
+export default defineConfig({
+  transformer,
+  plugins: [
+    {
+      enforce: 'pre',
+      plugin: optimizeLodashImports(),
+    },
+  ],
+})
+```
+
+Resolved plugin order is: alias → user `enforce: 'pre'` → Rollup core → user plugins (no enforce) → Rollup build plugins → user `enforce: 'post'` → Rollup post-build plugins (minify, copy, reporting).
+
+### 4. Pass through raw Rollup options
+
+Anything Packem does not surface as a top-level option lives under `rollup`. This is also where CSS loaders and external-resolution tweaks go:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    // Rollup / transformer passthrough options
+  },
+})
+```
+
+### 5. Replace env and banner plugins
+
+`@rollup/plugin-replace` for `process.env.NODE_ENV` is replaced by compile-time env injection:
+
+```bash
+packem build --env.NODE_ENV=production
+```
+
+`output.banner` / `output.footer` become the `banner` / `footer` options, which can target JS and declaration output independently:
+
+```typescript
+export default defineConfig({
+  transformer,
+  banner: { js: "'use client';", dts: '// Generated types' },
+})
+```
+
+## Gotchas
+
+- **One config produces many outputs.** A single Packem build emits ESM, CJS, and declarations together based on your exports — you no longer maintain an array of Rollup config objects or a separate dts pass.
+- **No `input`/`output` keys.** Entries and formats come from `package.json`. If you need an entry that is not part of your public API, add it to `exports` or use the `entries` config option directly.
+- **Resolution and CommonJS interop are built in.** Drop `@rollup/plugin-node-resolve` and `@rollup/plugin-commonjs`; Packem resolves modules (oxc-based) and produces statically analyzable CJS output itself.
+- **Don't double-externalize.** Listing `dependencies` in `externals` is redundant — they are already external. Use `externals` only for packages you want forced external that aren't declared as deps, and `--no-external` to inline everything.
+- **The `rollup` option is an escape hatch, not the main surface.** Reach for it only for options Packem doesn't expose directly. Most plain-Rollup configs shrink to a transformer plus a handful of top-level options.
+
+## Next steps
+
+- [Plugins](/docs/guide/plugins) — Add and order custom Rollup plugins.
+- [Bundler](/docs/options/bundler) — Rollup (default) or the experimental Rolldown backend.
+- [Dependencies](/docs/options/externals) — How externalization works.

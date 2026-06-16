@@ -1,0 +1,182 @@
+---
+title: CSS Issues
+description: CSS processing and styling problems
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# CSS Issues
+
+Packem processes CSS through [`@visulima/rollup-plugin-css`](https://github.com/visulima/packem/tree/main/packages/rollup-plugin-css), configured under the `rollup.css` key. This page covers the most common CSS problems: styles not extracting or injecting, PostCSS configuration, and CSS Modules.
+
+## CSS not extracted or injected
+
+### Problem
+
+You import a CSS file but nothing ends up in the output, or it lands inline when you expected a separate `.css` file (or vice versa).
+
+### Cause
+
+The CSS plugin's `mode` controls where processed CSS goes, and the default is `"inject"` — CSS is embedded inside the JS bundle and injected into `<head>` at runtime. The available modes are:
+
+- `"inject"` *(default)* — embeds CSS inside JS and injects it into `<head>` at runtime.
+- `"extract"` — extracts CSS to the same location as the JS file but with a `.css` extension.
+- `"emit"` — emits pure processed CSS and passes it along the build pipeline for other plugins.
+
+If you expected a standalone stylesheet but never set `mode`, you got the default injection behavior instead.
+
+### Solution
+
+Set the mode explicitly under `rollup.css`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract'
+    }
+  }
+})
+```
+
+If CSS still does not show up at all, confirm the basics:
+
+1. The CSS file is actually imported from your JS/TS entry (`import './styles.css'`).
+2. The import path is correct.
+3. CSS processing is not disabled (`rollup.css` is not set to `false`).
+
+## PostCSS config not applied
+
+### Problem
+
+Your PostCSS plugins (autoprefixer, cssnano, Tailwind) do not run.
+
+### Cause
+
+Packem reads PostCSS configuration either from a standalone `postcss.config.js` (via `postcss-load-config`) or from the loaders you register on `rollup.css`. PostCSS support also requires its dependencies to be installed — they are not bundled by default.
+
+### Solution
+
+Install the PostCSS toolchain:
+
+```bash
+npm install --save-dev postcss postcss-load-config postcss-modules \
+  postcss-modules-extract-imports postcss-modules-local-by-default \
+  postcss-modules-scope postcss-modules-values postcss-value-parser icss-utils
+```
+
+Register the PostCSS loader in `packem.config.ts`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import sourceMapLoader from '@visulima/packem/css/loader/sourcemap'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      loaders: [postcssLoader, sourceMapLoader]
+    }
+  }
+})
+```
+
+A standalone `postcss.config.js` is picked up automatically:
+
+```javascript
+// postcss.config.js
+module.exports = {
+  plugins: [
+    require('autoprefixer'),
+    require('cssnano')({ preset: 'default' })
+  ]
+}
+```
+
+## Preprocessor errors (Sass, Less, Stylus)
+
+### Problem
+
+Importing `.scss`, `.less`, or `.styl` throws or produces no output.
+
+### Cause
+
+Preprocessor support is opt-in: the preprocessor package must be installed, and its loader must be registered on `rollup.css`. Without the loader, the file is treated as plain CSS.
+
+### Solution
+
+Install the preprocessor and register its loader. For example, Less:
+
+```bash
+npm install --save-dev less
+```
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import lessLoader from '@visulima/packem/css/loader/less'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [lessLoader]
+    }
+  }
+})
+```
+
+For Sass, `sass-embedded` is recommended (`sass` and `node-sass` also work).
+
+## CSS Modules not scoping
+
+### Problem
+
+Class names from a CSS Modules file come through unhashed, or `import styles from './x.module.css'` returns an empty object.
+
+### Cause
+
+CSS Modules in Packem are driven by the `autoModules` option, which scopes files named `[name].module.[ext]` (for example `foo.module.css`, `bar.module.stylus`). If `autoModules` is off, or the file is not named with the `.module.` infix, it is processed as a normal global stylesheet.
+
+### Solution
+
+Enable `autoModules` and use the `.module.` naming convention:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      autoModules: true
+    }
+  }
+})
+```
+
+```typescript
+// src/Button.ts
+import styles from './Button.module.css'
+
+button.className = styles.button
+```
+
+<Callout type="warning">
+The `.module.` infix is required for `autoModules` to kick in. A file named `Button.css` is global even with `autoModules: true`; rename it to `Button.module.css`.
+</Callout>
+
+## Related
+
+- [CSS Processing](/docs/guide/css)
+- [Common Issues](/docs/guide/troubleshooting/common-issues)
+- [Build Errors](/docs/guide/troubleshooting/build-errors)

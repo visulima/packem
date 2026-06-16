@@ -1,0 +1,169 @@
+---
+title: From tsup
+description: Migrate from tsup to Packem
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# From tsup
+
+[tsup](https://github.com/egoist/tsup) and Packem solve the same problem — bundling TypeScript libraries — but take different approaches to configuration. tsup is **option-driven**: you list entries, formats, and flags in `tsup.config.ts`. Packem is **package.json-driven**: it reads your `exports`, `main`, `module`, and `bin` fields to decide what to build and in which formats.
+
+Packem ships a `migrate` command that rewrites your `package.json` dependencies and scripts automatically. The bundler config itself still needs a manual pass, which this guide walks you through.
+
+## Run the automated migration
+
+From your project root:
+
+```bash
+packem migrate
+```
+
+This will:
+
+- Replace `tsup` / `tsup-node` in your `dependencies`, `devDependencies`, and `peerDependencies` with `@visulima/packem`.
+- Rewrite `scripts` that invoke `tsup` to call `packem build` instead.
+- Detect a `tsup.config.*` file or an inline `tsup` field in `package.json` and warn you that the config requires a manual conversion (it is **not** auto-converted).
+
+Preview every change without writing anything:
+
+```bash
+packem migrate --dry-run
+```
+
+After running it, install dependencies with your package manager and continue with the config conversion below.
+
+<Callout type="warning">
+`packem migrate` modifies files in place and uncommitted changes can be lost. Commit your work first, or use `--dry-run` to preview.
+</Callout>
+
+## Option mapping
+
+| tsup config / flag | Packem equivalent |
+|--------------------|-------------------|
+| `entry` / `--entry` | Inferred from `package.json` `exports`, `main`, `module`, `bin`. No `entry` option — see below. |
+| `format: ['esm', 'cjs']` | Inferred from the export condition (`import`/`require`) and file extension (`.mjs`/`.cjs`). No `format` option. |
+| `dts: true` | `declaration: true` in `packem.config.ts` (or `--dts-only` to emit only `.d.ts`). Auto-enabled when `package.json` has a `types` field. |
+| `minify: true` / `--minify` | `minify: true` or `--minify` |
+| `sourcemap: true` / `--sourcemap` | `sourcemap: true` or `--sourcemap` |
+| `clean: true` | Cleaning is on by default; disable with `--no-clean` |
+| `watch: true` / `--watch` | `--watch` |
+| `target: 'node18'` / `--target` | `target` config option or `--target` (tsconfig `target` is added automatically) |
+| `external: [...]` / `--external` | `externals` config option or `--external lodash,react`. `dependencies` and `peerDependencies` are external by default. |
+| `noExternal` | Bundle a dependency by not listing it as a dep, or use `--no-external` to inline all |
+| `platform: 'node' \| 'browser'` | `runtime: 'node' \| 'browser'` or `--runtime` |
+| `env` / `--env.KEY=value` | `--env.KEY=value` (replaced at compile time) |
+| `onSuccess` | `onSuccess` config option or `--onSuccess "node dist/index.js"` |
+| `esbuildPlugins` | Use the esbuild transformer plus the `rollup` passthrough / `plugins` option |
+| `tsup` inline `package.json` field | Move to `packem.config.ts`; delete the field |
+
+## Step-by-step
+
+### 1. Move your entries into package.json exports
+
+tsup declares entries explicitly:
+
+```typescript
+// tsup.config.ts
+import { defineConfig } from 'tsup'
+
+export default defineConfig({
+  entry: ['src/index.ts', 'src/cli.ts'],
+  format: ['esm', 'cjs'],
+  dts: true,
+})
+```
+
+Packem reads them from `package.json`. The `exports` map below produces both an ESM and a CJS build of `src/index.ts`, plus declarations, with no entry list:
+
+```json
+{
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "bin": "./dist/cli.mjs",
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  }
+}
+```
+
+Packem matches `src/index.ts` to the `"."` export and `src/cli.ts` to `bin`. The `import`/`require` conditions drive the ESM/CJS split that `format` controlled in tsup.
+
+### 2. Write packem.config.ts
+
+Replace `tsup.config.ts` with `packem.config.ts`. Pick a transformer — esbuild is the closest match to tsup, which uses esbuild internally:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+})
+```
+
+Carry over only the flags you actually set in tsup. `declaration` can be omitted when `package.json` has a `types` field — Packem turns it on automatically.
+
+### 3. Map the remaining options
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+  minify: true,
+  declaration: true,
+  runtime: 'node',
+  externals: ['some-peer-only-dep'],
+})
+```
+
+### 4. Update scripts
+
+If you skipped `packem migrate`, change your scripts by hand:
+
+```json
+{
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  }
+}
+```
+
+### 5. Delete the old config
+
+Remove `tsup.config.ts` (and any inline `tsup` field in `package.json`) once the build passes.
+
+## Gotchas
+
+- **No `entry` and no `format` options.** This is the biggest mental shift. Entries come from `package.json` exports/bin; output format comes from the export condition and file extension. If a build is missing, check that the matching `exports` entry and the corresponding `src/` file both exist.
+- **Declarations follow your exports.** With dual ESM/CJS exports that point at `.d.mts` and `.d.cts`, Packem emits matching extension-specific declaration files. A single `.d.ts` is enough for an ESM-only package.
+- **`dependencies` are external by default.** tsup users often rely on `noExternal` or `external` lists. In Packem, anything in `dependencies`/`peerDependencies` is already external. Use `--no-external` only if you want everything inlined.
+- **`onSuccess` as a function needs the config file.** The `--onSuccess` flag takes a shell string. To run JavaScript (e.g. start a dev server) use the `onSuccess` function form in `packem.config.ts`.
+- **Config conversion is manual.** `packem migrate` never rewrites `tsup.config.ts` — it only warns. Translate the options yourself using the table above.
+
+## Next steps
+
+- [Configuration](/docs/guide/configuration) — Full option reference.
+- [Transformers](/docs/guide/transformers) — esbuild, swc, OXC, and sucrase.
+- [Package.json Setup](/docs/guide/package-json) — How exports drive entries and formats.

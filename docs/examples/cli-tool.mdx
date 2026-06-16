@@ -1,0 +1,160 @@
+---
+title: CLI Tool
+description: Command-line tool with executable binaries
+---
+
+# CLI Tool
+
+Build a command-line tool with Packem. Any file referenced from `package.json#bin` is treated as an executable entry: Packem prepends a `#!/usr/bin/env node` hashbang automatically and marks the output file as executable (`chmod 0o755`), so the binary is ready to run after a build.
+
+## Overview
+
+This example demonstrates:
+- An executable entry inferred from `package.json#bin`
+- Automatic hashbang (`#!/usr/bin/env node`) insertion
+- The output file being made executable automatically
+- Shipping a library entry alongside the CLI
+
+## Project Setup
+
+### Directory Structure
+
+```
+my-cli/
+├── src/
+│   ├── cli.ts
+│   └── index.ts
+├── package.json
+└── packem.config.ts
+```
+
+### Source Files
+
+You do not need to write the hashbang yourself — Packem adds it during the build.
+
+**src/cli.ts**
+```typescript
+import { run } from './index'
+
+const [, , ...args] = process.argv
+
+run(args)
+```
+
+**src/index.ts**
+```typescript
+/**
+ * Run the CLI with the given arguments.
+ */
+export function run(args: string[]): void {
+  const name = args[0] ?? 'world'
+  console.log(`Hello, ${name}!`)
+}
+```
+
+## Configuration
+
+### package.json
+
+The `bin` field points at the built CLI file. Packem detects it and emits an
+executable entry for it. The `exports` field also exposes the programmatic API.
+
+```json
+{
+  "name": "@myorg/my-cli",
+  "version": "1.0.0",
+  "description": "A command-line tool",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "my-cli": "./dist/cli.mjs"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+<Callout type="info">
+`bin` can be a string (a single binary named after the package) or an object mapping command names to files. Each referenced file becomes its own executable entry.
+</Callout>
+
+### Packem Configuration
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+})
+```
+
+## Building
+
+```bash
+npm run build
+```
+
+### Output Structure
+
+```
+dist/
+├── cli.mjs          # executable, starts with #!/usr/bin/env node
+├── index.mjs        # ESM library entry
+└── index.d.mts      # declarations
+```
+
+The first line of `dist/cli.mjs` is the auto-inserted hashbang:
+
+```javascript
+#!/usr/bin/env node
+// ...your bundled CLI code
+```
+
+## Running the CLI
+
+After building, the binary is executable directly:
+
+```bash
+./dist/cli.mjs Ada
+# Hello, Ada!
+```
+
+Or via the linked command name once installed:
+
+```bash
+my-cli Ada
+# Hello, Ada!
+```
+
+You can also import the API in another project:
+
+```typescript
+import { run } from '@myorg/my-cli'
+
+run(['Grace'])
+```
+
+## Next Steps
+
+- Add multiple commands by listing more files under `bin`
+- Expose extra subpaths — see [Multiple Exports](/docs/examples/multi-exports)
+- Bundle into a single standalone binary with the `exe` option

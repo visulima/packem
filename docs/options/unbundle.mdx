@@ -1,0 +1,56 @@
+---
+title: Unbundle
+description: Preserve file structure mode
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Unbundle
+
+The `unbundle` option switches Packem from bundling everything into a single file to **preserving the original source file structure**. Each module is emitted as its own output file, mirroring the directory layout of your source tree.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  unbundle: true,
+})
+```
+
+## Default
+
+`unbundle` defaults to `false` — Packem bundles your modules together.
+
+## What "preserved structure" means
+
+With `unbundle: true`, instead of inlining imported modules into one output, every module becomes a separate file at a path that matches its source location. For example, if `src/index.ts` re-exports from `./a/indexA` and `./b/indexB`:
+
+```
+src/index.ts        →  dist/index.js
+src/a/indexA.ts     →  dist/a/indexA.js
+src/b/indexB.ts     →  dist/b/indexB.js
+```
+
+The import graph between those files is kept, so `dist/index.js` still imports from `dist/a/indexA.js` rather than containing its code.
+
+<Callout type="info">
+This is the "preserve modules" style of output: useful when consumers want to import individual files, when you want maximal tree-shakeability for downstream bundlers, or when you need the output layout to mirror the source layout.
+</Callout>
+
+## CLI flag
+
+`unbundle` can also be enabled per build from the command line:
+
+```bash
+packem build --unbundle
+```
+
+The flag is described as "Enable unbundle mode to preserve source file structure instead of bundling into a single file".
+
+---
+
+## Related Options
+
+- [Output Directory](/docs/options/output-directory) - Where the preserved structure is written
+- [Tree Shaking](/docs/options/tree-shaking) - Dead-code elimination across modules
+- [Package Exports](/docs/options/package-exports) - Mapping entries to `package.json#exports`

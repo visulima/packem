@@ -1,0 +1,178 @@
+---
+title: TypeScript Library
+description: Simple TypeScript library with ESM and CJS outputs
+---
+
+# TypeScript Library
+
+Build a small TypeScript utility library with Packem that ships both ESM and CommonJS output plus TypeScript declarations. Packem reads your `package.json#exports` to figure out which entries to build, so there is no entry list to maintain by hand.
+
+## Overview
+
+This example demonstrates:
+- A TypeScript library with a single entry point
+- Dual ESM + CJS output driven by `package.json#exports`
+- Automatic `.d.ts` declaration generation
+- Tree-shakable named exports
+
+## Project Setup
+
+### Directory Structure
+
+```
+my-library/
+├── src/
+│   └── index.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+### Source Files
+
+**src/index.ts**
+```typescript
+export interface GreetOptions {
+  shout?: boolean
+}
+
+/**
+ * Greet someone by name.
+ */
+export function greet(name: string, options: GreetOptions = {}): string {
+  const message = `Hello, ${name}!`
+  return options.shout ? message.toUpperCase() : message
+}
+
+/**
+ * Sum a list of numbers.
+ */
+export function sum(values: number[]): number {
+  return values.reduce((total, value) => total + value, 0)
+}
+```
+
+## Configuration
+
+### package.json
+
+Packem infers the entry points from the `exports` field. The `import`/`require`/`types`
+conditions tell Packem which formats to emit.
+
+```json
+{
+  "name": "@myorg/my-library",
+  "version": "1.0.0",
+  "description": "A simple TypeScript library",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+### TypeScript Configuration
+
+**tsconfig.json**
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Packem Configuration
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+})
+```
+
+<Callout type="info">
+Declarations are auto-detected: because `package.json` defines a `types` field, Packem generates `.d.ts` (plus `.d.mts`/`.d.cts`) without any extra option.
+</Callout>
+
+## Building
+
+Run the build:
+
+```bash
+npm run build
+```
+
+### Output Structure
+
+```
+dist/
+├── index.mjs        # ESM entry
+├── index.cjs        # CJS entry
+├── index.d.mts      # ESM declarations
+├── index.d.cts      # CJS declarations
+└── index.d.ts       # Declarations
+```
+
+## Usage
+
+### ESM
+
+```typescript
+import { greet, sum } from '@myorg/my-library'
+
+greet('world')              // "Hello, world!"
+greet('world', { shout: true }) // "HELLO, WORLD!"
+sum([1, 2, 3])              // 6
+```
+
+### CommonJS
+
+```javascript
+const { greet, sum } = require('@myorg/my-library')
+
+greet('world') // "Hello, world!"
+```
+
+## Next Steps
+
+- Add more entry points with [Multiple Exports](/docs/examples/multi-exports)
+- Switch to another [transformer](/docs/guide/transformers) such as swc or oxc
+- Configure declaration output with [Declaration Files](/docs/options/declaration-files)

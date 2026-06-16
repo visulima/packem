@@ -1,0 +1,199 @@
+---
+title: "@visulima/rollup-plugin-css"
+description: CSS processing and optimization plugin
+---
+
+# @visulima/rollup-plugin-css
+
+A comprehensive CSS processing plugin for [Packem](https://github.com/visulima/packem) that provides support for multiple CSS preprocessors, CSS modules, and advanced optimization features. It powers Packem's CSS pipeline but can also be used as a standalone Rollup plugin.
+
+This package is ESM-only (`"type": "module"` with no CommonJS exports) and requires Node.js `^22.14.0 || >= 24.10.0`. The CSS processors you use (postcss, sass/sass-embedded, less, stylus, lightningcss, cssnano, tailwindcss) are optional peer dependencies — install only the ones you need.
+
+## Installation
+
+```bash
+npm install @visulima/rollup-plugin-css
+```
+
+## Exports
+
+The package root exports two plugin factories plus its public types:
+
+```typescript
+import {
+  rollupCssPlugin,
+  cssModulesTypesPlugin,
+} from '@visulima/rollup-plugin-css'
+```
+
+### `rollupCssPlugin(options, browserTargets, cwd, sourceDirectory, environment, useSourcemap, debug, minify, alias)`
+
+The main CSS processing plugin. Returns a Rollup `Plugin`. It handles preprocessing, PostCSS, CSS modules, source maps, minification, and the configured integration mode (inject / extract / emit / inline).
+
+```typescript
+const plugin = rollupCssPlugin(
+  { mode: 'extract', postcss: { plugins: [] } },
+  ['> 1%'],          // browserTargets
+  process.cwd(),     // cwd
+  'src',             // sourceDirectory
+  'production',      // environment
+  true,              // useSourcemap
+  false,             // debug
+  false,             // minify
+  {},                // alias
+)
+```
+
+### `cssModulesTypesPlugin()`
+
+Generates TypeScript declaration files (`.d.ts`) for CSS modules, enabling type-safe class-name usage. Use it alongside `rollupCssPlugin`.
+
+```typescript
+import { rollupCssPlugin, cssModulesTypesPlugin } from '@visulima/rollup-plugin-css'
+
+export default {
+  plugins: [
+    rollupCssPlugin({ /* ...options, modules enabled */ }),
+    cssModulesTypesPlugin(),
+  ],
+}
+```
+
+The generated declaration looks like:
+
+```typescript
+// styles.module.css.d.ts
+declare const styles: {
+  readonly container: string
+  readonly button: string
+  readonly active: string
+}
+export default styles
+```
+
+## Options — `StyleOptions`
+
+The first argument to `rollupCssPlugin`. Key fields:
+
+```typescript
+interface StyleOptions {
+  /** Aliases for URL and import paths. */
+  alias?: Record<string, string>
+  /** Auto-enable CSS Modules for files named [name].module.[ext]. @default false */
+  autoModules?: RegExp | boolean | ((id: string) => boolean)
+  /** Options for the cssnano minifier. */
+  cssnano?: Options
+  /** Generate TypeScript declaration files for input style files. */
+  dts?: boolean
+  /** Files to exclude from processing. */
+  exclude?: ReadonlyArray<RegExp | string> | RegExp | string
+  /** Extensions to process. @default [".css", ".pcss", ".postcss", ".sss"] */
+  extensions?: string[]
+  /** Files to include for processing. */
+  include?: ReadonlyArray<RegExp | string> | RegExp | string
+  /** Options for the Less loader. */
+  less?: LESSLoaderOptions
+  /** Options for LightningCSS. */
+  lightningcss?: LightningCSSOptions
+  /** Array of custom loaders. */
+  loaders?: Loader[]
+  /** Enable the CSS minifier. */
+  minifier?: Minifier
+  /**
+   * Integration mode.
+   * - "inject" (default) — embed CSS in JS and inject into <head> at runtime
+   * - "extract" — extract CSS to a separate .css file
+   * - "emit" — pass processed CSS along the build pipeline
+   * - "inline" — embed CSS directly as strings in JS modules
+   * @default "inject"
+   */
+  mode?:
+    | 'emit' | 'extract' | 'inject' | 'inline'
+    | ['extract', string]
+    | ['inject', InjectOptions | ((varname: string, id: string) => string)]
+  /** Use named exports alongside the default export. @default false */
+  namedExports?: boolean | ((name: string) => string)
+  /** Invoked on CSS file extraction; return boolean to control extraction. */
+  onExtract?: (data: ExtractedData) => boolean
+  /** Invoked on CSS file import before transformations. */
+  onImport?: (code: string, id: string) => void
+  /** Options for PostCSS. */
+  postcss?: PostCSSOptions
+  /** Options for the Sass loader. */
+  sass?: SassLoaderOptions
+  /** Enable/disable or configure sourcemaps. @default false */
+  sourceMap?: boolean | 'inline' | [boolean | 'inline', SourceMapOptions] | [boolean | 'inline']
+  /** Options for the Stylus loader. */
+  stylus?: StylusLoaderOptions
+}
+```
+
+### `InjectOptions`
+
+Controls runtime injection when `mode` is `"inject"`:
+
+```typescript
+interface InjectOptions {
+  /** Attributes set on the injected <style> tag(s). */
+  attributes?: Record<string, string>
+  /** Container for <style> tag(s) injection. @default "head" */
+  container?: string
+  /** Package method name to use. @default "cssStyleInject" */
+  method?: string
+  /** Package to import the CSS injector from. @default "@visulima/css-style-inject" */
+  package?: string
+  /** Insert <style> tag(s) at the beginning of the container. @default false */
+  prepend?: boolean
+  /** Inject CSS into a single <style> tag only. @default false */
+  singleTag?: boolean
+  /** Make the injector treeshakeable. Incompatible with namedExports. */
+  treeshakeable?: boolean
+}
+```
+
+## Loaders
+
+Each loader is the `default` export of its subpath. The plugin runs preprocessor loaders before PostCSS.
+
+```typescript
+import sass from '@visulima/rollup-plugin-css/loader/sass'
+import less from '@visulima/rollup-plugin-css/loader/less'
+import stylus from '@visulima/rollup-plugin-css/loader/stylus'
+import postcss from '@visulima/rollup-plugin-css/loader/postcss'
+import lightningcss from '@visulima/rollup-plugin-css/loader/lightningcss'
+import tailwindcss from '@visulima/rollup-plugin-css/loader/tailwindcss'
+import sourcemap from '@visulima/rollup-plugin-css/loader/sourcemap'
+```
+
+| Subpath | Loader |
+|---------|--------|
+| `./loader/sass` | Sass/SCSS preprocessing (`sass` or `sass-embedded`) |
+| `./loader/less` | Less compilation (`less`) |
+| `./loader/stylus` | Stylus compilation (`stylus`) |
+| `./loader/postcss` | PostCSS pipeline, CSS Modules, `@import`/url resolution |
+| `./loader/lightningcss` | LightningCSS processing |
+| `./loader/tailwindcss` | Tailwind Oxide engine integration |
+| `./loader/sourcemap` | Source map extraction |
+
+## Minifiers
+
+```typescript
+import cssnano from '@visulima/rollup-plugin-css/minifier/cssnano'
+import lightningcss from '@visulima/rollup-plugin-css/minifier/lightningcss'
+```
+
+Each is the `default` export of its subpath and implements the `Minifier` interface used by the `minifier` option.
+
+## Utilities
+
+```typescript
+import { /* ... */ } from '@visulima/rollup-plugin-css/utils'
+```
+
+Internal helpers used by the plugin and loaders, available under the `./utils` subpath.
+
+## Related
+
+- [CSS Processing Guide](/docs/guide/css)
+- [@visulima/css-style-inject](/docs/api/css-style-inject)
+- [@visulima/packem-rollup](/docs/api/packem-rollup)

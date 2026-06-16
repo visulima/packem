@@ -1,0 +1,174 @@
+---
+title: PostCSS
+description: Advanced PostCSS configuration with plugins
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# PostCSS
+
+PostCSS is the default processing pipeline for CSS in Packem. The PostCSS loader
+in [`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css) automatically
+picks up a `postcss.config.js` file and also accepts inline plugin configuration.
+
+## Overview
+
+This example demonstrates:
+
+- Using a `postcss.config.js` file with autoprefixer and other plugins
+- Configuring plugins inline in `packem.config.ts`
+- Controlling the config loader, `@import` resolution, and URL handling
+
+## Setup
+
+Install `postcss` plus any plugins you need. `postcss-load-config` is used to
+discover the config file.
+
+```bash
+npm install --save-dev postcss autoprefixer postcss-nested
+```
+
+### Directory Structure
+
+```
+my-package/
+├── src/
+│   ├── index.ts
+│   └── styles.css
+├── postcss.config.js
+├── package.json
+└── packem.config.ts
+```
+
+### Source Files
+
+**src/styles.css**
+
+```css
+.card {
+  display: grid;
+  gap: 1rem;
+
+  .title {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+}
+```
+
+**src/index.ts**
+
+```typescript
+import './styles.css'
+
+export function createCard() {
+  const card = document.createElement('div')
+  card.className = 'card'
+  return card
+}
+```
+
+## Using a PostCSS Config File
+
+The PostCSS loader detects and applies your `postcss.config.js` automatically.
+
+```javascript
+// postcss.config.js
+export default {
+  plugins: {
+    'postcss-nested': {},
+    autoprefixer: {},
+  },
+}
+```
+
+Then register the PostCSS loader:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+    },
+  },
+})
+```
+
+## Inline Plugin Configuration
+
+Plugins listed in the `postcss.plugins` option run *before* any plugins loaded
+from the config file. Each entry can be a plugin instance, a module name string,
+or a `[name, options]` tuple.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      postcss: {
+        plugins: [
+          'autoprefixer',
+          ['postcss-custom-properties', { preserve: false }],
+        ],
+      },
+    },
+  },
+})
+```
+
+## PostCSS Loader Options
+
+The `postcss` option exposes several sub-options:
+
+- `config` — enable/disable or configure the config-file loader (set to `false`
+  to ignore `postcss.config.js`, or pass `{ path, ctx }`)
+- `plugins` — plugins applied before config-file plugins
+- `import` — options for the CSS `@import` resolver (or `false` to disable)
+- `url` — options for the CSS URL resolver (or `false` to disable)
+- `modules` — enable/configure CSS Modules
+- `parser`, `syntax`, `stringifier` — override the PostCSS parser/syntax/stringifier
+- `to` — the `to` option for plugins that require it
+
+```typescript
+css: {
+  loaders: [postcssLoader],
+  postcss: {
+    // Skip the postcss.config.js file and use inline plugins only
+    config: false,
+    plugins: ['autoprefixer'],
+    // Disable the built-in @import resolver
+    import: false,
+  },
+}
+```
+
+<Callout type="info">
+The built-in `@import` and URL resolvers run by default. Disable them by setting
+`postcss.import` or `postcss.url` to `false` when you want a plugin to handle
+them instead.
+</Callout>
+
+## Building
+
+```bash
+packem build
+```
+
+## Related
+
+- [Basic CSS](/docs/examples/css/basic)
+- [CSS Modules](/docs/examples/css/modules)
+- [Tailwind CSS](/docs/examples/react/tailwind)
+- [CSS Processing guide](/docs/guide/css)

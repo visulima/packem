@@ -1,0 +1,195 @@
+---
+title: "@visulima/packem-share"
+description: Shared types, utilities, and constants
+---
+
+# @visulima/packem-share
+
+Shared types, utilities, and constants used across the Packem packages. It centralizes the build-context contracts, Rollup helper utilities, and the constants that drive module resolution and export handling.
+
+This package is ESM-only (`"type": "module"` with no CommonJS exports) and requires Node.js `^22.14.0 || >= 24.10.0`. It has a `rollup` peer dependency.
+
+## Installation
+
+```bash
+npm install @visulima/packem-share
+```
+
+## Subpath exports
+
+The root re-exports everything from the three subpaths, which are also importable directly:
+
+```typescript
+import { /* constants, utils, types */ } from '@visulima/packem-share'
+import { /* utils */ } from '@visulima/packem-share/utils'
+import type { /* types */ } from '@visulima/packem-share/types'
+import { /* constants */ } from '@visulima/packem-share/constants'
+```
+
+## Constants — `@visulima/packem-share/constants`
+
+```typescript
+import {
+  VALID_EXPORT_EXTENSIONS,
+  DEFAULT_EXTENSIONS,
+  DEFAULT_LOADERS,
+  PRODUCTION_ENV,
+  DEVELOPMENT_ENV,
+  RUNTIME_EXPORT_CONVENTIONS,
+  SPECIAL_EXPORT_CONVENTIONS,
+  EXCLUDE_REGEXP,
+  ENDING_REGEX,
+  CHUNKS_PACKEM_FOLDER,
+  SHARED_PACKEM_FOLDER,
+  ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
+} from '@visulima/packem-share/constants'
+```
+
+| Constant | Type | Description |
+|----------|------|-------------|
+| `VALID_EXPORT_EXTENSIONS` | `ReadonlyArray<string>` | Valid file extensions for the `package.json` `exports` field. |
+| `DEFAULT_EXTENSIONS` | `string[]` | Default extensions Packem processes (adds `.ctsx`/`.mtsx`). |
+| `DEFAULT_LOADERS` | `Record<string, Loader>` | Maps file extensions to esbuild loader types. |
+| `PRODUCTION_ENV` | `string` | `"production"`. |
+| `DEVELOPMENT_ENV` | `string` | `"development"`. |
+| `RUNTIME_EXPORT_CONVENTIONS` | `Set<string>` | `edge-light`, `react-native`, `react-server`. |
+| `SPECIAL_EXPORT_CONVENTIONS` | `Set<string>` | Runtime conventions plus the environment names. |
+| `EXCLUDE_REGEXP` | `RegExp` | Matches `node_modules` for skipping processing. |
+| `ENDING_REGEX` | `RegExp` | Matches file extensions, including `.d.ts`/`.d.mts`/`.d.cts`. |
+| `CHUNKS_PACKEM_FOLDER` | `string` | `"packem_chunks"` — directory for generated chunks. |
+| `SHARED_PACKEM_FOLDER` | `string` | `"packem_shared"` — directory for shared resources. |
+| `ALLOWED_TRANSFORM_EXTENSIONS_REGEX` | `RegExp` | Matches JS/TS files (and module variants) eligible for transform. |
+
+## Utilities — `@visulima/packem-share/utils`
+
+```typescript
+import {
+  arrayify,
+  createRollupLogger,
+  enhanceRollupError,
+  FileCache,
+  getCacheHash,
+  getChunkFilename,
+  getEntryFileNames,
+  getDtsExtension,
+  getOutputExtension,
+  getHash,
+  getPackageName,
+  getRegexMatches,
+  isBareSpecifier,
+  isFromNodeModules,
+  isOutsideProject,
+  parseSpecifier,
+  memoize,
+  memoizeByKey,
+  replaceContentWithinMarker,
+  sortUserPlugins,
+  svgToCssDataUri,
+  svgToTinyDataUri,
+  svgEncoder,
+  warn,
+} from '@visulima/packem-share/utils'
+
+import type { RollupLogger, Memoized } from '@visulima/packem-share/utils'
+```
+
+- **`arrayify`** — Normalize a value into an array.
+- **`createRollupLogger`** / **`RollupLogger`** — Build a Rollup-compatible logger.
+- **`enhanceRollupError`** — Enrich Rollup errors with extra context.
+- **`FileCache`** — Filesystem-backed cache class.
+- **`getCacheHash`**, **`getHash`** — Hashing helpers.
+- **`getChunkFilename`**, **`getEntryFileNames`** — Output filename helpers.
+- **`getDtsExtension`**, **`getOutputExtension`** — Resolve declaration/output extensions.
+- **`getPackageName`** — Extract a package name from a specifier.
+- **`getRegexMatches`** — Collect all matches for a pattern.
+- **`isBareSpecifier`**, **`isFromNodeModules`**, **`isOutsideProject`**, **`parseSpecifier`** — Import-specifier analysis.
+- **`memoize`**, **`memoizeByKey`** / **`Memoized`** — Memoization helpers.
+- **`replaceContentWithinMarker`** — Replace content between markers.
+- **`sortUserPlugins`** — Order user-supplied plugins.
+- **`svgToCssDataUri`**, **`svgToTinyDataUri`**, **`svgEncoder`** — SVG data-URI encoding.
+- **`warn`** — Emit a warning.
+
+## Types — `@visulima/packem-share/types`
+
+```typescript
+import type {
+  BuildContext,
+  BuildContextBuildAssetAndChunk,
+  BuildContextBuildEntry,
+  BuildHooks,
+  Environment,
+  Format,
+  Mode,
+  Runtime,
+} from '@visulima/packem-share/types'
+```
+
+### Core type aliases
+
+```typescript
+type Environment = 'production' | 'development' | undefined
+type Mode = 'build' | 'jit' | 'watch'
+type Format = 'cjs' | 'esm'
+type Runtime =
+  | 'browser' | 'bun' | 'deno' | 'edge-light' | 'electron'
+  | 'node' | 'react-native' | 'react-server' | 'workerd' | undefined
+```
+
+### `BuildContext<T>`
+
+The context object passed to build hooks. Carries the resolved options, package manifest, logger, hookable instance, dependency tracking sets, and the collected build entries.
+
+```typescript
+type BuildContext<T = unknown> = {
+  buildEntries: (BuildContextBuildAssetAndChunk | BuildContextBuildEntry)[]
+  dependencyGraphMap: Map<string, Set<[string, string]>>
+  environment: Environment
+  hoistedDependencies: Set<string>
+  hooks: Hookable<BuildHooks<T>>
+  implicitDependencies: Set<string>
+  jiti: Jiti
+  logger: Pail
+  mode: Mode
+  options: T
+  pkg: PackageJson
+  tsconfig?: TsConfigResult
+  usedDependencies: Set<string>
+  warnings: Set<string>
+}
+```
+
+### `BuildHooks<T>`
+
+The lifecycle hooks contract. Each hook receives the `BuildContext` (some also receive a Rollup build/options/watcher object):
+
+```typescript
+interface BuildHooks<T> {
+  'build:before': (context: BuildContext<T>) => Promise<void> | void
+  'build:prepare': (context: BuildContext<T>) => Promise<void> | void
+  'build:done': (context: BuildContext<T>) => Promise<void> | void
+  'builder:before': (name: string, context: BuildContext<T>) => Promise<void> | void
+  'builder:done': (name: string, context: BuildContext<T>) => Promise<void> | void
+  'rollup:options': (context: BuildContext<T>, options: RollupOptions) => Promise<void> | void
+  'rollup:build': (context: BuildContext<T>, build: RollupBuild) => Promise<void> | void
+  'rollup:done': (context: BuildContext<T>) => Promise<void> | void
+  'rollup:watch': (context: BuildContext<T>, watcher: RollupWatcher) => Promise<void> | void
+  'rollup:dts:options': (context: BuildContext<T>, options: RollupOptions) => Promise<void> | void
+  'rollup:dts:build': (context: BuildContext<T>, build: RollupBuild) => Promise<void> | void
+  'rollup:dts:done': (context: BuildContext<T>) => Promise<void> | void
+  /** @deprecated Use "builder:before" instead */
+  'typedoc:before': (context: BuildContext<T>) => Promise<void> | void
+  /** @deprecated Use "builder:done" instead */
+  'typedoc:done': (context: BuildContext<T>) => Promise<void> | void
+  'validate:before': (context: BuildContext<T>) => Promise<void> | void
+  'validate:done': (context: BuildContext<T>) => Promise<void> | void
+}
+```
+
+### `BuildContextBuildEntry` / `BuildContextBuildAssetAndChunk`
+
+Describe a single emitted entry or asset/chunk, including its path, size breakdown (`bytes`/`gzip`/`brotli`), modules, chunks, exports, and dynamic imports.
+
+## Related
+
+- [Build Hooks](/docs/options/hooks)
+- [@visulima/packem](/docs/api/packem)

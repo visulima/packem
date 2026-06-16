@@ -1,0 +1,71 @@
+---
+title: Shims
+description: ESM/CJS interoperability
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Shims
+
+When you publish ESM and CommonJS output from the same source, two interop problems show up: CommonJS globals (`__dirname`, `__filename`, `require`) do not exist in ESM, and default-export shapes differ between the two module systems. Packem addresses both with two real options.
+
+## `cjsInterop`
+
+`cjsInterop` enables CommonJS interop handling for ESM modules. It is a top-level `BuildOptions` field and defaults to `false`.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  cjsInterop: true,
+})
+```
+
+When enabled, Packem applies its CommonJS-interop Rollup plugin and adjusts warning handling (for example, it suppresses the `MIXED_EXPORTS` warning that would otherwise fire). The plugin's own behaviour can be tuned through `rollup.cjsInterop`, which defaults to `{ addDefaultProperty: false }`:
+
+```typescript
+export default defineConfig({
+  cjsInterop: true,
+  rollup: {
+    cjsInterop: {
+      addDefaultProperty: true,
+    },
+  },
+})
+```
+
+## ESM `__dirname` / `__filename` / `require` shim
+
+The ESM shim rewrites CommonJS-only globals so that code using `__dirname`, `__filename`, or a global `require(...)` keeps working when emitted as ESM. It is configured via `rollup.shim` (an `EsmShimCjsSyntaxOptions | false`).
+
+<Callout type="warning">
+The shim is only applied when **both** `cjsInterop` is truthy **and** `rollup.shim` is set. In source the gate is literally `cjsInterop && rollup.shim` — enabling one without the other does nothing.
+</Callout>
+
+```typescript
+export default defineConfig({
+  cjsInterop: true,
+  rollup: {
+    shim: {
+      // EsmShimCjsSyntaxOptions (e.g. include/exclude filters)
+    },
+  },
+})
+```
+
+### What the shim injects
+
+The shim scans each chunk for `__filename`, `__dirname`, and global `require(...)` usage and, only when found, prepends the matching imports after the last static import. For example:
+
+- `__filename` / `__dirname` → `import __cjs_url__ from "node:url"` (and `node:path` for `__dirname`)
+- global `require(...)` → `import __cjs_mod__ from "node:module"`
+
+Each injected line is marked with a `// -- packem CommonJS … shim --` comment, so Packem will not double-shim already-shimmed output. To disable the shim entirely, set `rollup.shim: false`.
+
+---
+
+## Related Options
+
+- [Bundler](/docs/options/bundler) - Shims run on the Rollup backend
+- [Package Exports](/docs/options/package-exports) - How ESM/CJS entries map to `exports`
+- [Target](/docs/options/target) - Node target affects which interop you need

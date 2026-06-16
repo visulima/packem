@@ -1,0 +1,216 @@
+---
+title: Basic CSS
+description: CSS bundling with PostCSS and optimization
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Basic CSS
+
+Packem processes CSS imported from your JavaScript/TypeScript through the
+[`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css) plugin. Plain
+`.css` files run through PostCSS, and you control whether the result is injected
+at runtime or extracted into separate `.css` files via the `mode` option.
+
+## Overview
+
+This example demonstrates:
+
+- Importing plain CSS into a TypeScript module
+- Registering the PostCSS loader in `packem.config.ts`
+- Switching between **inject** and **extract** output modes
+- Minifying the output with cssnano
+
+## Setup
+
+The PostCSS loader requires `postcss` to be installed. The CSS loaders ship with
+Packem and are imported from the `@visulima/packem/css/loader/*` sub-paths.
+
+```bash
+npm install --save-dev postcss
+```
+
+If you want minified output, install cssnano as well:
+
+```bash
+npm install --save-dev cssnano
+```
+
+### Directory Structure
+
+```
+my-package/
+├── src/
+│   ├── index.ts
+│   └── styles.css
+├── package.json
+└── packem.config.ts
+```
+
+### Source Files
+
+**src/styles.css**
+
+```css
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+```
+
+**src/index.ts**
+
+```typescript
+import './styles.css'
+
+export function createButton() {
+  const button = document.createElement('button')
+  button.className = 'btn btn-primary'
+  button.textContent = 'Click me'
+  return button
+}
+```
+
+## Configuration
+
+CSS options live under `rollup.css` and are typed as `StyleOptions` from
+`@visulima/rollup-plugin-css`. Register the PostCSS loader by importing it and
+adding it to the `loaders` array.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      loaders: [postcssLoader],
+    },
+  },
+})
+```
+
+## Output Modes
+
+The `mode` option selects how CSS reaches the bundle. The default is `"inject"`.
+
+### Inject (default)
+
+Embeds the CSS inside the JavaScript bundle and injects it into `<head>` at
+runtime. This requires `@visulima/css-style-inject` to be installed.
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'inject',
+      loaders: [postcssLoader],
+    },
+  },
+})
+```
+
+```bash
+npm install --save-dev @visulima/css-style-inject
+```
+
+### Extract
+
+Writes CSS to a separate `.css` file next to the generated JS. You can also pass
+a path (relative to the output directory) to control the extraction location.
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+    },
+  },
+})
+```
+
+To extract to a fixed file name, use the tuple form:
+
+```typescript
+css: {
+  mode: ['extract', 'styles.css'],
+  loaders: [postcssLoader],
+}
+```
+
+### Inline
+
+Embeds the processed CSS as a string export in the JavaScript module without
+runtime injection.
+
+```typescript
+css: {
+  mode: 'inline',
+  loaders: [postcssLoader],
+}
+```
+
+## Minification
+
+CSS minification is enabled by passing a minifier object to the `minifier`
+option. Packem provides cssnano and Lightning CSS minifiers as importable
+sub-paths.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import cssnanoMinifier from '@visulima/packem/css/minifier/cssnano'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      minifier: cssnanoMinifier,
+    },
+  },
+})
+```
+
+## Source Maps
+
+Enable CSS source maps with the `sourceMap` option:
+
+```typescript
+css: {
+  mode: 'extract',
+  loaders: [postcssLoader],
+  sourceMap: true, // or 'inline'
+}
+```
+
+## Building
+
+```bash
+packem build
+```
+
+<Callout type="info">
+Run `packem build --verbose` to see detailed CSS processing information for each
+file.
+</Callout>
+
+## Related
+
+- [PostCSS](/docs/examples/css/postcss) — plugins and `postcss.config.js`
+- [CSS Modules](/docs/examples/css/modules) — scoped class names
+- [CSS Processing guide](/docs/guide/css)

@@ -1,0 +1,288 @@
+---
+title: "@visulima/packem"
+description: Main bundler package with CLI and core functionality
+---
+
+# @visulima/packem
+
+The main Packem package: a fast and modern bundler for Node.js and TypeScript. It ships the `packem` CLI, the configuration API, and the transformer integrations.
+
+`@visulima/packem` is ESM-only (`"type": "module"` with no CommonJS exports). It requires Node.js `^22.14.0 || >= 24.10.0`.
+
+## Installation
+
+```bash
+npm install @visulima/packem
+```
+
+## CLI
+
+The package exposes a single binary, `packem`:
+
+```json
+{
+  "bin": {
+    "packem": "./dist/cli/index.js"
+  }
+}
+```
+
+### `packem build`
+
+Build the package using the resolved Packem configuration.
+
+```bash
+packem build [dir]
+```
+
+Selected options (run `packem build --help` for the full list):
+
+- `--bundler <rollup|rolldown>` — Specify the bundler to use.
+- `--dir <dir>` — The directory to build.
+- `--target <target>` — Environments to support. The `target` in `tsconfig.json` is added automatically.
+- `--config <file>` — Use a custom config file.
+- `--tsconfig <file>` — Path to the `tsconfig.json` file.
+- `--minify` — Minify the output.
+- `--sourcemap` — Generate sourcemaps (experimental).
+- `--watch` — Watch for changes.
+- `--jit` — Stub the package for JIT compilation.
+- `--env.<KEY>=<value>` — Compile-time environment variables (e.g. `--env.NODE_ENV=production`).
+- `--env-file <file>` — Path to the `.env` file to load environment variables from.
+- `--env-prefix <prefix>` — Prefix for environment variables to load from `.env` (default: `PACKEM_`).
+- `--metafile` — Generate a meta file (experimental).
+- `--license <file>` — Path to the license file.
+- `--analyze` — Visualize and analyze the bundle.
+- `--cjsInterop` — CJS interop mode (experimental).
+- `--production` / `--development` — Run in production or development environment.
+- `--no-clean` — Do not clean the `dist` directory before building.
+
+### `packem init`
+
+Initialize a Packem configuration in your project.
+
+```bash
+packem init [dir]
+```
+
+Options:
+
+- `--dir <dir>` — The directory to initialize.
+- `--transformer <name>` — Choose a transformer.
+- `--css` — Use CSS.
+- `--css-minifier <name>` — Use a CSS minifier.
+- `--typescript` — Use TypeScript.
+- `--runtime <nodejs|browser>` — Specify the build runtime.
+
+### `packem add`
+
+Add an optional Packem feature to your project.
+
+```bash
+packem add <feature>
+```
+
+Recognized features include `typedoc`, `react`, `solid`, `preact`, `vue`, `svelte`, and `css`.
+
+Options:
+
+- `--dir <dir>` — The directory to build.
+- `--config <file>` — Use a custom config file.
+
+### `packem migrate`
+
+Migrate from other bundlers (tsup, unbuild, bunchee, etc.) to Packem.
+
+```bash
+packem migrate [cwd]
+```
+
+Options:
+
+- `--cwd <dir>` — The directory to migrate.
+- `--dry-run` — Preview changes without applying them.
+
+## Programmatic API
+
+The package root re-exports the `packem` runner alongside the core build types.
+
+```typescript
+import { packem } from '@visulima/packem'
+
+await packem('./', {
+  mode: 'build',
+  environment: 'production',
+})
+```
+
+### `packem(rootDirectory, options?)`
+
+```typescript
+const packem = (rootDirectory: string, options?: PackemOptions) => Promise<void>
+```
+
+- **rootDirectory** (`string`) — The root directory of the project to bundle.
+- **options** (`PackemOptions`) — Configuration options for the bundler.
+
+### `PackemOptions`
+
+Extends `BuildConfig` with a few runner-level fields:
+
+```typescript
+interface PackemOptions extends BuildConfig {
+  /** The environment to build for. @default "production" */
+  environment?: Environment
+  /** Logger configuration options. */
+  logger?: ConstructorOptions<string, string>
+  /** The mode to run Packem in. @default "build" */
+  mode?: Mode
+}
+```
+
+### Exported types
+
+The package root also re-exports the following types:
+
+```typescript
+import type {
+  BuildEntry,
+  BuildOptions,
+  RollupBuildOptions,
+} from '@visulima/packem'
+
+import type {
+  TransformerFn,
+  TransformerName,
+} from '@visulima/packem'
+
+import type {
+  BuildContext,
+  BuildContextBuildAssetAndChunk,
+  BuildContextBuildEntry,
+  BuildHooks,
+  Environment,
+  Mode,
+  Runtime,
+} from '@visulima/packem'
+```
+
+## Configuration — `@visulima/packem/config`
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  entries: ['./src/index.ts'],
+})
+```
+
+### `defineConfig(config)`
+
+Defines a build configuration. Accepts a static configuration object or a function that returns one.
+
+```typescript
+const defineConfig = (
+  config: BuildConfig | BuildConfigFunction,
+) => BuildConfig | BuildConfigFunction
+```
+
+```typescript
+// Dynamic configuration
+export default defineConfig((env, mode) => ({
+  entries: ['./src/index.ts'],
+  outDir: env === 'production' ? './dist' : './dev',
+}))
+```
+
+### `definePreset(preset)`
+
+Defines a reusable build preset.
+
+```typescript
+const definePreset = (preset: BuildPreset) => BuildPreset
+```
+
+```typescript
+export default definePreset({
+  name: 'my-preset',
+  defaults: {
+    entries: ['./src/index.ts'],
+  },
+  hooks: {
+    'build:before': (context) => {
+      // Custom build preparation logic
+    },
+  },
+})
+```
+
+### Config types
+
+The `config` subpath also re-exports these types:
+
+```typescript
+import type {
+  BuildConfig,
+  BuildConfigFunction,
+  BuildPreset,
+  BuildHooks,
+} from '@visulima/packem/config'
+```
+
+### Framework presets
+
+Ready-made presets are available as dedicated subpaths:
+
+```typescript
+import react from '@visulima/packem/config/preset/react'
+import preact from '@visulima/packem/config/preset/preact'
+import solid from '@visulima/packem/config/preset/solid'
+import svelte from '@visulima/packem/config/preset/svelte'
+import vue from '@visulima/packem/config/preset/vue'
+```
+
+## Transformers
+
+Pick the transformer that compiles your TypeScript/JavaScript and pass it to `transformer` in your config.
+
+### esbuild
+
+```typescript
+import transformer from '@visulima/packem/transformer/esbuild'
+```
+
+### swc
+
+```typescript
+import transformer from '@visulima/packem/transformer/swc'
+```
+
+### OXC
+
+```typescript
+import transformer from '@visulima/packem/transformer/oxc'
+```
+
+### sucrase
+
+```typescript
+import transformer from '@visulima/packem/transformer/sucrase'
+```
+
+## Additional subpath exports
+
+The `package.json` `exports` map also exposes:
+
+- `@visulima/packem/css/loader/{sourcemap,less,postcss,sass,stylus,lightningcss,tailwindcss}` — CSS loaders.
+- `@visulima/packem/css/minifier/{cssnano,lightningcss}` — CSS minifiers.
+- `@visulima/packem/builder/typedoc` — TypeDoc documentation builder.
+- `@visulima/packem/files` — Ambient declarations for asset imports (types only).
+- `@visulima/packem/package.json` — The package manifest.
+
+## Related
+
+- [Packem Configuration](/docs/guide/configuration)
+- [Transformers Guide](/docs/guide/transformers)
+- [CLI Reference](/docs/guide/cli)
+- [@visulima/packem-rollup](/docs/api/packem-rollup)

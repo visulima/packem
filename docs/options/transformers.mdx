@@ -1,0 +1,85 @@
+---
+title: Transformers
+description: Choose and configure transformers
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Transformers
+
+The `transformer` option selects the engine that converts your TypeScript and modern JavaScript source into the output Packem bundles. It is the option-reference companion to the [Transformers guide](/docs/guide/transformers), which compares the engines in detail.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+})
+```
+
+## Setting the transformer
+
+`transformer` is a function (`TransformerFn`), not a string. You import the adapter you want from `@visulima/packem` and pass it straight through to `defineConfig`.
+
+```typescript
+import esbuild from '@visulima/packem/transformer/esbuild'
+import swc from '@visulima/packem/transformer/swc'
+import oxc from '@visulima/packem/transformer/oxc'
+import sucrase from '@visulima/packem/transformer/sucrase'
+```
+
+There are **four** transformer import paths:
+
+| Import path | Engine |
+|---|---|
+| `@visulima/packem/transformer/esbuild` | esbuild (Go) |
+| `@visulima/packem/transformer/swc` | swc (Rust) |
+| `@visulima/packem/transformer/oxc` | OXC (Rust, experimental) |
+| `@visulima/packem/transformer/sucrase` | sucrase (JavaScript) |
+
+<Callout type="info">
+Under the default `bundler: 'rollup'` backend, `transformer` is **required** — Packem refuses to build without it. See the [Transformers guide](/docs/guide/transformers) for how to choose between the four engines.
+</Callout>
+
+## When each transformer applies
+
+The `transformer` option only takes effect under the default `'rollup'` [bundler](/docs/options/bundler). The esbuild / swc / oxc / sucrase adapters are Rollup plugins, so they are only invoked on the Rollup path.
+
+When you select `bundler: 'rolldown'`, Rolldown ships its own oxc-based transform and always uses it. In that case the `transformer` option **must be omitted** — passing one is a configuration mistake and Packem will refuse to build.
+
+```typescript
+// ✅ Rollup (default) — transformer required
+export default defineConfig({
+  bundler: 'rollup',
+  transformer: esbuild,
+})
+
+// ✅ Rolldown — no transformer
+export default defineConfig({
+  bundler: 'rolldown',
+})
+```
+
+## Switching transformers conditionally
+
+Because `transformer` is just a value, you can swap engines based on the environment:
+
+```typescript
+import esbuild from '@visulima/packem/transformer/esbuild'
+import swc from '@visulima/packem/transformer/swc'
+
+const isDev = process.env.NODE_ENV === 'development'
+
+export default defineConfig({
+  transformer: isDev ? esbuild : swc,
+})
+```
+
+---
+
+## Related Options
+
+- [Bundler](/docs/options/bundler) - Rollup (transformer-driven) vs Rolldown (built-in oxc)
+- [Target](/docs/options/target) - Compilation targets passed to the transformer
+- [Minification](/docs/options/minify) - Output minification

@@ -1,0 +1,122 @@
+---
+title: Less
+description: Less compilation with functions and mixins
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Less
+
+Packem compiles `.less` files through the Less loader in
+[`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css). The loader forwards
+its options directly to the Less compiler.
+
+## Overview
+
+This example demonstrates:
+
+- Compiling Less with variables, mixins, and functions
+- Registering the Less loader in `packem.config.ts`
+- Passing Less compiler options
+
+## Setup
+
+The Less loader requires the `less` package.
+
+```bash
+npm install --save-dev less
+```
+
+### Directory Structure
+
+```
+my-package/
+├── src/
+│   ├── index.ts
+│   └── styles.less
+├── package.json
+└── packem.config.ts
+```
+
+### Source Files
+
+**src/styles.less**
+
+```less
+@primary-color: #007bff;
+@border-radius: 0.25rem;
+
+.button-style(@bg-color) {
+  background-color: @bg-color;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: @border-radius;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken(@bg-color, 10%);
+  }
+}
+
+.btn-primary {
+  .button-style(@primary-color);
+}
+```
+
+**src/index.ts**
+
+```typescript
+import './styles.less'
+
+export function createButton() {
+  const button = document.createElement('button')
+  button.className = 'btn-primary'
+  button.textContent = 'Click me'
+  return button
+}
+```
+
+## Configuration
+
+Register the Less loader by importing it and adding it to `rollup.css.loaders`.
+The `less` option accepts the standard Less compiler options
+(`Less.Options`).
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import lessLoader from '@visulima/packem/css/loader/less'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [lessLoader],
+      less: {
+        math: 'parens-division',
+        paths: ['node_modules', 'src/styles'],
+      },
+    },
+  },
+})
+```
+
+<Callout type="info">
+The `less` option maps to `Less.Options`. See the
+[Less.js options documentation](https://lesscss.org/usage/#less-options) for the
+full list, including `math`, `paths`, `globalVars`, and `plugins`.
+</Callout>
+
+## Building
+
+```bash
+packem build
+```
+
+## Related
+
+- [Sass/SCSS](/docs/examples/css/sass)
+- [Stylus](/docs/examples/css/stylus)
+- [CSS Processing guide](/docs/guide/css)

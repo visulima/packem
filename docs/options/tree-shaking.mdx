@@ -1,0 +1,79 @@
+---
+title: Tree Shaking
+description: Dead code elimination
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Tree Shaking
+
+Tree shaking removes code that is never used from the final bundle. Packem does **not** expose a top-level `treeshake` option — tree-shaking is configured through the `rollup.treeshake` passthrough, which forwards directly to [Rollup's `treeshake` options](https://rollupjs.org/configuration-options/#treeshake).
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  rollup: {
+    treeshake: {
+      preset: 'smallest',
+      moduleSideEffects: true,
+    },
+  },
+})
+```
+
+<Callout type="info">
+There is no `defineConfig({ treeshake })` key. Always nest it under `rollup`.
+</Callout>
+
+## Defaults
+
+Packem configures Rollup's tree-shaking with these defaults:
+
+```typescript
+{
+  // preserve side-effect-only imports
+  moduleSideEffects: true,
+  // Rollup's most optimal tree-shaking (drops unused getter reads)
+  preset: 'smallest',
+}
+```
+
+The `smallest` preset is Rollup's most aggressive setting, while `moduleSideEffects: true` keeps `import './side-effect'`-style imports intact so global side effects are not dropped.
+
+## Customizing tree-shaking
+
+Because `rollup.treeshake` is a straight passthrough, any Rollup tree-shake option is available:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    treeshake: {
+      preset: 'recommended',
+      propertyReadSideEffects: false,
+      unknownGlobalSideEffects: false,
+      tryCatchDeoptimization: false,
+    },
+  },
+})
+```
+
+### Marking side-effect-free code
+
+To let the bundler drop more code, declare your package side-effect-free in `package.json`:
+
+```json
+{
+  "sideEffects": false
+}
+```
+
+Combine that with `moduleSideEffects` to fine-tune which imports are preserved.
+
+---
+
+## Related Options
+
+- [Minification](/docs/options/minify) - Shrink the remaining code
+- [Bundler](/docs/options/bundler) - Tree-shaking applies to the Rollup backend
+- [Target](/docs/options/target) - Modern targets enable more aggressive shaking

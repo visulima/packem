@@ -1,0 +1,256 @@
+---
+title: Tailwind CSS
+description: React components with Tailwind CSS integration
+---
+
+# Tailwind CSS
+
+Style React components with Tailwind CSS. Tailwind runs through PostCSS as part of Packem's CSS pipeline, so utility classes are compiled and the resulting stylesheet is extracted alongside your components.
+
+## Overview
+
+This example demonstrates:
+
+- React components using Tailwind utility classes
+- Tailwind CSS v4 wired in through PostCSS
+- A single extracted stylesheet for the whole library
+- The `react` preset for JSX handling
+
+Tailwind is processed by the PostCSS loader from [`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css), configured through Packem's `rollup.css` option.
+
+## Installation
+
+```bash
+npm install --save-dev tailwindcss @tailwindcss/postcss postcss
+```
+
+## Project Structure
+
+```
+react-tailwind-lib/
+├── src/
+│   ├── Button.tsx
+│   ├── styles.css      # Tailwind entry stylesheet
+│   └── index.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Component Implementation
+
+**src/styles.css** — import Tailwind
+
+```css
+@import 'tailwindcss';
+```
+
+**src/Button.tsx**
+
+```tsx
+'use client'
+
+import React from 'react'
+
+import './styles.css'
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary'
+  children: React.ReactNode
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant = 'primary', children, ...props }, ref) => {
+    const base =
+      'inline-flex items-center justify-center rounded-md px-4 py-2 font-medium'
+    const variants = {
+      primary: 'bg-blue-600 text-white hover:bg-blue-700',
+      secondary: 'bg-gray-600 text-white hover:bg-gray-700',
+    }
+
+    return (
+      <button
+        ref={ref}
+        className={`${base} ${variants[variant]}`}
+        {...props}
+      >
+        {children}
+      </button>
+    )
+  }
+)
+
+Button.displayName = 'Button'
+```
+
+**src/index.ts**
+
+```typescript
+export { Button } from './Button'
+export type { ButtonProps } from './Button'
+```
+
+## Configuration
+
+### package.json
+
+```json
+{
+  "name": "@myorg/react-tailwind",
+  "version": "1.0.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "postcss": "^8.4.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+<Callout type="info">
+Exposing the compiled stylesheet through an `"./styles.css"` export lets consumers import it once: `import '@myorg/react-tailwind/styles.css'`.
+</Callout>
+
+### Packem Configuration
+
+Enable the React preset and register Tailwind as a PostCSS plugin. `mode: 'extract'` writes the compiled utilities to a single `.css` file:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'react',
+  transformer,
+  sourcemap: true,
+  declaration: true,
+  rollup: {
+    css: {
+      mode: 'extract',
+      postcss: {
+        plugins: ['@tailwindcss/postcss'],
+      },
+    },
+  },
+})
+```
+
+If you prefer an explicit PostCSS config file, point the loader at it instead:
+
+```js
+// postcss.config.js
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+}
+```
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
+export default defineConfig({
+  preset: 'react',
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+    },
+  },
+})
+```
+
+### TypeScript Configuration
+
+**tsconfig.json**
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## Building
+
+```bash
+npm run build
+```
+
+### Output
+
+```
+dist/
+├── index.js     # ESM entry
+├── index.cjs    # CJS entry
+├── index.d.ts   # TypeScript declarations
+└── styles.css   # Compiled Tailwind utilities
+```
+
+## Usage
+
+```tsx
+import { Button } from '@myorg/react-tailwind'
+import '@myorg/react-tailwind/styles.css'
+
+function App() {
+  return <Button variant="primary">Click me</Button>
+}
+```
+
+## Tailwind Oxide (Alternative)
+
+Packem also ships a dedicated Tailwind loader backed by Tailwind's Rust-based Oxide engine. See the [CSS guide](/docs/guide/css) for details on the `@visulima/packem/css/loader/tailwindcss` loader and the required `@tailwindcss/node` / `@tailwindcss/oxide` dependencies.
+
+## Next Steps
+
+- Combine Tailwind with scoped [CSS Modules](/docs/examples/react/css-modules)
+- Read the full [CSS Processing guide](/docs/guide/css)
+- Set up a [React Library](/docs/examples/react/library) with externalized React

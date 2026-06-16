@@ -1,0 +1,198 @@
+---
+title: Multiple Exports
+description: Package with multiple entry points and exports
+---
+
+# Multiple Exports
+
+Expose several entry points from one package using `package.json#exports` subpaths. Packem maps each subpath key (`.`, `./utils`, …) to a build entry based on the file paths in its conditions, so consumers can import exactly the slice they need and bundlers can tree-shake the rest.
+
+## Overview
+
+This example demonstrates:
+- Multiple entry points via `exports` subpaths
+- How Packem maps each subpath to a build entry
+- Dual ESM + CJS output per entry
+- Per-subpath TypeScript declarations
+
+## Project Setup
+
+### Directory Structure
+
+```
+my-package/
+├── src/
+│   ├── index.ts
+│   └── utils.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+### Source Files
+
+**src/index.ts**
+```typescript
+export interface User {
+  id: string
+  name: string
+}
+
+export function createUser(name: string): User {
+  return { id: crypto.randomUUID(), name }
+}
+```
+
+**src/utils.ts**
+```typescript
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max)
+}
+
+export function range(start: number, end: number): number[] {
+  return Array.from({ length: end - start }, (_, index) => start + index)
+}
+```
+
+## Configuration
+
+### package.json
+
+Each key under `exports` is a subpath. Packem reads the file paths in the
+`import`/`require`/`types` conditions and creates one entry per subpath, matching
+the output filenames you declare here. The `.` key maps to `src/index.ts` and
+`./utils` maps to `src/utils.ts`.
+
+```json
+{
+  "name": "@myorg/my-package",
+  "version": "1.0.0",
+  "description": "A package with multiple entry points",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils.d.mts",
+        "default": "./dist/utils.mjs"
+      },
+      "require": {
+        "types": "./dist/utils.d.cts",
+        "default": "./dist/utils.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+<Callout type="info">
+The output file name (`./dist/utils.mjs`) tells Packem to look for the matching source file (`src/utils.ts`). Keep your source filenames aligned with the export targets and the mapping is automatic.
+</Callout>
+
+### TypeScript Configuration
+
+**tsconfig.json**
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Packem Configuration
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+})
+```
+
+## Building
+
+```bash
+npm run build
+```
+
+### Output Structure
+
+```
+dist/
+├── index.mjs        # "." ESM entry
+├── index.cjs        # "." CJS entry
+├── index.d.mts
+├── index.d.cts
+├── index.d.ts
+├── utils.mjs        # "./utils" ESM entry
+├── utils.cjs        # "./utils" CJS entry
+├── utils.d.mts
+├── utils.d.cts
+└── utils.d.ts
+```
+
+## Usage
+
+### Importing subpaths
+
+```typescript
+// Root entry
+import { createUser } from '@myorg/my-package'
+
+// Subpath entry — only the utils module is loaded
+import { clamp, range } from '@myorg/my-package/utils'
+
+createUser('Ada')
+clamp(12, 0, 10) // 10
+```
+
+### CommonJS
+
+```javascript
+const { createUser } = require('@myorg/my-package')
+const { clamp } = require('@myorg/my-package/utils')
+```
+
+## Next Steps
+
+- Add a CLI entry with [CLI Tool](/docs/examples/cli-tool)
+- Add runtime-specific outputs with [Multi-Runtime](/docs/examples/advanced/multi-runtime)
+- Review automatic exports handling in [Package Exports](/docs/options/package-exports)

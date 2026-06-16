@@ -1,0 +1,170 @@
+---
+title: Common Issues
+description: Solutions to frequently encountered problems
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Common Issues
+
+This page covers the problems people hit most often when bundling with Packem: nothing gets built, dependencies fail to resolve, output lands in the wrong place, or the package.json validators flag your configuration. Each section follows a problem → cause → solution structure and uses the real messages Packem emits.
+
+## No entries detected
+
+### Problem
+
+The build stops immediately with one of:
+
+```
+No source files found in 'src' directory. Please provide entries manually.
+```
+
+```
+No entries detected. Please provide entries manually.
+```
+
+### Cause
+
+Packem's `auto` preset infers entry points from your `package.json` `exports`, `main`, `module`, and `types` fields and then maps them back to source files in your source directory (`src` by default). If none of those fields are configured — or they point at output paths that have no matching source file — there is nothing to infer.
+
+### Solution
+
+Configure your `package.json` `exports` so each output maps to a source file:
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+With `./dist/index.mjs` declared, Packem looks for `./src/index.ts` (or `.js`, `.tsx`, etc.) and builds it. Alternatively, define entries explicitly in `packem.config.ts`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  entries: ['src/index.ts']
+})
+```
+
+<Callout type="warning">
+When you map exports to wildcard patterns, Packem warns `Could not find entrypoints matching pattern` and `Could not find entrypoint for` if a declared output has no source behind it. Treat those warnings as a sign that your `exports` and source tree are out of sync.
+</Callout>
+
+## Externals not resolving
+
+### Problem
+
+The build fails with:
+
+```
+Failed to resolve the module "some-package" imported by "src/index.ts"
+Is the module installed? Note:
+ ↳ to inline a module into your bundle, install it to "devDependencies".
+ ↳ to depend on a module via import/require, install it to "dependencies".
+```
+
+### Cause
+
+Packem treats this `UNRESOLVED_IMPORT` as a hard error by default. The two hints in the message are the actual fix paths: where a dependency lives in `package.json` determines whether it gets inlined into the bundle or left external.
+
+By default, everything in `dependencies` and `peerDependencies` is marked external automatically and is **not** included in the bundle. Packages you want bundled in must be resolvable on disk.
+
+### Solution
+
+- To **bundle** a module into your output, install it under `devDependencies`.
+- To **depend** on a module at runtime (kept external), install it under `dependencies` or `peerDependencies`.
+
+If you want an unresolved import to warn instead of failing the build, set `unresolvedImportBehavior` to `"warn"`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    resolve: {
+      unresolvedImportBehavior: 'warn'
+    }
+  }
+})
+```
+
+You can also bundle declared `dependencies` instead of externalizing them with the CLI flag:
+
+```bash
+packem build --no-external
+```
+
+## Output directory and file names
+
+### Problem
+
+Files land somewhere unexpected, or you can't find the generated `dist`.
+
+### Cause
+
+Packem resolves the output directory from your TypeScript config first: `compilerOptions.outDir` is used when present, falling back to `dist`. The validators also check that your `package.json` `files` field includes that directory.
+
+### Solution
+
+If your `files` array does not list the output directory, Packem warns:
+
+```
+The 'files' field in your package.json is missing the 'dist' directory. Ensure the output directory is included.
+```
+
+Add it so your published package actually ships the build:
+
+```json
+{
+  "files": ["dist"]
+}
+```
+
+To change where output goes, set `outDir` in `compilerOptions` of `tsconfig.json`, and keep the `files` field in sync.
+
+## Validation failures
+
+### Problem
+
+The build prints `package.json` validation warnings, or fails outright when `failOnWarn` is enabled.
+
+### Cause
+
+Packem validates `package.json` against what is required to publish a working package. Real warnings include:
+
+- `Missing main export ".". Subpaths exports should include a main export entry`
+- `The 'name' field is missing in your package.json. Please provide a valid package name.`
+- `The 'module' field is missing in your package.json, but you are emitting ES modules.`
+- `Incorrect condition order at <path>. Standard conditions should be ordered: node-addons > node > import > require > module-sync > default`
+- `These dependencies are listed in package.json but not used: <list>`
+- `These dependencies are shamefully hoisted: <list>`
+
+### Solution
+
+Fix the underlying `package.json` field the warning points at. Conditions inside `exports` are order-sensitive — `types` must come first and `default` last, with `import`/`require` in between. For a clean publish, also run [publint](https://github.com/bluwy/publint) and [Are the Types Wrong?](https://arethetypeswrong.github.io).
+
+If you need to skip validation entirely (for example, in a fast inner-loop build), pass `--no-validation`:
+
+```bash
+packem build --no-validation
+```
+
+<Callout type="info">
+Use `packem build --verbose` to see exactly which entries were inferred and how each was mapped to a source file.
+</Callout>
+
+## Related
+
+- [TypeScript Problems](/docs/guide/troubleshooting/typescript)
+- [CSS Issues](/docs/guide/troubleshooting/css)
+- [Build Errors](/docs/guide/troubleshooting/build-errors)

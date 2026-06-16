@@ -1,0 +1,134 @@
+---
+title: JavaScript Package
+description: Modern JavaScript package with zero configuration
+---
+
+# JavaScript Package
+
+Build a modern, ESM-only JavaScript package with Packem. There is no entry list to maintain: Packem infers the build entries from your `package.json`, and `packem init` scaffolds the transformer and config for you, so the setup is effectively zero-config.
+
+## Overview
+
+This example demonstrates:
+- A plain JavaScript (no TypeScript) package
+- ESM-only output
+- Entry inference from `package.json#exports`
+- Generating the config with `packem init`
+
+## Project Setup
+
+### Directory Structure
+
+```
+my-package/
+├── src/
+│   └── index.js
+├── package.json
+└── packem.config.ts
+```
+
+### Source File
+
+**src/index.js**
+```javascript
+/**
+ * Slugify a string into a URL-friendly form.
+ */
+export function slugify(input) {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+/**
+ * Truncate a string to a maximum length.
+ */
+export function truncate(input, max = 80) {
+  return input.length > max ? `${input.slice(0, max - 1)}…` : input
+}
+```
+
+## Configuration
+
+### package.json
+
+With `"type": "module"` and a single `exports` entry, Packem builds one ESM bundle.
+No `main`/`require` condition means no CommonJS output is produced.
+
+```json
+{
+  "name": "@myorg/my-package",
+  "version": "1.0.0",
+  "description": "A modern JavaScript package",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": "./dist/index.mjs"
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2",
+    "esbuild": "^0.25.0"
+  }
+}
+```
+
+### Generating the config
+
+Run the interactive setup to pick a bundler and transformer and write the config file:
+
+```bash
+npx packem init
+```
+
+This scaffolds a minimal `packem.config.ts`:
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+})
+```
+
+<Callout type="info">
+Packem reads the entries straight from `package.json`. Add another subpath to `exports` and it is picked up automatically — no config change required.
+</Callout>
+
+## Building
+
+```bash
+npm run build
+```
+
+### Output Structure
+
+```
+dist/
+└── index.mjs        # ESM entry
+```
+
+## Usage
+
+```javascript
+import { slugify, truncate } from '@myorg/my-package'
+
+slugify('Hello World!')          // "hello-world"
+truncate('a very long sentence', 10) // "a very lo…"
+```
+
+## Next Steps
+
+- Add CommonJS output by introducing a `require` condition — see [Dual Package](/docs/examples/dual-package)
+- Add a TypeScript entry — see [TypeScript Library](/docs/examples/basic-typescript)
+- Pick a different [transformer](/docs/guide/transformers)

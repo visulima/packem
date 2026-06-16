@@ -1,0 +1,263 @@
+---
+title: CSS Modules
+description: React components with scoped styling
+---
+
+# CSS Modules
+
+Build React components with locally scoped CSS Modules. Class names are hashed at build time so styles never collide across components.
+
+## Overview
+
+This example demonstrates:
+
+- React components styled with CSS Modules
+- Automatic scoping for `*.module.css` files via `autoModules`
+- Generated, collision-free class names
+- Extracted `.css` output alongside your JavaScript
+- Auto-generated TypeScript declarations for CSS Module imports
+
+CSS Modules are powered by [`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css), which Packem configures through the `rollup.css` option.
+
+## Project Structure
+
+```
+react-ui-lib/
+├── src/
+│   ├── Button.tsx
+│   ├── Button.module.css
+│   └── index.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Component Implementation
+
+**src/Button.tsx**
+
+```tsx
+'use client'
+
+import React from 'react'
+
+import styles from './Button.module.css'
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary'
+  children: React.ReactNode
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant = 'primary', children, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={`${styles.button} ${styles[variant]}`}
+        {...props}
+      >
+        {children}
+      </button>
+    )
+  }
+)
+
+Button.displayName = 'Button'
+```
+
+**src/Button.module.css**
+
+```css
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.secondary {
+  background-color: #6b7280;
+  color: white;
+}
+```
+
+**src/index.ts**
+
+```typescript
+export { Button } from './Button'
+export type { ButtonProps } from './Button'
+```
+
+## Configuration
+
+### package.json
+
+```json
+{
+  "name": "@myorg/react-ui",
+  "version": "1.0.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+<Callout type="info">
+Listing `"**/*.css"` under `sideEffects` ensures the extracted stylesheets are preserved during tree shaking when the library is consumed.
+</Callout>
+
+### Packem Configuration
+
+Enable the React preset and turn on CSS Modules through `rollup.css`. `autoModules` opts every `*.module.css` file into scoped class names, and `mode: 'extract'` writes the styles to companion `.css` files:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'react',
+  transformer,
+  sourcemap: true,
+  declaration: true,
+  rollup: {
+    css: {
+      mode: 'extract',
+      autoModules: true,
+      postcss: {
+        modules: {
+          generateScopedName: '[name]__[local]___[hash:base64:5]',
+        },
+      },
+    },
+  },
+})
+```
+
+The `autoModules` option accepts a regular expression if you want to control which files are treated as modules:
+
+```typescript
+rollup: {
+  css: {
+    mode: 'extract',
+    // Only files matching `.module.` become CSS Modules
+    autoModules: /\.module\./,
+  },
+}
+```
+
+### TypeScript Configuration
+
+CSS Module imports are typed via auto-generated companion declaration files. To let TypeScript resolve `import styles from './Button.module.css'`, add a global ambient declaration:
+
+**src/css-modules.d.ts**
+
+```typescript
+declare module '*.module.css' {
+  const styles: { readonly [key: string]: string }
+  export default styles
+}
+```
+
+**tsconfig.json**
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## Building
+
+```bash
+npm run build
+```
+
+### Output
+
+```
+dist/
+├── index.js          # ESM entry
+├── index.cjs         # CJS entry
+├── index.d.ts        # TypeScript declarations
+└── Button.module.css # Extracted, scoped styles
+```
+
+At build time, class names are rewritten using the `generateScopedName` pattern:
+
+```tsx
+// Source
+import styles from './Button.module.css'
+<button className={styles.button} />
+
+// Generated class name, e.g.
+// Button__button___a1b2c
+```
+
+## Key Features
+
+### Scoped by Default
+
+Every class declared in a `*.module.css` file is rewritten to a unique, hashed name. Two components can both use `.button` without conflicting.
+
+### Extract vs. Inject
+
+This example uses `mode: 'extract'` to emit standalone `.css` files. If you prefer the styles embedded in JavaScript and injected at runtime, use `mode: 'inject'` (which requires `@visulima/css-style-inject`). See the [CSS guide](/docs/guide/css) for all modes.
+
+## Next Steps
+
+- Add [Tailwind CSS](/docs/examples/react/tailwind) for utility-first styling
+- Read the full [CSS Processing guide](/docs/guide/css)
+- Set up a [React Library](/docs/examples/react/library) with externalized React

@@ -1,0 +1,111 @@
+---
+title: Dependency Validation
+description: Validate dependencies and detect issues
+---
+
+# Dependency Validation
+
+Packem can warn you about two common dependency problems: packages that are **shamefully hoisted** (relied on transitively but not declared) and packages **listed in `package.json` but never imported**. This example shows the `validation.dependencies` block and how to exclude false positives.
+
+## Overview
+
+This example demonstrates:
+- Enabling hoisted and unused dependency checks
+- Excluding specific packages from each check
+- How framework presets configure these excludes
+- Detecting packages that get bundled more than once
+
+## Configuration
+
+```typescript
+// packem.config.ts
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+    transformer,
+    validation: {
+        dependencies: {
+            // Warn when dependencies are used but not declared
+            // (shamefully hoisted). Provide packages to ignore.
+            hoisted: {
+                exclude: [],
+            },
+
+            // Warn when dependencies are declared in package.json
+            // but never imported. Exclude packages that are used
+            // indirectly (e.g. by a runtime/JSX import).
+            unused: {
+                exclude: ["react", "react-dom"],
+            },
+        },
+    },
+})
+```
+
+## How it works
+
+- **Hoisted check** — if a package ends up in your build without being declared in `package.json`, Packem reports: `These dependencies are shamefully hoisted: ...`.
+- **Unused check** — every key in `dependencies` that is never imported by your source is reported: `These dependencies are listed in package.json but not used: ...`. Anything listed in `unused.exclude` is removed from that report.
+
+## Excluding packages
+
+Each check takes an `exclude` array of package names. This is useful for dependencies that are present for runtime reasons but aren't statically imported — for example, `react` / `react-dom` as JSX runtimes:
+
+```typescript
+validation: {
+    dependencies: {
+        hoisted: { exclude: [] },
+        unused: { exclude: ["react", "react-dom"] },
+    },
+}
+```
+
+The React, Preact, Solid, Svelte, and Vue presets configure these excludes for you so peer runtimes aren't flagged as unused.
+
+## Disabling the checks
+
+Set a check to `false` to disable just that one, or set `dependencies` to `false` to disable both:
+
+```typescript
+// Disable only the unused check
+validation: {
+    dependencies: {
+        hoisted: { exclude: [] },
+        unused: false,
+    },
+}
+
+// Disable both dependency checks
+validation: {
+    dependencies: false,
+}
+```
+
+## Detecting duplicated packages
+
+A related check finds packages that get **bundled more than once** (for example, two different versions resolved through your dependency tree). It is enabled by default and configured separately under `rollup.detectDuplicated`:
+
+```typescript
+export default defineConfig({
+    transformer,
+    rollup: {
+        detectDuplicated: {
+            // Skip specific packages/versions. Use "*" to ignore all versions.
+            ignore: {
+                lodash: ["*"],
+            },
+            // Fail the build when duplicates are found.
+            throwErrorWhenDuplicated: false,
+        },
+    },
+})
+```
+
+See the [Duplicate packages](/docs/options/detect-duplicated) option for the full list of `detectDuplicated` settings.
+
+## Related Examples
+
+- [Package.json Validation](/docs/examples/configuration/package-validation) - Complete package.json validation setup
+- [Bundle Size Limits](/docs/examples/configuration/bundle-limits) - Set up bundle size validation and limits
+- [Duplicate packages](/docs/options/detect-duplicated) - Detect dependencies bundled more than once

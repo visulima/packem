@@ -1,0 +1,176 @@
+---
+title: Lightning CSS
+description: Fast CSS processing with Lightning CSS
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Lightning CSS
+
+[Lightning CSS](https://lightningcss.dev/) is a Rust-based CSS parser,
+transformer, and minifier. In Packem it is available two ways through
+[`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css): as a **loader**
+that transforms your CSS, and as a **minifier** for optimized output.
+
+## Overview
+
+This example demonstrates:
+
+- Using the Lightning CSS loader to transform CSS
+- Using Lightning CSS as the minifier
+- Configuring browser targets and draft features via the `lightningcss` option
+- CSS Modules support through Lightning CSS
+
+## Setup
+
+Install the `lightningcss` package.
+
+```bash
+npm install --save-dev lightningcss
+```
+
+### Directory Structure
+
+```
+my-package/
+├── src/
+│   ├── index.ts
+│   └── styles.css
+├── package.json
+└── packem.config.ts
+```
+
+### Source Files
+
+**src/styles.css**
+
+```css
+.card {
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+
+  /* CSS nesting, transformed by Lightning CSS */
+  .title {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+}
+```
+
+**src/index.ts**
+
+```typescript
+import './styles.css'
+
+export function createCard() {
+  const card = document.createElement('div')
+  card.className = 'card'
+  return card
+}
+```
+
+## Lightning CSS as a Loader
+
+Import the Lightning CSS loader and add it to `rollup.css.loaders`. The loader
+transforms CSS with Lightning CSS, including nesting and other modern features.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import lightningcssLoader from '@visulima/packem/css/loader/lightningcss'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [lightningcssLoader],
+    },
+  },
+})
+```
+
+### Loader Options
+
+Lightning CSS transform options are passed via the `lightningcss` option. It
+accepts the Lightning CSS `TransformOptions`, except for `code`, `filename`,
+`minify`, `targets`, and `cssModules`, which the loader manages internally.
+Browser `targets` are derived from your project's browserslist configuration.
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [lightningcssLoader],
+      lightningcss: {
+        // Enable draft-stage features
+        drafts: {
+          customMedia: true,
+        },
+      },
+    },
+  },
+})
+```
+
+### CSS Modules with Lightning CSS
+
+The Lightning CSS loader supports CSS Modules. Configure them through the
+`lightningcss.modules` option, which additionally accepts an `include` pattern
+for selecting module files.
+
+```typescript
+css: {
+  mode: 'extract',
+  loaders: [lightningcssLoader],
+  lightningcss: {
+    modules: {
+      // Treat *.module.* files as CSS Modules
+      include: /\.module\./,
+    },
+  },
+}
+```
+
+<Callout type="info">
+Lightning CSS does not resolve cross-file `composes from "..."` references. If
+you rely on those, use the [PostCSS loader](/docs/examples/css/postcss) for CSS
+Modules instead.
+</Callout>
+
+## Lightning CSS as a Minifier
+
+You can minify with Lightning CSS regardless of which loader processed the CSS.
+Import the minifier and assign it to the `minifier` option.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import lightningcssMinifier from '@visulima/packem/css/minifier/lightningcss'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      minifier: lightningcssMinifier,
+    },
+  },
+})
+```
+
+## Building
+
+```bash
+packem build
+```
+
+## Related
+
+- [Basic CSS](/docs/examples/css/basic)
+- [PostCSS](/docs/examples/css/postcss)
+- [CSS Processing guide](/docs/guide/css)

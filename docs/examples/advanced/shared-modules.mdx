@@ -1,0 +1,134 @@
+---
+title: Shared Modules
+description: Shared code between different bundles
+---
+
+# Shared Modules
+
+Sometimes you need to share code between bundles without exposing it as its own entry or export. Packem's shared module convention bundles such code into a single shared chunk that the different entry bundles reference.
+
+## Overview
+
+Name a source file using the convention `[name].[layer]-runtime.[ext]` and Packem will pull it into a separate **layer** chunk that matches the layer in the file name. That chunk is built once and referenced by every entry that imports it.
+
+This is especially valuable across multiple runtime bundles (for example `default` and `react-server`) where a module must keep a single shared instance across runtimes.
+
+:::note
+Shared Modules is an experimental feature. The layer in the file name (`shared` in `util.shared-runtime.js`) determines the shared chunk it lands in.
+:::
+
+## Project Structure
+
+```
+shared-modules-example/
+├── src/
+│   ├── index.ts
+│   ├── lite.ts
+│   └── util.shared-runtime.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Source Files
+
+**src/util.shared-runtime.ts**
+```typescript
+export function sharedUtil(): string {
+  return 'shared'
+}
+```
+
+**src/index.ts**
+```typescript
+import { sharedUtil as sharedUtility } from './util.shared-runtime'
+
+export function full() {
+  return sharedUtility()
+}
+```
+
+**src/lite.ts**
+```typescript
+import { sharedUtil as sharedUtility } from './util.shared-runtime'
+
+export function lite() {
+  return sharedUtility()
+}
+```
+
+Packem bundles `util.shared-runtime` into a separate `shared` layer chunk, which both `index` and `lite` reference instead of each inlining their own copy.
+
+## Sharing Across Runtimes
+
+The same convention keeps a single instance of a module across different runtime bundles, such as `default` and `react-server`:
+
+**src/app-context.shared-runtime.ts**
+```typescript
+'use client'
+
+import { createContext } from 'react'
+
+export const AppContext = createContext(null)
+```
+
+**src/index.ts**
+```typescript
+import { AppContext } from './app-context.shared-runtime'
+```
+
+**src/index.react-server.ts**
+```typescript
+import { AppContext } from './app-context.shared-runtime'
+```
+
+`app-context.shared-runtime` is bundled into one chunk with a single instance and is shared between the `default` and `react-server` bundles.
+
+## Configuration
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  declaration: true
+})
+```
+
+**package.json**
+```json
+{
+  "name": "@myorg/shared-modules",
+  "version": "1.0.0",
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs"
+    },
+    "./lite": {
+      "import": "./dist/lite.mjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^2"
+  }
+}
+```
+
+## Notes
+
+- The shared chunk is created only when a file matches the `[name].[layer]-runtime.[ext]` convention.
+- Pair this with [Multi-Runtime](/docs/examples/advanced/multi-runtime) when the shared module must keep one instance across `react-server`/`edge-light` bundles.
+- For lazy on-demand splitting instead of always-shared chunks, use [Dynamic Imports](/docs/examples/advanced/dynamic-imports).
+
+## Related
+
+- [Multi-Runtime](/docs/examples/advanced/multi-runtime)
+- [Dynamic Imports](/docs/examples/advanced/dynamic-imports)
+- [Multiple Exports](/docs/examples/multi-exports)

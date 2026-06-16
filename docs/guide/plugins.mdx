@@ -1,0 +1,132 @@
+---
+title: Plugins
+description: Extend Packem with custom plugins
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Plugins
+
+Packem builds on Rollup, so you can extend a build with any Rollup plugin. User plugins are registered through the `rollup.plugins` option, where each entry describes the plugin, when it runs relative to Packem's built-in plugins, and which build it applies to.
+
+## Adding a plugin
+
+Each entry in `rollup.plugins` is an object with a `plugin` property holding the Rollup plugin instance:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import inject from '@rollup/plugin-inject'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    plugins: [
+      { plugin: inject({ Buffer: ['buffer', 'Buffer'] }) },
+    ],
+  },
+})
+```
+
+## Plugin shape
+
+The `rollup.plugins` array accepts objects with the following properties:
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `plugin` | `Plugin` | The Rollup plugin instance. |
+| `enforce` | `"pre"` \| `"post"` | When the plugin runs relative to Packem's built-in plugins. Omit for the normal position. |
+| `type` | `"build"` \| `"dts"` | Which build the plugin applies to. Defaults to the JavaScript (`build`) bundle. |
+
+## Enforce order
+
+`enforce` controls where the plugin sits in the pipeline relative to Packem's own plugins:
+
+- `"pre"` — runs **before** the built-in plugins.
+- `"post"` — runs **after** the built-in plugins.
+- omitted — runs in the **normal** position, between pre and post.
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    plugins: [
+      { enforce: 'pre', plugin: myEarlyPlugin() },
+      { plugin: myNormalPlugin() },
+      { enforce: 'post', plugin: myLatePlugin() },
+    ],
+  },
+})
+```
+
+## Targeting the build or declaration output
+
+Packem runs two passes: the JavaScript bundle (`build`) and the TypeScript declaration bundle (`dts`). The `type` property decides which pass a plugin participates in:
+
+- `type: "build"` (or omitted) — applies to the JavaScript bundle only.
+- `type: "dts"` — applies to the declaration (`.d.ts`) build only.
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    plugins: [
+      // Only runs during the JavaScript build
+      { plugin: jsOnlyPlugin() },
+      // Only runs during declaration generation
+      { type: 'dts', plugin: dtsOnlyPlugin() },
+    ],
+  },
+})
+```
+
+<Callout type="info">
+A plugin with no `type` is applied to the `build` bundle, not the declaration build. To process the declaration output, set `type: "dts"` explicitly.
+</Callout>
+
+## A custom plugin
+
+Any object that satisfies Rollup's plugin interface works:
+
+```typescript
+import type { Plugin } from 'rollup'
+
+function bannerPlugin(): Plugin {
+  return {
+    name: 'banner',
+    renderChunk(code) {
+      return `/* built with packem */\n${code}`
+    },
+  }
+}
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    plugins: [
+      { plugin: bannerPlugin() },
+    ],
+  },
+})
+```
+
+<Callout type="info">
+For prepending or appending text to the output, Packem also has dedicated `banner` and `footer` options that target the JavaScript and declaration files independently.
+</Callout>
+
+## Babel and framework presets
+
+Babel-based framework transforms (React, SolidJS, Preact, Vue, Svelte) are not registered through `rollup.plugins`. They are wired up via the `rollup.babel` option or a [preset](/docs/guide/react), which run Babel **before** the main transformer. Babel transforms can also run across a pool of worker threads for larger builds:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `parallel` | `true` | `false` always transforms in-process; `true` auto-enables workers above the threshold; a number caps the worker count. |
+| `parallelThreshold` | `20` | Number of matched files required before the worker pool is created. |
+
+Parallel mode requires fully serializable Babel options. If a non-serializable option is present (for example a plugin passed as a live function), Packem silently falls back to in-process transforms.
+
+## Next steps
+
+- [Plugins option](/docs/options/plugins) — the option reference.
+- [React Support](/docs/guide/react) — framework presets and the Babel pipeline.
+- [Optimization](/docs/guide/optimization) — bundle analysis and minification.

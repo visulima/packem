@@ -1,0 +1,110 @@
+---
+title: sucrase
+description: Simple and fast alternative to Babel
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# sucrase Transformer
+
+The **sucrase** transformer is a lightweight, JavaScript-based alternative to Babel. It focuses on speed and simplicity with a deliberately smaller feature set, making it a good fit for straightforward TypeScript projects.
+
+## Overview
+
+This example shows how to build a simple TypeScript library with the sucrase transformer. Sucrase options are exposed through `rollup.sucrase`, mapping directly to sucrase's own `transforms` and related options.
+
+sucrase handles:
+
+- TypeScript type stripping
+- Basic JSX transformation
+- Fast, single-pass compilation with minimal overhead
+
+<Callout type="warning">
+sucrase does **not** support decorators or advanced transformations. If you need decorators or decorator metadata, use the [swc transformer](/docs/examples/transformers/swc) instead.
+</Callout>
+
+## When to Use
+
+- Simple TypeScript projects without decorators
+- Lightweight packages that prioritize a minimal toolchain
+- Rapid prototyping, tutorials, and educational projects
+
+## Project Setup
+
+### Directory Structure
+
+```
+my-lib/
+├── src/
+│   └── index.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+### Packem Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/sucrase'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    sucrase: {
+      // Which sucrase transforms to run
+      transforms: ['typescript'],
+      // Skip down-leveling of modern ES syntax for faster builds
+      disableESTransforms: true,
+      // Enable production mode (removes development-only JSX output)
+      production: true
+    }
+  }
+})
+```
+
+For a project that also uses JSX, add the `jsx` transform:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/sucrase'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    sucrase: {
+      transforms: ['typescript', 'jsx'],
+      jsxRuntime: 'automatic'
+    }
+  }
+})
+```
+
+<Callout type="info">
+Packem already derives a sensible sucrase configuration from your tsconfig — it adds the `jsx` transform automatically when your tsconfig `jsx` option is a React variant, and sets `production` from the build environment. The examples above show the options explicitly so you can see what is configurable.
+</Callout>
+
+### Minimal Configuration
+
+The transformer alone works out of the box for TypeScript projects:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/sucrase'
+
+export default defineConfig({
+  transformer
+})
+```
+
+## Building
+
+```bash
+packem build
+```
+
+## Notes
+
+- sucrase feeds Rollup, which requires ESM input — Packem therefore never enables the `imports` transform (it would rewrite ESM to `require()` and break Rollup's static module graph).
+- By default Packem sets `disableESTransforms: true`, `preserveDynamicImport: true`, and derives `enableLegacyTypeScriptModuleInterop` from your tsconfig `esModuleInterop` setting.
+- Source map quality is more basic than esbuild or swc; sucrase is best for projects where compilation speed and simplicity matter more than advanced output features.

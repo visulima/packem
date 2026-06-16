@@ -1,0 +1,136 @@
+---
+title: Stylus
+description: Stylus with expressive syntax
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Stylus
+
+Packem compiles `.styl` files through the Stylus loader in
+[`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css). The loader extends
+the Stylus `RenderOptions` with extra helpers for include paths, plugins, and
+shared data.
+
+## Overview
+
+This example demonstrates:
+
+- Compiling Stylus with its indentation-based syntax
+- Registering the Stylus loader in `packem.config.ts`
+- Configuring include paths, plugins, and prepended data
+
+## Setup
+
+The Stylus loader requires the `stylus` package.
+
+```bash
+npm install --save-dev stylus
+```
+
+### Directory Structure
+
+```
+my-package/
+├── src/
+│   ├── index.ts
+│   └── styles.styl
+├── package.json
+└── packem.config.ts
+```
+
+### Source Files
+
+**src/styles.styl**
+
+```stylus
+primary-color = #007bff
+border-radius = 0.25rem
+
+button-style(bg-color)
+  background-color bg-color
+  color white
+  padding 0.5rem 1rem
+  border none
+  border-radius border-radius
+  cursor pointer
+
+  &:hover
+    background-color darken(bg-color, 10%)
+
+.btn-primary
+  button-style(primary-color)
+```
+
+**src/index.ts**
+
+```typescript
+import './styles.styl'
+
+export function createButton() {
+  const button = document.createElement('button')
+  button.className = 'btn-primary'
+  button.textContent = 'Click me'
+  return button
+}
+```
+
+## Configuration
+
+Register the Stylus loader by importing it and adding it to
+`rollup.css.loaders`. The `stylus` option extends Stylus `RenderOptions` with
+loader-specific fields.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import stylusLoader from '@visulima/packem/css/loader/stylus'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [stylusLoader],
+      stylus: {
+        // Additional include paths
+        include: ['node_modules', 'src/styles'],
+        // Pre-defined variables/functions on the renderer
+        define: { 'primary-color': '#007bff' },
+        // Plugins applied via .use()
+        use: ['nib'],
+      },
+    },
+  },
+})
+```
+
+The Stylus loader adds several options on top of the standard Stylus render
+options:
+
+- `additionalData` — prepend or append Stylus code (shared variables/mixins)
+  before compilation
+- `define` — pre-define variables/functions on the renderer
+- `import` — files to pre-import before compiling
+- `include` — additional include paths
+- `includeCSS` — include regular CSS on `@import`
+- `lineNumbers` — emit comments with the source Stylus line
+- `use` — Stylus plugins to apply
+
+<Callout type="info">
+See the
+[Stylus JS API documentation](https://stylus-lang.com/docs/js.html) for the
+underlying render options.
+</Callout>
+
+## Building
+
+```bash
+packem build
+```
+
+## Related
+
+- [Sass/SCSS](/docs/examples/css/sass)
+- [Less](/docs/examples/css/less)
+- [CSS Processing guide](/docs/guide/css)

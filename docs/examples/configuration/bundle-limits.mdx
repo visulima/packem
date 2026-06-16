@@ -1,0 +1,103 @@
+---
+title: Bundle Size Limits
+description: Set up bundle size validation and limits
+---
+
+# Bundle Size Limits
+
+This example shows how to enforce bundle size budgets with Packem's `validation.bundleLimit` option. You can set a single limit for the whole build, per-file (or per-glob) limits, and decide whether exceeding a limit should fail the build or only warn.
+
+## Overview
+
+This example demonstrates:
+- Setting a total bundle size budget
+- Setting per-file and per-glob size limits
+- Mixing byte numbers and human-readable strings (e.g. `"1MB"`)
+- Controlling whether limit violations fail the build (`allowFail`)
+
+## Configuration
+
+```typescript
+// packem.config.ts
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+    transformer,
+    validation: {
+        bundleLimit: {
+            // Total size budget across all build entries.
+            // Accepts a number of bytes or a string with a unit.
+            limit: "1MB",
+
+            // Per-file / per-glob limits. The key is matched against the
+            // output path (relative to outDir) or as a glob pattern.
+            limits: {
+                "**/*.mjs": "500KB",
+                "index.cjs": 1048576, // 1MB in bytes
+            },
+
+            // When true, the build still succeeds and a warning is emitted
+            // instead of failing when a limit is exceeded.
+            // @default false
+            allowFail: false,
+        },
+    },
+})
+```
+
+## Size units
+
+The `limit` and each value in `limits` accept either:
+
+- A number of bytes, e.g. `1048576`
+- A string with a unit suffix: `"B"`, `"KB"`, `"MB"`, `"GB"`, or `"TB"`, e.g. `"500KB"`, `"1MB"`
+
+```typescript
+bundleLimit: {
+    limit: 1048576,   // exact byte count
+    // or
+    limit: "1MB",     // parsed to bytes for you
+}
+```
+
+## How `limits` keys are matched
+
+Each key in `limits` is matched against your build output. Packem first strips a leading `outDir` segment, then checks whether an output entry's path **ends with** the key, falling back to glob matching:
+
+- `"index.cjs"` matches the emitted `index.cjs` entry
+- `"**/*.mjs"` matches every emitted `.mjs` file via glob
+
+If a key matches no output entry, it is skipped (a debug message is logged) rather than failing the build.
+
+## Failing vs. warning
+
+By default a violation is reported and the build is treated as failed. Set `allowFail: true` to downgrade violations to warnings so the build still completes:
+
+```typescript
+validation: {
+    bundleLimit: {
+        limit: "250KB",
+        allowFail: true, // warn, but do not fail the build
+    },
+}
+```
+
+## Running the build
+
+```bash
+packem build
+```
+
+If the total output or a matched file exceeds its limit, Packem reports the actual size against the limit, for example:
+
+```text
+Total file size exceeds the limit: 1.4 MB / 1.00 MB
+File size exceeds the limit: dist/index.cjs (1.2 MB / 1.00 MB)
+```
+
+## Related Examples
+
+- [Package.json Validation](/docs/examples/configuration/package-validation) - Complete package.json validation setup
+- [Dependency Validation](/docs/examples/configuration/dependency-validation) - Validate dependencies and detect issues
+- [Extra Conditions](/docs/examples/configuration/extra-conditions) - Configure custom export conditions

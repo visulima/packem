@@ -1,0 +1,96 @@
+---
+title: "@visulima/css-style-inject"
+description: Runtime CSS injection utility
+---
+
+# @visulima/css-style-inject
+
+A small runtime utility that injects a `<style>` tag into the document head (or a custom container). It is the default injector used by [`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css) in `inject` mode, and supports server-side rendering by collecting CSS into a global store when `document` is unavailable.
+
+This package is ESM-only (`"type": "module"` with no CommonJS exports) and requires Node.js `^22.14.0 || >= 24.10.0`.
+
+## Installation
+
+```bash
+npm install @visulima/css-style-inject
+```
+
+## Exports
+
+The package root exports one function and one constant:
+
+```typescript
+import { cssStyleInject, SSR_INJECT_ID } from '@visulima/css-style-inject'
+```
+
+### `cssStyleInject(css, options?)`
+
+Injects the given CSS. In the browser it creates and inserts a `<style>` tag; during SSR (when `document` is `undefined`) it stores the CSS on a global array for later rendering. Returns `void`. Empty CSS is a no-op.
+
+```typescript
+const cssStyleInject = (
+  css: string,
+  options?: {
+    attributes?: Record<string, string>
+    container?: string
+    id?: string
+    insertAt?: number | 'first' | 'last' | { before: string }
+    nonce?: string
+    singleTag?: boolean
+  },
+) => void
+```
+
+```typescript
+import { cssStyleInject } from '@visulima/css-style-inject'
+
+cssStyleInject('body { margin: 0; }', { id: 'reset' })
+```
+
+#### Options
+
+- **id** (`string`) — Unique identifier for the style tag. Prevents duplicate injection: in the browser, injection is skipped if an element with the same `id` already exists; during SSR, a module with an already-seen `id` is not stored again.
+- **insertAt** (`number | 'first' | 'last' | { before: string }`, default `'last'`) — Where to insert the tag. A `number` inserts at that index (`0` = first child); a negative number counts from the end, so `-1` appends after the last child. `'first'`/`'last'` insert as first/last child. `{ before: selector }` inserts before the first element matching the selector (falls back to last position if none matches).
+- **singleTag** (`boolean`, default `false`) — Reuse a single cached `<style>` tag per container/`insertAt` key instead of creating a new one per call.
+- **container** (`string`) — CSS selector for the container element. Defaults to the document head.
+- **attributes** (`Record<string, string>`) — Extra attributes to set on the `<style>` tag. The reserved keys `id`, `type`, `nonce`, and any `on*` event-handler attributes are ignored for safety.
+- **nonce** (`string`) — Nonce value for CSP compliance. Set via the IDL property so it is not reflected into a readable DOM attribute.
+
+### `SSR_INJECT_ID`
+
+The constant key (`"__styleInject_SSR_MODULES"`) under which collected CSS is stored on `globalThis` during SSR. Use it to render the gathered styles on the server.
+
+```typescript
+const SSR_INJECT_ID = '__styleInject_SSR_MODULES'
+```
+
+#### SSR usage (Next.js example)
+
+```jsx
+// pages/_document.js
+import React from 'react'
+import { SSR_INJECT_ID } from '@visulima/css-style-inject'
+
+const SSRInjectStyles = () => {
+  if (!globalThis[SSR_INJECT_ID]) return null
+
+  return (
+    <>
+      {globalThis[SSR_INJECT_ID].map((module) => (
+        <style
+          id={module.id}
+          key={module.id}
+          dangerouslySetInnerHTML={{ __html: module.css }}
+        />
+      ))}
+    </>
+  )
+}
+```
+
+Each stored entry has the shape `{ css: string; id?: string }`.
+
+## Related
+
+- [@visulima/rollup-plugin-css](/docs/api/rollup-plugin-css)
+- [CSS Processing Guide](/docs/guide/css)

@@ -1,0 +1,151 @@
+---
+title: Sass/SCSS
+description: Sass preprocessing with variables and mixins
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
+
+# Sass/SCSS
+
+Packem compiles `.scss` and `.sass` files through the Sass loader in
+[`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css). It supports both
+Dart Sass (`sass`) and the faster `sass-embedded` implementation.
+
+## Overview
+
+This example demonstrates:
+
+- Compiling SCSS with variables, mixins, and nesting
+- Registering the Sass loader in `packem.config.ts`
+- Configuring the Sass implementation and compiler options
+
+## Setup
+
+The Sass loader requires a Sass implementation. Install either `sass` or
+`sass-embedded`.
+
+<Tabs items={['Dart Sass', 'Embedded Sass']}>
+  <Tab value="Dart Sass">
+    ```bash
+    npm install --save-dev sass
+    ```
+  </Tab>
+  <Tab value="Embedded Sass">
+    ```bash
+    npm install --save-dev sass-embedded
+    ```
+  </Tab>
+</Tabs>
+
+### Directory Structure
+
+```
+my-package/
+├── src/
+│   ├── index.ts
+│   └── styles.scss
+├── package.json
+└── packem.config.ts
+```
+
+### Source Files
+
+**src/styles.scss**
+
+```scss
+$primary-color: #007bff;
+$border-radius: 0.25rem;
+
+@mixin button-style($bg-color) {
+  background-color: $bg-color;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: $border-radius;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($bg-color, 10%);
+  }
+}
+
+.btn-primary {
+  @include button-style($primary-color);
+}
+```
+
+**src/index.ts**
+
+```typescript
+import './styles.scss'
+
+export function createButton() {
+  const button = document.createElement('button')
+  button.className = 'btn-primary'
+  button.textContent = 'Click me'
+  return button
+}
+```
+
+## Configuration
+
+Register the Sass loader by importing it and adding it to `rollup.css.loaders`.
+The `sass` option accepts the Sass loader options, which extend the Sass
+compiler's `StringOptions`.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import sassLoader from '@visulima/packem/css/loader/sass'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [sassLoader],
+      sass: {
+        implementation: 'sass', // or 'sass-embedded'
+      },
+    },
+  },
+})
+```
+
+### Compiler Options
+
+The `sass` option forwards options to the underlying Sass compiler. The loader
+also adds an `additionalData` hook for prepending shared variables or mixins to
+every file, an `implementation` switch, and `warnRuleAsWarning`.
+
+```typescript
+css: {
+  mode: 'extract',
+  loaders: [sassLoader],
+  sass: {
+    implementation: 'sass-embedded',
+    // Prepend shared variables/mixins to every entry file
+    additionalData: `@use "src/styles/_variables.scss" as *;`,
+    // Forwarded to the Sass compiler
+    style: 'compressed',
+  },
+}
+```
+
+<Callout type="info">
+The `charset` and `indentedSyntax` options are managed by the loader and cannot
+be set directly. Use the `.sass` extension for indented syntax files.
+</Callout>
+
+## Building
+
+```bash
+packem build
+```
+
+## Related
+
+- [Less](/docs/examples/css/less)
+- [Stylus](/docs/examples/css/stylus)
+- [CSS Processing guide](/docs/guide/css)

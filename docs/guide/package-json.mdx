@@ -1,0 +1,220 @@
+---
+title: Package.json Setup
+description: Configure your package.json for optimal bundling
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
+
+# Package.json Setup
+
+Packem reads your `package.json` to decide **what** to build and **how**. Entry points, output formats, and declaration paths are all derived from the standard fields — `exports`, `main`, `module`, `types`, and `bin` — so there is no duplicate configuration between your build and your package's public API.
+
+## How entries are detected
+
+Packem recognizes a file convention: files in your `src` folder are treated as entry files and matched against the export names in `package.json`.
+
+- `src/index.ts` matches the export name `"."` (the main export).
+- The output **format** is chosen from the exports condition and the file extension:
+  - CommonJS for `require`, ESM for `import` (by condition).
+  - CommonJS for `.cjs`, ESM for `.mjs` (by extension, regardless of condition).
+
+<Callout type="info">
+The `src` source directory and the `dist` output directory are both configurable in your `packem.config.ts`. See [Source Directory](/docs/options/source-dir) and [Output Directory](/docs/options/output-directory).
+</Callout>
+
+## The `exports` field
+
+The [`exports` field](https://nodejs.org/api/packages.html#exports-sugar) defines conditions that map consumers to the right file. Packem builds an output for each condition it finds and matches it to the corresponding source file.
+
+```json
+{
+  "files": ["dist"],
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "build": "packem build"
+  }
+}
+```
+
+### Subpath exports
+
+Add more keys to `exports` to expose multiple entry points. Each subpath maps to its own source file under `src`.
+
+<Tabs items={["ESM only", "Dual (ESM + CJS)"]}>
+  <Tab value="ESM only">
+    ```json
+    {
+      "type": "module",
+      "files": ["dist"],
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./utils": {
+          "types": "./dist/utils.d.ts",
+          "default": "./dist/utils.js"
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab value="Dual (ESM + CJS)">
+    ```json
+    {
+      "files": ["dist"],
+      "main": "./dist/index.cjs",
+      "module": "./dist/index.mjs",
+      "exports": {
+        ".": {
+          "import": {
+            "types": "./dist/index.d.mts",
+            "default": "./dist/index.mjs"
+          },
+          "require": {
+            "types": "./dist/index.d.cts",
+            "default": "./dist/index.cjs"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+See the [Entry option](/docs/options/entry) for the full entry-inference reference.
+
+## `main` and `module`
+
+`main` and `module` are recognized alongside `exports` to define entry points. They are most useful for the older resolution algorithm and for consumers that do not read the `exports` map.
+
+```json
+{
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs"
+}
+```
+
+## `types`
+
+When building a TypeScript library, point the `types` field at the declaration file for your main entry. Packem generates the declaration files automatically.
+
+```json
+{
+  "types": "./dist/index.d.ts"
+}
+```
+
+When you use `.mjs`/`.cjs` outputs with modern module resolution (`node16` or above), TypeScript expects extension-matched declaration files (`.d.mts` / `.d.cts`). Packem generates the right declaration files to match each condition and extension:
+
+```json
+{
+  "files": ["dist"],
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+See [TypeScript](/docs/guide/typescript) and [Declaration Files](/docs/options/declaration-files) for details.
+
+## `bin` — executables
+
+Use the `bin` field to build executables. The source-file matching follows the same convention as regular entries.
+
+<Callout type="info">
+Packem automatically preserves and prepends the shebang to the executable file, and sets the correct executable permissions.
+</Callout>
+
+A single binary maps `src/bin/index.ts` to the configured output:
+
+```
+|- src/
+  |- bin/
+    |- index.ts
+```
+
+```json
+{
+  "bin": "./dist/bin/index.cjs"
+}
+```
+
+Use `.mjs` when `"type": "module"` is set:
+
+```json
+{
+  "type": "module",
+  "bin": "./dist/bin/index.mjs"
+}
+```
+
+Multiple binaries each map to their own source file:
+
+```
+|- src/
+  |- bin/
+    |- foo.ts
+    |- bar.ts
+```
+
+```json
+{
+  "bin": {
+    "foo": "./dist/bin/foo.cjs",
+    "bar": "./dist/bin/bar.cjs"
+  }
+}
+```
+
+## `typesVersions` (Node 10 compatibility)
+
+To support the legacy Node 10 type resolution, Packem can generate a `typesVersions` map for you. Enable it through `node10Compatibility` in your config:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  node10Compatibility: {
+    typeScriptVersion: '>=5.0', // the TypeScript version you want to support
+    writeToPackageJson: true,
+  },
+})
+```
+
+## `files`
+
+List `dist` (or your output directory) in the `files` array so the built output is included when the package is published:
+
+```json
+{
+  "files": ["dist"]
+}
+```
+
+## External dependencies
+
+All `dependencies` and `peerDependencies` are marked as external automatically and are not included in the bundle. To bundle them instead, pass the `--no-external` flag or configure [Dependencies](/docs/options/externals).
+
+## Validation
+
+Packem can validate that your `package.json` fields point at files that were actually built. See the package validation examples for [Package.json validation](/docs/examples/configuration/package-validation) and [extra export conditions](/docs/examples/configuration/extra-conditions).
+
+## Next steps
+
+- [TypeScript](/docs/guide/typescript) — declaration generation and isolated declarations.
+- [Multi-Runtime](/docs/guide/multi-runtime) — conditional exports for different runtimes.
+- [Entry option](/docs/options/entry) — the full entry reference.
