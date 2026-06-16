@@ -11,6 +11,10 @@ import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
 
+// Leading `"use client"` / `'use client'`, tolerant of bundler quote style.
+const USE_CLIENT_DIRECTIVE_RE = /^['"]use client['"];/;
+const USE_SUKKA_DIRECTIVE_RE = /['"]use sukka['"];/;
+
 describe("packem preserve-directives", () => {
     let temporaryDirectoryPath: string;
 
@@ -169,7 +173,7 @@ export default Tr;`,
         // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown's native oxc transform emits the dev JSX runtime (jsxDEV, with `_jsxFileName`) under --development, while rollup uses esbuild (production jsx). This test asserts directive preservation; the dev-runtime body shape is not normalize-able.
         if (isRolldown) {
             // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above; the `"use client"` directive must be hoisted onto the entry regardless of jsx runtime shape
-            expect(/^['"]use client['"];/.test(mjsContent)).toBe(true);
+            expect(USE_CLIENT_DIRECTIVE_RE.test(mjsContent)).toBe(true);
         } else {
             // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above
             expect(normalizeBundleOutput(mjsContent)).toBe(`'use client';
@@ -341,9 +345,9 @@ console.log("Hello, cli!");
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Leading `"use client"` / `'use client'`, tolerant of bundler quote style.
-        expect(/^['"]use client['"];/.test(mjsContent)).toBe(true);
+        expect(USE_CLIENT_DIRECTIVE_RE.test(mjsContent)).toBe(true);
         // The second directive of the multi-directive module is preserved too.
-        expect(/['"]use sukka['"];/.test(mjsContent)).toBe(true);
+        expect(USE_SUKKA_DIRECTIVE_RE.test(mjsContent)).toBe(true);
         // The implementation survives (sanity check that we did not corrupt the module).
         expect(mjsContent.includes("widget")).toBe(true);
     });

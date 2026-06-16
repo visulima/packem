@@ -10,7 +10,7 @@ import { createFilter } from "@rollup/pluginutils";
 import MagicString from "magic-string";
 import type { Plugin, SourceMap } from "rollup";
 
-export type PreserveDirectivesPluginOptions = {
+type PreserveDirectivesPluginOptions = {
     directiveRegex: RegExp;
     exclude?: FilterPattern;
     include?: FilterPattern;
@@ -54,6 +54,9 @@ const MODULE_LEVEL_DIRECTIVE_MESSAGE_RE = /"([^"]*)"|'([^']*)'/;
  * estree's ExpressionStatement `start`/`end` (start at the opening quote, end
  * after the terminating `;` when present, otherwise after the closing quote).
  */
+// Intricate single-pass prologue scanner; splitting it would obscure the
+// byte-identical span semantics it deliberately mirrors from estree.
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const scanLeadingDirectives = (code: string): ScannedDirective[] => {
     const directives: ScannedDirective[] = [];
     const { length } = code;
@@ -62,6 +65,7 @@ const scanLeadingDirectives = (code: string): ScannedDirective[] => {
     // Advance past whitespace and comments. When `allowNewlines` is false the
     // scan stops at the first line terminator (used to find a same-line
     // statement terminator after a string literal).
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     const skipTrivia = (allowNewlines: boolean): void => {
         while (index < length) {
             const char = code[index] as string;
@@ -251,7 +255,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                     // single quotes are escaped so a directive value containing them
                     // cannot break out of the literal and inject statements.
                     magicString.prepend(
-                        `${Array.from(outputDirectives, (directive) => `'${directive.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}';`).join("\n")}\n`,
+                        `${Array.from(outputDirectives, (directive) => `'${directive.replaceAll("\\", String.raw`\\`).replaceAll("'", String.raw`\'`)}';`).join("\n")}\n`,
                     );
                 }
 
@@ -422,3 +426,5 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
         },
     };
 };
+
+export type { PreserveDirectivesPluginOptions };
