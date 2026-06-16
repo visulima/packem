@@ -464,7 +464,7 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                 const instance = jsxRemoveAttributes({
                     attributes: context.options.rollup.jsxRemoveAttributes.attributes,
                     logger: getLogger(context),
-                    ...(isRolldown ? { mode: "renderChunk" as const } : {}),
+                    ...isRolldown ? { mode: "renderChunk" as const } : {},
                 });
 
                 // Only the rollup transform path is cacheable; the rolldown path

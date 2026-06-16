@@ -2,8 +2,10 @@ import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getCacheHash, getChunkFilename, getDtsExtension } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
-import type { OutputBundle, Plugin, RollupCache } from "rollup";
+import type { OutputBundle, Plugin, RollupBuild, RollupCache } from "rollup";
 
+import { getRolldownBuild } from "../rolldown/get-rolldown";
+import { getRolldownDtsOptions } from "../rolldown/get-rolldown-options";
 import { getRollupDtsOptions } from "../rollup/get-rollup-options";
 import type { BuildEntry, InternalBuildOptions } from "../types";
 import { getRollupBuild } from "./get-rollup";
@@ -140,43 +142,63 @@ const resolveEntryExtensions = (entry: BuildEntry, context: BuildContext<Interna
     return result;
 };
 
-// DTS is rollup-only because @visulima/rollup-plugin-dts depends on rollup
-// option shapes (treeshake.preset, generatedCode.arrowFunctions, compact…)
-// that rolldown rejects. The factory parameter keeps the seam visible so the
-// caller can swap it once a rolldown-compatible DTS plugin lands.
+// DTS build routes through rolldown or rollup depending on the configured bundler.
+// Both backends use `@visulima/rollup-plugin-dts` (plan 014: the plugin is
+// rolldown-compatible). The rolldown path omits serializable cache (rolldown manages
+// its own incremental state) and strips the worktree-path region comments that
+// rolldown injects into declaration chunks (via stripRolldownRegionCommentsPlugin).
 const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): Promise<void> => {
-    const rollupTypeOptions = await getRollupDtsOptions(context, fileCache);
+    const isRolldown = context.options.bundler === "rolldown";
 
-    await context.hooks.callHook("rollup:dts:options", context, rollupTypeOptions);
+    const typeOptions = isRolldown
+        ? await getRolldownDtsOptions(context, fileCache)
+        : await getRollupDtsOptions(context, fileCache);
 
-    if (Object.keys(rollupTypeOptions.input ?? {}).length === 0) {
+    await context.hooks.callHook("rollup:dts:options", context, typeOptions);
+
+    if (Object.keys(typeOptions.input ?? {}).length === 0) {
         return;
     }
 
-    // Isolate the DTS rollup cache per entry-set, not just per `subDirectory`.
-    // Several entry-groups can share a runtime (e.g. the default, browser and
-    // development conditions of one package are all `browser`), so they share the
-    // same `subDirectory`. `@visulima/rollup-plugin-dts` carries TypeScript program
-    // state in its rollup cache; sharing one cache slot across those concurrent
-    // builds lets them clobber each other — the default entry's declaration
-    // collapses and a sibling's chunk (`index.development.d`) is written in place
-    // of the real `index.d.ts`. Keying the cache on the build's entry names gives
-    // each DTS build its own slot.
-    const dtsCacheNamespace = `${subDirectory}/${getCacheHash(
-        context.options.entries
-            .map((entry) => entry.name ?? "")
-            .filter(Boolean)
-            .toSorted((a, b) => a.localeCompare(b))
-            .join(","),
-    )}`;
+    let typesBuild: RollupBuild;
+    let dtsCacheNamespace: string | undefined;
 
-    rollupTypeOptions.cache = fileCache.get<RollupCache>(DTS_CACHE_KEY, dtsCacheNamespace);
+    if (isRolldown) {
+        // Rolldown DTS: no serializable cache — rolldown manages its own incremental
+        // state internally. The options builder (getRolldownDtsOptions) already
+        // omits the `cache` property.
+        const rolldown = await getRolldownBuild();
 
-    const rollup = await getRollupBuild();
-    const typesBuild = await rollup(rollupTypeOptions);
+        typesBuild = (await rolldown(typeOptions)) as unknown as RollupBuild;
+    } else {
+        // Isolate the DTS rollup cache per entry-set, not just per `subDirectory`.
+        // Several entry-groups can share a runtime (e.g. the default, browser and
+        // development conditions of one package are all `browser`), so they share the
+        // same `subDirectory`. `@visulima/rollup-plugin-dts` carries TypeScript program
+        // state in its rollup cache; sharing one cache slot across those concurrent
+        // builds lets them clobber each other — the default entry's declaration
+        // collapses and a sibling's chunk (`index.development.d`) is written in place
+        // of the real `index.d.ts`. Keying the cache on the build's entry names gives
+        // each DTS build its own slot.
+        dtsCacheNamespace = `${subDirectory}/${getCacheHash(
+            context.options.entries
+                .map((entry) => entry.name ?? "")
+                .filter(Boolean)
+                .toSorted((a, b) => a.localeCompare(b))
+                .join(","),
+        )}`;
+
+        typeOptions.cache = fileCache.get<RollupCache>(DTS_CACHE_KEY, dtsCacheNamespace);
+
+        const rollup = await getRollupBuild();
+
+        typesBuild = await rollup(typeOptions);
+    }
 
     try {
-        fileCache.set(DTS_CACHE_KEY, typesBuild.cache, dtsCacheNamespace);
+        if (!isRolldown && dtsCacheNamespace !== undefined) {
+            fileCache.set(DTS_CACHE_KEY, typesBuild.cache, dtsCacheNamespace);
+        }
 
         await context.hooks.callHook("rollup:dts:build", context, typesBuild);
 

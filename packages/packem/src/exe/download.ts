@@ -14,6 +14,9 @@ import { getArchiveExtension, getBinaryPathInArchive, getDownloadUrl, resolveNod
 
 const debug = createDebug();
 
+// Splits a SHASUMS256.txt line on its run of whitespace separating hash and name.
+const WHITESPACE_REGEX = /\s+/;
+
 /**
  * Fetches `SHASUMS256.txt` for the given Node.js version and returns the
  * expected sha256 hex digest for the named archive file.
@@ -37,7 +40,7 @@ const fetchExpectedChecksum = async (nodeVersion: string, archiveFileName: strin
 
     // Each line is `<sha256>  <filename>` (two spaces).
     for (const line of shasums.split("\n")) {
-        const [hash, name] = line.trim().split(/\s+/);
+        const [hash, name] = line.trim().split(WHITESPACE_REGEX);
 
         if (name === archiveFileName && hash) {
             return hash.toLowerCase();

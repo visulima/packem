@@ -48,7 +48,8 @@ const normalizeModulesExports = (
         for (const composed of entry.composes) {
             if (composed.type === "local" || composed.type === "global") {
                 parts.push(composed.name);
-            } else if (composed.type === "dependency") {
+            } else {
+                // composed.type === "dependency": cross-file composes are dropped here.
                 droppedComposes.add(name);
             }
         }
@@ -59,9 +60,9 @@ const normalizeModulesExports = (
     if (droppedComposes.size > 0 && logger) {
         logger.warn({
             message:
-                `lightningcss dropped cross-file \`composes\` for ${[...droppedComposes].map((n) => `\`${n}\``).join(", ")} in ${id}. ` +
-                `The generated class names will be missing the composed names. ` +
-                `Use the postcss loader if you rely on cross-file \`composes from "..."\`.`,
+                `lightningcss dropped cross-file \`composes\` for ${[...droppedComposes].map((n) => `\`${n}\``).join(", ")} in ${id}. `
+                + `The generated class names will be missing the composed names. `
+                + `Use the postcss loader if you rely on cross-file \`composes from "..."\`.`,
             plugin: "lightningcss",
         });
     }

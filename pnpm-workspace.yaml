@@ -420,7 +420,7 @@ overrides:
   lodash@<=4.17.23: ">=4.18.0"
   lodash@>=4.0.0 <=4.17.22: ">=4.17.23"
   lodash@>=4.0.0 <=4.17.23: ">=4.18.0"
-  markdown-it@<14.1.2: ">=14.1.2"
+  markdown-it@<=14.1.1: ">=14.2.0"
   minimatch@<3.1.3: ">=3.1.3"
   minimatch@<3.1.4: ">=3.1.4"
   minimatch@>=10.0.0 <10.2.1: ">=10.2.1"
@@ -436,7 +436,6 @@ overrides:
   svelte@<=5.55.6: ">=5.55.7"
   svelte@>=5.46.0 <=5.55.6: ">=5.55.7"
   svelte@>=5.51.5 <=5.55.6: ">=5.55.7"
-  tmp@<0.2.6: ^0.2.6
   tmp@<0.2.7: ">=0.2.7"
   # Force a single typescript version across the whole dep graph. Without this, deps that pin
   # an older 6.0.x (e.g. @anolilab/eslint-config, @sxzz/test-utils) pull typescript@6.0.2 while

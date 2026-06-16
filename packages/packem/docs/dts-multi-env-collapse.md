@@ -12,17 +12,17 @@ shared declaration file** but uses **different JS files per condition**, e.g.
 
 ```jsonc
 {
-  "exports": {
-    "types": "./dist/index.d.ts",
-    "workerd": { "types": "./dist/index.d.ts", "import": "./dist/index.server.js" },
-    "browser": {
-      "types": "./dist/index.d.ts",
-      "development": { "types": "./dist/index.d.ts", "import": "./dist/index.development.js" },
-      "import": "./dist/index.browser.js"
-    },
-    "node": { "types": "./dist/index.d.ts", "import": "./dist/index.server.js" },
-    "import": "./dist/index.js"
-  }
+    "exports": {
+        "types": "./dist/index.d.ts",
+        "workerd": { "types": "./dist/index.d.ts", "import": "./dist/index.server.js" },
+        "browser": {
+            "types": "./dist/index.d.ts",
+            "development": { "types": "./dist/index.d.ts", "import": "./dist/index.development.js" },
+            "import": "./dist/index.browser.js"
+        },
+        "node": { "types": "./dist/index.d.ts", "import": "./dist/index.server.js" },
+        "import": "./dist/index.js"
+    }
 }
 ```
 

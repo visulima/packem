@@ -34,7 +34,7 @@ const WHITESPACE_RE = /\s/;
  */
 const AUTOMATIC_RUNTIME_CALLEES = new Set(["jsx", "jsxDEV", "jsxs"]);
 
-export type JSXRemoveAttributesPlugin = {
+type JSXRemoveAttributesPlugin = {
     attributes: string[];
 };
 
@@ -93,15 +93,15 @@ const removeProperty = (magicString: MagicString, code: string, start: number, e
  * automatic-runtime JSX call's props object. Returns a `MagicString` only when an
  * edit was made (so callers can skip serialization on a no-op).
  *
- * `trailingComma` selects how the property + its separating comma are removed:
- * - `false` (rollup transform): the per-module source is the transformer's
- *   single-line output (`{ a: 1, "x": 2 }`), so the leading `, ` is removed —
- *   byte-identical to the long-standing behavior.
- * - `true` (rolldown renderChunk): the emitted chunk is rolldown's formatted
- *   output, where props are multi-line WITH trailing commas
- *   (`{\n  a: 1,\n  "x": 2,\n}`). Removing the leading `, ` there would leave a
- *   dangling comma (`,,`) and produce invalid JS; instead remove the property and
- *   its own trailing comma.
+ * `trailingComma` selects how the property + its separating comma are removed.
+ * `false` (rollup transform): the per-module source is the transformer's
+ * single-line output (`{ a: 1, "x": 2 }`), so the leading `, ` is removed —
+ * byte-identical to the long-standing behavior.
+ * `true` (rolldown renderChunk): the emitted chunk is rolldown's formatted
+ * output, where props are multi-line WITH trailing commas
+ * (`{\n a: 1,\n "x": 2,\n}`). Removing the leading `, ` there would leave a
+ * dangling comma (`,,`) and produce invalid JS; instead remove the property and
+ * its own trailing comma.
  */
 const stripAttributes = (ast: Node, code: string, attributes: string[], trailingComma: boolean, logger: Console): MagicString | undefined => {
     const magicString = new MagicString(code);
@@ -143,20 +143,25 @@ const stripAttributes = (ast: Node, code: string, attributes: string[], trailing
         },
     });
 
+    // `changed` is flipped to true inside the `walk` callback above. TypeScript's
+    // control-flow analysis doesn't model that the closure ran, so it narrows
+    // `changed` back to its initial `false` here and the rule misreads the ternary
+    // as always-falsy — a known closure-mutation false positive. Runtime is correct.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return changed ? magicString : undefined;
 };
 
 /**
  * Remove JSX attributes (e.g. `data-testid`) from automatic-runtime JSX calls.
  *
- * Two modes, because the bundlers run their JSX transform at different times:
- * - `"transform"` (rollup): packem's transformer adapter runs as an earlier
- *   transform plugin, so by the time this transform hook runs the per-module
- *   source already contains `jsx(...)` calls and `this.parse` sees plain JS.
- * - `"renderChunk"` (rolldown): rolldown's native oxc transform runs AFTER
- *   plugin transform hooks, so a transform hook would see raw JSX and
- *   `this.parse` would throw. The emitted chunk, however, is fully transpiled —
- *   so the same AST walk runs there instead.
+ * Two modes, because the bundlers run their JSX transform at different times.
+ * `"transform"` (rollup): packem's transformer adapter runs as an earlier
+ * transform plugin, so by the time this transform hook runs the per-module
+ * source already contains `jsx(...)` calls and `this.parse` sees plain JS.
+ * `"renderChunk"` (rolldown): rolldown's native oxc transform runs AFTER
+ * plugin transform hooks, so a transform hook would see raw JSX and
+ * `this.parse` would throw. The emitted chunk, however, is fully transpiled —
+ * so the same AST walk runs there instead.
  */
 export const jsxRemoveAttributes = ({
     attributes,
@@ -247,3 +252,5 @@ export const jsxRemoveAttributes = ({
         },
     };
 };
+
+export type { JSXRemoveAttributesPlugin };

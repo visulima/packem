@@ -38,7 +38,7 @@ const callRenderChunk = (
         | undefined;
     // Track parse calls so "skip parse" tests can assert the parse never ran.
     const parseSpy = vi.fn(parseAst);
-    const context: RenderChunkContext = { parse: parseSpy as unknown as typeof parseAst, warn: vi.fn(), ...context_ };
+    const context: RenderChunkContext = { parse: parseSpy, warn: vi.fn(), ...context_ };
 
     return { parseSpy, result: handler?.call(context, code, { fileName: "chunk.js" }, { sourcemap: false }) };
 };

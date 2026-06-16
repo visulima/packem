@@ -281,18 +281,6 @@ const cssPlugin = (
                 });
             }
         },
-        moduleParsed(moduleInfo) {
-            // Fires for every module, including ones restored from rollup's cache
-            // that skip transform(). Without this, `extracted` (cleared each
-            // buildStart) stays empty for cached CSS modules and generateBundle
-            // emits nothing — the bug that forced packem's watch mode to disable
-            // caching whenever CSS was enabled.
-            const extractedMeta = moduleInfo.meta?.extracted as Extracted | null | undefined;
-
-            if (extractedMeta) {
-                extracted.set(extractedMeta.id, extractedMeta);
-            }
-        },
         // eslint-disable-next-line sonarjs/cognitive-complexity
         async generateBundle(outputOptions, bundle) {
             if (extracted.size === 0 || !(outputOptions.dir || outputOptions.file)) {
@@ -553,6 +541,18 @@ const cssPlugin = (
                 });
             }
         },
+        moduleParsed(moduleInfo) {
+            // Fires for every module, including ones restored from rollup's cache
+            // that skip transform(). Without this, `extracted` (cleared each
+            // buildStart) stays empty for cached CSS modules and generateBundle
+            // emits nothing — the bug that forced packem's watch mode to disable
+            // caching whenever CSS was enabled.
+            const extractedMeta = moduleInfo.meta.extracted as Extracted | null | undefined;
+
+            if (extractedMeta) {
+                extracted.set(extractedMeta.id, extractedMeta);
+            }
+        },
         name: "rollup-plugin-css",
         async transform(code, transformId) {
             if (!isIncluded(transformId) || !loaders.isSupported(transformId)) {
@@ -639,7 +639,7 @@ const cssPlugin = (
                 code: result.code,
                 map: sourceMap && result.map ? result.map : { mappings: "" as const },
                 meta: {
-                    extracted: result.extracted ?? null,
+                    extracted: result.extracted,
                     styles: result.meta,
                 },
                 moduleSideEffects: result.extracted ? true : undefined,

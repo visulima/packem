@@ -8,7 +8,7 @@ export { indent };
 
 exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > cjs output 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/detect-indent@7.0.2/node_modules/detect-indent/index.js
+//#region <root>/node_modules/.pnpm/detect-indent@7.0.2/node_modules/detect-indent/index.js
 const INDENT_REGEX = /^(?:( )+|\\t+)/;
 const INDENT_TYPE_SPACE = "space";
 const INDENT_TYPE_TAB = "tab";
@@ -127,7 +127,7 @@ export { indent };
 `;
 
 exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > mjs output 1`] = `
-"//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/detect-indent@7.0.2/node_modules/detect-indent/index.js
+"//#region <root>/node_modules/.pnpm/detect-indent@7.0.2/node_modules/detect-indent/index.js
 const INDENT_REGEX = /^(?:( )+|\\t+)/;
 const INDENT_TYPE_SPACE = "space";
 const INDENT_TYPE_TAB = "tab";
@@ -278,10 +278,10 @@ export { src_default as default };
 `;
 
 exports[`packem externals > should inline types from namespaced optional peer dependencies in DTS output automatically > dts output 1`] = `
-"import { Options } from 'prettier';
-import { Config as Config$1 } from 'svgo';
-import { Options as Options$1 } from '@svgr/babel-preset';
-import { TransformOptions } from '@babel/core';
+"import { Options } from "prettier";
+import { Config } from "svgo";
+import { Options as Options$1 } from "@svgr/babel-preset";
+import { TransformOptions } from "@babel/core";
 interface State {
   filePath?: string;
   componentName: string;
@@ -292,10 +292,10 @@ interface State {
   };
 }
 interface Plugin {
-  (code: string, config: Config, state: State): string;
+  (code: string, config: Config$1, state: State): string;
 }
 type ConfigPlugin = string | Plugin;
-interface Config {
+interface Config$1 {
   ref?: boolean;
   titleProp?: boolean;
   descProp?: boolean;
@@ -314,7 +314,7 @@ interface Config {
   prettier?: boolean;
   prettierConfig?: Options;
   svgo?: boolean;
-  svgoConfig?: Config$1;
+  svgoConfig?: Config;
   configFile?: string;
   template?: Options$1['template'];
   memo?: boolean;
@@ -334,8 +334,8 @@ interface Config {
   };
 }
 declare const transform: {
-  (code: string, config?: Config, state?: Partial<State>): Promise<string>;
-  sync(code: string, config?: Config, state?: Partial<State>): string;
+  (code: string, config?: Config$1, state?: Partial<State>): Promise<string>;
+  sync(code: string, config?: Config$1, state?: Partial<State>): string;
 };
 export { transform };
 "

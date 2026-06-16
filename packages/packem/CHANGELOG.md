@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.90](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.89...@visulima/packem@2.0.0-alpha.90) (2026-06-16)
+
+### Features
+
+* **packem:** add banner/footer injection for JS and declaration output ([fef6a45](https://github.com/visulima/packem/commit/fef6a45e71e7d94c5c1a5b0ba6897766cba68346))
+* **packem:** route DTS through rolldown natively when rolldown is the bundler ([#208](https://github.com/visulima/packem/issues/208)) ([2802f4d](https://github.com/visulima/packem/commit/2802f4d72f6c4f2d1a74e51388b4771fb33fa3e6))
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.54
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.35
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.74
+
 ## @visulima/packem [2.0.0-alpha.89](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.88...@visulima/packem@2.0.0-alpha.89) (2026-06-15)
 
 ### Bug Fixes

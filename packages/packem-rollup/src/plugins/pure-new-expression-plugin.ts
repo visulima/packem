@@ -39,8 +39,9 @@ const calleeToName = (callee: CalleeNode | undefined): string | undefined => {
 
     if (callee.type === "MemberExpression" && !callee.computed && callee.property?.type === "Identifier") {
         const object = calleeToName(callee.object);
+        const propertyName = callee.property.name;
 
-        return object === undefined ? undefined : `${object}.${callee.property.name}`;
+        return object === undefined || propertyName === undefined ? undefined : `${object}.${propertyName}`;
     }
 
     return undefined;
@@ -50,17 +51,17 @@ const calleeToName = (callee: CalleeNode | undefined): string | undefined => {
 const isAlreadyPure = (code: string, start: number): boolean => code.slice(Math.max(0, start - PURE_LOOKBEHIND), start).includes("__PURE__");
 
 /**
- * A plugin that adds `/* @__PURE__ * /` annotations so consumers can tree-shake
+ * A plugin that adds `/* \@__PURE__ * /` annotations so consumers can tree-shake
  * unused calls/instantiations.
  *
- * Two modes, because rolldown and rollup expose pure-annotation timing differently:
- * - `"transform"` (rollup, default): annotates `new Constructor(...)`
- *   (`NewExpression`) only — `rollup-plugin-pure` handles the `CallExpression`
- *   side separately. Runs `order: "post"` so `this.parse` sees transpiled JS.
- * - `"renderChunk"` (rolldown): `rollup-plugin-pure` is transform-only and can't
- *   run under rolldown (its native oxc transform runs after plugin transforms),
- *   so this single renderChunk pass annotates BOTH `NewExpression` (constructors)
- *   and `CallExpression` (functions) on the final transpiled chunk.
+ * Two modes, because rolldown and rollup expose pure-annotation timing differently.
+ * `"transform"` (rollup, default): annotates `new Constructor(...)`
+ * (`NewExpression`) only — `rollup-plugin-pure` handles the `CallExpression`
+ * side separately. Runs `order: "post"` so `this.parse` sees transpiled JS.
+ * `"renderChunk"` (rolldown): `rollup-plugin-pure` is transform-only and can't
+ * run under rolldown (its native oxc transform runs after plugin transforms),
+ * so this single renderChunk pass annotates BOTH `NewExpression` (constructors)
+ * and `CallExpression` (functions) on the final transpiled chunk.
  */
 // eslint-disable-next-line import/prefer-default-export -- public API surface stays named for plugin consumers
 export const pureNewExpressionPlugin = (options: {
@@ -97,8 +98,8 @@ export const pureNewExpressionPlugin = (options: {
     // source, there is nothing to annotate and we can skip the parse entirely.
     const quickTokens = new Set<string>(constructorSet);
 
-    for (const fn of functionSet) {
-        quickTokens.add(fn.split(".")[0] as string);
+    for (const functionName of functionSet) {
+        quickTokens.add(functionName.split(".")[0] as string);
     }
 
     const quickCheckRegExp
@@ -109,7 +110,7 @@ export const pureNewExpressionPlugin = (options: {
             name: "packem:pure-new-expression",
             renderChunk: {
                 handler(code: string, _chunk, { sourcemap }) {
-                    if (quickCheckRegExp === undefined || !quickCheckRegExp.test(code)) {
+                    if (!quickCheckRegExp?.test(code)) {
                         return undefined;
                     }
 

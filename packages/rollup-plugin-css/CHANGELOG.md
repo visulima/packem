@@ -1,3 +1,14 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.54](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.53...@visulima/rollup-plugin-css@1.0.0-alpha.54) (2026-06-16)
+
+### Features
+
+* **packem:** route DTS through rolldown natively when rolldown is the bundler ([#208](https://github.com/visulima/packem/issues/208)) ([2802f4d](https://github.com/visulima/packem/commit/2802f4d72f6c4f2d1a74e51388b4771fb33fa3e6))
+
+
+### Dependencies
+
+* **@visulima/css-style-inject:** upgraded to 1.0.0-alpha.19
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.53](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.52...@visulima/rollup-plugin-css@1.0.0-alpha.53) (2026-06-12)
 
 ### Bug Fixes

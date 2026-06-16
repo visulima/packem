@@ -96,16 +96,20 @@ const parseExportDefault = function* (): Generator<ParsedExportInfo> {
  * dialect lets the splitter read exports off the untranspiled source. The value
  * is harmless under rollup (acorn ignores unknown parse options).
  */
+const TSX_FILE_RE = /\.tsx$/;
+const TS_FILE_RE = /\.[cm]?ts$/;
+const JSX_FILE_RE = /\.jsx$/;
+
 const langForId = (id: string): "js" | "jsx" | "ts" | "tsx" => {
-    if (/\.tsx$/.test(id)) {
+    if (TSX_FILE_RE.test(id)) {
         return "tsx";
     }
 
-    if (/\.[cm]?ts$/.test(id)) {
+    if (TS_FILE_RE.test(id)) {
         return "ts";
     }
 
-    if (/\.jsx$/.test(id)) {
+    if (JSX_FILE_RE.test(id)) {
         return "jsx";
     }
 

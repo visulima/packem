@@ -1,6 +1,6 @@
 {
     "name": "@visulima/rollup-plugin-css",
-    "version": "1.0.0-alpha.53",
+    "version": "1.0.0-alpha.54",
     "description": "CSS processing plugin for packem",
     "keywords": [
         "visulima",
@@ -145,7 +145,7 @@
         "@types/postcss-modules-scope": "catalog:types",
         "@types/stylus": "catalog:types",
         "@types/uglifycss": "catalog:types",
-        "@visulima/css-style-inject": "1.0.0-alpha.18",
+        "@visulima/css-style-inject": "1.0.0-alpha.19",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",
@@ -181,7 +181,7 @@
         "@csstools/postcss-slow-plugins": ">=3.0.0",
         "@tailwindcss/node": ">=4.3.0",
         "@tailwindcss/oxide": ">=4.3.0",
-        "@visulima/css-style-inject": "1.0.0-alpha.18",
+        "@visulima/css-style-inject": "1.0.0-alpha.19",
         "cssnano": ">=8.0.1",
         "icss-utils": ">=5.1.0",
         "less": ">=4.6.4",

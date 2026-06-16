@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.74](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.73...@visulima/packem-rollup@1.0.0-alpha.74) (2026-06-16)
+
+### Features
+
+* **packem:** route DTS through rolldown natively when rolldown is the bundler ([#208](https://github.com/visulima/packem/issues/208)) ([2802f4d](https://github.com/visulima/packem/commit/2802f4d72f6c4f2d1a74e51388b4771fb33fa3e6))
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.35
+
 ## @visulima/packem-rollup [1.0.0-alpha.73](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.72...@visulima/packem-rollup@1.0.0-alpha.73) (2026-06-12)
 
 ### Features

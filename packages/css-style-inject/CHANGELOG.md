@@ -1,3 +1,9 @@
+## @visulima/css-style-inject [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.18...@visulima/css-style-inject@1.0.0-alpha.19) (2026-06-16)
+
+### Features
+
+* **packem:** route DTS through rolldown natively when rolldown is the bundler ([#208](https://github.com/visulima/packem/issues/208)) ([2802f4d](https://github.com/visulima/packem/commit/2802f4d72f6c4f2d1a74e51388b4771fb33fa3e6))
+
 ## @visulima/css-style-inject [1.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.17...@visulima/css-style-inject@1.0.0-alpha.18) (2026-06-12)
 
 ### Bug Fixes
