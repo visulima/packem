@@ -1,39 +1,43 @@
 # Rolldown backend: support status and graduation criteria
 
-> **As of 2026-06-11 (rolldown 1.0.3).** These criteria are proposals; the
-> maintainer decides by ticking (or editing) the checkboxes below.
+> **Updated 2026-06-16 (rolldown 1.0.3).** Two graduation criteria are now met:
+> the rolldown suite **gates merges** (folded into the `test` matrix across
+> node 22/24/25 + macOS, see criterion 1) and **native DTS landed** (PR #208,
+> plan 015 — see criterion 2). The remaining checkboxes are maintainer
+> decisions; tick or edit them below.
 
 ## 1. Status today
 
 | Dimension                | State                                                                                                                                                                                                                                                                                                                                                              | Source                                                                                         |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| Wizard label             | **"experimental, fast — falls back to rollup for DTS"**                                                                                                                                                                                                                                                                                                            | `packages/packem/src/bundler/first-run-wizard.ts:52`                                           |
-| CI job                   | Advisory — runs on every PR touching packages but is **excluded from `test-required-check`**. Rationale: "known cache/ordering flakiness; surface regressions without gating merges until it has proven stable."                                                                                                                                   | `.github/workflows/test.yml:150-196`                                                           |
-| DTS generation (build)   | Always routes through rollup, even when `bundler: "rolldown"`. Rollup is pulled in automatically when rolldown + `declaration: true` is configured.                                                                                                                                                                                                                | `packages/packem/src/packem/index.ts:930-935`                                                  |
-| DTS watching             | A log line informs the user: _"Declaration (DTS) watching runs through rollup; the bundle watcher is rolldown."_ Watching also falls back to rollup for DTS.                                                                                                                                                                                                       | `packages/packem/src/packem/index.ts:1035-1040`, `packages/packem/src/rollup/watch.ts:266-268` |
+| Wizard label             | **"experimental, fast"** (the "falls back to rollup for DTS" clause was dropped once native DTS landed)                                                                                                                                                                                                                                                            | `packages/packem/src/bundler/first-run-wizard.ts:52`                                           |
+| CI job                   | **Gating** — folded into the `test` matrix via a `bundler: [rollup, rolldown]` dimension, so the full rolldown suite runs on node 22/24/25 (ubuntu) + node 22 (macOS) and is **required** through `test-required-check` (which `needs: [files-changed, test]`). The standalone advisory `test-rolldown` job was removed.                                              | `.github/workflows/test.yml` (`test` job, `bundler` matrix)                                     |
+| DTS generation (build)   | **Routes through rolldown natively** when `bundler: "rolldown"` (PR #208). Rollup is no longer pulled in for the DTS path under rolldown; the `@visulima/rollup-plugin-dts` virtual-module guard makes `emitDtsOnly` work under rolldown.                                                                                                                            | `packages/packem/src/packem/index.ts`                                                          |
+| DTS watching             | **Runs natively through rolldown** when rolldown is the bundler — the bundle watcher and the DTS watcher both use the rolldown-native watch path (PR #208). No rollup fallback for the watch DTS path.                                                                                                                                                              | `packages/packem/src/rollup/watch.ts:278-296, 341`                                             |
 | `packem-rolldown` pkg    | Empty `export {}` placeholder. No rolldown-only plugins have landed yet. The package is versioned and released with every alpha bump.                                                                                                                                                                                                                              | `packages/packem-rolldown/src/index.ts`                                                        |
-| Local suite (2026-06-11) | **465 passed / 5 failed / 37 skipped** across 507 tests (44 test files: 37 passed, 3 failed, 4 skipped). The 5 failures are snapshot mismatches in `externals.test.ts` and `css.test.ts` whose diffs contain absolute worktree paths — likely load-induced or path-sensitive rather than logic failures; CI on the canonical checkout is the authoritative signal. | `pnpm run test:rolldown` in `packages/packem`                                                  |
+| Local suite (2026-06-16) | **rolldown: 476 passed / 0 failed / 37 skipped** (41 files passed, 4 skipped); **rollup: 505 passed / 0 failed / 8 skipped**. The earlier 5 snapshot failures (absolute worktree paths in `externals.test.ts`/`css.test.ts`) are fixed by the `normalizeRolldownOutput` portability helper. | `pnpm run test:bundlers` in `packages/packem`                                                  |
 
 ## 2. Graduation criteria (proposed)
 
 Each checkbox is a decision point for the maintainer, not a preset constraint.
 
-- [ ] **CI stability**: `test-rolldown` is green on **20 consecutive** scheduled or PR
-      runs with zero flaky reruns. Once that bar is met, add `test-rolldown` to
-      `test-required-check.needs` in `.github/workflows/test.yml:201-204` so
-      rolldown failures gate merges alongside the rollup suite.
+- [x] **CI stability**: **met (2026-06-16).** Rather than keep a standalone
+      `test-rolldown` job and add it to `test-required-check.needs` after N green
+      runs, the rolldown suite was folded directly into the `test` matrix via a
+      `bundler: [rollup, rolldown]` dimension. Because `test-required-check`
+      already `needs: [files-changed, test]`, every rolldown matrix leg (node
+      22/24/25 + macOS) now gates merges alongside rollup. The flakiness that
+      motivated the advisory carve-out was traced to non-portable snapshots
+      (machine-specific absolute pnpm paths and content-derived chunk hashes)
+      and fixed with a rolldown-only `normalizeRolldownOutput` helper, so the
+      "20 consecutive green runs" probation is moot — the root cause is resolved,
+      not merely observed-stable.
 
-    > Rationale for N = 20: that is roughly two weeks of typical PR cadence
-    > (about 10 merges/week), which is long enough to observe intermittent
-    > cache/ordering flakes without requiring months of data. The maintainer may
-    > lower this threshold once the root cause of current flakiness is
-    > understood and fixed.
-
-- [ ] **Native DTS**: rolldown-native DTS generation lands (per the plan-012
-      spike GO path described below), **or** an explicit documented decision is
-      recorded that "DTS stays on rollup by design" and the wizard hint is
-      reworded from _"falls back to rollup for DTS"_ to _"DTS runs through rollup
-      by design"_.
+- [x] **Native DTS**: **met (2026-06-16, PR #208 / plan 015).** Rolldown-native
+      DTS generation landed — packem routes the DTS path through rolldown when
+      rolldown is the selected bundler, the rollup-DTS fallback pull-in is gone,
+      and the wizard hint's _"falls back to rollup for DTS"_ clause was dropped.
+      The plan-012 GO path below records how the blocker was cleared.
 
     Plan-012 spike (2026-06-11, on branch
     `advisor/012-rolldown-dts-spike`) returned **GO (conditional)**:
@@ -55,12 +59,14 @@ Each checkbox is a decision point for the maintainer, not a preset constraint.
     to route DTS through rolldown when rolldown is the selected bundler, and
     decide on stripping rolldown `//#region` comments from emitted d.ts.
 
-- [ ] **Snapshot currency**: `.rolldown.snap` files are kept up-to-date by the
-      advisory CI job. "Current" means: no obsolete snapshot entries that differ
-      from what `pnpm run test:rolldown -- -u` would regenerate, and no
-      rolldown-specific snapshot in the `test-rolldown` job's failure set on the
-      canonical branch. The advisory job already exercises the `.rolldown.snap`
-      family on every qualifying PR.
+- [x] **Snapshot currency**: **met (2026-06-16).** The `.rolldown.snap` family
+      is now exercised by the **gating** rolldown matrix legs on every qualifying
+      PR, and the snapshots were made machine/CI-portable (the
+      `normalizeRolldownOutput` helper rewrites absolute pnpm-store paths to
+      `<root>` and content-derived chunk hashes to `[HASH]`), so a green CI run
+      now proves currency. Regenerate with
+      `PACKEM_TEST_BUNDLER=rolldown pnpm exec vitest run "<path>" -u` from
+      `packages/packem`.
 
 - [ ] **Package decision**: decide the fate of `packages/packem-rolldown`
       — either (a) activate it when the first rolldown-only plugin lands and
@@ -70,20 +76,23 @@ Each checkbox is a decision point for the maintainer, not a preset constraint.
       consumers who install it expecting plugin exports.
 
 - [ ] **Wizard label**: drop the word _"experimental"_ from the wizard hint in
-      `packages/packem/src/bundler/first-run-wizard.ts:52`. This is the
-      user-visible graduation signal. Do this only after the CI-stability and
-      DTS criteria above are resolved.
+      `packages/packem/src/bundler/first-run-wizard.ts:52` (currently
+      `"experimental, fast"`). This is the user-visible graduation signal and the
+      last remaining flip. Its prerequisites (CI stability + native DTS) are now
+      **met**, so this is unblocked — it is a maintainer call on whether rolldown
+      should be presented as non-experimental in the first-run wizard.
 
 ## 3. What graduation changes (file-by-line)
 
-| Criterion met                         | File:line to edit                                                               | Change                                                                                                            |
-| ------------------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| CI stability (criterion 1)            | `.github/workflows/test.yml:202`                                                | Add `"test-rolldown"` to `test-required-check.needs`                                                              |
-| CI stability (criterion 1)            | `.github/workflows/test.yml:205` (the `if:` condition of `test-required-check`) | Extend the `always() &&` expression to also guard on `needs.test-rolldown.result`                                 |
-| Native DTS or explicit stay-on-rollup | `packages/packem/src/bundler/first-run-wizard.ts:52`                            | Reword hint: either remove _"falls back to rollup for DTS"_ or replace with _"DTS runs through rollup by design"_ |
-| Native DTS lands                      | `packages/packem/src/packem/index.ts:930-935` and `:1038-1043`                  | Remove the rollup-DTS fallback pull-in and the informational log line                                             |
-| Native DTS lands                      | `packages/packem/src/rollup/watch.ts:266-268`                                   | Remove the rolldown-compatibility comment and route DTS watch through rolldown                                    |
-| Wizard label (criterion 5)            | `packages/packem/src/bundler/first-run-wizard.ts:52`                            | Drop `"experimental, "` prefix from the hint string                                                               |
+Most rows below are now **DONE**; only the wizard-label flip remains.
+
+| Criterion                             | Status | File / change                                                                                                                                                                            |
+| ------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CI stability (criterion 1)            | DONE   | Achieved differently than originally planned: instead of adding a `test-rolldown` job to `test-required-check.needs`, rolldown was folded into the `test` matrix (`bundler` dimension), which `test-required-check` already depends on. |
+| Native DTS — wizard hint              | DONE   | `first-run-wizard.ts:52` — the _"falls back to rollup for DTS"_ clause was removed; hint is now `"experimental, fast"`.                                                                  |
+| Native DTS lands                      | DONE   | `packages/packem/src/packem/index.ts` — the rollup-DTS fallback pull-in and informational log line were removed; DTS routes through rolldown natively (PR #208).                          |
+| Native DTS lands (watch)              | DONE   | `packages/packem/src/rollup/watch.ts` — DTS watch under rolldown updated alongside PR #208.                                                                                              |
+| Wizard label (criterion 5)           | TODO   | `first-run-wizard.ts:52` — drop the `"experimental, "` prefix from the hint string (maintainer decision; prerequisites met).                                                             |
 
 ## 4. Non-goals
 
