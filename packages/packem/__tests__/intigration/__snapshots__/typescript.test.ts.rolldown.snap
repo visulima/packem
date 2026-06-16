@@ -52,7 +52,7 @@ exports[`packem typescript > should bundle deeks package > cjs content 1`] = `
 //#region \\0rolldown/runtime.js
 var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/utils.js
+//#region <root>/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/utils.js
 var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.isDocumentToRecurOn = exports.flatten = exports.unique = void 0;
@@ -75,7 +75,7 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
 	exports.isDocumentToRecurOn = isDocumentToRecurOn;
 }));
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/types.js
+//#region <root>/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/types.js
 var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 }));
@@ -272,7 +272,7 @@ exports[`packem typescript > should bundle deeks package > mjs content 1`] = `
 //#region \\0rolldown/runtime.js
 var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/utils.js
+//#region <root>/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/utils.js
 var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.isDocumentToRecurOn = exports.flatten = exports.unique = void 0;
@@ -295,7 +295,7 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
 	exports.isDocumentToRecurOn = isDocumentToRecurOn;
 }));
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/types.js
+//#region <root>/node_modules/.pnpm/deeks@3.2.1/node_modules/deeks/lib/types.js
 var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 }));

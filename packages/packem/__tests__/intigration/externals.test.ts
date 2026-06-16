@@ -9,7 +9,7 @@ import { execaNode } from "execa";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage, normalizeRolldownOutput } from "../helpers";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 const DECLARE_TRANSFORM_REGEX = /declare const transform/u;
@@ -126,23 +126,23 @@ export const indent = dIndent;
 
         const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toMatchSnapshot("mjs output");
+        expect(normalizeRolldownOutput(mjsContent)).toMatchSnapshot("mjs output");
 
         const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toMatchSnapshot("cjs output");
+        expect(normalizeRolldownOutput(cjsContent)).toMatchSnapshot("cjs output");
 
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(dCtsContent).toMatchSnapshot("cjs dts output");
+        expect(normalizeRolldownOutput(dCtsContent)).toMatchSnapshot("cjs dts output");
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toMatchSnapshot("mjs dts output");
+        expect(normalizeRolldownOutput(dMtsContent)).toMatchSnapshot("mjs dts output");
 
         const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dContent).toMatchSnapshot("dts output");
+        expect(normalizeRolldownOutput(dContent)).toMatchSnapshot("dts output");
     });
 
     it("should inline types from optional peer dependencies in DTS output automatically", async () => {
@@ -282,7 +282,7 @@ export const transform = svgrTransform;
 
         const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dContent).toMatchSnapshot("dts output");
+        expect(normalizeRolldownOutput(dContent)).toMatchSnapshot("dts output");
     });
 
     it("should not resolve .js to .ts in externalized dependency", async () => {

@@ -10,7 +10,7 @@ import { join } from "@visulima/path";
 import { execa } from "execa";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage, normalizeRolldownOutput } from "../helpers";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 // Tests that compare bundled output byte-exactly fail under rolldown because
@@ -2567,11 +2567,11 @@ export { deepKeys, deepKeysFromList } from "deeks";`,
 
         const ctsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(ctsContent).toMatchSnapshot("cjs content");
+        expect(normalizeRolldownOutput(ctsContent)).toMatchSnapshot("cjs content");
 
         const mtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(mtsContent).toMatchSnapshot("mjs content");
+        expect(normalizeRolldownOutput(mtsContent)).toMatchSnapshot("mjs content");
     });
 
     it("should compile only a type file", async () => {

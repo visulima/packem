@@ -412,7 +412,7 @@ export { css, css as default };
 `;
 
 exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 1`] = `
-"require("./packem_shared/sub-CmU9BtTw.cjs");
+"require("./packem_shared/sub-[HASH].cjs");
 //#region src/fourth.scss
 var css = ".fourth {\\n  color: magenta;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGguc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGNBQWM7QUFDaEIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRoIHtcbiAgY29sb3I6IG1hZ2VudGE7XG59Il19 */";
 //#endregion
@@ -429,7 +429,7 @@ console.log(css);
 `;
 
 exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 2`] = `
-"require("./packem_shared/sub-CmU9BtTw.cjs");
+"require("./packem_shared/sub-[HASH].cjs");
 //#region src/fourthtwo.scss
 var css = ".fourthtwo {\\n  color: honeydew;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGh0d28uc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGVBQWU7QUFDakIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRodHdvIHtcbiAgY29sb3I6IGhvbmV5ZGV3O1xufSJdfQ== */";
 //#endregion
@@ -497,7 +497,7 @@ exports.default = css;
 `;
 
 exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 9`] = `
-"import "./packem_shared/sub-CmU9BtTw.mjs";
+"import "./packem_shared/sub-[HASH].mjs";
 //#region src/fourth.scss
 var css = ".fourth {\\n  color: magenta;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGguc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGNBQWM7QUFDaEIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRoIHtcbiAgY29sb3I6IG1hZ2VudGE7XG59Il19 */";
 //#endregion
@@ -514,7 +514,7 @@ console.log(css);
 `;
 
 exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 10`] = `
-"import "./packem_shared/sub-CmU9BtTw.mjs";
+"import "./packem_shared/sub-[HASH].mjs";
 //#region src/fourthtwo.scss
 var css = ".fourthtwo {\\n  color: honeydew;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGh0d28uc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGVBQWU7QUFDakIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRodHdvIHtcbiAgY29sb3I6IGhvbmV5ZGV3O1xufSJdfQ== */";
 //#endregion
@@ -644,7 +644,7 @@ exports[`css > code-splitting > should work with processed 'multi-entry' css > c
 `;
 
 exports[`css > code-splitting > should work with processed 'multi-entry' css > js 1`] = `
-"require("./packem_shared/sub-BIwSBJ8l.cjs");
+"require("./packem_shared/sub-[HASH].cjs");
 //#region src/fourth.scss
 var css = ".fourth {\\n  color: magenta;\\n}";
 //#endregion
@@ -661,7 +661,7 @@ console.log(css);
 `;
 
 exports[`css > code-splitting > should work with processed 'multi-entry' css > js 2`] = `
-"require("./packem_shared/sub-BIwSBJ8l.cjs");
+"require("./packem_shared/sub-[HASH].cjs");
 //#region src/fourthtwo.scss
 var css = ".fourthtwo {\\n  color: honeydew;\\n}";
 //#endregion
@@ -729,7 +729,7 @@ exports.default = css;
 `;
 
 exports[`css > code-splitting > should work with processed 'multi-entry' css > js 9`] = `
-"import "./packem_shared/sub-CmU9BtTw.mjs";
+"import "./packem_shared/sub-[HASH].mjs";
 //#region src/fourth.scss
 var css = ".fourth {\\n  color: magenta;\\n}";
 //#endregion
@@ -746,7 +746,7 @@ console.log(css);
 `;
 
 exports[`css > code-splitting > should work with processed 'multi-entry' css > js 10`] = `
-"import "./packem_shared/sub-CmU9BtTw.mjs";
+"import "./packem_shared/sub-[HASH].mjs";
 //#region src/fourthtwo.scss
 var css = ".fourthtwo {\\n  color: honeydew;\\n}";
 //#endregion
@@ -866,7 +866,7 @@ exports[`css > code-splitting > should work with processed 'multi-entry-single' 
 `;
 
 exports[`css > code-splitting > should work with processed 'multi-entry-single' css > js 1`] = `
-"require("./packem_shared/sub-BIwSBJ8l.cjs");
+"require("./packem_shared/sub-[HASH].cjs");
 //#region src/fourth.scss
 var css = ".fourth {\\n  color: magenta;\\n}";
 //#endregion
@@ -883,7 +883,7 @@ console.log(css);
 `;
 
 exports[`css > code-splitting > should work with processed 'multi-entry-single' css > js 2`] = `
-"require("./packem_shared/sub-BIwSBJ8l.cjs");
+"require("./packem_shared/sub-[HASH].cjs");
 //#region src/fourthtwo.scss
 var css = ".fourthtwo {\\n  color: honeydew;\\n}";
 //#endregion
@@ -951,7 +951,7 @@ exports.default = css;
 `;
 
 exports[`css > code-splitting > should work with processed 'multi-entry-single' css > js 9`] = `
-"import "./packem_shared/sub-CmU9BtTw.mjs";
+"import "./packem_shared/sub-[HASH].mjs";
 //#region src/fourth.scss
 var css = ".fourth {\\n  color: magenta;\\n}";
 //#endregion
@@ -968,7 +968,7 @@ console.log(css);
 `;
 
 exports[`css > code-splitting > should work with processed 'multi-entry-single' css > js 10`] = `
-"import "./packem_shared/sub-CmU9BtTw.mjs";
+"import "./packem_shared/sub-[HASH].mjs";
 //#region src/fourthtwo.scss
 var css = ".fourthtwo {\\n  color: honeydew;\\n}";
 //#endregion
@@ -3144,8 +3144,8 @@ for (const name of Object.values(modules_5a199c00)) console.log(name);
 
 exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require_a = require("./packem_shared/a-DYgeErG_.cjs");
-const require_b = require("./packem_shared/b-BqyA13J2.cjs");
+const require_a = require("./packem_shared/a-[HASH].cjs");
+const require_b = require("./packem_shared/b-[HASH].cjs");
 exports.a = require_a.a;
 exports.b = require_b.b;
 "
@@ -3200,8 +3200,8 @@ exports.b = require_b.b;
 `;
 
 exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 6`] = `
-"import { t as a } from "./packem_shared/a-BbTGSOLI.mjs";
-import { t as b } from "./packem_shared/b-DJVdoX-9.mjs";
+"import { t as a } from "./packem_shared/a-[HASH].mjs";
+import { t as b } from "./packem_shared/b-[HASH].mjs";
 export { a, b };
 "
 `;
@@ -3504,8 +3504,8 @@ for (const name of Object.values(modules_5a199c00)) console.log(name);
 
 exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require_a = require("./packem_shared/a-B86oB8eS.cjs");
-const require_b = require("./packem_shared/b-BUHKFAbl.cjs");
+const require_a = require("./packem_shared/a-[HASH].cjs");
+const require_b = require("./packem_shared/b-[HASH].cjs");
 exports.a = require_a.a;
 exports.b = require_b.b;
 "
@@ -3594,8 +3594,8 @@ exports.b = require_b.b;
 `;
 
 exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 6`] = `
-"import { t as a } from "./packem_shared/a-Ce4245Au.mjs";
-import { t as b } from "./packem_shared/b-DLrMza9s.mjs";
+"import { t as a } from "./packem_shared/a-[HASH].mjs";
+import { t as b } from "./packem_shared/b-[HASH].mjs";
 export { a, b };
 "
 `;
@@ -3673,7 +3673,7 @@ export { b };
 `;
 
 exports[`css > emit > should work with emitted processed 'basic-emit' css > js 1`] = `
-"//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/element-internals.js
+"//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/element-internals.js
 /**
 * @license
 * Copyright 2023 Google LLC
@@ -3755,7 +3755,7 @@ const ElementInternalsShim = class ElementInternals {
 	setValidity() {}
 };
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/events.js
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/events.js
 /**
 * @license
 * Copyright 2023 Google LLC
@@ -3900,7 +3900,7 @@ Object.defineProperties(CustomEventShim.prototype, { detail: enumerableProperty$
 const EventShimWithRealType = EventShim;
 const CustomEventShimWithRealType = CustomEventShim;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/css.js
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/css.js
 /**
 * @license
 * Copyright 2024 Google LLC
@@ -3936,7 +3936,7 @@ var _a = class CSSRule {
 };
 _a.STYLE_RULE = 1, _a.CHARSET_RULE = 2, _a.IMPORT_RULE = 3, _a.MEDIA_RULE = 4, _a.FONT_FACE_RULE = 5, _a.PAGE_RULE = 6, _a.NAMESPACE_RULE = 10, _a.KEYFRAMES_RULE = 7, _a.KEYFRAME_RULE = 8, _a.SUPPORTS_RULE = 12, _a.COUNTER_STYLE_RULE = 11, _a.FONT_FEATURE_VALUES_RULE = 14, _a.MARGIN_RULE = 9;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/index.js
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/index.js
 /**
 * @license
 * Copyright 2019 Google LLC
@@ -4324,7 +4324,7 @@ var CustomElementRegistry = class {
 const customElements = new CustomElementRegistry();
 const windowShim = new WindowShim(constructionToken);
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/css-tag.js
+//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/css-tag.js
 /**
 * @license
 * Copyright 2019 Google LLC
@@ -4367,7 +4367,7 @@ const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$2 
 	return r$2(e);
 })(t) : t;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/reactive-element.js
+//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/reactive-element.js
 const { is: h$1, defineProperty: r$1, getOwnPropertyDescriptor: o$2, getOwnPropertyNames: n$1, getOwnPropertySymbols: a$1, getPrototypeOf: c$1 } = Object, l$1 = globalThis;
 l$1.customElements ??= customElements;
 const p$1 = l$1.trustedTypes, d$1 = p$1 ? p$1.emptyScript : "", u$1 = l$1.reactiveElementPolyfillSupport, f$1 = (t, s) => t, b$1 = {
@@ -4595,7 +4595,7 @@ var g$1 = class extends (globalThis.HTMLElement ?? HTMLElementShimWithRealType) 
 };
 g$1.elementStyles = [], g$1.shadowRootOptions = { mode: "open" }, g$1[f$1("elementProperties")] = /* @__PURE__ */ new Map(), g$1[f$1("finalized")] = /* @__PURE__ */ new Map(), u$1?.({ ReactiveElement: g$1 }), (l$1.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/node/lit-html.js
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/node/lit-html.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -4843,7 +4843,7 @@ const B = (t, i, s) => {
 	return h._$AI(t), h;
 };
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
+//#region <root>/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -4889,7 +4889,7 @@ console.log(styles);
 `;
 
 exports[`css > emit > should work with emitted processed 'basic-emit' css > js 2`] = `
-"//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/css-tag.js
+"//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/css-tag.js
 /**
 * @license
 * Copyright 2019 Google LLC
@@ -4932,7 +4932,7 @@ const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$3 
 	return r$2(e);
 })(t) : t;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/reactive-element.js
+//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/reactive-element.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -5162,7 +5162,7 @@ var y$1 = class extends HTMLElement {
 };
 y$1.elementStyles = [], y$1.shadowRootOptions = { mode: "open" }, y$1[d$1("elementProperties")] = /* @__PURE__ */ new Map(), y$1[d$1("finalized")] = /* @__PURE__ */ new Map(), p$1?.({ ReactiveElement: y$1 }), (a$1.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/lit-html.js
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/lit-html.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -5410,7 +5410,7 @@ const D = (t, i, s) => {
 	return h._$AI(t), h;
 };
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
+//#region <root>/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -5488,7 +5488,7 @@ console.log({ "main": "style_main_77557771 shared_bold_2a196ebe" }, ["./shared.c
 `;
 
 exports[`css > emit > should work with emitted processed 'sourcemap-emit' css > js 1`] = `
-"//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/element-internals.js
+"//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/element-internals.js
 /**
 * @license
 * Copyright 2023 Google LLC
@@ -5570,7 +5570,7 @@ const ElementInternalsShim = class ElementInternals {
 	setValidity() {}
 };
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/events.js
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/events.js
 /**
 * @license
 * Copyright 2023 Google LLC
@@ -5715,7 +5715,7 @@ Object.defineProperties(CustomEventShim.prototype, { detail: enumerableProperty$
 const EventShimWithRealType = EventShim;
 const CustomEventShimWithRealType = CustomEventShim;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/css.js
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/css.js
 /**
 * @license
 * Copyright 2024 Google LLC
@@ -5751,7 +5751,7 @@ var _a = class CSSRule {
 };
 _a.STYLE_RULE = 1, _a.CHARSET_RULE = 2, _a.IMPORT_RULE = 3, _a.MEDIA_RULE = 4, _a.FONT_FACE_RULE = 5, _a.PAGE_RULE = 6, _a.NAMESPACE_RULE = 10, _a.KEYFRAMES_RULE = 7, _a.KEYFRAME_RULE = 8, _a.SUPPORTS_RULE = 12, _a.COUNTER_STYLE_RULE = 11, _a.FONT_FEATURE_VALUES_RULE = 14, _a.MARGIN_RULE = 9;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/index.js
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/index.js
 /**
 * @license
 * Copyright 2019 Google LLC
@@ -6139,7 +6139,7 @@ var CustomElementRegistry = class {
 const customElements = new CustomElementRegistry();
 const windowShim = new WindowShim(constructionToken);
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/css-tag.js
+//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/css-tag.js
 /**
 * @license
 * Copyright 2019 Google LLC
@@ -6182,7 +6182,7 @@ const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$2 
 	return r$2(e);
 })(t) : t;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/reactive-element.js
+//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/reactive-element.js
 const { is: h$1, defineProperty: r$1, getOwnPropertyDescriptor: o$2, getOwnPropertyNames: n$1, getOwnPropertySymbols: a$1, getPrototypeOf: c$1 } = Object, l$1 = globalThis;
 l$1.customElements ??= customElements;
 const p$1 = l$1.trustedTypes, d$1 = p$1 ? p$1.emptyScript : "", u$1 = l$1.reactiveElementPolyfillSupport, f$1 = (t, s) => t, b$1 = {
@@ -6410,7 +6410,7 @@ var g$1 = class extends (globalThis.HTMLElement ?? HTMLElementShimWithRealType) 
 };
 g$1.elementStyles = [], g$1.shadowRootOptions = { mode: "open" }, g$1[f$1("elementProperties")] = /* @__PURE__ */ new Map(), g$1[f$1("finalized")] = /* @__PURE__ */ new Map(), u$1?.({ ReactiveElement: g$1 }), (l$1.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/node/lit-html.js
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/node/lit-html.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -6658,7 +6658,7 @@ const B = (t, i, s) => {
 	return h._$AI(t), h;
 };
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
+//#region <root>/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -6705,7 +6705,7 @@ console.log(styles);
 `;
 
 exports[`css > emit > should work with emitted processed 'sourcemap-emit' css > js 2`] = `
-"//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/css-tag.js
+"//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/css-tag.js
 /**
 * @license
 * Copyright 2019 Google LLC
@@ -6748,7 +6748,7 @@ const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$3 
 	return r$2(e);
 })(t) : t;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/reactive-element.js
+//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/reactive-element.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -6978,7 +6978,7 @@ var y$1 = class extends HTMLElement {
 };
 y$1.elementStyles = [], y$1.shadowRootOptions = { mode: "open" }, y$1[d$1("elementProperties")] = /* @__PURE__ */ new Map(), y$1[d$1("finalized")] = /* @__PURE__ */ new Map(), p$1?.({ ReactiveElement: y$1 }), (a$1.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/lit-html.js
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/lit-html.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -7226,7 +7226,7 @@ const D = (t, i, s) => {
 	return h._$AI(t), h;
 };
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
+//#region <root>/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -7273,7 +7273,7 @@ console.log(styles);
 `;
 
 exports[`css > emit > should work with emitted processed 'sourcemap-transform' css > js 1`] = `
-"//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/element-internals.js
+"//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/element-internals.js
 /**
 * @license
 * Copyright 2023 Google LLC
@@ -7355,7 +7355,7 @@ const ElementInternalsShim = class ElementInternals {
 	setValidity() {}
 };
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/events.js
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/events.js
 /**
 * @license
 * Copyright 2023 Google LLC
@@ -7500,7 +7500,7 @@ Object.defineProperties(CustomEventShim.prototype, { detail: enumerableProperty$
 const EventShimWithRealType = EventShim;
 const CustomEventShimWithRealType = CustomEventShim;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/css.js
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/css.js
 /**
 * @license
 * Copyright 2024 Google LLC
@@ -7536,7 +7536,7 @@ var _a = class CSSRule {
 };
 _a.STYLE_RULE = 1, _a.CHARSET_RULE = 2, _a.IMPORT_RULE = 3, _a.MEDIA_RULE = 4, _a.FONT_FACE_RULE = 5, _a.PAGE_RULE = 6, _a.NAMESPACE_RULE = 10, _a.KEYFRAMES_RULE = 7, _a.KEYFRAME_RULE = 8, _a.SUPPORTS_RULE = 12, _a.COUNTER_STYLE_RULE = 11, _a.FONT_FEATURE_VALUES_RULE = 14, _a.MARGIN_RULE = 9;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/index.js
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/index.js
 /**
 * @license
 * Copyright 2019 Google LLC
@@ -7924,7 +7924,7 @@ var CustomElementRegistry = class {
 const customElements = new CustomElementRegistry();
 const windowShim = new WindowShim(constructionToken);
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/css-tag.js
+//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/css-tag.js
 /**
 * @license
 * Copyright 2019 Google LLC
@@ -7967,7 +7967,7 @@ const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$2 
 	return r$2(e);
 })(t) : t;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/reactive-element.js
+//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/reactive-element.js
 const { is: h$1, defineProperty: r$1, getOwnPropertyDescriptor: o$2, getOwnPropertyNames: n$1, getOwnPropertySymbols: a$1, getPrototypeOf: c$1 } = Object, l$1 = globalThis;
 l$1.customElements ??= customElements;
 const p$1 = l$1.trustedTypes, d$1 = p$1 ? p$1.emptyScript : "", u$1 = l$1.reactiveElementPolyfillSupport, f$1 = (t, s) => t, b$1 = {
@@ -8195,7 +8195,7 @@ var g$1 = class extends (globalThis.HTMLElement ?? HTMLElementShimWithRealType) 
 };
 g$1.elementStyles = [], g$1.shadowRootOptions = { mode: "open" }, g$1[f$1("elementProperties")] = /* @__PURE__ */ new Map(), g$1[f$1("finalized")] = /* @__PURE__ */ new Map(), u$1?.({ ReactiveElement: g$1 }), (l$1.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/node/lit-html.js
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/node/lit-html.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -8443,7 +8443,7 @@ const B = (t, i, s) => {
 	return h._$AI(t), h;
 };
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
+//#region <root>/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -8490,7 +8490,7 @@ console.log(styles);
 `;
 
 exports[`css > emit > should work with emitted processed 'sourcemap-transform' css > js 2`] = `
-"//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/css-tag.js
+"//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/css-tag.js
 /**
 * @license
 * Copyright 2019 Google LLC
@@ -8533,7 +8533,7 @@ const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$3 
 	return r$2(e);
 })(t) : t;
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/reactive-element.js
+//#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/reactive-element.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -8763,7 +8763,7 @@ var y$1 = class extends HTMLElement {
 };
 y$1.elementStyles = [], y$1.shadowRootOptions = { mode: "open" }, y$1[d$1("elementProperties")] = /* @__PURE__ */ new Map(), y$1[d$1("finalized")] = /* @__PURE__ */ new Map(), p$1?.({ ReactiveElement: y$1 }), (a$1.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/lit-html.js
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/lit-html.js
 /**
 * @license
 * Copyright 2017 Google LLC
@@ -9011,7 +9011,7 @@ const D = (t, i, s) => {
 	return h._$AI(t), h;
 };
 //#endregion
-//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
+//#region <root>/node_modules/.pnpm/lit-element@4.2.2/node_modules/lit-element/lit-element.js
 /**
 * @license
 * Copyright 2017 Google LLC
