@@ -863,13 +863,14 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     // stat → brotli → gzip serially per file (brotli at quality 11 alone was
     // the single largest non-rollup phase for small projects).
     const distributionPath = join(context.options.rootDir, context.options.outDir);
+    const entryByOutputPath = new Map(context.buildEntries.map((bEntry) => [join(distributionPath, bEntry.path), bEntry]));
     const sizingTasks: Promise<void>[] = [];
 
     for await (const file of walk(distributionPath, {
         includeDirs: false,
         includeFiles: true,
     })) {
-        let entry = context.buildEntries.find((bEntry) => join(distributionPath, bEntry.path) === file.path);
+        let entry = entryByOutputPath.get(file.path);
 
         if (!entry) {
             entry = {
