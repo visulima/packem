@@ -1,0 +1,71 @@
+---
+title: Bundler
+description: Choose the bundler backend — Rollup (default) or the experimental Rolldown
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+# Bundler
+
+Packem can build with one of two backends. By default it uses [Rollup](https://rollupjs.org) — the full-featured, fully-supported path. You can opt into the experimental [Rolldown](https://rolldown.rs) backend (a Rust-based, oxc-powered bundler) with the `bundler` option.
+
+```typescript
+export default defineConfig({
+  bundler: 'rollup',   // default
+  // or
+  bundler: 'rolldown', // experimental
+})
+```
+
+## CLI flag
+
+You can also select the backend per build without editing the config file:
+
+```sh
+packem build --bundler rolldown
+```
+
+The flag accepts `rollup` or `rolldown`; any other value is rejected.
+
+## Rolldown backend (experimental)
+
+<Callout type="warning">
+The Rolldown backend is **experimental** and not yet at full feature parity with Rollup. Rollup remains the default and the fully-supported path — opting into Rolldown does not deprecate it.
+</Callout>
+
+When you select Rolldown, keep these in mind:
+
+- **No `transformer` option.** Rolldown ships its own oxc-based transform and always uses it, so omit the `transformer` option when `bundler` is `'rolldown'`. The `esbuild` / `swc` / `sucrase` / `oxc` transformer adapters only apply under the default `'rollup'` backend.
+
+  ```typescript
+  // ✅ Rolldown — no transformer
+  export default defineConfig({
+    bundler: 'rolldown',
+  })
+
+  // ❌ Rolldown + transformer is not supported
+  export default defineConfig({
+    bundler: 'rolldown',
+    transformer: esbuild, // remove this
+  })
+  ```
+
+- **Declaration files route through Rollup.** Even with `bundler: 'rolldown'`, `.d.ts` generation (and DTS watching) still runs through Rollup. Rollup is pulled in automatically when Rolldown is combined with `declaration: true`, so you don't need to configure anything — but Rollup remains a build-time dependency in that case.
+
+## Choosing a backend
+
+| | Rollup (default) | Rolldown (experimental) |
+|---|---|---|
+| Stability | Fully supported | Experimental, opt-in |
+| Transformer | Pluggable (esbuild, swc, oxc, sucrase, tsc) | Built-in oxc only |
+| Declaration files | Native | Routed through Rollup |
+| Speed | Baseline | Faster bundling |
+
+For the detailed support matrix and the criteria for graduating Rolldown out of experimental status, see [Rolldown backend status](https://github.com/visulima/packem/blob/main/docs/rolldown-status.md).
+
+---
+
+## Related Options
+
+- [Transformers](/docs/options/transformers) - Choose the code transformer (Rollup backend only)
+- [Declaration Files](/docs/options/declaration-files) - TypeScript `.d.ts` generation

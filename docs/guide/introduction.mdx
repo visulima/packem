@@ -7,7 +7,7 @@ description: What Packem is, how it works, and when to use it
 
 Packem is a bundler for Node.js and TypeScript libraries. It reads your `package.json` exports, picks the right entry points, and produces optimized ESM, CJS, or IIFE bundles — with TypeScript declarations, CSS processing, and tree shaking included.
 
-Under the hood it uses Rollup for bundling and lets you swap in the compiler that fits your project: esbuild, swc, OXC, sucrase, or the official TypeScript compiler.
+Under the hood it uses Rollup for bundling and lets you swap in the compiler that fits your project: esbuild, swc, OXC, sucrase, or the official TypeScript compiler. An experimental [Rolldown](https://rolldown.rs) backend is also selectable via the [`bundler`](/docs/options/bundler) option.
 
 ## How Packem differs from plain Rollup
 

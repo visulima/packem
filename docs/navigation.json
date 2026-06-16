@@ -141,6 +141,11 @@
           "description": "Choose and configure transformers"
         },
         {
+          "title": "Bundler",
+          "href": "/docs/options/bundler",
+          "description": "Rollup (default) or experimental Rolldown backend"
+        },
+        {
           "title": "Target",
           "href": "/docs/options/target",
           "description": "JavaScript compilation targets"
