@@ -51,7 +51,7 @@ jobs:
                   filters: ".github/file-filters.yml"
 
     test:
-        name: "Test (node-${{ matrix.node_version }}, ${{ matrix.os }})"
+        name: "Test (node-${{ matrix.node_version }}, ${{ matrix.os }}, ${{ matrix.bundler }})"
         if: "needs.files-changed.outputs.packages == 'true'"
         needs: "files-changed"
         strategy:
@@ -60,12 +60,21 @@ jobs:
                 os:
                     - "ubuntu-latest"
                 node_version: ["22", "24", "25"]
+                # Run both bundler backends across the node matrix. rollup is the
+                # primary backend (carries coverage); rolldown is the native-DTS
+                # backend routed via PACKEM_TEST_BUNDLER.
+                bundler: ["rollup", "rolldown"]
                 # On the other platforms, we only test the lts node version
                 include:
                     - os: "macos-latest"
                       node_version: "22"
+                      bundler: "rollup"
+                    - os: "macos-latest"
+                      node_version: "22"
+                      bundler: "rolldown"
                       # - os: "windows-latest"
                       #  node_version: "22"
+                      #  bundler: "rollup"
             fail-fast: false
         runs-on: "${{ matrix.os }}"
         env:
@@ -122,12 +131,21 @@ jobs:
             # (spawn E2BIG) on large diffs and fails the job before anything runs.
             - name: "Build"
               shell: "bash"
-              run: "pnpm run build:affected:packages"
+              run: |
+                  if [[ "${{ matrix.bundler }}" == "rolldown" ]]; then
+                      # The rolldown integration suite is the full packem suite (not
+                      # nx-affected), so build every package it depends on.
+                      pnpm run build:packages
+                  else
+                      pnpm run build:affected:packages
+                  fi
 
             - name: "Run tests"
               shell: "bash"
               run: |
-                  if [[ "${{ matrix.os }}" == "ubuntu-latest" && "${{ matrix.node_version }}" == 22 ]]; then
+                  if [[ "${{ matrix.bundler }}" == "rolldown" ]]; then
+                      pnpm --filter @visulima/packem run test:rolldown
+                  elif [[ "${{ matrix.os }}" == "ubuntu-latest" && "${{ matrix.node_version }}" == 22 ]]; then
                       pnpm run test:affected:coverage
                   else
                       pnpm run test:affected
@@ -138,7 +156,7 @@ jobs:
               run: "tar -cf - .nx/cache | lz4 > /tmp/nx_cache.tar.lz4" # compress nx cache
 
             - name: "Upload code coverage to codecov"
-              if: "matrix.os == 'ubuntu-latest' && matrix.node_version == 22"
+              if: "matrix.bundler == 'rollup' && matrix.os == 'ubuntu-latest' && matrix.node_version == 22"
               uses: "anolilab/workflows/step/codecov@acba5fb15ac98ad23dec1ad233e40e1bb79c1dae" # v19.0.4
               with:
                   run-lint: "needs.files-changed.outputs.codecov == 'true'"
@@ -146,54 +164,6 @@ jobs:
                   use-affected: "true"
                   affected-files: "${{ steps.files.outputs.all_changed_files }}"
                   exclude-affected-projects: "bench,docs,examples_*"
-
-    test-rolldown:
-        name: "Test rolldown backend (advisory)"
-        if: "needs.files-changed.outputs.packages == 'true'"
-        needs: "files-changed"
-        runs-on: "ubuntu-latest"
-        # Advisory: NOT part of test-required-check yet. The rolldown full-suite
-        # run has known cache/ordering flakiness; surface regressions without
-        # gating merges until it has proven stable (see plans/001).
-        steps:
-            - name: "Harden Runner"
-              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
-              with:
-                  egress-policy: "audit"
-
-            - name: "Git checkout ${{ env.HEAD_REPOSITORY }}:${{ env.HEAD_REF }}"
-              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
-              env:
-                  GIT_COMMITTER_NAME: "GitHub Actions Shell"
-                  GIT_AUTHOR_NAME: "GitHub Actions Shell"
-                  EMAIL: "github-actions[bot]@users.noreply.github.com"
-              with:
-                  fetch-depth: 0
-
-            - name: "Setup resources and environment"
-              id: "setup"
-              uses: "anolilab/workflows/step/setup@802f3b1d00b0ab47c3102b4f4ebd866b9f7f8fcf" # v18.0.3
-              with:
-                  node-version: "22"
-                  install-packages: "false"
-                  install-node-gyp: "true"
-
-            - name: "Install packages"
-              shell: "bash"
-              run: "pnpm install --frozen-lockfile --prefer-offline"
-              env:
-                  "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": true
-                  "CYPRESS_INSTALL_BINARY": true
-                  "SKIP_CHECK": "true"
-                  "HUSKY": 0
-
-            - name: "Build packages"
-              shell: "bash"
-              run: "pnpm run build:packages"
-
-            - name: "Run rolldown integration suite"
-              shell: "bash"
-              run: "pnpm --filter @visulima/packem run test:rolldown"
 
     # This check runs once all dependant jobs have passed
     # It symbolizes that all required checks have successfully passed (Or skipped)
