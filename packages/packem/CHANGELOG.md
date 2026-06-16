@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.92](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.91...@visulima/packem@2.0.0-alpha.92) (2026-06-16)
+
+### Features
+
+* **packem:** drop "experimental" from the rolldown wizard hint ([f237cca](https://github.com/visulima/packem/commit/f237cca245fc318925adf5a4e712f26172b5b239))
+
 ## @visulima/packem [2.0.0-alpha.91](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.90...@visulima/packem@2.0.0-alpha.91) (2026-06-16)
 
 ### Bug Fixes
