@@ -374,26 +374,25 @@ export default defineConfig({
 
 ## Format Validation
 
-Validate your output formats:
+Packem validates that your `package.json` `exports` map matches the formats it
+produces. This runs automatically; configure it through the `validation` option
+rather than a manual hook:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  rollup: {
-    output: [
-      { format: 'esm', file: 'dist/index.mjs' },
-      { format: 'cjs', file: 'dist/index.cjs' }
-    ]
+  transformer,
+  validation: {
+    packageJson: {
+      exports: true,
+    },
   },
-  
-  hooks: {
-    'build:after': async () => {
-      // Validate package.json exports
-      const { validatePackage } = await import('@visulima/packem/validator')
-      await validatePackage('./package.json')
-    }
-  }
 })
 ```
+
+See the [validation docs](/docs/guide/package-json) for the full set of checks.
 
 ## Interoperability
 
@@ -530,21 +529,22 @@ export default defineConfig({
 
 ### External Dependencies
 
-Configure externals appropriately for each format:
+`dependencies`, `peerDependencies`, and Node built-ins are externalized by
+default. Use the top-level `externals` array to force-externalize extra
+packages, and `rollup.resolveExternals` to change classification:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  rollup: {
-    external: (id) => {
-      // Different externals for different formats
-      if (format === 'iife') {
-        return ['react', 'react-dom'].includes(id)
-      }
-      return !id.startsWith('.') && !id.startsWith('/')
-    }
-  }
+  transformer,
+  externals: ['react', 'react-dom'],
 })
 ```
+
+See the [externals option](/docs/options/externals) for the full classification
+controls (`deps`, `peerDeps`, `exclude`, …).
 
 ## Performance Considerations
 

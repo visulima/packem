@@ -8,7 +8,9 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 # CSS Processing
 
-Packem provides first-class support for CSS and all major CSS preprocessors. From vanilla CSS to advanced CSS Modules, Packem handles all your styling needs with optimized bundling and processing.
+Packem provides first-class support for CSS and all major CSS preprocessors. From vanilla CSS to advanced CSS Modules, Packem handles all your styling needs through the [`@visulima/rollup-plugin-css`](/docs/api/rollup-plugin-css) plugin.
+
+CSS options are configured under `rollup.css` and are typed as `StyleOptions` from `@visulima/rollup-plugin-css`. The CSS loaders and minifiers ship with Packem and are imported from the `@visulima/packem/css/loader/*` and `@visulima/packem/css/minifier/*` sub-paths. Register a loader by adding it to the `loaders` array.
 
 ## Supported CSS Technologies
 
@@ -56,7 +58,7 @@ Packem provides first-class support for CSS and all major CSS preprocessors. Fro
 
 ## Basic CSS Support
 
-Packem automatically processes CSS files imported in your JavaScript/TypeScript code:
+Packem processes CSS files imported in your JavaScript/TypeScript code. Register the PostCSS loader to enable plain `.css` processing:
 
 ```typescript
 // src/index.ts
@@ -87,31 +89,43 @@ export function createButton() {
 
 ## Configuration
 
-Configure CSS processing in your `packem.config.ts`:
+Configure CSS processing in your `packem.config.ts`. The PostCSS loader requires `postcss` to be installed.
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
 import transformer from '@visulima/packem/transformer/esbuild'
-import lessLoader from '@visulima/packem/css/loader/less'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
 
 export default defineConfig({
   transformer,
-  
   rollup: {
     css: {
       mode: 'extract',
-      loaders: [lessLoader],
-      less: {
-        options: {
-          math: 'parens-division',
-          paths: ['node_modules', 'src/styles'],
-          sourceMap: {}
-        }
-      }
-    }
-  }
+      loaders: [postcssLoader],
+    },
+  },
 })
 ```
+
+### Available `css` options
+
+The `css` option accepts the following keys (typed as `StyleOptions`):
+
+- `mode` — how CSS is delivered: `"inject"` (default), `"extract"`, `"emit"`, or `"inline"`. See [Output Modes](#output-modes).
+- `loaders` — array of CSS loaders to register (PostCSS, Sass, Less, Stylus, Lightning CSS, Tailwind CSS).
+- `autoModules` — enable CSS Modules for `*.module.*` files. Accepts a boolean, RegExp, or function (`@default false`).
+- `minifier` — a minifier object (cssnano or Lightning CSS). See [Minification](#minification).
+- `cssnano` — options for the cssnano minifier.
+- `lightningcss` — options for Lightning CSS.
+- `postcss` — PostCSS options (plugins, modules, etc.).
+- `sass` / `less` / `stylus` — preprocessor loader options.
+- `extensions` — file extensions to process (`@default [".css", ".pcss", ".postcss", ".sss"]`).
+- `include` / `exclude` — file filters (RegExp, string, or array).
+- `alias` — URL and import path aliases.
+- `sourceMap` — source map control: `boolean`, `"inline"`, or a tuple with `SourceMapOptions` (`@default false`).
+- `dts` — generate `.d.ts` files for style imports.
+- `namedExports` — export each class as a named binding (`@default false`).
+- `onImport` / `onExtract` — lifecycle callbacks.
 
 ## Sass/SCSS
 
@@ -146,7 +160,7 @@ $border-radius: 0.25rem;
   border: none;
   border-radius: $border-radius;
   cursor: pointer;
-  
+
   &:hover {
     background-color: darken($bg-color, 10%);
   }
@@ -159,20 +173,26 @@ $border-radius: 0.25rem;
 
 ### Configuration
 
+Register the Sass loader and pass options on the `sass` key. The Sass options are passed directly to the Dart Sass / Embedded Sass compiler. Select the implementation with `implementation` (`"sass"` or `"sass-embedded"`).
+
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import sassLoader from '@visulima/packem/css/loader/sass'
+
 export default defineConfig({
-  css: {
-    preprocessors: {
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [sassLoader],
       sass: {
         implementation: 'sass', // or 'sass-embedded'
-        options: {
-          outputStyle: 'compressed',
-          sourceMap: true,
-          includePaths: ['node_modules', 'src/styles']
-        }
-      }
-    }
-  }
+        style: 'compressed',
+        loadPaths: ['node_modules', 'src/styles'],
+      },
+    },
+  },
 })
 ```
 
@@ -200,7 +220,7 @@ npm install --save-dev less
   border: none;
   border-radius: @border-radius;
   cursor: pointer;
-  
+
   &:hover {
     background-color: darken(@bg-color, 10%);
   }
@@ -213,6 +233,8 @@ npm install --save-dev less
 
 ### Configuration
 
+Register the Less loader and pass Less.js compiler options directly on the `less` key.
+
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
 import transformer from '@visulima/packem/transformer/esbuild'
@@ -220,20 +242,16 @@ import lessLoader from '@visulima/packem/css/loader/less'
 
 export default defineConfig({
   transformer,
-  
   rollup: {
     css: {
       mode: 'extract',
       loaders: [lessLoader],
       less: {
-        options: {
-          math: 'parens-division',
-          paths: ['node_modules', 'src/styles'],
-          sourceMap: {}
-        }
-      }
-    }
-  }
+        math: 'parens-division',
+        paths: ['node_modules', 'src/styles'],
+      },
+    },
+  },
 })
 ```
 
@@ -261,7 +279,7 @@ button-style(bg-color)
   border none
   border-radius border-radius
   cursor pointer
-  
+
   &:hover
     background-color darken(bg-color, 10%)
 
@@ -271,6 +289,8 @@ button-style(bg-color)
 
 ### Configuration
 
+Register the Stylus loader and pass Stylus render options directly on the `stylus` key.
+
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
 import transformer from '@visulima/packem/transformer/esbuild'
@@ -278,20 +298,17 @@ import stylusLoader from '@visulima/packem/css/loader/stylus'
 
 export default defineConfig({
   transformer,
-  
   rollup: {
     css: {
       mode: 'extract',
       loaders: [stylusLoader],
       stylus: {
-        options: {
-          compress: true,
-          paths: ['node_modules', 'src/styles'],
-          sourcemap: true
-        }
-      }
-    }
-  }
+        compress: true,
+        paths: ['node_modules', 'src/styles'],
+        use: ['nib'],
+      },
+    },
+  },
 })
 ```
 
@@ -322,7 +339,7 @@ module.exports = {
 }
 ```
 
-Or configure directly in Packem:
+Or configure directly in Packem on the `postcss` key:
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
@@ -331,7 +348,6 @@ import postcssLoader from '@visulima/packem/css/loader/postcss'
 
 export default defineConfig({
   transformer,
-  
   rollup: {
     css: {
       mode: 'extract',
@@ -358,34 +374,52 @@ export default defineConfig({
 
 ## CSS Modules
 
-CSS Modules provide locally scoped CSS to avoid naming conflicts.
+CSS Modules provide locally scoped CSS to avoid naming conflicts. Enable them with the `autoModules` option, which applies to files named `[name].module.[ext]` (for example `Button.module.css`).
 
 ### Enable CSS Modules
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
 import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
 
 export default defineConfig({
   transformer,
-  
   rollup: {
     css: {
       mode: 'extract',
+      loaders: [postcssLoader],
       autoModules: true,
-      // or with options
-      postcss: {
-        modules: {
-          scopeBehaviour: 'local',
-          generateScopedName: '[name]__[local]___[hash:base64:5]',
-          hashPrefix: 'prefix',
-          exportGlobals: true
-        }
-      }
-    }
-  }
+    },
+  },
 })
 ```
+
+To restrict CSS Modules to a custom pattern, pass a regular expression to `autoModules`. Module name generation is customized through `postcss.modules`:
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      autoModules: /\.module\./,
+      postcss: {
+        modules: {
+          generateScopedName: '[name]__[local]___[hash:base64:5]',
+          exportGlobals: true,
+        },
+      },
+    },
+  },
+})
+```
+
+<Callout type="info">
+You can also enable modules through `postcss.modules` directly (set it to `true`
+or an options object) instead of using `autoModules`.
+</Callout>
 
 ### Usage
 
@@ -423,21 +457,51 @@ export function createButton(variant: 'primary' | 'secondary' = 'primary') {
 
 ### CSS Modules with TypeScript
 
-Generate type definitions for CSS Modules:
+Set the `dts` option to generate companion `.d.ts` files alongside your CSS Modules, giving you IntelliSense and compile-time checks for class names.
+
+```typescript
+css: {
+  mode: 'extract',
+  loaders: [postcssLoader],
+  autoModules: true,
+  dts: true,
+}
+```
+
+This emits a declaration file next to each module:
 
 ```typescript
 // src/Button.module.css.d.ts (auto-generated)
-declare const styles: {
-  readonly button: string
-  readonly primary: string
-  readonly secondary: string
+declare const button: string
+declare const primary: string
+declare const secondary: string
+
+interface ModulesExports {
+  button: string
+  primary: string
+  secondary: string
 }
+
+declare const styles: ModulesExports
 export default styles
+export { button, primary, secondary }
+```
+
+### Named Exports
+
+Enable `namedExports` to export each class as a named binding alongside the default export:
+
+```typescript
+css: {
+  loaders: [postcssLoader],
+  autoModules: true,
+  namedExports: true,
+}
 ```
 
 ## Lightning CSS
 
-Lightning CSS provides fast CSS parsing, transformation, and minification.
+Lightning CSS provides fast CSS parsing, transformation, and minification, written in Rust. It can be used as a loader, and as a minifier (see [Minification](#minification)).
 
 ### Installation
 
@@ -447,99 +511,175 @@ npm install --save-dev lightningcss
 
 ### Configuration
 
+Register the Lightning CSS loader and pass Lightning CSS transform options on the `lightningcss` key. Browser targets are derived from your project's browserslist configuration.
+
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import lightningcssLoader from '@visulima/packem/css/loader/lightningcss'
+
 export default defineConfig({
-  css: {
-    transformer: 'lightningcss',
-    lightningcss: {
-      minify: true,
-      targets: {
-        chrome: 80,
-        firefox: 75,
-        safari: 13
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [lightningcssLoader],
+      lightningcss: {
+        drafts: {
+          customMedia: true,
+        },
       },
-      drafts: {
-        nesting: true,
-        customMedia: true
-      }
-    }
-  }
+    },
+  },
 })
 ```
+
+<Callout type="info">
+The `targets`, `minify`, `code`, `filename`, and `cssModules` Lightning CSS
+options are managed by Packem internally and are not configurable through the
+`lightningcss` key. Browser targets come from your browserslist configuration.
+</Callout>
 
 ### Features
 
 - **Fast parsing** - Written in Rust for maximum performance
 - **Modern CSS** - Support for CSS nesting, custom media queries, etc.
-- **Browser targets** - Automatic feature detection based on targets
-- **Minification** - Built-in CSS minification
+- **Browser targets** - Automatic feature detection based on your browserslist
+- **Minification** - Built-in CSS minification when used as a minifier
 
-## CSS Optimization
+## Minification
+
+CSS minification is enabled by passing a **minifier object** to the `minifier` option. Packem ships two built-in minifiers as importable sub-paths:
+
+- `@visulima/packem/css/minifier/cssnano` — cssnano (requires `cssnano` installed)
+- `@visulima/packem/css/minifier/lightningcss` — Lightning CSS (requires `lightningcss` installed)
+
+<Callout type="warn">
+There is no boolean `minify` / `minimize` option for CSS. Minification is opt-in
+by assigning a minifier object to `minifier`.
+</Callout>
 
 ### cssnano
 
-Advanced CSS minification and optimization.
-
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import cssnanoMinifier from '@visulima/packem/css/minifier/cssnano'
+
 export default defineConfig({
-  css: {
-    minimize: true,
-    minimizer: 'cssnano',
-    cssnano: {
-      preset: ['default', {
-        discardComments: { removeAll: true },
-        normalizeWhitespace: true,
-        colormin: true,
-        convertValues: true
-      }]
-    }
-  }
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      minifier: cssnanoMinifier,
+      cssnano: {
+        preset: ['default', {
+          discardComments: { removeAll: true },
+        }],
+      },
+    },
+  },
 })
 ```
 
-### Bundle Analysis
+### Lightning CSS
 
-Analyze your CSS bundle size:
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import lightningcssMinifier from '@visulima/packem/css/minifier/lightningcss'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      minifier: lightningcssMinifier,
+    },
+  },
+})
+```
+
+## Output Modes
+
+The `mode` option controls how CSS reaches the bundle. The default is `"inject"`.
+
+### Extract
+
+Writes CSS to a separate `.css` file next to the generated JS.
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+    },
+  },
+})
+```
+
+To extract to a fixed file name (relative to the output directory), use the tuple form:
+
+```typescript
+css: {
+  mode: ['extract', 'styles.css'],
+  loaders: [postcssLoader],
+}
+```
+
+### Inject (default)
+
+Embeds the CSS inside the JavaScript bundle and injects it into `<head>` at runtime. This requires `@visulima/css-style-inject` to be installed.
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    css: {
+      mode: 'inject',
+      loaders: [postcssLoader],
+    },
+  },
+})
+```
 
 ```bash
-packem build --analyze
+npm install --save-dev @visulima/css-style-inject
 ```
 
-This generates a report showing:
-- CSS file sizes
-- Unused CSS rules
-- Optimization opportunities
-- Dependency tree
+You can also pass injector options or your own injector function with the tuple form `['inject', options | fn]`.
 
-## CSS Injection Strategies
+### Inline
 
-Control how CSS is injected into your application:
-
-### Extract CSS Files
+Embeds the processed CSS as a string export in the JavaScript module without runtime injection.
 
 ```typescript
-export default defineConfig({
-  css: {
-    extract: true, // Extract CSS to separate files
-    filename: '[name].[contenthash].css'
-  }
-})
+css: {
+  mode: 'inline',
+  loaders: [postcssLoader],
+}
 ```
 
-### Inline CSS
+### Emit
+
+Emits pure processed CSS and passes it along the build pipeline. Useful for preprocessing CSS before it is consumed by other plugins.
 
 ```typescript
-export default defineConfig({
-  css: {
-    extract: false, // Inline CSS in JavaScript bundles
-    inject: 'style-tag' // or 'css-variables'
-  }
-})
+css: {
+  mode: 'emit',
+  loaders: [postcssLoader],
+}
 ```
 
 ### Runtime Injection
 
-Use the CSS style inject utility:
+When using `inject` mode, Packem relies on `@visulima/css-style-inject`. You can also call it directly for dynamic, runtime-generated styles:
 
 ```typescript
 import { injectStyles } from '@visulima/css-style-inject'
@@ -556,6 +696,20 @@ injectStyles(css, {
   prepend: false
 })
 ```
+
+## Source Maps
+
+Enable CSS source maps with the `sourceMap` option:
+
+```typescript
+css: {
+  mode: 'extract',
+  loaders: [postcssLoader],
+  sourceMap: true, // or 'inline'
+}
+```
+
+You can also pass a tuple with `SourceMapOptions`, e.g. `sourceMap: [true, { /* options */ }]`.
 
 ## Advanced Features
 
@@ -580,19 +734,19 @@ injectStyles(css, {
 .card {
   padding: 1rem;
   border: 1px solid #dee2e6;
-  
+
   .title {
     font-size: 1.25rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
   }
-  
+
   .content {
     color: #6c757d;
-    
+
     p {
       margin-bottom: 1rem;
-      
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -666,27 +820,27 @@ withDefaults(defineProps<Props>(), {
 ### CSS Not Loading
 
 1. **Check imports** - Ensure CSS files are imported in your JavaScript/TypeScript
-2. **Verify file paths** - Check that CSS file paths are correct
-3. **Check configuration** - Verify CSS processing is enabled
+2. **Register a loader** - Add the relevant loader (e.g. `postcssLoader`) to the `loaders` array
+3. **Verify file paths** - Check that CSS file paths are correct
 
 ### Preprocessor Errors
 
-1. **Install dependencies** - Make sure preprocessor packages are installed
-2. **Check syntax** - Verify preprocessor syntax is correct
-3. **Update paths** - Check include paths and import statements
+1. **Install dependencies** - Make sure preprocessor packages are installed (`sass`, `less`, `stylus`)
+2. **Register the loader** - Add the matching loader to `css.loaders`
+3. **Check syntax** - Verify preprocessor syntax is correct
 
 ### CSS Modules Not Working
 
-1. **Enable CSS Modules** - Set `css.modules: true` in configuration
-2. **File naming** - Use `.module.css` suffix for CSS Modules files
+1. **Enable CSS Modules** - Set `css.autoModules: true` (or configure `css.postcss.modules`)
+2. **File naming** - Use the `.module.css` suffix for CSS Modules files
 3. **Import syntax** - Use `import styles from './file.module.css'`
 
 ### Performance Issues
 
-1. **Enable minification** - Use `css.minimize: true`
-2. **Extract CSS** - Use `css.extract: true` for better caching
+1. **Enable minification** - Assign a minifier to `css.minifier`
+2. **Extract CSS** - Use `css.mode: 'extract'` for better caching
 3. **Optimize imports** - Remove unused CSS imports
-4. **Use Lightning CSS** - Switch to Lightning CSS for better performance
+4. **Use Lightning CSS** - Switch to the Lightning CSS loader/minifier for better performance
 
 <Callout type="tip">
 Use `packem build --verbose` to see detailed CSS processing information and identify issues.
@@ -705,4 +859,4 @@ Check out our CSS examples:
 
 ---
 
-Need more help? Check the [CSS troubleshooting guide](/docs/guide/troubleshooting/css) or explore [CSS examples](/docs/examples/css).
+Need more help? Check the [CSS troubleshooting guide](/docs/guide/troubleshooting/css) or explore [CSS examples](/docs/examples/css/basic).

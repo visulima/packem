@@ -92,35 +92,48 @@ export default defineConfig({
   // Transformer selection
   transformer?: 'esbuild' | 'swc' | 'oxc' | 'sucrase' | 'typescript'
 
-  // Rollup configuration
+  // Generate source maps for every output
+  sourcemap?: boolean
+
+  // Minify the output (the active transformer performs the minification)
+  minify?: boolean
+
+  // Target runtime environment
+  runtime?: 'node' | 'browser' | 'edge-light' | 'react-server' | 'bun' | 'deno' | 'workerd' | 'electron' | 'react-native'
+
+  // Browserslist queries used for transpilation
+  browserTargets?: string[]
+
+  // Rollup configuration. Transformer-specific options and CSS options
+  // nest here, NOT at the top level.
   rollup?: {
     input?: InputOption
     output?: OutputOptions | OutputOptions[]
     plugins?: Plugin[]
     external?: ExternalOption
+
+    // Transformer-specific options
+    esbuild?: EsbuildOptions | false
+    swc?: SwcPluginConfig | false
+    oxc?: OxcOptions | false
+    sucrase?: SucrasePluginConfig | false
+
+    // CSS configuration
+    css?: {
+      extract?: boolean | string
+      modules?: boolean | CssModulesOptions
+      loaders?: CssLoader[]
+      sourceMap?: boolean | 'inline'
+      // ... other CSS options
+    }
     // ... other Rollup options
   }
 
-  // CSS configuration
-  css?: {
-    extract?: boolean
-    modules?: boolean | CssModulesOptions
-    loaders?: CssLoader[]
-    // ... other CSS options
-  }
-
-  // Transformer-specific options
-  esbuild?: EsbuildOptions
-  swc?: SwcOptions
-  oxc?: OxcOptions
-  sucrase?: SucraseOptions
-  typescript?: TypeScriptOptions
-
-  // Build hooks
+  // Build hooks (each receives the build context)
   hooks?: {
-    'build:before'?: (config) => void | Promise<void>
-    'build:after'?: (result) => void | Promise<void>
-    // ... other hooks
+    'build:before'?: (context) => void | Promise<void>
+    'build:done'?: (context) => void | Promise<void>
+    // ... other hooks (rollup:options, validate:before, …)
   }
 })
 ```
@@ -171,8 +184,8 @@ export default defineConfig((env) => {
     },
 
     css: {
-      extract: isProduction,
-      modules: true
+      mode: isProduction ? 'extract' : 'inject',
+      autoModules: true
     }
   }
 })
@@ -760,7 +773,7 @@ export default defineConfig({
   // Hooks from preset are automatically merged
   // You can add your own hooks or override preset hooks
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       console.log('User hook: Build completed')
     }
     // Preset's 'build:before' hook is still registered
@@ -774,24 +787,26 @@ Hooks from presets are automatically merged with your configuration. If you defi
 
 ## Configuration Composition
 
-Compose configurations from multiple sources:
+`defineConfig` takes a plain object, so you can compose configuration from
+multiple sources with object spreading — later spreads win:
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
-import { mergeConfig } from '@visulima/packem/utils'
+import transformer from '@visulima/packem/transformer/swc'
 import baseConfig from './base.config'
 import cssConfig from './css.config'
 
-export default defineConfig(
-  mergeConfig(
-    baseConfig,
-    cssConfig,
-    {
-      // Additional overrides
-      transformer: 'swc'
-    }
-  )
-)
+export default defineConfig({
+  ...baseConfig,
+  ...cssConfig,
+
+  // Additional overrides
+  transformer,
+  rollup: {
+    ...baseConfig.rollup,
+    ...cssConfig.rollup,
+  },
+})
 ```
 
 ## IDE Support
@@ -866,12 +881,11 @@ export default defineConfig({
 export default defineConfig({
   transformer: 'esbuild',
 
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: 'react'
-  },
-
   rollup: {
+    esbuild: {
+      jsx: 'automatic',
+      jsxImportSource: 'react'
+    },
     external: ['react', 'react-dom'],
     output: [
       { format: 'esm', file: 'dist/index.mjs' },
@@ -925,8 +939,8 @@ export default defineConfig([
       }
     },
     css: {
-      extract: true,
-      modules: true
+      mode: 'extract',
+      autoModules: true
     }
   }
 ])

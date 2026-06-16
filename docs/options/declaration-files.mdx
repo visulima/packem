@@ -34,39 +34,55 @@ Packem automatically enables declaration file generation when it detects TypeScr
 
 ## Configuration
 
+The `declaration` option is a boolean or one of the string modes `"compatible"` / `"node16"`:
+
+| Value           | Behaviour                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| `"compatible"`  | Generates `dist/index.d.mts`, `dist/index.d.cts` **and** `dist/index.d.ts`.                                    |
+| `true`          | Equivalent to `"compatible"`.                                                                                  |
+| `"node16"`      | Generates `dist/index.d.mts` and `dist/index.d.cts` only.                                                      |
+| `false`         | Disables declaration generation.                                                                              |
+| `undefined`     | Auto-detect from `package.json`: if a `types` field is present → `"compatible"`, otherwise `false`. (default) |
+
 ### Enable/Disable Declaration Generation
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
-  // Explicitly enable declaration generation
+  transformer,
+  // Explicitly enable declaration generation ("compatible")
   declaration: true,
-  
-  transformer: 'esbuild'
 })
 ```
 
-### Advanced Declaration Options
+To restrict output to the dual `.d.mts` / `.d.cts` files only, use `"node16"`:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  declaration: {
-    // Generate declaration files
-    enabled: true,
-    
-    // Output directory for declarations
-    outDir: 'types',
-    
-    // Generate declaration maps for better debugging
-    declarationMap: true,
-    
-    // Include comments in declaration files
-    removeComments: false,
-    
-    // Emit declarations only (no JS output)
-    emitDeclarationOnly: false
-  }
+  transformer,
+  declaration: 'node16',
+})
+```
+
+### Per-format Declaration Control
+
+If you need to emit only one declaration flavour without triggering the matching JavaScript build, use `declarationCjs` and `declarationEsm`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  // Generate .d.cts without producing a CJS JS bundle
+  declarationCjs: true,
+  // Generate .d.mts without producing an ESM JS bundle
+  declarationEsm: true,
 })
 ```
 
@@ -95,9 +111,10 @@ Your `packem.config.ts` stays minimal:
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
-  transformer: 'esbuild'
+  transformer,
 })
 ```
 
@@ -171,7 +188,11 @@ Packem will generate:
 ### Legacy Node.js Compatibility
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
+  transformer,
   rollup: {
     node10Compatibility: {
       typeScriptVersion: '>=5.0',
@@ -181,7 +202,7 @@ export default defineConfig({
 })
 ```
 
-This generates `typeVersions` in your `package.json` for Node.js 10 compatibility:
+This generates `typesVersions` in your `package.json` for Node.js 10 compatibility:
 
 ```json
 {
@@ -194,46 +215,17 @@ This generates `typeVersions` in your `package.json` for Node.js 10 compatibilit
 }
 ```
 
-## Declaration Bundling
-
-Bundle multiple declaration files into a single file:
-
-```typescript
-export default defineConfig({
-  declaration: {
-    enabled: true,
-    bundle: true, // Bundle all declarations into one file
-    outFile: 'dist/index.d.ts'
-  }
-})
-```
-
-### Declaration Bundling with rollup-plugin-dts
-
-```typescript
-import dts from 'rollup-plugin-dts'
-
-export default defineConfig({
-  rollup: {
-    plugins: [
-      dts({
-        // Bundle all .d.ts files
-        bundledPackages: ['my-dependency'],
-        // Respect external dependencies
-        respectExternal: true
-      })
-    ]
-  }
-})
-```
-
 ## Include/Exclude Filters
 
 Control which source files have `.d.ts` declarations generated using `include` and `exclude` patterns.
 This is useful when you want to skip declaration generation for specific files (e.g., test utilities, internal helpers).
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
+  transformer,
   declaration: true,
 
   rollup: {
@@ -280,7 +272,11 @@ With this config, types from `webpack` and `vite` are automatically inlined in `
 Use `rollup.dts.resolve` to add extra packages or override the automatic behavior:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
+  transformer,
   rollup: {
     dts: {
       // Add extra packages on top of auto-detected ones
@@ -300,13 +296,17 @@ Options:
 Generate declarations for multiple entry points:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
+  transformer,
   entry: {
     index: 'src/index.ts',
     utils: 'src/utils.ts',
     cli: 'src/cli.ts'
   },
-  
+
   declaration: true
 })
 ```
@@ -318,33 +318,25 @@ This generates:
 
 ## Declaration Maps
 
-Enable declaration maps for better IDE support:
+Declaration maps let IDEs navigate from compiled declaration files back to the original TypeScript source. They are driven by the TypeScript `declarationMap` compiler option — enable it in your `tsconfig.json`:
 
-```typescript
-export default defineConfig({
-  declaration: {
-    enabled: true,
-    declarationMap: true
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true
   }
-})
+}
 ```
 
-Declaration maps allow IDEs to navigate from compiled declaration files back to the original TypeScript source.
-
-## External Dependencies
-
-Handle external dependencies in declarations:
-
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  rollup: {
-    external: ['react', 'lodash'],
-    
-    // Ensure externals are preserved in declarations
-    dts: {
-      external: ['react', 'lodash']
-    }
-  }
+  transformer,
+  declaration: true
 })
 ```
 
@@ -378,11 +370,15 @@ Packem automatically resolves these paths in the generated declarations.
 Validate your declaration files with external tools:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
+  transformer,
   declaration: true,
-  
+
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       // Run attw (Are The Types Wrong?)
       await import('@arethetypeswrong/core').then(({ analyze }) => {
         return analyze('./package.json')
@@ -408,9 +404,12 @@ For maximum performance, enable isolated declarations in your `tsconfig.json`. P
 ```
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  // Use a fast transformer for JavaScript
-  transformer: 'esbuild'
+  transformer,
+  declaration: true
 })
 ```
 
@@ -426,25 +425,6 @@ Enable TypeScript incremental compilation:
     "tsBuildInfoFile": ".tsbuildinfo"
   }
 }
-```
-
-### Parallel Processing
-
-Process multiple entry points in parallel:
-
-```typescript
-export default defineConfig({
-  entry: {
-    index: 'src/index.ts',
-    utils: 'src/utils.ts',
-    cli: 'src/cli.ts'
-  },
-  
-  declaration: {
-    enabled: true,
-    parallel: true // Process declarations in parallel
-  }
-})
 ```
 
 ## Troubleshooting
@@ -507,15 +487,17 @@ If JSDoc comments are missing from your generated `.d.ts` files:
 1. **Use isolated declarations** for large projects
 2. **Enable incremental compilation** in TypeScript
 3. **Exclude test files** from declaration generation using `rollup.dts.exclude`
-4. **Use declaration bundling** to reduce file count
 
 ## Examples
 
 ### Basic Library
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  transformer: 'esbuild',
+  transformer,
   declaration: true
 })
 ```
@@ -523,21 +505,21 @@ export default defineConfig({
 ### React Component Library
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  transformer: 'esbuild',
-  
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: 'react'
-  },
-  
-  declaration: {
-    enabled: true,
-    declarationMap: true
-  },
-  
+  transformer,
+
+  declaration: true,
+
+  externals: ['react', 'react-dom'],
+
   rollup: {
-    external: ['react', 'react-dom']
+    esbuild: {
+      jsx: 'automatic',
+      jsxImportSource: 'react'
+    }
   }
 })
 ```
@@ -556,13 +538,12 @@ Enable isolated declarations in `tsconfig.json` and let Packem use the fast oxc-
 ```
 
 ```typescript
-export default defineConfig({
-  transformer: 'esbuild',
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
-  declaration: {
-    enabled: true,
-    parallel: true
-  }
+export default defineConfig({
+  transformer,
+  declaration: true
 })
 ```
 
@@ -591,5 +572,5 @@ export default defineConfig({
 
 - [Transformers](/docs/options/transformers) - Choose compatible transformers
 - [Output Format](/docs/options/output-format) - Match declaration formats to output formats
-- [TSConfig](/docs/options/tsconfig) - TypeScript configuration integration
+- [TSConfig](/docs/options/declaration-files) - TypeScript configuration integration
 - [Package Exports](/docs/options/package-exports) - Automatic exports generation

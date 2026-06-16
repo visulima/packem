@@ -458,7 +458,7 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       const { chmod } = await import('fs/promises')
       await chmod('dist', 0o755)
     }
@@ -477,7 +477,7 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       const { chown } = await import('fs/promises')
       const { getuid, getgid } = await import('process')
       await chown('dist', getuid(), getgid())
@@ -596,5 +596,5 @@ export default defineConfig({
 
 - [Output Format](/docs/options/output-format) - Configure output formats
 - [Entry](/docs/options/entry) - Configure entry points
-- [Assets](/docs/options/assets) - Handle static assets
-- [Clean](/docs/options/clean) - Clean output directories
+- [Assets](/docs/guide/introduction) - Handle static assets
+- [Clean](/docs/options/cleaning) - Clean output directories

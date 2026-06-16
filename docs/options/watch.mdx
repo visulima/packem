@@ -1,472 +1,180 @@
 ---
 title: Watch Mode
-description: Configure file watching for development builds
+description: Rebuild automatically when source files change
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout'
 
 # Watch Mode
 
-Watch mode automatically rebuilds your project when files change, providing fast feedback during development. Packem's watch mode is optimized for performance and includes smart caching.
+Watch mode rebuilds your project whenever a file in the module graph changes,
+giving you fast feedback during development. It is driven by Rollup's native
+watcher.
 
-## Basic Usage
-
-### Enable Watch Mode
-
-```bash
-# CLI
-packem --watch
-
-# Or short form
-packem -w
-```
-
-```typescript
-// Configuration
-export default defineConfig({
-  watch: true
-})
-```
-
-### Watch Specific Files
-
-```typescript
-export default defineConfig({
-  watch: {
-    include: ['src/**/*'],
-    exclude: ['**/*.test.ts', 'dist/**/*']
-  }
-})
-```
-
-## Configuration Options
-
-### Watch Patterns
-
-```typescript
-export default defineConfig({
-  watch: {
-    // Files to watch
-    include: [
-      'src/**/*.{ts,tsx,js,jsx}',
-      'styles/**/*.{css,scss,sass}',
-      'assets/**/*'
-    ],
-    
-    // Files to ignore
-    exclude: [
-      'node_modules/**/*',
-      'dist/**/*',
-      '**/*.test.{ts,js}',
-      '**/*.spec.{ts,js}'
-    ]
-  }
-})
-```
-
-### Watch Options
-
-```typescript
-export default defineConfig({
-  watch: {
-    // Polling interval (ms)
-    poll: 1000,
-    
-    // Use polling instead of native file events
-    usePolling: false,
-    
-    // Ignore initial build
-    skipWrite: false,
-    
-    // Clear console on rebuild
-    clearScreen: true,
-    
-    // Build delay after file change (ms)
-    buildDelay: 10
-  }
-})
-```
-
-## Development Server Integration
-
-### Built-in Dev Server
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  server: {
-    port: 3000,
-    host: 'localhost',
-    open: true,
-    cors: true
-  }
-})
-```
-
-### Hot Module Replacement
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  server: {
-    hmr: {
-      port: 24678,
-      host: 'localhost'
-    }
-  }
-})
-```
-
-### Live Reload
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  server: {
-    liveReload: true,
-    // Inject live reload script
-    injectLiveReload: true
-  }
-})
-```
-
-## Performance Optimization
-
-### Smart Caching
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  cache: {
-    // Enable persistent cache
-    enabled: true,
-    
-    // Cache directory
-    dir: '.packem-cache',
-    
-    // Cache invalidation
-    invalidateOnBuild: false
-  }
-})
-```
-
-### Incremental Builds
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  // Only rebuild changed modules
-  incremental: true,
-  
-  rollup: {
-    // Preserve module structure for faster rebuilds
-    output: {
-      preserveModules: true
-    }
-  }
-})
-```
-
-### Parallel Processing
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  // Process multiple files in parallel
-  parallel: true,
-  
-  // Maximum parallel workers
-  maxWorkers: 4
-})
-```
-
-## File System Events
-
-### Custom Event Handlers
-
-```typescript
-export default defineConfig({
-  watch: {
-    onFileChange: (file, event) => {
-      console.log(`File ${event}: ${file}`)
-    },
-    
-    onBuildStart: () => {
-      console.log('Build started...')
-    },
-    
-    onBuildEnd: (error) => {
-      if (error) {
-        console.error('Build failed:', error)
-      } else {
-        console.log('Build completed!')
-      }
-    }
-  }
-})
-```
-
-### Debouncing
-
-```typescript
-export default defineConfig({
-  watch: {
-    // Debounce file changes (ms)
-    debounce: 100,
-    
-    // Ignore rapid successive changes
-    ignoreInitial: true,
-    
-    // Atomic writes handling
-    atomic: true
-  }
-})
-```
-
-## Framework Integration
-
-### React Development
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  rollup: {
-    plugins: [
-      react({
-        // Fast refresh for React
-        fastRefresh: true,
-        
-        // Development mode
-        development: true
-      })
-    ]
-  }
-})
-```
-
-### Vue Development
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  rollup: {
-    plugins: [
-      vue({
-        // Vue dev tools
-        devtools: true,
-        
-        // Hot reload
-        hotReload: true
-      })
-    ]
-  }
-})
-```
-
-### CSS Preprocessing
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  css: {
-    // Watch imported CSS files
-    watchDependencies: true,
-    
-    // Inject CSS for development
-    inject: true,
-    
-    // Source maps
-    sourceMap: true
-  }
-})
-```
-
-## Advanced Configuration
-
-### Conditional Watch
-
-```typescript
-export default defineConfig({
-  watch: process.env.NODE_ENV === 'development',
-  
-  // Different config for watch mode
-  ...(process.env.NODE_ENV === 'development' && {
-    sourcemap: true,
-    minify: false
-  })
-})
-```
-
-### Multi-Package Watch
-
-```typescript
-// Monorepo root
-export default defineConfig({
-  watch: {
-    // Watch all packages
-    include: ['packages/*/src/**/*'],
-    
-    // Rebuild dependencies
-    buildDependencies: true
-  }
-})
-```
-
-### Custom File Watcher
-
-```typescript
-import chokidar from 'chokidar'
-
-export default defineConfig({
-  watch: {
-    // Custom watcher implementation
-    watcher: chokidar.watch('src/**/*', {
-      ignored: /node_modules/,
-      persistent: true,
-      ignoreInitial: true
-    })
-  }
-})
-```
-
-## Error Handling
-
-### Build Error Recovery
-
-```typescript
-export default defineConfig({
-  watch: {
-    // Continue watching on build errors
-    continueOnError: true,
-    
-    // Error overlay in browser
-    errorOverlay: true,
-    
-    // Notification on errors
-    notify: true
-  }
-})
-```
-
-### Graceful Shutdown
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  hooks: {
-    'watch:close': async () => {
-      console.log('Watch mode stopped')
-      // Cleanup resources
-    }
-  }
-})
-```
-
-## Testing Integration
-
-### Test File Watching
-
-```typescript
-export default defineConfig({
-  watch: {
-    include: ['src/**/*', 'test/**/*'],
-    
-    // Run tests on file change
-    onFileChange: async (file) => {
-      if (file.includes('.test.')) {
-        const { exec } = await import('child_process')
-        exec('npm test')
-      }
-    }
-  }
-})
-```
-
-### Type Checking
-
-```typescript
-export default defineConfig({
-  watch: true,
-  
-  typescript: {
-    // Watch mode type checking
-    watch: true,
-    
-    // Incremental type checking
-    incremental: true
-  }
-})
-```
-
-## Troubleshooting
-
-### High CPU Usage
-
-<Callout type="warning">
-If watch mode causes high CPU usage, try reducing watched files or using polling.
+<Callout type="info">
+Watch mode is enabled from the **CLI**, not from a config option. There is no
+top-level `watch` key in `packem.config.ts`; watcher tuning lives under
+`rollup.watch`.
 </Callout>
 
+## Enable Watch Mode
+
+```bash
+# Long form
+packem build --watch
+
+# Short form
+packem build -w
+```
+
+Run a command after every successful rebuild with `--onSuccess` (handy for
+restarting a server):
+
+```bash
+packem build --watch --onSuccess "node dist/index.mjs"
+```
+
+## Tuning the Watcher
+
+Watcher behaviour is configured through `rollup.watch`, which accepts Rollup's
+[`WatcherOptions`](https://rollupjs.org/configuration-options/#watch). These
+options only take effect when the build is started with `--watch`.
+
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  watch: {
-    // Use polling for problematic file systems
-    usePolling: true,
-    poll: 1000,
-    
-    // Reduce watched files
-    exclude: [
-      'node_modules/**/*',
-      'dist/**/*',
-      '.git/**/*',
-      '**/*.log'
-    ]
-  }
+  transformer,
+
+  rollup: {
+    watch: {
+      // Restrict which files are watched
+      include: 'src/**',
+      exclude: ['**/*.test.ts', 'node_modules/**'],
+
+      // Clear the console before each rebuild
+      clearScreen: true,
+
+      // Delay (ms) before a rebuild starts after a change
+      buildDelay: 0,
+
+      // Re-run the build without writing files to disk
+      skipWrite: false,
+    },
+  },
 })
 ```
 
-### File System Limits
+### Supported `rollup.watch` keys
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `include` | `string \| RegExp \| (string \| RegExp)[]` | Limit watching to these files |
+| `exclude` | `string \| RegExp \| (string \| RegExp)[]` | Skip watching these files |
+| `clearScreen` | `boolean` | Clear the screen before each rebuild |
+| `buildDelay` | `number` | Throttle rebuilds by this many milliseconds |
+| `skipWrite` | `boolean` | Run the build but don't write output files |
+| `chokidar` | `ChokidarOptions` | Options passed through to the underlying chokidar watcher |
+
+### Polling for problematic file systems
+
+Native file events do not work reliably on some network drives, containers, or
+virtual machines. Fall back to polling by passing chokidar options:
 
 ```typescript
 export default defineConfig({
-  watch: {
-    // Increase file descriptor limits
-    maxFiles: 10000,
-    
-    // Use polling for network drives
-    usePolling: process.platform === 'win32'
-  }
+  transformer,
+
+  rollup: {
+    watch: {
+      chokidar: {
+        usePolling: true,
+        interval: 1000,
+      },
+    },
+  },
 })
 ```
 
-### Memory Leaks
+## CSS in Watch Mode
+
+Imported CSS (and preprocessor) files are part of the module graph, so editing a
+watched stylesheet triggers a rebuild automatically. Configure CSS handling
+under `rollup.css`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
+export default defineConfig({
+  transformer,
+
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      // Emit source maps while iterating
+      sourceMap: true,
+    },
+  },
+})
+```
+
+## Reacting to Watch Events
+
+There is no dedicated "watch closed" hook. Use the `rollup:watch` hook to access
+the Rollup watcher instance and subscribe to its events (including `END` and
+`ERROR`) for cleanup or custom logging:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+
+  hooks: {
+    'rollup:watch': (context, watcher) => {
+      watcher.on('event', (event) => {
+        if (event.code === 'END') {
+          console.log('Rebuild complete')
+        }
+
+        if (event.code === 'ERROR') {
+          console.error('Rebuild failed:', event.error)
+        }
+      })
+
+      // Clean up when the process is terminated
+      process.on('SIGINT', () => {
+        watcher.close()
+        process.exit(0)
+      })
+    },
+  },
+})
+```
+
+## Faster Rebuilds
+
+Watch mode reuses Packem's persistent file cache when it is enabled, so
+unchanged modules are not re-transformed between rebuilds:
 
 ```typescript
 export default defineConfig({
-  watch: {
-    // Cleanup watchers
-    cleanup: true,
-    
-    // Limit cache size
-    maxCacheSize: '100MB'
-  }
+  transformer,
+  fileCache: true,
 })
 ```
+
+See [file cache](/docs/options/file-cache) for details.
 
 ---
 
 ## Related Options
 
-- [Server](/docs/options/server) - Development server configuration
-- [Cache](/docs/options/cache) - Build caching
-- [Incremental](/docs/options/incremental) - Incremental builds
+- [On Success](/docs/options/on-success) - Run a command after each successful build
+- [File Cache](/docs/options/file-cache) - Persistent cache for faster rebuilds
 - [Source Maps](/docs/options/source-maps) - Debug information

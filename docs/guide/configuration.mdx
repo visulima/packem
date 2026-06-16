@@ -589,15 +589,14 @@ export default defineConfig({
 ```typescript
 // config/factory.ts
 export function createConfig(options: {
-  target: 'node' | 'browser'
-  format: string[]
+  runtime: 'node' | 'browser'
 }) {
   return defineConfig({
     transformer,
-    format: options.format,
-    target: options.target,
+    runtime: options.runtime,
+    minify: options.runtime === 'browser',
     rollup: {
-      external: options.target === 'node'
+      external: options.runtime === 'node'
         ? (id) => !id.startsWith('.')
         : []
     }
@@ -608,10 +607,16 @@ export function createConfig(options: {
 import { createConfig } from './config/factory'
 
 export default createConfig({
-  target: 'node',
-  format: ['cjs', 'esm']
+  runtime: 'node'
 })
 ```
+
+<Callout type="info">
+Output formats (CommonJS / ESM) are derived from your `package.json` `exports`,
+`main`, and `module` fields — there is no top-level `format` or `target` option.
+Set the JavaScript language target via `rollup.esbuild.target`, your `tsconfig.json`,
+or `browserTargets`.
+</Callout>
 
 ### Plugin System
 
@@ -636,29 +641,25 @@ export default defineConfig({
 
 ## TypeScript Integration
 
-### Type Checking
+### Declaration Files
 
-Enable type checking during build:
+Generate TypeScript declaration files alongside your bundle:
 
 ```typescript
 export default defineConfig({
-  transformer: typescript, // Use TypeScript compiler
-  declaration: true,
-  rollup: {
-    typescript: {
-      check: true,        // Enable type checking
-      verbosity: 2,       // Detailed output
-      clean: true         // Clean previous declarations
-    }
-  }
+  transformer,
+  declaration: true, // 'compatible' | 'node16' | false also accepted
 })
 ```
 
+See the [declaration option](#declaration) above for the meaning of each value.
+
 ### Path Mapping
 
-Support TypeScript path mapping:
+Packem reads your `tsconfig.json` automatically and resolves TypeScript path
+mappings. Configure the paths in `tsconfig.json`:
 
-```typescript
+```json
 // tsconfig.json
 {
   "compilerOptions": {
@@ -668,13 +669,17 @@ Support TypeScript path mapping:
     }
   }
 }
+```
 
-// packem.config.ts
+Path resolution is enabled by default. To resolve mapped paths to absolute
+paths, enable the `rollup.tsconfigPaths` plugin option:
+
+```typescript
 export default defineConfig({
   transformer,
   rollup: {
-    typescript: {
-      tsconfig: './tsconfig.json'
+    tsconfigPaths: {
+      resolveAbsolutePath: true
     }
   }
 })
@@ -684,13 +689,12 @@ export default defineConfig({
 
 ### Verbose Output
 
+Enable debug mode for verbose logging during the build:
+
 ```typescript
 export default defineConfig({
   transformer,
-  rollup: {
-    verbose: true,
-    logLevel: 'debug'
-  }
+  debug: true
 })
 ```
 
@@ -720,9 +724,7 @@ export default defineConfig({
 export default defineConfig({
   transformer: esbuild, // Fastest transformer
   sourcemap: false,     // Disable in production
-  declaration: {
-    isolated: true      // Faster declarations
-  },
+  declaration: 'node16', // Emit only .d.mts + .d.cts (skip the extra .d.ts)
   rollup: {
     treeshake: true,    // Enable tree shaking
     external: [         // Externalize dependencies
@@ -773,11 +775,14 @@ export default defineConfig({
 Configure CSS loaders properly:
 
 ```typescript
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
 export default defineConfig({
   rollup: {
     css: {
-      extract: true,  // Extract CSS to separate files
-      modules: true   // Enable CSS modules
+      mode: 'extract',     // Extract CSS to a separate file ('inject' is the default)
+      autoModules: true,   // Treat *.module.css files as CSS modules
+      loaders: [postcssLoader]
     }
   }
 })

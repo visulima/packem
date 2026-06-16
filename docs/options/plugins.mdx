@@ -14,11 +14,13 @@ Packem leverages Rollup's powerful plugin ecosystem to extend functionality. You
 ### Adding Plugins
 
 ```typescript
-import { defineConfig } from '@visulima/packem'
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 
 export default defineConfig({
+  transformer,
   rollup: {
     plugins: [
       nodeResolve(),
@@ -30,17 +32,18 @@ export default defineConfig({
 
 ### Built-in Plugins
 
-Packem includes several plugins by default:
+Packem wires up the resolution, CommonJS, JSON and TypeScript handling it needs internally — you do not register these yourself. To add your own plugins, pass them through `rollup.plugins`:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+
 export default defineConfig({
-  // These are enabled automatically
-  autoPlugins: {
-    nodeResolve: true,
-    commonjs: true,
-    json: true,
-    typescript: true // If using TypeScript
-  }
+  transformer,
+  rollup: {
+    plugins: [nodeResolve()],
+  },
 })
 ```
 
@@ -894,7 +897,7 @@ export default defineConfig({
 
 ## Related Options
 
-- [Rollup](/docs/options/rollup) - Rollup configuration
-- [Transform](/docs/options/transform) - Code transformation
-- [Assets](/docs/options/assets) - Asset handling
-- [External](/docs/options/external) - External dependencies
+- [Rollup](/docs/options/plugins) - Rollup configuration
+- [Transform](/docs/options/transformers) - Code transformation
+- [Assets](/docs/guide/introduction) - Asset handling
+- [External](/docs/options/externals) - External dependencies

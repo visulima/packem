@@ -9,11 +9,30 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 Hooks allow you to tap into Packem's build lifecycle and execute custom logic at specific points during the build process. This enables advanced customization and integration with external tools.
 
+Hooks are registered through the `hooks` option and are powered by [hookable](https://github.com/unjs/hookable). Every hook receives the active `BuildContext` as its first argument; some hooks receive an additional argument (for example the Rollup build, the resolved Rollup options, or the watcher).
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  hooks: {
+    'build:before': async (context) => {
+      context.logger.info('Build starting...')
+    },
+    'build:done': async (context) => {
+      context.logger.info('Build completed!')
+    },
+  },
+})
+```
+
 ## Hook Merging
 
 When using presets, hooks from both the preset and your configuration are automatically merged. This means:
 
-- **Hooks from presets are preserved** - Preset hooks (like Solid preset's `rollup:options` hook) are automatically included
+- **Hooks from presets are preserved** - Preset hooks (like the Solid preset's `rollup:options` hook) are automatically included
 - **User config hooks take precedence** - If both preset and user config define the same hook, your hook will be used
 - **Multiple hooks can coexist** - Different hooks from preset and user config are all registered
 
@@ -32,63 +51,103 @@ Hooks are merged automatically when using presets. You don't need to manually co
 
 ## Available Hooks
 
+Packem exposes the following hooks (defined by the `BuildHooks` type). Each callback may be synchronous or return a `Promise`.
+
+| Hook | Arguments | When it runs |
+| --- | --- | --- |
+| `build:prepare` | `(context)` | Before the build context is fully set up. |
+| `build:before` | `(context)` | Right before the build starts. |
+| `build:done` | `(context)` | After the build finishes. |
+| `builder:before` | `(name, context)` | Before an individual builder runs. |
+| `builder:done` | `(name, context)` | After an individual builder finishes. |
+| `rollup:options` | `(context, options)` | After the Rollup options are assembled, before bundling. |
+| `rollup:build` | `(context, build)` | After Rollup produces the build. |
+| `rollup:done` | `(context)` | After the Rollup build completes. |
+| `rollup:watch` | `(context, watcher)` | After the Rollup watcher is created. |
+| `rollup:dts:options` | `(context, options)` | After the declaration-build Rollup options are assembled. |
+| `rollup:dts:build` | `(context, build)` | After the declaration build is produced. |
+| `rollup:dts:done` | `(context)` | After the declaration build completes. |
+| `validate:before` | `(context)` | Before validation runs. |
+| `validate:done` | `(context)` | After validation runs. |
+
+<Callout type="warning">
+`typedoc:before` and `typedoc:done` still exist but are deprecated. Use `builder:before` and `builder:done` instead.
+</Callout>
+
 ### Build Lifecycle
 
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:before': async () => {
-      console.log('Build starting...')
+    'build:prepare': async (context) => {
+      context.logger.info('Preparing build context...')
     },
 
-    'build:after': async () => {
-      console.log('Build completed!')
+    'build:before': async (context) => {
+      context.logger.info('Build starting...')
     },
 
-    'build:error': async (error) => {
-      console.error('Build failed:', error)
-    }
-  }
+    'build:done': async (context) => {
+      context.logger.info('Build completed!')
+    },
+  },
 })
 ```
 
-### File System Hooks
+### Rollup Hooks
 
 ```typescript
 export default defineConfig({
   hooks: {
-    'file:change': async (file, event) => {
-      console.log(`File ${event}: ${file}`)
+    'rollup:options': async (context, options) => {
+      // Inspect or mutate the resolved Rollup options
+      context.logger.debug('Rollup input:', options.input)
     },
 
-    'file:add': async (file) => {
-      console.log(`File added: ${file}`)
+    'rollup:build': async (context, build) => {
+      context.logger.info('Rollup build produced')
     },
 
-    'file:delete': async (file) => {
-      console.log(`File deleted: ${file}`)
-    }
-  }
+    'rollup:done': async (context) => {
+      context.logger.info('Rollup finished')
+    },
+  },
 })
 ```
 
-### Bundle Hooks
+### Declaration (DTS) Hooks
 
 ```typescript
 export default defineConfig({
   hooks: {
-    'bundle:start': async (options) => {
-      console.log('Bundle generation started')
+    'rollup:dts:options': async (context, options) => {
+      // Adjust the declaration-build Rollup options
     },
 
-    'bundle:end': async (bundle) => {
-      console.log('Bundle generated:', Object.keys(bundle))
+    'rollup:dts:build': async (context, build) => {
+      context.logger.info('Declaration build produced')
     },
 
-    'chunk:generated': async (chunk) => {
-      console.log(`Chunk generated: ${chunk.fileName}`)
-    }
-  }
+    'rollup:dts:done': async (context) => {
+      context.logger.info('Declaration build finished')
+    },
+  },
+})
+```
+
+### Validation Hooks
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'validate:before': async (context) => {
+      context.logger.info('Running validation...')
+    },
+
+    'validate:done': async (context) => {
+      context.logger.info('Validation finished')
+    },
+  },
 })
 ```
 
@@ -103,8 +162,8 @@ export default defineConfig({
       // Generate types from schema
       const { generateTypes } = await import('./scripts/generate-types')
       await generateTypes()
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -113,12 +172,12 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       // Optimize images
       const { optimizeImages } = await import('./scripts/optimize-images')
       await optimizeImages('dist/assets')
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -129,15 +188,15 @@ export default defineConfig({
   hooks: {
     'build:before': async () => {
       // Update version in files
-      const { writeFile } = await import('fs/promises')
+      const { writeFile } = await import('node:fs/promises')
       const version = process.env.npm_package_version
 
       await writeFile(
         'src/version.ts',
         `export const VERSION = '${version}'`
       )
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -146,16 +205,13 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'bundle:end': async (bundle) => {
-      // Analyze bundle size
-      const sizes = Object.entries(bundle).map(([name, chunk]) => ({
-        name,
-        size: chunk.code?.length || 0
-      }))
-
-      console.table(sizes)
-    }
-  }
+    'build:done': async (context) => {
+      // Inspect the entries Packem produced
+      for (const entry of context.buildEntries) {
+        context.logger.info(`${entry.path}: ${entry.size?.bytes ?? 0} bytes`)
+      }
+    },
+  },
 })
 ```
 
@@ -166,7 +222,7 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       if (process.env.NODE_ENV === 'production') {
         // Production-only tasks
         await deployToS3()
@@ -176,12 +232,14 @@ export default defineConfig({
         // Optional bundle analysis
         await generateBundleReport()
       }
-    }
-  }
+    },
+  },
 })
 ```
 
 ### Async Hook Chains
+
+A hook value may be a single function or an array of functions. All registered functions run in order.
 
 ```typescript
 export default defineConfig({
@@ -200,9 +258,9 @@ export default defineConfig({
       async () => {
         console.log('Step 3: Copy assets')
         await copyAssets()
-      }
-    ]
-  }
+      },
+    ],
+  },
 })
 ```
 
@@ -219,61 +277,32 @@ export default defineConfig({
         // Continue build despite error
       }
     },
-
-    'build:error': async (error) => {
-      // Send error to monitoring service
-      await sendErrorReport(error)
-
-      // Clean up resources
-      await cleanup()
-    }
-  }
+  },
 })
 ```
 
-## File System Integration
+## Validation Integration
 
-### Watch Mode Hooks
+### Reacting to Validation
 
-```typescript
-export default defineConfig({
-  hooks: {
-    'watch:start': async () => {
-      console.log('Watch mode started')
-    },
-
-    'watch:restart': async () => {
-      console.log('Restarting due to config change')
-    },
-
-    'watch:close': async () => {
-      console.log('Watch mode stopped')
-      await cleanup()
-    }
-  }
-})
-```
-
-### File Change Reactions
+Use the `validate:before` and `validate:done` hooks to run custom checks around Packem's built-in validation (such as `attw`, `bundleLimit`, `dependencies` and `packageJson`).
 
 ```typescript
 export default defineConfig({
+  validation: {
+    bundleLimit: {
+      limit: '50KB',
+    },
+  },
   hooks: {
-    'file:change': async (file, event) => {
-      // React to specific file changes
-      if (file.endsWith('.graphql')) {
-        await regenerateGraphQLTypes()
-      }
+    'validate:before': async (context) => {
+      context.logger.info('Starting validation pass')
+    },
 
-      if (file.includes('i18n/')) {
-        await updateTranslations()
-      }
-
-      if (file === 'package.json') {
-        await updateDependencies()
-      }
-    }
-  }
+    'validate:done': async (context) => {
+      context.logger.info('Validation pass complete')
+    },
+  },
 })
 ```
 
@@ -284,10 +313,10 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       if (process.env.RUN_TESTS) {
-        const { exec } = await import('child_process')
-        const { promisify } = await import('util')
+        const { exec } = await import('node:child_process')
+        const { promisify } = await import('node:util')
         const execAsync = promisify(exec)
 
         try {
@@ -298,8 +327,8 @@ export default defineConfig({
           process.exit(1)
         }
       }
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -308,13 +337,13 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       if (process.env.GENERATE_COVERAGE) {
         await generateCoverageReport()
         await uploadCoverageToService()
       }
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -325,7 +354,7 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       if (process.env.AUTO_DEPLOY === 'true') {
         console.log('Deploying to production...')
 
@@ -338,8 +367,8 @@ export default defineConfig({
         // Send notification
         await sendDeploymentNotification()
       }
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -348,7 +377,7 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       const env = process.env.DEPLOY_ENV
 
       switch (env) {
@@ -361,8 +390,8 @@ export default defineConfig({
         default:
           console.log('No deployment configured')
       }
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -378,7 +407,7 @@ export default defineConfig({
       global.buildStartTime = Date.now()
     },
 
-    'build:after': async () => {
+    'build:done': async () => {
       // Calculate build duration
       const duration = Date.now() - global.buildStartTime
       console.log(`Build completed in ${duration}ms`)
@@ -386,10 +415,10 @@ export default defineConfig({
       // Send metrics to monitoring service
       await sendMetrics({
         buildDuration: duration,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       })
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -398,86 +427,18 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'bundle:end': async (bundle) => {
-      const bundleSizes = Object.entries(bundle).reduce((acc, [name, chunk]) => {
-        acc[name] = chunk.code?.length || 0
-        return acc
-      }, {})
+    'build:done': async (context) => {
+      const bundleSizes = Object.fromEntries(
+        context.buildEntries.map((entry) => [entry.path, entry.size?.bytes ?? 0])
+      )
 
       // Track bundle size changes
       await trackBundleSizes(bundleSizes)
 
       // Alert if bundle size increased significantly
       await checkBundleSizeThresholds(bundleSizes)
-    }
-  }
-})
-```
-
-## Custom Hook System
-
-### Hook Registration
-
-```typescript
-class HookManager {
-  private hooks = new Map<string, Function[]>()
-
-  register(name: string, fn: Function) {
-    if (!this.hooks.has(name)) {
-      this.hooks.set(name, [])
-    }
-    this.hooks.get(name)!.push(fn)
-  }
-
-  async execute(name: string, ...args: any[]) {
-    const hooks = this.hooks.get(name) || []
-
-    for (const hook of hooks) {
-      await hook(...args)
-    }
-  }
-}
-
-const hookManager = new HookManager()
-
-export default defineConfig({
-  hooks: {
-    'build:before': async () => {
-      await hookManager.execute('custom:before-build')
-    }
-  }
-})
-```
-
-### Plugin Hook Integration
-
-```typescript
-function customPlugin() {
-  return {
-    name: 'custom-plugin',
-
-    buildStart() {
-      // Register custom hooks
-      this.emitFile({
-        type: 'asset',
-        fileName: 'custom-hook.js',
-        source: 'console.log("Custom hook executed")'
-      })
-    }
-  }
-}
-
-export default defineConfig({
-  rollup: {
-    plugins: [customPlugin()]
+    },
   },
-
-  hooks: {
-    'build:after': async () => {
-      // Execute plugin-specific hooks
-      await executePluginHooks()
-    }
-  }
 })
 ```
 
@@ -488,26 +449,18 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:before': async () => {
-      console.log('🚀 Starting build process')
+    'build:before': async (context) => {
+      context.logger.info('Starting build process')
     },
 
-    'file:change': async (file, event) => {
-      console.log(`📝 File ${event}: ${file}`)
+    'rollup:done': async (context) => {
+      context.logger.info('Rollup bundling finished')
     },
 
-    'bundle:end': async (bundle) => {
-      console.log('📦 Bundle generated:', Object.keys(bundle))
+    'build:done': async (context) => {
+      context.logger.info('Build completed successfully')
     },
-
-    'build:after': async () => {
-      console.log('✅ Build completed successfully')
-    },
-
-    'build:error': async (error) => {
-      console.error('❌ Build failed:', error.message)
-    }
-  }
+  },
 })
 ```
 
@@ -527,8 +480,8 @@ export default defineConfig({
   hooks: {
     'build:before': withTiming('build:before', async () => {
       await heavyOperation()
-    })
-  }
+    }),
+  },
 })
 ```
 
@@ -554,8 +507,8 @@ export default defineConfig({
         }
         // Otherwise continue
       }
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -569,10 +522,10 @@ export default defineConfig({
       await Promise.all([
         operation1(),
         operation2(),
-        operation3()
+        operation3(),
       ])
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -585,9 +538,9 @@ export default defineConfig({
       // Order matters - dependencies first
       async () => await setupDependencies(),
       async () => await configureEnvironment(),
-      async () => await startServices()
-    ]
-  }
+      async () => await startServices(),
+    ],
+  },
 })
 ```
 
@@ -597,5 +550,5 @@ export default defineConfig({
 
 - [Plugins](/docs/options/plugins) - Rollup plugins
 - [Watch](/docs/options/watch) - File watching
-- [Build](/docs/options/build) - Build configuration
-- [Scripts](/docs/options/scripts) - Custom scripts
+- [Build](/docs/guide/cli) - Build configuration
+- [Scripts](/docs/options/on-success) - Custom scripts

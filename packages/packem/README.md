@@ -598,8 +598,8 @@ import { defineConfig } from "@visulima/packem/config";
 
 export default defineConfig({
     // ...
-    validator: {
-        bundleSize: {
+    validation: {
+        bundleLimit: {
             limit: 1024 * 1024, // 1MB
             // or / and limits per file
             limits: {

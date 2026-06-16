@@ -3,582 +3,244 @@ title: Externals
 description: Configure external dependencies that should not be bundled
 ---
 
-# Externals
+import { Callout } from 'fumadocs-ui/components/callout'
 
-External dependencies are modules that should not be bundled with your library. Instead, they're expected to be provided by the consuming application. This is essential for libraries to avoid bundling large dependencies like React or Node.js built-ins.
+# External Dependencies
 
-## Basic Configuration
+External dependencies are modules that should not be bundled with your library. Instead, they are expected to be provided by the consuming application. Externalizing dependencies keeps your bundle small and avoids shipping duplicate copies of packages like React or Node.js built-ins.
 
-### Simple Externals
+Packem exposes two related controls:
+
+- **`externals`** — a top-level array that force-marks specific specifiers (or patterns) as external.
+- **`rollup.resolveExternals`** — automatic classification of `package.json` dependency groups and Node.js built-ins, plus an `exclude` list to force-bundle specific specifiers.
+
+## Default Behavior
+
+<Callout type="info">
+You usually need **no externals configuration at all**. By default Packem already externalizes your `dependencies`, `peerDependencies`, `optionalDependencies`, and Node.js built-in modules (`fs`, `path`, `node:url`, …).
+</Callout>
+
+The default classification is:
+
+| Group | Externalized by default? |
+| --- | --- |
+| `dependencies` | yes (`deps: true`) |
+| `peerDependencies` | yes (`peerDeps: true`) |
+| `optionalDependencies` | yes (`optDeps: true`) |
+| Node.js built-ins | yes (`builtins: true`) |
+| `devDependencies` | no (`devDeps: false`) |
+
+Because of this, most libraries only need to declare their runtime packages in `package.json` and let Packem do the rest. Reach for the options below when you need to deviate from the defaults.
+
+## The `externals` Array
+
+Use the top-level `externals` option to force-externalize additional specifiers that would not otherwise be classified as external. It accepts an array of strings and/or `RegExp` values — it is **not** a function.
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  rollup: {
-    external: ['react', 'react-dom', 'lodash']
-  }
+  transformer,
+  externals: ['react', 'react-dom'],
 })
 ```
 
-### Pattern-Based Externals
+- **Strings** are matched against the import specifier.
+- **`RegExp`** values are tested against the import id, which is handy for whole scopes or families of packages.
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  rollup: {
-    external: [
-      /^react/, // All React packages
-      /^@babel/, // All Babel packages
-      /^node:/ // Node.js built-ins with node: prefix
-    ]
-  }
+  transformer,
+  externals: [
+    'react',
+    'react-dom',
+    /^@myscope\//, // every package under the @myscope/ namespace
+  ],
 })
 ```
 
-### Function-Based Externals
+### React library example
+
+A typical React component library declares `react` and `react-dom` as peer dependencies. They are then externalized automatically. If you also want to make sure the JSX runtime entry points stay external, list them explicitly:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  rollup: {
-    external: (id) => {
-      // Custom logic for determining externals
-      if (id.startsWith('react')) return true
-      if (id.includes('node_modules')) return false
-      return false
-    }
-  }
+  transformer,
+  externals: ['react', 'react-dom', 'react/jsx-runtime'],
 })
 ```
 
-## Automatic Externals
+### Monorepo scope example
 
-### Package.json Dependencies
+To keep every workspace package under a shared scope external (so each one is resolved at runtime rather than inlined), use a `RegExp`:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  rollup: {
-    external: (id) => {
-      const pkg = require('./package.json')
-      
-      // All dependencies and peerDependencies are external
-      return [
-        ...Object.keys(pkg.dependencies || {}),
-        ...Object.keys(pkg.peerDependencies || {})
-      ].includes(id)
-    }
-  }
+  transformer,
+  externals: [/^@mycompany\//],
 })
 ```
 
-### Node.js Built-ins
+## Automatic Classification: `rollup.resolveExternals`
+
+`rollup.resolveExternals` controls how Packem classifies dependency groups and Node.js built-ins. You only need it when you want to change the defaults shown above.
 
 ```typescript
-import { builtinModules } from 'module'
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
+  transformer,
   rollup: {
-    external: [
-      ...builtinModules, // fs, path, url, etc.
-      ...builtinModules.map(m => `node:${m}`) // node:fs, node:path, etc.
-    ]
-  }
-})
-```
-
-### Using External Helper
-
-```typescript
-import { external } from '@visulima/packem/external'
-
-export default defineConfig({
-  rollup: {
-    external: external({
-      dependencies: true,    // Include dependencies
-      peerDependencies: true, // Include peerDependencies
-      builtins: true,        // Include Node.js built-ins
-      devDependencies: false // Exclude devDependencies
-    })
-  }
-})
-```
-
-## Framework-Specific Externals
-
-### React Library
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: [
-      'react',
-      'react-dom',
-      'react/jsx-runtime',
-      'react/jsx-dev-runtime'
-    ],
-    
-    output: {
-      globals: {
-        'react': 'React',
-        'react-dom': 'ReactDOM'
-      }
-    }
-  }
-})
-```
-
-### Vue Library
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['vue'],
-    
-    output: {
-      globals: {
-        'vue': 'Vue'
-      }
-    }
-  }
-})
-```
-
-### Angular Library
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: [
-      '@angular/core',
-      '@angular/common',
-      '@angular/platform-browser',
-      /^@angular\//
-    ]
-  }
-})
-```
-
-## Library Types
-
-### Peer Dependencies
-
-```json
-{
-  "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
-  }
-}
-```
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['react', 'react-dom'] // Match peerDependencies
-  }
-})
-```
-
-### Optional Dependencies
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: (id) => {
-      const pkg = require('./package.json')
-      const optionalDeps = Object.keys(pkg.optionalDependencies || {})
-      
-      // Make optional dependencies external
-      return optionalDeps.includes(id)
-    }
-  }
-})
-```
-
-### Scoped Packages
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: [
-      /@babel\//, // All @babel packages
-      /@types\//, // All @types packages
-      /@company\//, // Company-specific packages
-    ]
-  }
-})
-```
-
-## Format-Specific Externals
-
-### Different Externals per Format
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: [
-      {
-        format: 'esm',
-        file: 'dist/index.mjs',
-        external: ['react', 'react-dom']
-      },
-      {
-        format: 'iife',
-        file: 'dist/index.global.js',
-        external: [], // Bundle everything for IIFE
-        globals: {
-          'react': 'React',
-          'react-dom': 'ReactDOM'
-        }
-      }
-    ]
-  }
-})
-```
-
-### Platform-Specific Externals
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: [
-      {
-        format: 'cjs',
-        file: 'dist/index.node.cjs',
-        external: ['fs', 'path', 'url'] // Node.js built-ins
-      },
-      {
-        format: 'esm',
-        file: 'dist/index.browser.mjs',
-        external: ['react', 'react-dom'] // Browser externals
-      }
-    ]
-  }
-})
-```
-
-## Advanced Patterns
-
-### Conditional Externals
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: (id, parentId, isResolved) => {
-      // Only external if imported from entry point
-      if (parentId === undefined) {
-        return ['react', 'react-dom'].includes(id)
-      }
-      
-      // Bundle if imported from internal modules
-      return false
-    }
-  }
-})
-```
-
-### Dynamic Externals
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: (id) => {
-      // Check if module exists in node_modules
-      try {
-        require.resolve(id)
-        return true // External if found
-      } catch {
-        return false // Bundle if not found
-      }
-    }
-  }
-})
-```
-
-### Size-Based Externals
-
-```typescript
-import { statSync } from 'fs'
-import { resolve } from 'path'
-
-export default defineConfig({
-  rollup: {
-    external: (id) => {
-      try {
-        const modulePath = require.resolve(id)
-        const stats = statSync(modulePath)
-        
-        // External if larger than 100KB
-        return stats.size > 100 * 1024
-      } catch {
-        return false
-      }
-    }
-  }
-})
-```
-
-## Globals Configuration
-
-### UMD/IIFE Globals
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['react', 'react-dom', 'lodash'],
-    
-    output: {
-      format: 'umd',
-      globals: {
-        'react': 'React',
-        'react-dom': 'ReactDOM',
-        'lodash': '_'
-      }
-    }
-  }
-})
-```
-
-### CDN Globals
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['react', 'react-dom'],
-    
-    output: {
-      format: 'iife',
-      globals: {
-        // Expecting these to be loaded from CDN
-        'react': 'React',
-        'react-dom': 'ReactDOM'
-      }
-    }
-  }
-})
-```
-
-### Nested Globals
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['react/jsx-runtime'],
-    
-    output: {
-      format: 'iife',
-      globals: {
-        'react/jsx-runtime': 'React.jsx'
-      }
-    }
-  }
-})
-```
-
-## Monorepo Externals
-
-### Workspace Dependencies
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: (id) => {
-      // External if it's a workspace package
-      return id.startsWith('@mycompany/')
-    }
-  }
-})
-```
-
-### Cross-Package Dependencies
-
-```typescript
-// packages/ui/packem.config.ts
-export default defineConfig({
-  rollup: {
-    external: [
-      '@mycompany/utils', // Other workspace package
-      '@mycompany/theme'
-    ]
-  }
-})
-```
-
-### Shared Externals
-
-```typescript
-// shared-config.ts
-export const sharedExternals = [
-  'react',
-  'react-dom',
-  '@mycompany/shared'
-]
-
-// packages/*/packem.config.ts
-export default defineConfig({
-  rollup: {
-    external: sharedExternals
-  }
-})
-```
-
-## Validation and Testing
-
-### External Validation
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['react', 'react-dom']
+    resolveExternals: {
+      deps: true,
+      peerDeps: true,
+      optDeps: true,
+      builtins: true,
+      devDeps: false,
+    },
   },
-  
-  hooks: {
-    'build:after': async () => {
-      // Validate externals are not bundled
-      const { readFile } = await import('fs/promises')
-      const bundle = await readFile('dist/index.js', 'utf-8')
-      
-      if (bundle.includes('React.createElement')) {
-        throw new Error('React was bundled instead of being external')
-      }
-    }
-  }
 })
 ```
 
-### Bundle Analysis
+### Options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `builtins` | `boolean` | `true` | Mark Node.js built-ins (`path`, `fs`, …) as external. Set to `false` to use shims/polyfills instead. |
+| `builtinsPrefix` | `"add" \| "ignore" \| "strip"` | `"add"` | How to handle the `node:` prefix on built-in imports. |
+| `deps` | `boolean` | `true` | Mark `dependencies` as external. |
+| `devDeps` | `boolean` | `false` | Mark `devDependencies` as external. |
+| `optDeps` | `boolean` | `true` | Mark `optionalDependencies` as external. |
+| `peerDeps` | `boolean` | `true` | Mark `peerDependencies` as external. |
+| `exclude` | `(RegExp \| string)[]` | `[]` | Specifiers forced to be **bundled**, overriding every other rule. |
+
+### Force-bundling with `exclude`
+
+The `exclude` list does the opposite of `externals`: matching specifiers are forced **into** the bundle even if they would otherwise be classified as external (for example a `dependency` or `peerDependency`). This is useful for tiny, ESM-only packages you would rather inline.
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
+  transformer,
   rollup: {
-    external: ['react', 'react-dom'],
-    
-    plugins: [
-      bundleAnalyzer({
-        // Analyze what's bundled vs external
-        analyzerMode: 'static',
-        openAnalyzer: false
-      })
-    ]
-  }
+    resolveExternals: {
+      // Bundle this package even though it is a dependency:
+      exclude: ['some-tiny-esm-only-pkg', /^@internal\//],
+    },
+  },
+})
+```
+
+- **Strings** are matched as exact specifiers.
+- **`RegExp`** values are tested against the import id.
+
+`exclude` overrides all other rules — `deps`, `peerDeps`, `optDeps`, and `builtins` — so a matched specifier is always bundled.
+
+### Bundle everything (for IIFE / standalone output)
+
+When producing a self-contained bundle (such as an IIFE for the browser), turn off every classification so nothing is left external:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    resolveExternals: {
+      deps: false,
+      peerDeps: false,
+      optDeps: false,
+      builtins: false,
+    },
+  },
+})
+```
+
+If you only need to bundle a few specific packages rather than everything, list them in `exclude` instead of disabling whole groups.
+
+## Node.js Built-ins and the `node:` Prefix
+
+`builtinsPrefix` controls how Packem rewrites imports of Node.js built-in modules:
+
+- `"add"` (default) — turns `'path'` into `'node:path'`.
+- `"strip"` — turns `'node:path'` into `'path'`.
+- `"ignore"` — leaves names exactly as written.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    resolveExternals: {
+      builtins: true,
+      builtinsPrefix: 'add', // 'path' -> 'node:path'
+    },
+  },
+})
+```
+
+To bundle Node.js built-ins with shims/polyfills instead of externalizing them, set `builtins: false`.
+
+## Validating Externals
+
+You can verify your externalization is working by inspecting the output in the `build:done` hook:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  externals: ['react', 'react-dom'],
+  hooks: {
+    'build:done': async () => {
+      const { readFile } = await import('node:fs/promises')
+      const bundle = await readFile('dist/index.mjs', 'utf-8')
+
+      if (bundle.includes('React.createElement')) {
+        throw new Error('react was bundled instead of being left external')
+      }
+    },
+  },
 })
 ```
 
 ## Troubleshooting
 
-### Missing Externals
+### A package is being bundled when it should be external
 
-<Callout type="warning">
-If externals are missing at runtime, ensure they're properly installed and imported.
-</Callout>
+- Make sure it is listed in your `package.json` under `dependencies`, `peerDependencies`, or `optionalDependencies` — those groups are externalized by default.
+- If it is not a declared dependency, add it to the top-level `externals` array.
+- Check that it is not matched by an `exclude` pattern in `rollup.resolveExternals`, which would force it to be bundled.
 
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['react', 'react-dom'],
-    
-    // Warn about missing externals
-    onwarn: (warning, warn) => {
-      if (warning.code === 'UNRESOLVED_IMPORT') {
-        console.warn(`External dependency not found: ${warning.source}`)
-      }
-      warn(warning)
-    }
-  }
-})
-```
+### A package is external when it should be bundled
 
-### Incorrect Externals
+- Add the specifier (or a matching `RegExp`) to `rollup.resolveExternals.exclude`. `exclude` overrides all other classification rules.
+- Alternatively, disable the relevant group (`deps`, `peerDeps`, `optDeps`, `builtins`) if you want to change classification wholesale.
 
-```typescript
-export default defineConfig({
-  rollup: {
-    external: (id) => {
-      // Log external decisions for debugging
-      const isExternal = ['react', 'react-dom'].includes(id)
-      console.log(`${id}: ${isExternal ? 'external' : 'bundled'}`)
-      return isExternal
-    }
-  }
-})
-```
+### Node.js built-ins appear with an unexpected `node:` prefix
 
-### Version Conflicts
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['react'],
-    
-    // Check for version compatibility
-    plugins: [
-      {
-        name: 'version-check',
-        buildStart() {
-          const pkg = require('./package.json')
-          const reactVersion = pkg.peerDependencies?.react
-          
-          if (!reactVersion) {
-            this.warn('React version not specified in peerDependencies')
-          }
-        }
-      }
-    ]
-  }
-})
-```
-
-## Performance Considerations
-
-### Bundle Size Impact
-
-```typescript
-export default defineConfig({
-  rollup: {
-    // More externals = smaller bundle
-    external: [
-      'react',
-      'react-dom',
-      'lodash',
-      'moment',
-      'axios'
-    ]
-  }
-})
-```
-
-### Tree Shaking
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['lodash'], // External for better tree shaking
-    
-    // Or bundle specific functions
-    external: (id) => {
-      // Bundle lodash utilities, external lodash core
-      return id === 'lodash' && !id.startsWith('lodash/')
-    }
-  }
-})
-```
-
-### Runtime Performance
-
-```typescript
-export default defineConfig({
-  rollup: {
-    // External heavy dependencies
-    external: (id) => {
-      const heavyDeps = ['three', 'tensorflow', 'opencv']
-      return heavyDeps.some(dep => id.startsWith(dep))
-    }
-  }
-})
-```
+- Adjust `builtinsPrefix` to `"add"`, `"strip"`, or `"ignore"` depending on the prefix style you want in the output.
 
 ---
 
 ## Related Options
 
 - [Output Format](/docs/options/output-format) - Configure output formats
-- [Globals](/docs/options/globals) - Global variable mapping
 - [Package Exports](/docs/options/package-exports) - Package.json exports
-- [Peer Dependencies](/docs/options/peer-dependencies) - Peer dependency handling

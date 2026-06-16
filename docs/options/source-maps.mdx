@@ -13,6 +13,20 @@ Source maps provide a way to map compiled code back to the original source code,
 
 ### Enable Source Maps
 
+The simplest way to enable source maps for every output is the top-level `sourcemap` boolean:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+})
+```
+
+For per-output control, set `sourcemap` on the Rollup output instead:
+
 ```typescript
 export default defineConfig({
   rollup: {
@@ -116,94 +130,69 @@ export default defineConfig({
 
 ## Transformer-Specific Source Maps
 
+Transformer source map options live under the matching transformer key inside `rollup`.
+
 ### esbuild Source Maps
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  transformer: 'esbuild',
-  
-  esbuild: {
-    sourcemap: true,
-    sourcesContent: true
-  },
-  
+  transformer,
+  sourcemap: true,
   rollup: {
-    output: {
-      sourcemap: true
-    }
-  }
+    esbuild: {
+      sourceMap: true,
+    },
+  },
 })
 ```
 
 ### SWC Source Maps
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/swc'
+
 export default defineConfig({
-  transformer: 'swc',
-  
-  swc: {
-    sourceMaps: true,
-    inlineSourcesContent: true
-  },
-  
+  transformer,
+  sourcemap: true,
   rollup: {
-    output: {
-      sourcemap: true
-    }
-  }
-})
-```
-
-### TypeScript Source Maps
-
-```typescript
-export default defineConfig({
-  transformer: 'typescript',
-  
-  typescript: {
-    sourceMap: true,
-    inlineSources: true,
-    inlineSourceMap: false
-  }
+    swc: {
+      sourceMaps: true,
+    },
+  },
 })
 ```
 
 ## CSS Source Maps
 
-### CSS Preprocessing
+CSS source maps are configured via the `sourceMap` option of the CSS processor, which lives under `rollup.css`. It accepts `true`, `false`, or `'inline'`.
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  css: {
-    sourceMap: true,
-    
-    preprocessors: {
-      scss: {
-        sourceMap: true,
-        sourceMapContents: true
-      },
-      
-      less: {
-        sourceMap: true
-      }
-    }
-  }
+  transformer,
+  rollup: {
+    css: {
+      sourceMap: true,
+    },
+  },
 })
 ```
 
-### PostCSS Source Maps
+For inline CSS source maps:
 
 ```typescript
 export default defineConfig({
-  css: {
-    postcss: {
-      map: {
-        inline: false,
-        annotation: true,
-        sourcesContent: true
-      }
-    }
-  }
+  rollup: {
+    css: {
+      sourceMap: 'inline',
+    },
+  },
 })
 ```
 
@@ -391,7 +380,7 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   hooks: {
-    'build:after': async () => {
+    'build:done': async () => {
       // Validate source maps
       const { SourceMapConsumer } = await import('source-map')
       const fs = await import('fs/promises')
@@ -448,21 +437,24 @@ If source maps aren't working, ensure all transformers have source map support e
 </Callout>
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
+  transformer,
   // Enable source maps at all levels
+  sourcemap: true,
   rollup: {
     output: {
-      sourcemap: true
-    }
+      sourcemap: true,
+    },
+    esbuild: {
+      sourceMap: true,
+    },
+    css: {
+      sourceMap: true,
+    },
   },
-  
-  esbuild: {
-    sourcemap: true
-  },
-  
-  css: {
-    sourceMap: true
-  }
 })
 ```
 
