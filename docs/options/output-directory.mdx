@@ -381,24 +381,6 @@ export default defineConfig({
 })
 ```
 
-### Development Server
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      dir: 'dev',
-      sourcemap: true,
-      entryFileNames: '[name].js'
-    }
-  },
-  
-  server: {
-    static: 'dev' // Serve from output directory
-  }
-})
-```
-
 ## Advanced Patterns
 
 ### Dynamic Directory Names

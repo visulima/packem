@@ -30,36 +30,34 @@ TypeScript configuration files (`packem.config.ts`) are recommended as they prov
 ```typescript
 // packem.config.ts
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
-  // Choose your transformer
-  transformer: 'esbuild',
+  // The transformer is imported and passed as a value
+  transformer,
 
-  // Rollup configuration
-  rollup: {
-    output: {
-      format: 'esm',
-      dir: 'dist'
-    },
-    sourcemap: true
-  }
+  // Generate source maps for every output
+  sourcemap: true,
 })
 ```
+
+<Callout type="info">
+The `transformer` is **imported and passed as a value**, not selected with a
+string. Swap the import to choose a different one — e.g.
+`@visulima/packem/transformer/swc`, `/oxc`, or `/sucrase`. Output formats are
+derived from your `package.json`; you rarely need to set `rollup.output`
+manually.
+</Callout>
 
 ### JavaScript Configuration
 
 ```javascript
 // packem.config.js
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
-  transformer: 'esbuild',
-  rollup: {
-    output: {
-      format: 'esm',
-      dir: 'dist'
-    }
-  }
+  transformer,
 })
 ```
 
@@ -68,15 +66,10 @@ export default defineConfig({
 ```javascript
 // packem.config.cjs
 const { defineConfig } = require('@visulima/packem/config')
+const transformer = require('@visulima/packem/transformer/esbuild')
 
 module.exports = defineConfig({
-  transformer: 'esbuild',
-  rollup: {
-    output: {
-      format: 'cjs',
-      dir: 'dist'
-    }
-  }
+  transformer,
 })
 ```
 
@@ -85,12 +78,14 @@ module.exports = defineConfig({
 The `defineConfig` function provides full TypeScript support and validation:
 
 ```typescript
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
   // Entry points (optional - auto-detected from package.json)
-  entry?: string | string[] | Record<string, string>
+  entries?: BuildEntry[] | string[]
 
-  // Transformer selection
-  transformer?: 'esbuild' | 'swc' | 'oxc' | 'sucrase' | 'typescript'
+  // The transformer instance, imported and passed as a value
+  transformer?: TransformerFn
 
   // Generate source maps for every output
   sourcemap?: boolean
@@ -107,10 +102,7 @@ export default defineConfig({
   // Rollup configuration. Transformer-specific options and CSS options
   // nest here, NOT at the top level.
   rollup?: {
-    input?: InputOption
-    output?: OutputOptions | OutputOptions[]
     plugins?: Plugin[]
-    external?: ExternalOption
 
     // Transformer-specific options
     esbuild?: EsbuildOptions | false
@@ -118,14 +110,17 @@ export default defineConfig({
     oxc?: OxcOptions | false
     sucrase?: SucrasePluginConfig | false
 
-    // CSS configuration
+    // CSS configuration (see the CSS guide for the full StyleOptions shape)
     css?: {
-      extract?: boolean | string
-      modules?: boolean | CssModulesOptions
-      loaders?: CssLoader[]
+      mode?: 'inject' | 'extract' | 'emit' | 'inline'
+      autoModules?: boolean | RegExp | ((id: string) => boolean)
+      loaders?: Loader[]
       sourceMap?: boolean | 'inline'
       // ... other CSS options
     }
+
+    // Watcher options, used when the build runs with --watch
+    watch?: WatcherOptions | false
     // ... other Rollup options
   }
 
@@ -145,20 +140,24 @@ export default defineConfig({
 Configure different options based on environment:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import esbuildTransformer from '@visulima/packem/transformer/esbuild'
+import swcTransformer from '@visulima/packem/transformer/swc'
+
+const isDevelopment = process.env.NODE_ENV === 'development'
+
 export default defineConfig({
-  transformer: process.env.NODE_ENV === 'development' ? 'esbuild' : 'swc',
+  // Import each transformer you want to switch between, then pick one
+  transformer: isDevelopment ? esbuildTransformer : swcTransformer,
+
+  sourcemap: isDevelopment,
 
   rollup: {
-    output: {
-      format: 'esm',
-      dir: 'dist',
-      sourcemap: process.env.NODE_ENV === 'development'
-    },
     plugins: [
       // Development plugins
-      ...(process.env.NODE_ENV === 'development' ? [devPlugin()] : []),
+      ...(isDevelopment ? [devPlugin()] : []),
       // Production plugins
-      ...(process.env.NODE_ENV === 'production' ? [prodPlugin()] : [])
+      ...(isDevelopment ? [] : [prodPlugin()])
     ]
   }
 })
@@ -168,24 +167,29 @@ export default defineConfig({
 
 Use a function for dynamic configuration:
 
+The configuration function receives `(environment, mode)`, where
+`environment` is `"production" | "development" | undefined` and `mode` is
+`"build" | "jit" | "watch"`:
+
 ```typescript
-export default defineConfig((env) => {
-  const isProduction = env === 'production'
+import { defineConfig } from '@visulima/packem/config'
+import esbuildTransformer from '@visulima/packem/transformer/esbuild'
+import swcTransformer from '@visulima/packem/transformer/swc'
+
+export default defineConfig((environment, mode) => {
+  const isProduction = environment === 'production'
 
   return {
-    transformer: isProduction ? 'swc' : 'esbuild',
+    transformer: isProduction ? swcTransformer : esbuildTransformer,
+
+    sourcemap: !isProduction,
 
     rollup: {
-      output: {
-        format: 'esm',
-        dir: 'dist',
-        sourcemap: !isProduction
+      // CSS options nest under `rollup.css`
+      css: {
+        mode: isProduction ? 'extract' : 'inject',
+        autoModules: true
       }
-    },
-
-    css: {
-      mode: isProduction ? 'extract' : 'inject',
-      autoModules: true
     }
   }
 })
@@ -193,65 +197,23 @@ export default defineConfig((env) => {
 
 ### Async Configuration
 
-Load configuration asynchronously:
+The configuration function may be `async` and return a `Promise`:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig(async () => {
-  const packageJson = await import('./package.json')
+  const { default: extraPlugins } = await import('./build/plugins.js')
 
   return {
-    transformer: 'esbuild',
+    transformer,
 
     rollup: {
-      output: {
-        format: packageJson.type === 'module' ? 'esm' : 'cjs',
-        dir: 'dist'
-      }
-    }
+      plugins: extraPlugins,
+    },
   }
 })
-```
-
-## Multiple Configurations
-
-Export an array of configurations for multiple builds:
-
-```typescript
-export default defineConfig([
-  // ESM build
-  {
-    transformer: 'esbuild',
-    rollup: {
-      output: {
-        format: 'esm',
-        file: 'dist/index.mjs'
-      }
-    }
-  },
-
-  // CJS build
-  {
-    transformer: 'esbuild',
-    rollup: {
-      output: {
-        format: 'cjs',
-        file: 'dist/index.cjs'
-      }
-    }
-  },
-
-  // IIFE build for browsers
-  {
-    transformer: 'esbuild',
-    rollup: {
-      output: {
-        format: 'iife',
-        file: 'dist/index.global.js',
-        name: 'MyLibrary'
-      }
-    }
-  }
-])
 ```
 
 ## Configuration Merging
@@ -264,19 +226,18 @@ Packem automatically merges configurations from multiple sources:
 
 ```typescript
 // packem.config.ts
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  transformer: 'esbuild',
-  rollup: {
-    output: {
-      dir: 'dist'
-    }
-  }
+  transformer,
+  outDir: 'dist',
 })
 ```
 
 ```bash
 # CLI flags override config file
-packem build --transformer swc --outDir build
+packem build --outDir build
 ```
 
 ## Environment Variables
@@ -284,23 +245,20 @@ packem build --transformer swc --outDir build
 Access environment variables in your configuration:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  transformer: process.env.PACKEM_TRANSFORMER || 'esbuild',
+  transformer,
 
-  rollup: {
-    output: {
-      dir: process.env.PACKEM_OUTPUT_DIR || 'dist',
-      sourcemap: process.env.NODE_ENV !== 'production'
-    }
-  },
-
-  // Custom environment variables
-  define: {
-    'process.env.VERSION': JSON.stringify(process.env.npm_package_version),
-    'process.env.BUILD_TIME': JSON.stringify(new Date().toISOString())
-  }
+  outDir: process.env.PACKEM_OUTPUT_DIR || 'dist',
+  sourcemap: process.env.NODE_ENV !== 'production',
 })
 ```
+
+To inject values into the **bundled source** at compile time (rather than into
+the config itself), use `.env` files or the `--env.*` CLI flag described below —
+Packem replaces matching `process.env.*` references in your code.
 
 ### Loading from .env Files
 
@@ -363,8 +321,13 @@ After building, these will be replaced with their actual values at compile-time.
 Packem validates your configuration and provides helpful error messages:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  transformer: 'invalid', // ❌ TypeScript error
+  transformer,
+
+  runtime: 'invalid', // ❌ TypeScript error: not a valid runtime
 
   rollup: {
     output: {
@@ -727,15 +690,12 @@ Create reusable configuration presets:
 
 ```typescript
 // configs/presets.ts
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export const libraryPreset = {
-  transformer: 'esbuild' as const,
-  rollup: {
-    output: {
-      format: 'esm' as const,
-      dir: 'dist'
-    },
-    sourcemap: true
-  },
+  transformer,
+  sourcemap: true,
+  declaration: true,
   hooks: {
     'build:before': async () => {
       console.log('Preset hook: Preparing library build')
@@ -744,13 +704,8 @@ export const libraryPreset = {
 }
 
 export const cliPreset = {
-  transformer: 'esbuild' as const,
-  rollup: {
-    output: {
-      format: 'cjs' as const,
-      dir: 'bin'
-    }
-  }
+  transformer,
+  outDir: 'bin',
 }
 ```
 
@@ -817,13 +772,14 @@ Get full autocomplete and type checking in your configuration:
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
-  // TypeScript will provide autocomplete here
-  transformer: '|', // Shows: 'esbuild' | 'swc' | 'oxc' | 'sucrase' | 'typescript'
+  transformer,
 
   rollup: {
     output: {
+      // TypeScript autocompletes Rollup options here
       format: '|' // Shows: 'es' | 'cjs' | 'iife' | 'umd' | 'system'
     }
   }
@@ -832,19 +788,16 @@ export default defineConfig({
 
 ### Configuration Schema
 
-Import types for better IDE support:
+Import the `BuildConfig` type for better IDE support:
 
 ```typescript
-import type { PackemConfig } from '@visulima/packem/config'
+import { defineConfig } from '@visulima/packem/config'
+import type { BuildConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
-const config: PackemConfig = {
-  transformer: 'esbuild',
-  rollup: {
-    output: {
-      format: 'esm',
-      dir: 'dist'
-    }
-  }
+const config: BuildConfig = {
+  transformer,
+  sourcemap: true,
 }
 
 export default defineConfig(config)
@@ -865,10 +818,13 @@ PACKEM_DEBUG=config,rollup packem build
 Or programmatically:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
   debug: true, // Enable debug logging
 
-  transformer: 'esbuild',
+  transformer,
   // ... rest of config
 })
 ```
@@ -878,19 +834,18 @@ export default defineConfig({
 ### React Library
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  transformer: 'esbuild',
+  transformer,
+  externals: ['react', 'react-dom'],
 
   rollup: {
     esbuild: {
       jsx: 'automatic',
       jsxImportSource: 'react'
-    },
-    external: ['react', 'react-dom'],
-    output: [
-      { format: 'esm', file: 'dist/index.mjs' },
-      { format: 'cjs', file: 'dist/index.cjs' }
-    ]
+    }
   }
 })
 ```
@@ -898,52 +853,37 @@ export default defineConfig({
 ### Node.js CLI Tool
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  transformer: 'esbuild',
+  transformer,
 
   rollup: {
     output: {
-      format: 'cjs',
-      file: 'bin/cli.js',
       banner: '#!/usr/bin/env node'
     }
   }
 })
 ```
 
-### Full-Stack Library
+### Library with CSS
 
 ```typescript
-export default defineConfig([
-  // Server build
-  {
-    entry: 'src/server.ts',
-    transformer: 'esbuild',
-    rollup: {
-      output: {
-        format: 'cjs',
-        file: 'dist/server.js'
-      },
-      external: ['express', 'mongoose']
-    }
-  },
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
-  // Client build
-  {
-    entry: 'src/client.ts',
-    transformer: 'esbuild',
-    rollup: {
-      output: {
-        format: 'esm',
-        file: 'dist/client.mjs'
-      }
-    },
+export default defineConfig({
+  transformer,
+  externals: ['express', 'mongoose'],
+
+  rollup: {
     css: {
       mode: 'extract',
       autoModules: true
     }
   }
-])
+})
 ```
 
 ---
