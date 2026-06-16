@@ -1,3 +1,14 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.35](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.34...@visulima/rollup-plugin-dts@1.0.0-alpha.35) (2026-06-16)
+
+### Features
+
+* **rollup-plugin-dts:** sync upstream fixes ([#208](https://github.com/visulima/packem/issues/208)/[#238](https://github.com/visulima/packem/issues/238)/[#254](https://github.com/visulima/packem/issues/254)/[#259](https://github.com/visulima/packem/issues/259)) + js-sibling skip ([190e045](https://github.com/visulima/packem/commit/190e04502f9ed331e230f93e3c318afae1ef0196)), closes [#92](https://github.com/visulima/packem/issues/92)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** build-mode dts sourcemaps and JSDoc .js re-exports ([#255](https://github.com/visulima/packem/issues/255)) ([e34f3da](https://github.com/visulima/packem/commit/e34f3daab981b9319c5884eace871f6f1116cf39))
+* **rollup-plugin-dts:** rewrite inferred re-export specifiers to the imported dependency ([#227](https://github.com/visulima/packem/issues/227)) ([36e5c49](https://github.com/visulima/packem/commit/36e5c49ec4c1b300741b09d3d1757ede7965df09))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.33...@visulima/rollup-plugin-dts@1.0.0-alpha.34) (2026-06-12)
 
 ### Features
