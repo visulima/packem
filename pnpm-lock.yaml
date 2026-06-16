@@ -1956,10 +1956,10 @@ importers:
         specifier: 1.0.0-alpha.50
         version: link:../packem-share
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.53
+        specifier: 1.0.0-alpha.54
         version: link:../rollup-plugin-css
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.34
+        specifier: 1.0.0-alpha.35
         version: link:../rollup-plugin-dts
       '@visulima/tsconfig':
         specifier: catalog:visulima
@@ -2137,7 +2137,7 @@ importers:
         specifier: workspace:*
         version: link:../packem-plugins
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.73
+        specifier: 1.0.0-alpha.74
         version: link:../packem-rollup
       '@visulima/pail':
         specifier: catalog:visulima
@@ -2618,7 +2618,7 @@ importers:
         specifier: catalog:visulima
         version: 3.0.0-alpha.10
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.34
+        specifier: 1.0.0-alpha.35
         version: link:../rollup-plugin-dts
       clean-css:
         specifier: catalog:style
@@ -3043,7 +3043,7 @@ importers:
         specifier: catalog:types
         version: 0.0.11
       '@visulima/css-style-inject':
-        specifier: 1.0.0-alpha.18
+        specifier: 1.0.0-alpha.19
         version: link:../css-style-inject
       '@vitest/coverage-v8':
         specifier: catalog:test
@@ -5485,7 +5485,6 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@oxc-parser/binding-linux-x64-musl@0.127.0':
     resolution: {integrity: sha512-5eY0B/bxf1xIUxb4NOTvOI3KWtBQfPWYyKAzgcrCt0mDibSZygVpO1Pz8bkeiSZ5Jj9+M09dkggG3H8I5d0Uyg==}
