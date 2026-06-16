@@ -11,6 +11,10 @@ STOP conditions, and update your row when done.
   categories) that reconciled against batch 1's rejected-findings list. Several
   new subagent findings were refuted during vetting — see "Findings considered
   and rejected" so they aren't re-audited.
+- **Batch 3** (016–019): generated 2026-06-16 against commit `e34f3daab`, from a
+  `standard` all-packages audit (4 parallel read-only subagents). Reconciled
+  against batches 1–2 — the onSuccess/fs.watch/watch-catch findings were already
+  in the rejected list and stay there. Four new, vetted, low-risk fixes.
 
 ## Execution order & status
 
@@ -31,8 +35,27 @@ STOP conditions, and update your row when done.
 | 013  | Fix the CSS watch-cache root cause and remove the `useCache` hack (009 follow-up) | P2 | M | MED | 009 | DONE — APPROVED, merged into alpha (commit 8de1655c5, merge 21cda54ba). `meta.extracted` + `moduleParsed` repopulation; hack removed (`const useCache = true`). Accepted deviation: the regression test deletes the emitted CSS before the JS-only rebuild (a stale file from build 1 would mask non-emission — sharper than the planned assertion). Reviewer independently re-ran the revert-check (FAILs without fix at the re-creation assert, passes with), watch suite both backends 4/4, css.test.ts 139/139, css unit 46/46, lint:types |
 | 014  | Make `rollup-plugin-dts` dual-compatible rollup+rolldown (012 GO path, items 1–5) | P2 | M | LOW-MED | 012 | DONE — APPROVED, merged into alpha (commit 8e2b95d7b, merge a737680b7). Guard at `generate.ts` transform top; rolldown optional peer + dev dep (lockfile +3 lines, confined); alias rename verified pure via sed-normalized diff; 9 new rolldown-lane tests; reviewer re-ran suite (96 pass), lint, and packem typescript.test.ts (62 pass) in the worktree |
 | 015  | Route packem's DTS through rolldown natively (012 GO path, item 6) | P2 | L | MED-HIGH | 014 | IN PROGRESS (executor running, branch `advisor/015-rolldown-native-dts`; mandatory Step-0 probe gates the approach: rolldown multi-write, output plugins in write(), function-form fileNames) |
+| 016  | Handle read-stream errors in gzip/brotli size helpers | P1 | S | LOW | — | DONE — APPROVED (applied uncommitted in working tree 2026-06-16; reviewer re-ran typecheck=0 + new size.test.ts 4/4 incl. missing-file rejection guards) |
+| 017  | O(1) build-entry lookup (Map) in the size loop | P2 | S | LOW | — | DONE — APPROVED (uncommitted; Map key expr identical to old `.find()` predicate; typecheck=0, cli.test.ts 35/36 w/ 1 pre-existing skip) |
+| 018  | Pin vulnerable transitive deps (tmp/ws/form-data/js-yaml/markdown-it) to clear the audit gate | P1 | S | LOW | — | DONE — APPROVED (uncommitted; 5 overrides added in sorted order, lockfile regenerated; reviewer re-ran `pnpm audit --prod` → "No known vulnerabilities found") |
+| 019  | Destroy both streams on error in the url-plugin copy helper | P3 | S | LOW | — | DONE — APPROVED (uncommitted; destroy-then-reject both ways, `write` hoisted before read handler; typecheck=0, packem-plugins 116/116) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
+
+## Recommended order & dependency notes (batch 3)
+
+- **016 and 018 first** — both P1. 016 is a real unhandled-`'error'` crash: the
+  size helpers `.pipe()` a read stream without binding an `error` listener to
+  the *source*, so a file-read failure mid-build takes down the process. 018
+  clears 5 fresh `pnpm audit` advisories (all transitive dev/build tooling, but
+  the `audit-ci` gate fails every CI job on them) by bumping override floors.
+- **017** (perf) and **019** (error-path hardening) are lower urgency.
+- All four touch **disjoint files** — `packem/src/packem/utils/{gzip,brotli}-size.ts`;
+  `packem/src/packem/build.ts`; `pnpm-workspace.yaml`; `packem-plugins/src/plugins/url.ts`
+  — and have no inter-plan dependencies, so any order or full parallelism is safe.
+- 018 is a sibling of 007 (same file, `pnpm-workspace.yaml` overrides) but a
+  disjoint advisory set; if both are unmerged, expect a trivial overrides-block
+  merge (both only append lines).
 
 ## Recommended order & dependency notes (batch 2)
 
@@ -122,6 +145,37 @@ From the 2026-06-11 audit:
   input was demonstrated. Downgraded to "watch in review", no plan.
 - **sort-package-json 3→4 major bump**: dev-only, zero current cost. Routine
   maintenance, not a plan.
+
+From the 2026-06-16 audit (batch 3):
+
+- **onSuccess shell injection / copy-plugin absolute `dest` / babel-plugin JIT
+  import / `--env-file` path**: all "attacker controls `packem.config`/CLI",
+  which already means arbitrary code for a build tool. By-design (onSuccess was
+  already rejected in batch 1). No privilege boundary crossed.
+- **`mkdtemp` prefix predictability** (attw.ts) and **alias-validation regex
+  ReDoS** (validate-alias-entries.ts): cosmetic — random suffix and short config
+  inputs make both non-issues.
+- **fs.watch handle leak / fire-and-forget restart catch** (watch.ts:416,427):
+  re-confirmed documented-intentional (already rejected in batches 1–2).
+- **Package-name `split("/")` bounds** (externals.ts:67-89) and **DTS resolver
+  null-deref** (resolver.ts:95): speculative — no malformed real input, and the
+  resolver's type signature already permits null with a guard. Defensive-only.
+- **Regex-escape duplication** (4+ impls across externals.ts,
+  patch-typescript-types.ts, packem-share, packem/utils/escape-regexp.ts):
+  deferred — the character classes deliberately differ (externals omits `-`/`/`;
+  patch-typescript-types includes them), so naive consolidation changes
+  behavior. Low value, non-trivial risk.
+- **regex-compiled-in-loops** (infer-entries.ts): plausible micro-perf, but needs
+  profiling before touching a 1400-line order-sensitive file. Not planned.
+- **Test-coverage gaps** — DTS chunk pruner (`bundler/build-types.ts`),
+  first-run wizard / installer, the SEA single-executable module (`src/exe/*`):
+  real gaps, but each is a sizeable characterization-test effort better done
+  right before those modules are next touched, not as a blind sweep. Tracked
+  here; no fix-plan.
+- **God-files `fake-js.ts` (~1827 LOC) and `infer-entries.ts` (~1400 LOC)** and
+  the **21 `as unknown as` casts** in bundler core: L-effort, HIGH-risk debt that
+  needs a design pass, not an executor fix. Same revisit trigger as
+  `get-rollup-options.ts` below (rolldown port stabilizing).
 
 ## Noted but deliberately not planned
 
