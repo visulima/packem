@@ -157,7 +157,7 @@
         },
         {
           "title": "Watch Mode",
-          "href": "/docs/options/watch-mode",
+          "href": "/docs/options/watch",
           "description": "File watching and development workflow"
         },
         {
@@ -167,7 +167,7 @@
         },
         {
           "title": "Dependencies",
-          "href": "/docs/options/dependencies",
+          "href": "/docs/options/externals",
           "description": "External dependency handling"
         },
         {
@@ -182,7 +182,7 @@
         },
         {
           "title": "Minification",
-          "href": "/docs/options/minification",
+          "href": "/docs/options/minify",
           "description": "Code minification options"
         },
         {
@@ -352,8 +352,7 @@
               "title": "sucrase",
               "href": "/docs/examples/transformers/sucrase",
               "description": "Simple and fast alternative to Babel"
-            },
-
+            }
           ]
         },
         {
@@ -474,21 +473,21 @@
               "href": "/docs/examples/advanced/custom-plugins",
               "description": "Extend Packem with custom Rollup plugins"
             },
-          {
-            "title": "Bundle Analysis",
-            "href": "/docs/examples/advanced/bundle-analysis",
-            "description": "Analyze and optimize bundle size"
-          },
-          {
-            "title": "minify-html-literals",
-            "href": "/docs/examples/advanced/minify-html-literals",
-            "description": "Automatically minify HTML and CSS in template literals"
-          },
-          {
-            "title": "require-cjs-transformer",
-            "href": "/docs/examples/advanced/require-cjs-transformer",
-            "description": "Transform ESM imports of CJS packages for performance"
-          }
+            {
+              "title": "Bundle Analysis",
+              "href": "/docs/examples/advanced/bundle-analysis",
+              "description": "Analyze and optimize bundle size"
+            },
+            {
+              "title": "minify-html-literals",
+              "href": "/docs/examples/advanced/minify-html-literals",
+              "description": "Automatically minify HTML and CSS in template literals"
+            },
+            {
+              "title": "require-cjs-transformer",
+              "href": "/docs/examples/advanced/require-cjs-transformer",
+              "description": "Transform ESM imports of CJS packages for performance"
+            }
           ]
         }
       ]
