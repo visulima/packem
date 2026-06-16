@@ -402,6 +402,7 @@ overrides:
   fast-uri@<=3.1.1: ">=3.1.2"
   flatted@<=3.4.1: ">=3.4.2"
   follow-redirects@<=1.15.11: ">=1.16.0"
+  form-data@>=4.0.0 <4.0.6: ">=4.0.6"
   glob@>=10.2.0 <10.5.0: ">=10.5.0"
   handlebars@>=4.0.0 <4.7.9: ">=4.7.9"
   handlebars@>=4.0.0 <=4.7.8: ">=4.7.9"
@@ -413,11 +414,13 @@ overrides:
   hono@>=4.0.0 <=4.12.11: ">=4.12.12"
   ip-address@<=10.1.0: ">=10.1.1"
   js-yaml@>=4.0.0 <4.1.1: ">=4.1.1"
+  js-yaml@>=4.0.0 <4.1.2: ">=4.1.2"
   lodash-es@<=4.17.23: ">=4.18.0"
   lodash-es@>=4.0.0 <=4.17.23: ">=4.18.0"
   lodash@<=4.17.23: ">=4.18.0"
   lodash@>=4.0.0 <=4.17.22: ">=4.17.23"
   lodash@>=4.0.0 <=4.17.23: ">=4.18.0"
+  markdown-it@<14.1.2: ">=14.1.2"
   minimatch@<3.1.3: ">=3.1.3"
   minimatch@<3.1.4: ">=3.1.4"
   minimatch@>=10.0.0 <10.2.1: ">=10.2.1"
@@ -434,6 +437,7 @@ overrides:
   svelte@>=5.46.0 <=5.55.6: ">=5.55.7"
   svelte@>=5.51.5 <=5.55.6: ">=5.55.7"
   tmp@<0.2.6: ^0.2.6
+  tmp@<0.2.7: ">=0.2.7"
   # Force a single typescript version across the whole dep graph. Without this, deps that pin
   # an older 6.0.x (e.g. @anolilab/eslint-config, @sxzz/test-utils) pull typescript@6.0.2 while
   # the workspace uses 6.0.3 — and @volar/typescript's proxyCreateProgram surface-types clash
@@ -443,6 +447,7 @@ overrides:
   undici@<6.24.0: ">=6.24.0"
   vite@>=8.0.0 <=8.0.4: ">=8.0.5"
   ws@>=8.0.0 <8.20.1: ">=8.20.1"
+  ws@>=8.0.0 <8.21.0: ">=8.21.0"
   yaml@>=2.0.0 <2.8.3: ">=2.8.3"
 
 patchedDependencies:
