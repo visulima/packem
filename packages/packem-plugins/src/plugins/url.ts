@@ -21,12 +21,17 @@ import { svgEncoder } from "../utils";
 const copy = async (source: string, destination: string): Promise<void> => {
     await new Promise((resolve, reject) => {
         const read = createReadStream(source);
-
-        read.on("error", reject);
-
         const write = createWriteStream(destination);
 
-        write.on("error", reject);
+        read.on("error", (error) => {
+            write.destroy();
+            reject(error);
+        });
+
+        write.on("error", (error) => {
+            read.destroy();
+            reject(error);
+        });
         write.on("finish", () => {
             resolve(undefined);
         });
