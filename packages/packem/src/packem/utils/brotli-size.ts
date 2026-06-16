@@ -9,7 +9,8 @@ const brotliSize = async (path: string): Promise<number> =>
     await new Promise((resolve, reject) => {
         let size = 0;
 
-        const pipe = createReadStream(path).pipe(
+        const readStream = createReadStream(path);
+        const pipe = readStream.pipe(
             createBrotliCompress({
                 params: {
                     [constants.BROTLI_PARAM_QUALITY]: 4,
@@ -17,6 +18,7 @@ const brotliSize = async (path: string): Promise<number> =>
             }),
         );
 
+        readStream.on("error", reject);
         pipe.on("error", reject);
         pipe.on("data", (buf: Buffer) => {
             size += buf.length;
