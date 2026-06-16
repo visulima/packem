@@ -35,6 +35,8 @@ It enables you to generate multiple bundles (CommonJS or ESModule) simultaneousl
 
 It uses the `exports` configuration in `package.json` and recognizes entry file conventions to match your exports and build them into bundles.
 
+Rollup is the default and full-featured backend. An experimental [Rolldown](https://rolldown.rs) backend is also selectable via the `bundler` option (or `--bundler` CLI flag) — see [Rolldown backend (experimental)](#rolldown-backend-experimental).
+
 ## Features
 
 - ✅ package.json#exports, package.json#main, package.json#module to define entry-points
@@ -56,6 +58,7 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 - ✅ Supports `tsconfig.json` paths and `package.json`, `package.yml`, `package.yaml` and `package.json5` imports resolution
 - ✅ ESM ⇄ CJS interoperability
 - ✅ Supports isolated declaration types (experimental) (Typescript version 5.5 or higher)
+- ✅ Selectable bundler backend: Rollup (default) or [Rolldown](https://rolldown.rs) (experimental)
 - ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
 - ✅ Supports css, [sass](https://github.com/sass/sass), [less](https://github.com/less/less.js), [stylus](https://github.com/stylus/stylus) and Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) (experimental)
 - ✅ [TypeDoc](https://github.com/TypeStrong/TypeDoc) documentation generation
@@ -612,6 +615,34 @@ export default defineConfig({
 ```
 
 ## Experimental Features
+
+### Rolldown backend (experimental)
+
+By default `packem` bundles with [Rollup](https://rollupjs.org). You can opt into the experimental [Rolldown](https://rolldown.rs) backend — a Rust-based, oxc-powered bundler — with the `bundler` option:
+
+```ts
+import { defineConfig } from "@visulima/packem/config";
+
+export default defineConfig({
+    // ...
+    bundler: "rolldown", // "rollup" (default) | "rolldown"
+    // ...
+});
+```
+
+Or from the CLI, without touching the config file:
+
+```sh
+packem build --bundler rolldown
+```
+
+Notes and current limitations:
+
+- **Experimental.** Rolldown is opt-in and not yet at full feature parity with the Rollup backend. Rollup remains the default and the fully-supported path; the Rolldown backend is not deprecating it.
+- **No `transformer` option.** When `bundler` is `"rolldown"`, omit the `transformer` option — Rolldown ships its own oxc-based transform and always uses it. The `esbuild`/`swc`/`sucrase`/`oxc` transformer adapters only apply under the default `"rollup"` bundler.
+- **Declaration files route through Rollup.** Even with `bundler: "rolldown"`, `.d.ts` generation (and DTS watching) still runs through Rollup. Rollup is pulled in automatically when Rolldown is combined with `declaration: true`.
+
+For the detailed support matrix and the criteria for graduating Rolldown out of experimental status, see [`docs/rolldown-status.md`](https://github.com/visulima/packem/blob/main/docs/rolldown-status.md).
 
 ### OXC Resolver
 
