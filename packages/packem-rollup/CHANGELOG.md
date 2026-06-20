@@ -1,3 +1,5 @@
+## @visulima/packem-rollup [1.0.0-alpha.75](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.74...@visulima/packem-rollup@1.0.0-alpha.75) (2026-06-20)
+
 ## @visulima/packem-rollup [1.0.0-alpha.74](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.73...@visulima/packem-rollup@1.0.0-alpha.74) (2026-06-16)
 
 ### Features
