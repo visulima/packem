@@ -7,31 +7,111 @@ import { readFile, isAccessible, walk } from "@visulima/fs";
 interface BenchmarkResult {
     builderName: string;
     project?: string;
+    /** Representative runtime (median across samples) in milliseconds. */
     runtime: number;
+    /** Fastest sample in milliseconds, when more than one sample was taken. */
+    runtimeMin?: number;
+    /** Slowest sample in milliseconds, when more than one sample was taken. */
+    runtimeMax?: number;
+    /** Population standard deviation across samples in milliseconds. */
+    runtimeStdDev?: number;
+    /** Number of measured (post-warmup) samples that produced the runtime. */
+    samples?: number;
     sourceFile: string;
     originalSize: number;
     gzipSize: number;
     brotliSize: number;
 }
 
+export interface RuntimeStats {
+    /** Median of the samples — used as the representative runtime. */
+    median: number;
+    min: number;
+    max: number;
+    mean: number;
+    /** Population standard deviation. */
+    stdDev: number;
+    /** Number of samples summarized. */
+    samples: number;
+}
+
 const KEY_REGEX = /^--(.*)/;
+
+/**
+ * Summarize a set of runtime samples into robust statistics. The median is used
+ * as the representative value because it is resistant to the occasional GC pause
+ * or disk hiccup that would skew a single measurement (the previous behaviour)
+ * or a plain mean.
+ * @param samples - Measured runtimes in milliseconds (must be non-empty).
+ */
+export const summarizeSamples = (samples: number[]): RuntimeStats => {
+    if (samples.length === 0) {
+        throw new Error("summarizeSamples requires at least one sample");
+    }
+
+    const sorted = [...samples].sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+    const median = sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
+
+    const mean = sorted.reduce((sum, value) => sum + value, 0) / sorted.length;
+    const variance = sorted.reduce((sum, value) => sum + (value - mean) ** 2, 0) / sorted.length;
+
+    return {
+        median,
+        min: sorted[0],
+        max: sorted[sorted.length - 1],
+        mean,
+        stdDev: Math.sqrt(variance),
+        samples: sorted.length,
+    };
+};
 
 /**
  * Format and display benchmark results
  * @param results - Array of benchmark results to display
  */
 export const displayBenchmarkResults = (results: BenchmarkResult[]): void => {
+    const formatRuntime = (ms: number) => duration(ms, { units: ["m", "s", "ms"], round: true });
+
+    // Only show the spread column when at least one row carries multi-sample
+    // statistics, so single-run callers (e.g. getMetrics) keep the compact table.
+    const hasSpread = results.some((result) => (result.samples ?? 1) > 1);
+
+    const header = [bold("Builder"), bold("Project"), bold("Runtime (median)")];
+
+    if (hasSpread) {
+        header.push(bold("Spread (min…max ±σ)"));
+    }
+
+    header.push(bold("Source Files"), bold("Original Size"), bold("Gzip Size"), bold("Brotli Size"));
+
     const data = [
-        [bold("Builder"), bold("Project"), bold("Runtime"), bold("Source Files"), bold("Original Size"), bold("Gzip Size"), bold("Brotli Size")],
-        ...results.map((result) => [
-            cyan(result.builderName),
-            cyan(result.project || "-"),
-            yellow(duration(result.runtime, { units: ["m", "s", "ms"], round: true })),
-            green(result.sourceFile),
-            magenta(formatBytes(result.originalSize, { decimals: 2 })),
-            magenta(formatBytes(result.gzipSize, { decimals: 2 })),
-            magenta(formatBytes(result.brotliSize, { decimals: 2 })),
-        ]),
+        header,
+        ...results.map((result) => {
+            const row = [
+                cyan(result.builderName),
+                cyan(result.project || "-"),
+                yellow(formatRuntime(result.runtime)),
+            ];
+
+            if (hasSpread) {
+                const spread =
+                    (result.samples ?? 1) > 1 && result.runtimeMin !== undefined && result.runtimeMax !== undefined
+                        ? `${formatRuntime(result.runtimeMin)}…${formatRuntime(result.runtimeMax)} ±${formatRuntime(result.runtimeStdDev ?? 0)} (n=${result.samples})`
+                        : "-";
+
+                row.push(yellow(spread));
+            }
+
+            row.push(
+                green(result.sourceFile),
+                magenta(formatBytes(result.originalSize, { decimals: 2 })),
+                magenta(formatBytes(result.gzipSize, { decimals: 2 })),
+                magenta(formatBytes(result.brotliSize, { decimals: 2 })),
+            );
+
+            return row;
+        }),
     ];
 
     const config = {

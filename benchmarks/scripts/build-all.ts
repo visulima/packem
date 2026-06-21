@@ -10,7 +10,7 @@ import { tsdownBuilder } from "../builders/tsdown";
 import { tsupBuilder } from "../builders/tsup";
 import { viteBuilder } from "../builders/vite";
 import { webpackBuilder } from "../builders/webpack";
-import { errorToString, getArguments, getFileMetrics } from "./utils";
+import { errorToString, getArguments, getFileMetrics, summarizeSamples } from "./utils";
 import { displayBenchmarkResults } from "./utils";
 import type { Builder, BuilderOptions } from "../builders/types";
 import { readdir } from "node:fs/promises";
@@ -19,11 +19,21 @@ interface BuilderResult {
     builderName: string;
     project: string;
     runtime: number;
+    runtimeMin: number;
+    runtimeMax: number;
+    runtimeStdDev: number;
+    samples: number;
     sourceFile: string;
     originalSize: number;
     gzipSize: number;
     brotliSize: number;
 }
+
+// Defaults: take a handful of measured samples after discarding warmup runs, so
+// a single GC pause or disk hiccup can't reorder the leaderboard. Override with
+// `--runs <n>` and `--warmup <n>`.
+const DEFAULT_RUNS = 5;
+const DEFAULT_WARMUP = 1;
 
 interface BuilderWithPreset {
     builder: Builder;
@@ -73,26 +83,51 @@ const getBuilderInstances = (): BuilderWithPreset[] => {
     return builders;
 };
 
-const runBuilder = async (builderWithPreset: BuilderWithPreset, baseOptions: BuilderOptions): Promise<BuilderResult | null> => {
+const runBuilder = async (
+    builderWithPreset: BuilderWithPreset,
+    baseOptions: BuilderOptions,
+    runs: number,
+    warmup: number,
+): Promise<BuilderResult | null> => {
     const { builder, preset, bundler } = builderWithPreset;
     const options = { ...baseOptions, preset, bundler };
     const builderName = [builder.name, bundler, preset].filter(Boolean).join("-");
 
     try {
-        await builder.cleanup?.(options);
+        const samples: number[] = [];
+        let buildPath = "";
 
-        const start = performance.now();
-        const buildPath = await builder.build(options);
-        const end = performance.now();
+        // Each iteration is an independent cold build: clean before, time the
+        // build, then move outputs. Warmup iterations prime caches/JIT and are
+        // discarded so they don't pull the median around.
+        for (let iteration = 0; iteration < warmup + runs; iteration += 1) {
+            await builder.cleanup?.(options);
 
-        await builder.move?.(options);
+            const start = performance.now();
+            buildPath = await builder.build(options);
+            const end = performance.now();
 
+            await builder.move?.(options);
+
+            if (iteration >= warmup) {
+                samples.push(end - start);
+            }
+        }
+
+        const stats = summarizeSamples(samples);
+
+        // Output is deterministic across runs, so the final build's artifacts are
+        // representative — measure size once instead of per sample.
         const { size, sizeGzip, sizeBrotli } = await getFileMetrics(buildPath);
 
         return {
             builderName,
             project: options.project,
-            runtime: end - start,
+            runtime: stats.median,
+            runtimeMin: stats.min,
+            runtimeMax: stats.max,
+            runtimeStdDev: stats.stdDev,
+            samples: stats.samples,
             sourceFile: buildPath,
             originalSize: size,
             gzipSize: sizeGzip,
@@ -113,10 +148,11 @@ const getProjects = async (): Promise<string[]> => {
     return projects.filter(project => !project.startsWith("."));
 };
 
-const runBenchmark = async (project: string): Promise<void> => {
+const runBenchmark = async (project: string, runs: number, warmup: number): Promise<void> => {
     console.log(`\n${'='.repeat(80)}`);
     console.log(`Running benchmark for project: ${project}`);
-    console.log(`Entry: ${DEFAULT_ENTRYPOINT}\n`);
+    console.log(`Entry: ${DEFAULT_ENTRYPOINT}`);
+    console.log(`Samples: ${runs} measured run(s) after ${warmup} warmup run(s) per builder\n`);
 
     const options: BuilderOptions = {
         project,
@@ -134,7 +170,7 @@ const runBenchmark = async (project: string): Promise<void> => {
     const results: (BuilderResult | null)[] = [];
 
     for (const builder of builders) {
-        results.push(await runBuilder(builder, options));
+        results.push(await runBuilder(builder, options, runs, warmup));
     }
 
     // Filter out failed builds and sort by runtime
@@ -147,7 +183,25 @@ const runBenchmark = async (project: string): Promise<void> => {
 
 (async () => {
     try {
-        const { project, projects: projectsArg } = getArguments();
+        const { project, projects: projectsArg, runs: runsArg, warmup: warmupArg } = getArguments();
+
+        // Sample counts: --runs <n> (measured) and --warmup <n> (discarded).
+        const parseCount = (value: unknown, fallback: number, label: string): number => {
+            if (value === undefined || value === true) {
+                return fallback;
+            }
+
+            const parsed = Number(value);
+
+            if (!Number.isInteger(parsed) || parsed < 0) {
+                throw new Error(`Invalid --${label}: ${String(value)}. Expected a non-negative integer.`);
+            }
+
+            return parsed;
+        };
+
+        const runs = Math.max(1, parseCount(runsArg, DEFAULT_RUNS, "runs"));
+        const warmup = parseCount(warmupArg, DEFAULT_WARMUP, "warmup");
 
         // Optional filter: --project <name> or --projects <a,b,c>
         const filter = [
@@ -171,7 +225,7 @@ const runBenchmark = async (project: string): Promise<void> => {
 
         // Run benchmarks for each project sequentially
         for (const project of projects) {
-            await runBenchmark(project);
+            await runBenchmark(project, runs, warmup);
         }
 
         process.exit(0);
