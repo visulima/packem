@@ -38,6 +38,38 @@ Configuration options for the plugin.
 
 ### General Options
 
+#### `generator`
+
+The generator used to produce `.d.ts` files.
+
+- `'tsc'`: The TypeScript 5.x/6.x compiler. Supports all TypeScript features.
+- `'oxc'`: [Oxc](https://oxc.rs)'s isolated declaration generator. Much faster than `tsc`, but only supports code that satisfies [`isolatedDeclarations`](https://www.typescriptlang.org/tsconfig/#isolatedDeclarations).
+- `'tsgo'`: **[Experimental]** The [TypeScript Go](https://github.com/microsoft/typescript-go) compiler. May not support all TypeScript features yet.
+
+When unset, the generator is inferred:
+
+- `'tsc'` whenever `vue` or `tsMacro` is enabled (both require the TypeScript compiler API).
+- `'tsgo'` if `tsgo` options are provided.
+- `'oxc'` if `oxc` options are provided, or `isolatedDeclarations` is enabled in `compilerOptions`.
+- `'tsgo'` if TypeScript 7.0 (or `@typescript/native-preview`) is installed.
+- `'tsc'` otherwise.
+
+**Default:** `'tsc'`
+
+```ts
+dts({ generator: "oxc" });
+```
+
+#### `logger`
+
+Logger used for user-facing diagnostics, such as the experimental-feature warning and the compiler version banner. Useful for routing plugin output through your own reporter instead of the global `console`.
+
+**Default:** `console`
+
+```ts
+dts({ logger: { error: myLogger.error, info: myLogger.info, warn: myLogger.warn } });
+```
+
 #### `cwd`
 
 The directory in which the plugin will search for the `tsconfig.json` file.

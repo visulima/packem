@@ -10,9 +10,23 @@ import type { IsolatedDeclarationsOptions } from "oxc-transform";
 import type { RenderedChunk } from "rollup";
 import ts from "typescript";
 
+import { isTS70Installed } from "./tsgo";
+
 type AddonFunction = (chunk: RenderedChunk) => string | Promise<string>;
 
 export type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | undefined;
+
+/** The generator used to produce `.d.ts` files. */
+export type Generator = "oxc" | "tsc" | "tsgo";
+
+export interface Logger {
+
+    error: (...args: any[]) => void;
+
+    info: (...args: any[]) => void;
+
+    warn: (...args: any[]) => void;
+}
 
 export interface TsgoOptions {
     /**
@@ -94,6 +108,23 @@ export interface GeneralOptions {
     exclude?: FilterPattern;
 
     /**
+     * The generator used to produce `.d.ts` files.
+     *
+     * - `'tsc'`: The TypeScript 5.x/6.x compiler. Supports all TypeScript features.
+     * - `'oxc'`: Oxc's isolated declaration generator. Much faster than `tsc`, but only supports code that satisfies [`isolatedDeclarations`](https://www.typescriptlang.org/tsconfig/#isolatedDeclarations).
+     * - `'tsgo'`: **[Experimental]** The TypeScript Go compiler. May not support all TypeScript features yet.
+     *
+     * When unset, the generator is inferred:
+     * - `'tsc'` whenever {@link TscOptions.vue vue} or {@link TscOptions.tsMacro tsMacro} is enabled.
+     * - `'tsgo'` if {@link Options.tsgo tsgo} options are provided.
+     * - `'oxc'` if {@link Options.oxc oxc} options are provided, or `isolatedDeclarations` is enabled in `compilerOptions`.
+     * - `'tsgo'` if TypeScript 7.0 (or `@typescript/native-preview`) is installed.
+     * - `'tsc'` otherwise.
+     * @default 'tsc'
+     */
+    generator?: Generator;
+
+    /**
      * A pattern (or array of patterns) specifying files to include in DTS generation.
      * Only files matching this pattern will have `.d.ts` files generated.
      *
@@ -101,6 +132,12 @@ export interface GeneralOptions {
      * Accepts minimatch glob patterns, regular expressions, or arrays of either.
      */
     include?: FilterPattern;
+
+    /**
+     * Logger used for user-facing diagnostics (experimental-feature warnings, the compiler
+     * version banner). Defaults to the global `console`.
+     */
+    logger?: Logger;
 
     /**
      * Controls whether type definitions from `node_modules` are bundled into your final `.d.ts` file or kept as external `import` statements.
@@ -283,7 +320,9 @@ export type OptionsResolved = Overwrite<
     {
         entry?: string[];
         exclude: FilterPattern;
+        generator: Generator;
         include: FilterPattern;
+        logger: Logger;
         oxc: IsolatedDeclarationsOptions | false;
         tsconfig?: string;
         tsconfigRaw: TsConfigJson;
@@ -419,7 +458,7 @@ const resolveTsconfigPath = (
     return { resolvedTsconfig: undefined, tsconfig: undefined };
 };
 
-const validateTsgoCompatibility = (tsgo: false | { path?: string }, vue: boolean, tsMacro: boolean, oxc: IsolatedDeclarationsOptions | false): void => {
+const validateTsgoCompatibility = (tsgo: boolean, vue: boolean, tsMacro: boolean, oxc: boolean): void => {
     if (!tsgo) {
         return;
     }
@@ -437,7 +476,7 @@ const validateTsgoCompatibility = (tsgo: false | { path?: string }, vue: boolean
     }
 };
 
-const validateOxcCompatibility = (oxc: IsolatedDeclarationsOptions | false, vue: boolean, tsMacro: boolean): void => {
+const validateOxcCompatibility = (oxc: boolean, vue: boolean, tsMacro: boolean): void => {
     if (!oxc) {
         return;
     }
@@ -448,6 +487,27 @@ const validateOxcCompatibility = (oxc: IsolatedDeclarationsOptions | false, vue:
 
     if (tsMacro) {
         throw new Error("[@visulima/rollup-plugin-dts] The `oxc` option is not compatible with the `tsMacro` option. Please disable one of them.");
+    }
+};
+
+const validateGenerator = (generator: Generator, logger: Logger): void => {
+    if (generator === "tsc") {
+        try {
+            createRequire(import.meta.url).resolve("typescript");
+        } catch {
+            throw new Error(
+                "[@visulima/rollup-plugin-dts] TypeScript is not installed. Install the `typescript` package, or enable `isolatedDeclarations` in your `tsconfig.json` to use Oxc instead.",
+            );
+        }
+
+        return;
+    }
+
+    if (generator === "tsgo" && !warnedTsgo) {
+        warnedTsgo = true;
+        logger.warn(
+            "[@visulima/rollup-plugin-dts] The `tsgo` generator is experimental: TypeScript 7.0 does not yet have a stable API, and some options (such as `isolatedDeclarations`) are unavailable.",
+        );
     }
 };
 
@@ -469,39 +529,79 @@ const normalizeTsgo = (tsgoOption: boolean | TsgoOptions): false | { path?: stri
     return { path: tsgoOption.path };
 };
 
-const normalizeOxc = (
+/**
+ * Whether the user asked for oxc, either explicitly or implicitly via `isolatedDeclarations`.
+ * This is about *intent* — the generator that actually runs is decided by {@link resolveGenerator}.
+ */
+const isOxcRequested = (oxcOption: boolean | Omit<IsolatedDeclarationsOptions, "sourcemap"> | undefined, compilerOptions: TsConfigJson.CompilerOptions): boolean => {
+    if (oxcOption === false) {
+        return false;
+    }
+
+    if (oxcOption === undefined) {
+        return Boolean(compilerOptions.isolatedDeclarations);
+    }
+
+    return true;
+};
+
+const applyOxcDefaults = (
     oxcOption: boolean | Omit<IsolatedDeclarationsOptions, "sourcemap"> | undefined,
     compilerOptions: TsConfigJson.CompilerOptions,
-    vue: boolean,
-    tsgo: false | { path?: string },
-    tsMacro: boolean,
-): IsolatedDeclarationsOptions | false => {
-    let oxcResolved: IsolatedDeclarationsOptions | false;
+): IsolatedDeclarationsOptions => {
+    const oxcResolved: IsolatedDeclarationsOptions = typeof oxcOption === "object" ? oxcOption : {};
 
-    switch (oxcOption) {
-        case false: {
-            oxcResolved = false;
-            break;
-        }
-        case true: {
-            oxcResolved = {};
-            break;
-        }
-        case undefined: {
-            oxcResolved = compilerOptions.isolatedDeclarations && !vue && !tsgo && !tsMacro ? {} : false;
-            break;
-        }
-        default: {
-            oxcResolved = oxcOption;
-        }
-    }
-
-    if (oxcResolved) {
-        oxcResolved.stripInternal ??= compilerOptions.stripInternal ?? false;
-        oxcResolved.sourcemap = compilerOptions.declarationMap ?? false;
-    }
+    oxcResolved.stripInternal ??= compilerOptions.stripInternal ?? false;
+    oxcResolved.sourcemap = compilerOptions.declarationMap ?? false;
 
     return oxcResolved;
+};
+
+const resolveGenerator = (
+    explicit: Generator | undefined,
+    oxcRequested: boolean,
+    tsgoRequested: boolean,
+    vue: boolean,
+    tsMacro: boolean,
+    logger: Logger,
+): Generator => {
+    // Volar-based backends (Vue / ts-macro) hook into the TypeScript compiler API, so they
+    // can only run under `tsc`.
+    if (vue || tsMacro) {
+        if (isTS70Installed()) {
+            throw new Error(
+                "[@visulima/rollup-plugin-dts] TypeScript 7.0 does not yet have a stable API and is experimental. The `vue` and `tsMacro` options are not yet supported with TypeScript 7.0.",
+            );
+        }
+
+        if (explicit && explicit !== "tsc") {
+            logger.warn(
+                `[@visulima/rollup-plugin-dts] The \`vue\`/\`tsMacro\` option requires the \`tsc\` generator; the \`generator: '${explicit}'\` option is ignored.`,
+            );
+        }
+
+        return "tsc";
+    }
+
+    if (explicit) {
+        return explicit;
+    }
+
+    if (tsgoRequested) {
+        return "tsgo";
+    }
+
+    if (oxcRequested) {
+        return "oxc";
+    }
+
+    // TypeScript 7 ships the native Go compiler as `typescript` itself; prefer it over the
+    // (much slower) JS compiler when it is what the user has installed.
+    if (isTS70Installed()) {
+        return "tsgo";
+    }
+
+    return "tsc";
 };
 
 export const resolveOptions = ({
@@ -518,8 +618,10 @@ export const resolveOptions = ({
     entry,
     exclude,
     footer,
+    generator: generatorOption,
     include,
     incremental: incrementalOption = false,
+    logger = console,
     newContext = false,
     oxc: oxcOption,
 
@@ -585,8 +687,23 @@ export const resolveOptions = ({
     };
 
     // Normalize tsgo: true → {} so downstream code can always treat it as an object or false.
-    const tsgo = normalizeTsgo(tsgoOption);
-    const oxcResolved = normalizeOxc(oxcOption, compilerOptions, vue, tsgo, tsMacro);
+    const tsgoNormalized = normalizeTsgo(tsgoOption);
+    const oxcRequested = isOxcRequested(oxcOption, compilerOptions);
+
+    // Conflicting *explicit* options are an error rather than something we silently drop,
+    // so validate the requested intent before the generator collapses it to one backend.
+    validateTsgoCompatibility(tsgoNormalized !== false, vue, tsMacro, oxcRequested);
+    validateOxcCompatibility(oxcRequested, vue, tsMacro);
+
+    const generator = resolveGenerator(generatorOption, oxcRequested, tsgoNormalized !== false, vue, tsMacro, logger);
+
+    validateGenerator(generator, logger);
+
+    // Exactly one backend runs. Collapsing the other to `false` here keeps the single
+    // source of truth in `generator` while leaving the downstream `if (tsgo) … else if (oxc)`
+    // dispatch (and the resolved option objects it reads) working unchanged.
+    const oxcResolved = generator === "oxc" ? applyOxcDefaults(oxcOption, compilerOptions) : false;
+    const tsgo = generator === "tsgo" ? tsgoNormalized || {} : false;
 
     // `checkJs` and `allowJs` independently justify emitting declarations for
     // `.js` sources, so this is an OR — not a `??` precedence chain. An explicit
@@ -595,15 +712,6 @@ export const resolveOptions = ({
     // declarations to be emitted.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- `||` is intentional: this is boolean OR semantics (either flag enables JS emit), not a null/undefined fallback; `??` would let an explicit `checkJs: false` veto `allowJs: true`.
     const emitJs = emitJsOption ?? Boolean(compilerOptions.checkJs || compilerOptions.allowJs);
-
-    validateTsgoCompatibility(tsgo, vue, tsMacro, oxcResolved);
-    validateOxcCompatibility(oxcResolved, vue, tsMacro);
-
-    if (tsgo && !warnedTsgo) {
-        // eslint-disable-next-line no-console -- user-facing warning is the intended UX for an experimental option
-        console.warn("The `tsgo` option is experimental and may change in the future.");
-        warnedTsgo = true;
-    }
 
     return {
         banner,
@@ -618,8 +726,10 @@ export const resolveOptions = ({
         entry: resolvedEntry,
         exclude,
         footer,
+        generator,
         include,
         incremental,
+        logger,
         newContext,
         oxc: oxcResolved,
 

@@ -51,6 +51,13 @@ const createTsProgramFromParsedConfig = ({
         // `patchCompilerOptions` guard. See sxzz/rolldown-plugin-dts#254.
         declaration: true,
         emitDeclarationOnly: true,
+        // Allow non-TS extensions (e.g. `.vue`) to be used as root files. Without this,
+        // TypeScript silently drops root files whose extension is not in its built-in
+        // supported list, so `program.getSourceFile(id)` returns `undefined` for a `.vue`
+        // entry that no `.ts` file imports. Only relevant when a language plugin
+        // (Vue/ts-macro) registers such extensions; module resolution already handles the
+        // imported-file case. See sxzz/rolldown-plugin-dts#272.
+        ...vue || tsMacro ? { allowNonTsExtensions: true } : undefined,
     };
 
     const rootNames = [...new Set([id, ...entries ?? parsedConfig.fileNames].map((f) => fsSystem.resolvePath(f)))];

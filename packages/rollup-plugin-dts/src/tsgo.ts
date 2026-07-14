@@ -3,15 +3,36 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { styleText } from "node:util";
 
 import type { TsConfigJson } from "@visulima/tsconfig";
 import { createDebug } from "obug";
+
+import type { Logger } from "./options";
 
 const debug = createDebug("rollup-plugin-dts:tsgo");
 
 interface GetExePathModule {
     default?: () => string;
 }
+
+// Resolving the binary shells out to the package's `getExePath`, so memoize it per process.
+let tsgoPathCache: string | undefined;
+
+/**
+ * TypeScript 7 ships the native (Go) compiler as the `typescript` package itself, so when
+ * it is installed the `tsgo` binary comes from there rather than from the
+ * `@typescript/native-preview` preview package.
+ */
+export const isTS70Installed = (): boolean => {
+    try {
+        const { versionMajorMinor } = createRequire(import.meta.url)("typescript") as { versionMajorMinor?: string };
+
+        return versionMajorMinor === "7.0";
+    } catch {
+        return false;
+    }
+};
 
 export const spawnAsync = async (...args: Parameters<typeof spawn>): Promise<void> => {
     await new Promise<void>((resolve, reject) => {
@@ -42,21 +63,33 @@ export const spawnAsync = async (...args: Parameters<typeof spawn>): Promise<voi
     });
 };
 
-export const getTsgoPathFromNodeModules = (): string => {
+export const getTsgoPathFromNodeModules = (logger: Logger = console): string => {
+    if (tsgoPathCache) {
+        return tsgoPathCache;
+    }
+
     const requireFromHere = createRequire(import.meta.url);
+    // TypeScript 7 is the native compiler itself, so `tsgo` lives in `typescript`. Older
+    // TypeScript needs the separate `@typescript/native-preview` package.
+    const packageName = isTS70Installed() ? "typescript" : "@typescript/native-preview";
     // Use an absolute path to bypass the package exports field restriction
-    const pkgJsonPath = requireFromHere.resolve("@typescript/native-preview/package.json");
+    const pkgJsonPath = requireFromHere.resolve(`${packageName}/package.json`);
     const pkgDirectory = path.dirname(pkgJsonPath);
+    const { version } = requireFromHere(pkgJsonPath) as { version: string };
+
+    logger.info(`Emit types with ${styleText("underline", `${packageName}@${version}`)}`);
 
     const loadedModule = requireFromHere(path.join(pkgDirectory, "lib", "getExePath.js")) as (() => string) | GetExePathModule;
     // Handle both CJS and ESM interop (ESM default exports become `mod.default` via CJS require)
     const getExePath: (() => string) | undefined = typeof loadedModule === "function" ? loadedModule : loadedModule.default;
 
     if (!getExePath) {
-        throw new Error("Failed to resolve getExePath from @typescript/native-preview");
+        throw new Error(`Failed to resolve getExePath from ${packageName}`);
     }
 
-    return getExePath();
+    tsgoPathCache = getExePath();
+
+    return tsgoPathCache;
 };
 
 /**
@@ -84,6 +117,7 @@ export const runTsgo = async (
     sourcemap?: boolean,
     tsgoPath?: string,
     tsconfigRaw?: TsConfigJson,
+    logger: Logger = console,
 ): Promise<string> => {
     debug("[tsgo] rootDir", rootDirectory);
 
@@ -93,7 +127,7 @@ export const runTsgo = async (
         tsgo = tsgoPath;
         debug("[tsgo] using custom path", tsgo);
     } else {
-        tsgo = getTsgoPathFromNodeModules();
+        tsgo = getTsgoPathFromNodeModules(logger);
         debug("[tsgo] using tsgo from node_modules", tsgo);
     }
 

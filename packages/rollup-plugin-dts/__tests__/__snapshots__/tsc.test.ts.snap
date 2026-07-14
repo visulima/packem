@@ -30,7 +30,7 @@ export { a };
 //# sourceMappingURL=index.d.ts.map
 
 // index.d.ts.map
-{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"cAAaA,CAAC;"}
+{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,cAAa;"}
 // index.js
 const a = 1;
 
@@ -48,7 +48,7 @@ export { a };
 //# sourceMappingURL=index.d.ts.map
 
 // index.d.ts.map
-{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"cAAaA,CAAC;"}
+{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,cAAa;"}
 // index.js
 const a = 1;
 
@@ -111,7 +111,7 @@ declare function fn(argument0: SomeType<FooType>, opt: Interface): void;
 declare enum Enum {
   A = 0,
   B = 1,
-  C = 2,
+  C = 2
 }
 declare class Cls {
   foo: string;
@@ -121,7 +121,7 @@ export { Cls, Enum, fn, foo };
 //# sourceMappingURL=basic.d.ts.map
 
 // basic.d.ts.map
-{"version":3,"file":"basic.d.ts","sources":["__tests__/fixtures/basic.ts"],"names":[],"mappings":"cAAaA,GAAgB;AAAA,KAExBC,QAAQ,MAAMC,CAAC;AAAA,KACfC,OAAO;AAAA,UACFC,SAAS;AAAA,iBAEHC,EAAEA,CAACC,SAA4B,EAAjBL,QAAQ,CAACE,OAAO,GAAGI,GAAc,EAATH,SAAS;AAAA,aAEnDI,IAAI;EACZC,CAAC;EACDC,CAAC;EACDC,CAAC;AAAA;AAAA,cAGQC,GAAG;EACZZ,GAAG;EAEHK,EAAEA,CAACQ,CAAO,EAAJL,IAAI;AAAA;"}
+{"version":3,"file":"basic.d.ts","sources":["__tests__/fixtures/basic.ts"],"names":[],"mappings":"AAAA,cAAa;KAER,SAAS,KAAK;KACd;UACK;iBAEM,GAAG,WAAW,SAAS,UAAU,KAAK;aAE1C;EACR;EACA;EACA;;cAGS;EACT;EAEA,GAAG,GAAG;;"}
 // basic.js.map
 {"version":3,"file":"basic.js","sources":[],"sourcesContent":[],"names":[],"mappings":""}"
 `;
@@ -246,6 +246,25 @@ interface Unused {
   foo: string;
 }
 export { Unused };
+"
+`;
+
+exports[`tsc > vue-sfc entries without a .ts importer 1`] = `
+"// Bar.vue.d.ts
+type __VLS_Props = {
+  bar: number;
+};
+declare const __VLS_export: import("vue").DefineComponent<__VLS_Props, {}, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, import("vue").ComponentProvideOptions, false, {}, any>;
+declare const _default: typeof __VLS_export;
+export { _default as default };
+
+// Foo.vue.d.ts
+type __VLS_Props = {
+  foo: string;
+};
+declare const __VLS_export: import("vue").DefineComponent<__VLS_Props, {}, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, import("vue").ComponentProvideOptions, false, {}, any>;
+declare const _default: typeof __VLS_export;
+export { _default as default };
 "
 `;
 

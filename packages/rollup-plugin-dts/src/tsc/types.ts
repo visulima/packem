@@ -28,3 +28,15 @@ export interface TscResult {
     error?: string;
     map?: SourceMapInput;
 }
+
+/** Request sent from the plugin to the forked tsc worker. */
+export interface WorkerRequest {
+    id: number;
+    options: Omit<TscOptions, "programs">;
+}
+
+/** Reply for a {@link WorkerRequest}, correlated back to it by `id`. */
+export interface WorkerResponse {
+    id: number;
+    result: TscResult;
+}

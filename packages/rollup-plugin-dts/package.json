@@ -44,6 +44,9 @@
             "types": "./dist/filename.d.ts",
             "default": "./dist/filename.js"
         },
+        "./tsc/worker": {
+            "default": "./dist/tsc/worker.js"
+        },
         "./package.json": "./package.json"
     },
     "files": [
@@ -71,19 +74,16 @@
         "test:watch": "vitest"
     },
     "dependencies": {
-        "@babel/generator": "catalog:prod",
-        "@babel/helper-validator-identifier": "catalog:prod",
-        "@babel/parser": "catalog:prod",
-        "@babel/types": "catalog:prod",
         "@rollup/pluginutils": "catalog:build",
         "@visulima/path": "catalog:visulima",
         "@visulima/tsconfig": "catalog:visulima",
-        "ast-kit": "catalog:prod",
-        "birpc": "catalog:prod",
         "magic-string": "catalog:utils",
         "obug": "catalog:prod",
         "oxc-resolver": "catalog:node",
-        "oxc-transform": "catalog:dev"
+        "oxc-transform": "catalog:dev",
+        "yuku-ast": "catalog:prod",
+        "yuku-codegen": "catalog:prod",
+        "yuku-parser": "catalog:prod"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "catalog:lint",
@@ -93,7 +93,6 @@
         "@arethetypeswrong/cli": "catalog:dev",
         "@jridgewell/source-map": "catalog:test",
         "@sxzz/test-utils": "catalog:test",
-        "@types/babel__generator": "catalog:types",
         "@types/debug": "catalog:types",
         "@types/node": "catalog:types",
         "@typescript/native-preview": "catalog:types",
@@ -103,7 +102,6 @@
         "conventional-changelog-conventionalcommits": "catalog:dev",
         "diff": "catalog:dev",
         "eslint": "catalog:lint",
-        "estree-walker": "catalog:dev",
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
         "rolldown": "catalog:build",
@@ -120,7 +118,7 @@
         "@typescript/native-preview": ">=7.0.0-dev.20250601.1",
         "rolldown": ">=1.0.3",
         "rollup": ">=4.61.0",
-        "typescript": "^6.0.3",
+        "typescript": "^6.0.3 || ~7.0.0",
         "vue-tsc": "catalog:tsc"
     },
     "peerDependenciesMeta": {

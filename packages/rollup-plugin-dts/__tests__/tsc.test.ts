@@ -260,6 +260,27 @@ describe("tsc", () => {
         expect(snapshot).toMatchSnapshot();
     });
 
+    // `.vue` files used directly as entries, with no `.ts` file importing them. TypeScript
+    // drops root files whose extension it does not natively support unless
+    // `allowNonTsExtensions` is set, which made `program.getSourceFile()` return undefined
+    // and the build throw "Source file not found". See sxzz/rolldown-plugin-dts#272.
+    it("vue-sfc entries without a .ts importer", async () => {
+        expect.assertions(1);
+
+        const root = path.resolve(dirname, "fixtures/vue-sfc-entries");
+        const { snapshot } = await rolldownBuild([path.resolve(root, "Foo.vue"), path.resolve(root, "Bar.vue")], [
+            dts({
+                compilerOptions: {
+                    isolatedDeclarations: false,
+                },
+                emitDtsOnly: true,
+                vue: true,
+            }),
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
     it("vue-sfc w/ ts-compiler w/ vueCompilerOptions in tsconfig", async () => {
         expect.assertions(1);
 

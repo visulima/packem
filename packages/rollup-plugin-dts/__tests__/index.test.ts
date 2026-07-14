@@ -2,7 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { rollupBuild } from "@sxzz/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { dts, resolveOptions } from "../src/index.js";
 import { getTsgoPathFromNodeModules } from "../src/tsgo.js";
@@ -949,6 +949,61 @@ describe("dts plugin", () => {
 
         expect(resolveOptions({ tsgo: { enabled: false } }).tsgo).toBe(false);
         expect(resolveOptions({ tsgo: { enabled: true, path: "custom-tsgo" } }).tsgo).toStrictEqual({ path: "custom-tsgo" });
+    });
+
+    describe("generator option", () => {
+        it("infers the generator from the legacy boolean options", () => {
+            expect.assertions(3);
+
+            expect(resolveOptions({}).generator).toBe("tsc");
+            expect(resolveOptions({ compilerOptions: { isolatedDeclarations: true } }).generator).toBe("oxc");
+            expect(resolveOptions({ tsgo: true }).generator).toBe("tsgo");
+        });
+
+        it("selects the backend explicitly, overriding the inferred default", () => {
+            expect.assertions(4);
+
+            // `isolatedDeclarations` would otherwise infer oxc; the explicit generator wins.
+            const resolved = resolveOptions({ compilerOptions: { isolatedDeclarations: true }, generator: "tsc" });
+
+            expect(resolved.generator).toBe("tsc");
+            expect(resolved.oxc).toBe(false);
+
+            // Explicit oxc without `isolatedDeclarations` still produces a usable oxc config.
+            // `tsconfig: false` isolates the assertion from this repo's own tsconfig.
+            const oxcResolved = resolveOptions({ generator: "oxc", tsconfig: false });
+
+            expect(oxcResolved.generator).toBe("oxc");
+            expect(oxcResolved.oxc).toStrictEqual({ sourcemap: false, stripInternal: false });
+        });
+
+        it("forces tsc for vue and warns that the generator is ignored", () => {
+            expect.assertions(3);
+
+            const warn = vi.fn<(...args: unknown[]) => void>();
+            const resolved = resolveOptions({
+                generator: "oxc",
+                logger: { error: vi.fn<(...args: unknown[]) => void>(), info: vi.fn<(...args: unknown[]) => void>(), warn },
+                vue: true,
+            });
+
+            expect(resolved.generator).toBe("tsc");
+            expect(resolved.oxc).toBe(false);
+            expect(warn).toHaveBeenCalledWith(expect.stringContaining("is ignored"));
+        });
+
+        it("defaults the logger to console and passes a custom one through", () => {
+            expect.assertions(2);
+
+            const logger = {
+                error: vi.fn<(...args: unknown[]) => void>(),
+                info: vi.fn<(...args: unknown[]) => void>(),
+                warn: vi.fn<(...args: unknown[]) => void>(),
+            };
+
+            expect(resolveOptions({}).logger).toBe(console);
+            expect(resolveOptions({ logger }).logger).toBe(logger);
+        });
     });
 
     it("jSDoc comments in types are preserved when tsc emits them", async () => {

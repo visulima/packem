@@ -204,4 +204,27 @@ describe("dts plugin – rolldown compat", () => {
         // every non-DTS module returned "export { }" including \0rolldown/runtime.js.
         await expect(rolldownBuildHelper(path.resolve(fixturesDirectory, "basic.ts"), { emitDtsOnly: true })).resolves.not.toThrow();
     });
+
+    // Regression: as of rolldown 1.1.5 only the FIRST declarator of a `var` statement goes
+    // through the identifier renamer. When a declaration bound several names at once
+    // (`declare const first: T, second: T`) and a later module declared the same names, the
+    // 2nd+ binding kept its original name while the export list referenced the renamed one —
+    // producing a `.d.ts` that declared `second` twice and exported an undeclared `second$1`.
+    // All bindings now live in one array-pattern declarator so every one is renamed.
+    // See sxzz/rolldown-plugin-dts@30104ca.
+    it("renames every binding of a multi-binding declaration on collision", async () => {
+        expect.assertions(2);
+
+        const { dtsChunks } = await rolldownBuildHelper(path.resolve(fixturesDirectory, "multi-binding-collide/index.ts"), { emitDtsOnly: true });
+        const code = dtsChunks.map((c) => c.code).join("\n");
+
+        // BOTH bindings of the colliding declaration must be renamed. Before the fix this
+        // emitted `declare const first$1: Shape, second: Shape;` — `second` left un-renamed,
+        // duplicating the `second` from the other module.
+        expect(code).toContain("declare const first$1: Shape, second$1: Shape;");
+
+        // ...and the export list must reference those declared names. Before the fix it
+        // exported `second$1`, which no declaration introduced.
+        expect(code).toContain("second$1 as bSecond");
+    });
 });

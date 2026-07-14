@@ -1,17 +1,19 @@
-/* eslint-disable consistent-return, sonarjs/cognitive-complexity, import/exports-last, @typescript-eslint/no-non-null-assertion, @typescript-eslint/prefer-nullish-coalescing, no-await-in-loop, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-dynamic-delete, unicorn/prevent-abbreviations, unicorn/no-await-expression-member, unicorn/no-null, @typescript-eslint/restrict-template-expressions, no-plusplus, @stylistic/no-extra-parens, jsdoc/check-indentation, jsdoc/match-description, import/no-commonjs -- this file orchestrates the dts generation pipeline; rule-by-rule refactoring would obscure the control flow and many `any` usages stem from JSON.parse / rollup internal types */
+/* eslint-disable consistent-return, sonarjs/cognitive-complexity, import/exports-last, @typescript-eslint/no-non-null-assertion, @typescript-eslint/prefer-nullish-coalescing, no-await-in-loop, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-dynamic-delete, unicorn/prevent-abbreviations, unicorn/no-null, @typescript-eslint/restrict-template-expressions, no-plusplus, @stylistic/no-extra-parens, jsdoc/check-indentation, jsdoc/match-description, import/no-commonjs -- this file orchestrates the dts generation pipeline; rule-by-rule refactoring would obscure the control flow and many `any` usages stem from JSON.parse / rollup internal types */
 import type { ChildProcess } from "node:child_process";
 import { fork } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { readFile, rm } from "node:fs/promises";
+import { createRequire } from "node:module";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
-import { parse } from "@babel/parser";
-import type { TSPropertySignature } from "@babel/types";
 import { createFilter } from "@rollup/pluginutils";
-import type { BirpcReturn } from "birpc";
 import { createDebug } from "obug";
 import { isolatedDeclarationSync, transformSync } from "oxc-transform";
 import type { ExistingRawSourceMap, Plugin, SourceMapInput } from "rollup";
+import { is } from "yuku-ast";
+import type { TSPropertySignature } from "yuku-parser";
+import { parse } from "yuku-parser";
 
 import { dtsEntryFileName, filenameToDts, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
@@ -19,13 +21,28 @@ import { createReexportSpecifierRewriter } from "./reexport-specifier";
 import type { TscContext } from "./tsc/context";
 import { createContext, globalContext, invalidateContextFile } from "./tsc/context";
 import type { TscOptions, TscResult } from "./tsc/index";
-import type { TscFunctions } from "./tsc/worker";
+import type { WorkerRequest, WorkerResponse } from "./tsc/types";
 import { runTsgo } from "./tsgo";
 
 const debug = createDebug("rollup-plugin-dts:generate");
 
-// `WORKER_URL` is injected at build time; it is not part of the standard `ImportMeta`.
-const WORKER_URL: string = (import.meta as ImportMeta & { WORKER_URL?: string }).WORKER_URL ?? "./tsc/worker.js";
+// The worker is forked as a *file*, so it must be located on disk. A path relative to
+// `import.meta.url` is not usable here: the bundler is free to hoist this module into a
+// hashed shared chunk (`dist/packem_shared/generate-*.js`), which puts it at a different
+// depth than the emitted worker. Going through the package's own `exports` map instead is
+// immune to however the caller happens to be chunked.
+//
+// Falls back to the sibling source file so the plugin still works when run straight from
+// `src` (tests, `vitest`), where the package's `dist` may not exist.
+const resolveWorkerUrl = (): URL => {
+    try {
+        return pathToFileURL(createRequire(import.meta.url).resolve("@visulima/rollup-plugin-dts/tsc/worker"));
+    } catch {
+        debug("could not resolve the built worker via package exports; falling back to the source worker");
+
+        return new URL("tsc/worker.js", import.meta.url);
+    }
+};
 
 export interface TsModule {
     /** `.ts` source code */
@@ -49,6 +66,7 @@ export const createGeneratePlugin = ({
     exclude,
     include,
     incremental,
+    logger,
     newContext,
     oxc,
     parallel,
@@ -78,6 +96,7 @@ export const createGeneratePlugin = ({
     | "include"
     | "exclude"
     | "entry"
+    | "logger"
 >): Plugin => {
     const filter = include || exclude ? createFilter(include, exclude) : null;
 
@@ -119,7 +138,26 @@ export const createGeneratePlugin = ({
 
     // let isWatch = false
     let childProcess: ChildProcess | undefined;
-    let rpc: BirpcReturn<TscFunctions> | undefined;
+
+    // In-flight worker requests, keyed by the id echoed back in the response. Rollup loads
+    // modules concurrently, so several `tscEmit` calls can be outstanding at once.
+    const pendingRequests = new Map<number, { reject: (error: Error) => void; resolve: (result: TscResult) => void }>();
+    let nextRequestId = 0;
+
+    const requestTscEmit = async (options: Omit<TscOptions, "programs">): Promise<TscResult> => {
+        if (!childProcess) {
+            throw new Error("Parallel tsc worker is not initialized");
+        }
+
+        const id = nextRequestId++;
+        const request: WorkerRequest = { id, options };
+
+        return await new Promise<TscResult>((resolve, reject) => {
+            pendingRequests.set(id, { reject, resolve });
+            childProcess!.send(request);
+        });
+    };
+
     let tscModule: typeof import("./tsc/index.ts");
     let tscContext: TscContext | undefined;
     let tsgoDist: string | undefined;
@@ -144,11 +182,11 @@ export const createGeneratePlugin = ({
             // isWatch = this.meta.watchMode
 
             if (tsgo) {
-                tsgoDist = await runTsgo(rootDir, tsconfig, sourcemap, tsgo.path, tsconfigRaw);
+                tsgoDist = await runTsgo(rootDir, tsconfig, sourcemap, tsgo.path, tsconfigRaw, logger);
             } else if (!oxc) {
                 // tsc
                 if (parallel) {
-                    childProcess = fork(new URL(WORKER_URL, import.meta.url), {
+                    childProcess = fork(resolveWorkerUrl(), {
                         stdio: "inherit",
                     });
 
@@ -161,13 +199,30 @@ export const createGeneratePlugin = ({
                         });
                     });
 
-                    rpc = (await import("birpc")).createBirpc<TscFunctions>(
-                        {},
-                        {
-                            on: (function_) => childProcess!.on("message", function_),
-                            post: (data) => childProcess!.send(data),
-                        },
-                    );
+                    childProcess.on("message", (response: WorkerResponse) => {
+                        const pending = pendingRequests.get(response.id);
+
+                        if (pending) {
+                            pendingRequests.delete(response.id);
+                            pending.resolve(response.result);
+                        }
+                    });
+
+                    // A worker that dies (OOM, a crash inside tsc) would otherwise leave every
+                    // in-flight `load` hook awaiting a reply forever, hanging the build.
+                    childProcess.on("exit", (code, signal) => {
+                        if (pendingRequests.size === 0) {
+                            return;
+                        }
+
+                        const reason = code === null ? `was terminated by signal ${String(signal)}` : `exited with code ${String(code)}`;
+
+                        for (const [, pending] of pendingRequests) {
+                            pending.reject(new Error(`The parallel tsc worker ${reason} before it replied.`));
+                        }
+
+                        pendingRequests.clear();
+                    });
                 } else {
                     tscModule = await import("./tsc/index.js");
 
@@ -335,17 +390,7 @@ export const createGeneratePlugin = ({
                         tsMacro,
                         vue,
                     };
-                    let result: TscResult;
-
-                    if (parallel) {
-                        if (!rpc) {
-                            return this.error(new Error("Parallel tsc worker is not initialized"));
-                        }
-
-                        result = await rpc.tscEmit(options);
-                    } else {
-                        result = tscModule.tscEmit(options);
-                    }
+                    const result: TscResult = parallel ? await requestTscEmit(options) : tscModule.tscEmit(options);
 
                     if (result.error) {
                         return this.error(result.error);
@@ -585,8 +630,7 @@ export { __json_default_export as default }`;
 const collectJsonExportMap = (code: string): Map<string, string> => {
     const exportMap = new Map<string, string>();
     const { program } = parse(code, {
-        errorRecovery: true,
-        plugins: [["typescript", { dts: true }]],
+        lang: "dts",
         sourceType: "module",
     });
 
@@ -622,7 +666,7 @@ const collectJsonExportMap = (code: string): Map<string, string> => {
 const collectJsonExports = (code: string) => {
     const exports: string[] = [];
     const { program } = parse(code, {
-        plugins: [["typescript", { dts: true }]],
+        lang: "dts",
         sourceType: "module",
     });
     const [firstStatement] = program.body;
@@ -641,7 +685,7 @@ const collectJsonExports = (code: string) => {
     for (const member of members) {
         if (member.key.type === "Identifier") {
             exports.push(member.key.name);
-        } else if (member.key.type === "StringLiteral") {
+        } else if (is.StringLiteral(member.key)) {
             exports.push(member.key.value);
         }
     }
