@@ -1,6 +1,6 @@
 {
     "name": "@visulima/rollup-plugin-css",
-    "version": "1.0.0-alpha.54",
+    "version": "1.0.0-alpha.55",
     "description": "CSS processing plugin for packem",
     "keywords": [
         "visulima",
@@ -117,7 +117,7 @@
         "@rollup/pluginutils": "catalog:build",
         "@visulima/fs": "catalog:visulima",
         "@visulima/package": "catalog:visulima",
-        "@visulima/packem-share": "1.0.0-alpha.50",
+        "@visulima/packem-share": "1.0.0-alpha.51",
         "@visulima/path": "catalog:visulima",
         "mlly": "catalog:prod",
         "oxc-resolver": "catalog:node",
