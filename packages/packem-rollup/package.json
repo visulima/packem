@@ -1,6 +1,6 @@
 {
     "name": "@visulima/packem-rollup",
-    "version": "1.0.0-alpha.75",
+    "version": "1.0.0-alpha.76",
     "description": "Rollup plugins for packem",
     "keywords": [
         "visulima",
@@ -112,9 +112,9 @@
         "@visulima/find-cache-dir": "catalog:visulima",
         "@visulima/fs": "catalog:visulima",
         "@visulima/package": "catalog:visulima",
-        "@visulima/packem-share": "1.0.0-alpha.50",
+        "@visulima/packem-share": "1.0.0-alpha.51",
         "@visulima/path": "catalog:visulima",
-        "@visulima/rollup-plugin-dts": "1.0.0-alpha.35",
+        "@visulima/rollup-plugin-dts": "1.0.0-alpha.36",
         "clean-css": "catalog:style",
         "html-minifier-next": "catalog:prod",
         "magic-string": "catalog:utils",
