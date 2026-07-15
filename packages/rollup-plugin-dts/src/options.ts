@@ -385,7 +385,12 @@ const resolveExtendedTsconfigPath = (extend: string, baseDirectory: string): str
 const readTsconfigFile = (p: string): string | undefined => {
     if (existsSync(p)) {
         try {
-            return readFileSync(p, "utf8");
+            const content = readFileSync(p, "utf8");
+
+            // The classic compiler's `ts.sys.readFile` strips a leading UTF-8 BOM before
+            // handing the text to `ts.readConfigFile`; `readFileSync` does not. Strip it here
+            // so a BOM-prefixed tsconfig parses identically under both compilers.
+            return content.charCodeAt(0) === 0xFE_FF ? content.slice(1) : content;
         } catch {
             return undefined;
         }
