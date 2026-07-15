@@ -1942,13 +1942,13 @@ importers:
         specifier: catalog:visulima
         version: 3.0.0(@visulima/find-cache-dir@3.0.0)(@visulima/pail@4.0.0(express@5.2.1)(hono@4.12.25))(github-slugger@2.0.0)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.50
+        specifier: 1.0.0-alpha.51
         version: link:../packem-share
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.54
+        specifier: 1.0.0-alpha.55
         version: link:../rollup-plugin-css
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.35
+        specifier: 1.0.0-alpha.36
         version: link:../rollup-plugin-dts
       '@visulima/tsconfig':
         specifier: catalog:visulima
@@ -2126,7 +2126,7 @@ importers:
         specifier: workspace:*
         version: link:../packem-plugins
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.75
+        specifier: 1.0.0-alpha.76
         version: link:../packem-rollup
       '@visulima/pail':
         specifier: catalog:visulima
@@ -2601,13 +2601,13 @@ importers:
         specifier: catalog:visulima
         version: 5.0.0(ini@7.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.50
+        specifier: 1.0.0-alpha.51
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
         version: 3.0.0
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.35
+        specifier: 1.0.0-alpha.36
         version: link:../rollup-plugin-dts
       clean-css:
         specifier: catalog:style
@@ -2953,7 +2953,7 @@ importers:
         specifier: catalog:visulima
         version: 5.0.0(ini@7.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.50
+        specifier: 1.0.0-alpha.51
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
