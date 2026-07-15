@@ -43,6 +43,34 @@ const LEADING_WHITESPACE_RE = /^\s+/;
 const CJS_MJS_RE = /\.[cm]js$/;
 
 /**
+ * Return a shallow copy of `object` without the given keys. Used to drop the
+ * rollup-only option keys that rolldown 1.1.5's stricter schema rejects (see the
+ * key lists in `getRolldownTransformOptions` / `getRolldownOptions`).
+ */
+const omit = (object: Record<string, unknown>, keys: readonly string[]): Record<string, unknown> => {
+    const result: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(object)) {
+        if (!keys.includes(key)) {
+            result[key] = value;
+        }
+    }
+
+    return result;
+};
+
+// Rolldown 1.1.5 validates transform/output options and rejects the rollup-only keys the shared
+// build config carries for rollup parity. The keys absent from rolldown's schema, by location:
+//   • transform.jsx.useBuiltIns/useSpread — Babel-era knobs; rolldown's JsxOptions has neither
+//   • treeshake.preset                    — rolldown has no preset knob (moduleSideEffects honoured)
+//   • output.compact                      — rolldown minifies via `output.minify`
+//   • output.freeze/interop/validate/importAttributesKey — not in rolldown's OutputOptions
+//   • output.generatedCode.*              — rolldown's GeneratedCodeOptions only has `symbols`/`preset`
+const ROLLDOWN_UNSUPPORTED_JSX_KEYS = ["useBuiltIns", "useSpread"] as const;
+const ROLLDOWN_UNSUPPORTED_OUTPUT_KEYS = ["compact", "freeze", "generatedCode", "importAttributesKey", "interop", "validate"] as const;
+const ROLLDOWN_GENERATED_CODE_KEYS = ["preset", "symbols"] as const;
+
+/**
  * Rolldown 1.0 removed native CSS bundling (rolldown#4271) and rejects any module
  * whose extension defaults to `moduleTypes: "css"`. packem's `rollup-plugin-css`
  * already transforms CSS source into JS via its `transform()` hook, so treat the
@@ -83,15 +111,11 @@ const getRolldownTransformOptions = (context: BuildContext<InternalBuildOptions>
 
     const oxc = getOxcTransformerConfig(context, resolveNodeTarget(context));
 
-    // `oxc.jsx` carries the Babel-era `useBuiltIns`/`useSpread` knobs the oxc *plugin* accepts.
-    // Rolldown's native `transform.jsx` schema (JsxOptions) has neither — as of rolldown 1.1.5
-    // that surfaces as an "Invalid input options" warning on every build — so drop them before
+    // `oxc.jsx` carries the Babel-era `useBuiltIns`/`useSpread` knobs the oxc *plugin* accepts;
+    // rolldown's native `transform.jsx` schema (JsxOptions) has neither, so drop them before
     // forwarding. The keys rolldown does accept (runtime, development, pragma, pragmaFrag, pure,
     // importSource) pass through untouched.
-    const jsx
-        = oxc.jsx && typeof oxc.jsx === "object"
-            ? (({ useBuiltIns: _useBuiltIns, useSpread: _useSpread, ...rest }) => rest)(oxc.jsx as Record<string, unknown>)
-            : oxc.jsx;
+    const jsx = oxc.jsx && typeof oxc.jsx === "object" ? omit(oxc.jsx as Record<string, unknown>, ROLLDOWN_UNSUPPORTED_JSX_KEYS) : oxc.jsx;
 
     return {
         jsx,
@@ -121,37 +145,25 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
         ...(options as { moduleTypes?: Record<string, string> }).moduleTypes,
     };
 
-    // Rolldown 1.1.5 validates input/output options and rejects the rollup-only keys the shared
-    // build config carries for rollup parity, emitting "Invalid options" warnings on every build.
-    // Strip the keys absent from rolldown's schema so the rolldown backend builds cleanly:
-    //   • treeshake.preset            — rolldown has no preset knob (moduleSideEffects is honoured)
-    //   • output.compact              — rolldown minifies via `output.minify` (set below)
-    //   • output.freeze/interop/validate/importAttributesKey — not in rolldown's OutputOptions
-    //   • output.generatedCode.*      — rolldown's GeneratedCodeOptions only has `symbols`/`preset`
+    // Strip the rollup-only keys rolldown 1.1.5 rejects (see ROLLDOWN_UNSUPPORTED_* above) so the
+    // rolldown backend builds without "Invalid options" warnings.
     if (options.treeshake && typeof options.treeshake === "object") {
-        const { preset: _preset, ...treeshakeRest } = options.treeshake as Record<string, unknown>;
-
-        options.treeshake = treeshakeRest as typeof options.treeshake;
+        options.treeshake = omit(options.treeshake as Record<string, unknown>, ["preset"]) as typeof options.treeshake;
     }
 
     if (Array.isArray(options.output)) {
         options.output = options.output.map((output: OutputOptions) => {
-            const {
-                compact: _compact,
-                freeze: _freeze,
-                generatedCode,
-                importAttributesKey: _importAttributesKey,
-                interop: _interop,
-                validate: _validate,
-                ...outputRest
-            } = output as Record<string, unknown>;
-            const sanitized: Record<string, unknown> = outputRest;
+            const original = output as Record<string, unknown>;
+            const sanitized = omit(original, ROLLDOWN_UNSUPPORTED_OUTPUT_KEYS);
+
+            const { generatedCode } = original;
 
             if (generatedCode && typeof generatedCode === "object") {
-                // Keep only the sub-keys rolldown's GeneratedCodeOptions defines.
-                const { preset, symbols } = generatedCode as Record<string, unknown>;
+                // generatedCode was stripped above; re-add it keeping only the sub-keys
+                // rolldown's GeneratedCodeOptions defines.
+                const source = generatedCode as Record<string, unknown>;
 
-                sanitized.generatedCode = { preset, symbols };
+                sanitized.generatedCode = Object.fromEntries(ROLLDOWN_GENERATED_CODE_KEYS.map((key) => [key, source[key]]));
             }
 
             // Rolldown's `output.minify` defaults to 'dce-only' (no identifier/whitespace
