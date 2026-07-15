@@ -1,5 +1,5 @@
 /* eslint-disable import/exports-last -- exports are intentionally interleaved with helper code by topic */
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import process from "node:process";
@@ -8,6 +8,12 @@ import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
 import { findTsConfigSync, readTsConfig } from "@visulima/tsconfig";
 import type { IsolatedDeclarationsOptions } from "oxc-transform";
 import type { RenderedChunk } from "rollup";
+// TypeScript 7 (the native/tsgo compiler) ships only a minimal, ESM API: the default
+// `typescript` export is version info, and the classic synchronous surface
+// (`ts.sys`, `ts.readConfigFile`, `ts.createProgram`, …) does not exist. This module runs
+// on *every* resolve regardless of the chosen generator, so it must not hard-depend on
+// that surface — every use below is feature-checked. The `tsc` backend, which genuinely
+// needs the classic API, is loaded lazily and only when `generator === 'tsc'`.
 import ts from "typescript";
 
 import { isTS70Installed } from "./tsgo";
@@ -378,11 +384,19 @@ const resolveExtendedTsconfigPath = (extend: string, baseDirectory: string): str
 
 const readTsconfigFile = (p: string): string | undefined => {
     if (existsSync(p)) {
-        return ts.sys.readFile(p);
+        try {
+            return readFileSync(p, "utf8");
+        } catch {
+            return undefined;
+        }
     }
 
     return undefined;
 };
+
+// `ts.readConfigFile` is a JSONC parser that only exists on the classic (TS 5/6) compiler.
+// It is `undefined` on the TS 7 native compiler.
+const canReadTsconfig = (): boolean => typeof (ts as { readConfigFile?: unknown }).readConfigFile === "function";
 
 // Detects *explicit* user intent to persist build info to disk by reading raw
 // tsconfig JSON (via `ts.readConfigFile`, which skips TypeScript's compiler-option
@@ -395,6 +409,13 @@ const readTsconfigFile = (p: string): string | undefined => {
 // the chain wins over later `true` values from extensions (user explicit opt-out).
 const hasExplicitIncrementalInTsconfig = (tsconfigPath: string, seen = new Set<string>()): boolean => {
     if (seen.has(tsconfigPath)) {
+        return false;
+    }
+
+    // `incremental` is a disk-writing feature of the classic `tsc` backend only; it has no
+    // effect under the oxc or tsgo generators. On the TS 7 native compiler — where the tsc
+    // backend cannot run anyway — there is nothing to detect, so skip.
+    if (!canReadTsconfig()) {
         return false;
     }
 
