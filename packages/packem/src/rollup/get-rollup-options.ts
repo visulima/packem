@@ -543,16 +543,19 @@ const formatRollupLog = (log: RollupLog): string => {
 };
 
 // Advisory log codes rollup/rolldown emit through the input `onLog` hook (independently of
-// `onwarn`) that packem suppresses in every configuration. Shared by the rollup `handleRollupLog`
-// and the rolldown `onLog` handler so the two bundler lanes cannot drift:
+// `onwarn`) that packem suppresses in every configuration — including under `--debug`, which the
+// integration suite asserts stays clean. Shared by the rollup `handleRollupLog` and the rolldown
+// `onLog` handler so the two bundler lanes cannot drift:
 //   • EMPTY_BUNDLE   — DTS builds run emitDtsOnly (every JS chunk empty by design) and JS builds
 //                      legitimately produce empty chunks for CSS-/asset-only entries.
-//   • MIXED_EXPORTS  — packem always builds output.exports:"auto", so "named and default exports
-//                      together" is inherent to every multi-export entry, not a user mistake. It is
-//                      suppressed unconditionally (not gated on cjsInterop): the integration suite
-//                      asserts clean stderr for cjsInterop-disabled fixtures, and this onLog path is
-//                      the only one that reaches stderr for it (onwarn's `!warning.code` guard
-//                      already drops every coded warning on the rollup side).
+//   • MIXED_EXPORTS  — the cjs-interop plugin *requires* output.exports:"auto" (its renderChunk
+//                      bails unless `options.exports === "auto"`; it rewrites the named-style CJS
+//                      auto mode emits into a `module.exports` default), and "auto" + an entry with
+//                      both default and named exports always warns. The warning is therefore
+//                      intrinsic to the interop, not a user mistake, and cannot be configured away
+//                      without breaking CJS interop. Suppressing it conditionally (on cjsInterop) or
+//                      surfacing it under `--debug` were both tried and rejected by the suite, which
+//                      asserts clean stderr for cjsInterop-disabled and `--debug` builds alike.
 // eslint-disable-next-line import/exports-last -- consumed by the rolldown options builder's onLog
 export const isSuppressedBundlerLogCode = (code: string | undefined): boolean => code === "EMPTY_BUNDLE" || code === "MIXED_EXPORTS";
 
