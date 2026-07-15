@@ -552,12 +552,14 @@ const handleRollupLog = (context: BuildContext<InternalBuildOptions>, type: "bui
         return;
     }
 
-    // MIXED_EXPORTS ("using named and default exports together") is advisory. packem
-    // deliberately builds with output.exports:"auto" alongside the cjsInterop plugin, so the
-    // default+named combination is intentional and consumers are handled. Rollup emits this
-    // warning through the input onLog hook rather than onwarn, so sharedOnWarn's suppression
-    // is structurally unreachable here — suppress it directly. (onwarn already swallows it:
-    // its `if (!warning.code)` guard skips any coded warning it doesn't explicitly re-emit.)
+    // MIXED_EXPORTS ("using named and default exports together") is advisory and non-actionable
+    // in packem: packem always builds with output.exports:"auto", so the default+named
+    // combination is inherent to every multi-export entry rather than a user mistake. Suppress it
+    // unconditionally. Rollup emits this warning through the input onLog hook rather than onwarn,
+    // so sharedOnWarn's suppression is structurally unreachable here — suppress it directly.
+    // (Gating this on cjsInterop is deliberately avoided: the integration suite asserts clean
+    // stderr for cjsInterop-disabled fixtures, i.e. packem treats MIXED_EXPORTS as noise in every
+    // configuration, and handleRollupLog is the only path that reaches stderr for it.)
     if (log.code === "MIXED_EXPORTS") {
         return;
     }

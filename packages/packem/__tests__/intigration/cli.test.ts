@@ -6,7 +6,7 @@ import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, expectNoUnexpectedStderrWarnings, installPackage, UNDECLARED_DEPENDENCY_WARNING_REGEX } from "../helpers";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 describe("packem cli", () => {
@@ -658,11 +658,7 @@ export function barFunction() {
         // but neither declared nor installed, so packem advises it will bundle the undeclared dep
         // and rollup reports it as unresolved-but-externalized — both expected for this fixture.
         // Assert no OTHER warnings reached stderr.
-        const unexpectedStderr = (binProcess.stderr as string)
-            .split("\n")
-            .filter((line) => line.includes("WARNING") && !/but not declared in package\.json|ould not (?:be )?resolve/.test(line));
-
-        expect(unexpectedStderr).toStrictEqual([]);
+        expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [UNDECLARED_DEPENDENCY_WARNING_REGEX]);
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).toContain("Preparing build for");

@@ -9,7 +9,7 @@ import { execaNode } from "execa";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage, normalizeRolldownOutput } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, expectNoUnexpectedStderrWarnings, installPackage, normalizeRolldownOutput } from "../helpers";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 const DECLARE_TRANSFORM_REGEX = /declare const transform/u;
@@ -260,11 +260,7 @@ export const transform = svgrTransform;
         // patch-types plugin advises they could be renamed via `patchTypes.identifierReplacements`.
         // That advisory is expected here (the test asserts type *inlining*, not identifier names);
         // assert no OTHER warnings reached stderr.
-        const unexpectedStderr = (binProcess.stderr as string)
-            .split("\n")
-            .filter((line) => line.includes("WARNING") && !line.includes("contains confusing identifier names"));
-
-        expect(unexpectedStderr).toStrictEqual([]);
+        expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [/contains confusing identifier names/]);
         expect(binProcess.exitCode).toBe(0);
 
         // JS output should still have the external import

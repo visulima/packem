@@ -5,7 +5,7 @@ import { readFileSync } from "@visulima/fs";
 import { join } from "@visulima/path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createPackemConfig, execPackem } from "../helpers";
+import { createPackemConfig, execPackem, expectNoUnexpectedStderrWarnings, UNDECLARED_DEPENDENCY_WARNING_REGEX } from "../helpers";
 
 const ecosystemPath = join(__dirname, "../..", "__fixtures__", "ecosystem");
 
@@ -54,15 +54,7 @@ describe("packem ecosystem", () => {
         // tsconfigs also set `verbatimModuleSyntax`, which the rolldown backend reports as
         // overridden by packem's `onlyRemoveTypeImports`. Both advisories are expected here; assert
         // no OTHER warnings reached stderr.
-        const unexpectedStderr = (binProcess.stderr as string)
-            .split("\n")
-            .filter(
-                (line) =>
-                    line.includes("WARNING")
-                    && !/but not declared in package\.json|ould not (?:be )?resolve|CONFIGURATION_FIELD_CONFLICT/.test(line),
-            );
-
-        expect(unexpectedStderr).toStrictEqual([]);
+        expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [UNDECLARED_DEPENDENCY_WARNING_REGEX, /CONFIGURATION_FIELD_CONFLICT/]);
         expect(binProcess.exitCode).toBe(0);
 
         const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {

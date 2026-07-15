@@ -11,7 +11,7 @@ import type { OutputOptions } from "rollup";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { PackemConfigProperties } from "../helpers";
-import { createPackageJson, createPackemConfig, execPackem, installPackage, normalizeRolldownOutput } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackem, expectNoUnexpectedStderrWarnings, installPackage, normalizeRolldownOutput } from "../helpers";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "css");
 
@@ -161,11 +161,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             };
         }
 
-        const unexpectedStderrWarnings = (binProcess.stderr as string)
-            .split("\n")
-            .filter((line) => line.includes("WARNING") && !CSS_BENIGN_STDERR_WARNING_REGEX.test(line));
-
-        expect(unexpectedStderrWarnings).toStrictEqual([]);
+        expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [CSS_BENIGN_STDERR_WARNING_REGEX]);
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).toSatisfy((content: string) => {

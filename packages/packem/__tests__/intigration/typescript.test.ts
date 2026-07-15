@@ -10,7 +10,7 @@ import { join } from "@visulima/path";
 import { execa } from "execa";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage, normalizeRolldownOutput } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, expectNoUnexpectedStderrWarnings, installPackage, normalizeRolldownOutput } from "../helpers";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 // Tests that compare bundled output byte-exactly fail under rolldown because
@@ -420,11 +420,7 @@ console.log(fromBoth, fromTs);
             // does not declare them (they exist only to exercise .js-over-.ts resolution), so
             // packem advises it will bundle those undeclared deps. That advisory is expected
             // here; assert no OTHER warnings reached stderr.
-            const unexpectedStderr = (binProcess.stderr as string)
-                .split("\n")
-                .filter((line) => line.includes("WARNING") && !line.includes("but not declared in package.json"));
-
-            expect(unexpectedStderr).toStrictEqual([]);
+            expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [/but not declared in package\.json/]);
             expect(binProcess.exitCode).toBe(0);
 
             const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);

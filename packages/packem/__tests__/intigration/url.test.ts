@@ -6,7 +6,7 @@ import type { UrlOptions } from "@visulima/packem-plugins/plugin/url";
 import { basename, join, resolve } from "@visulima/path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { assertContainFiles, createPackageJson, createPackemConfig, execPackem } from "../helpers";
+import { assertContainFiles, createPackageJson, createPackemConfig, execPackem, expectNoUnexpectedStderrWarnings } from "../helpers";
 import temporaryDirectory from "../helpers/temporary-directory";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
@@ -359,11 +359,7 @@ export default svg;`,
         // package.json (the test exercises bundling an image from a node_modules package), so
         // packem advises it will bundle the undeclared dep. That advisory is expected here;
         // assert no OTHER warnings reached stderr.
-        const unexpectedStderr = (binProcess.stderr as string)
-            .split("\n")
-            .filter((line) => line.includes("WARNING") && !line.includes("but not declared in package.json"));
-
-        expect(unexpectedStderr).toStrictEqual([]);
+        expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [/but not declared in package\.json/]);
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
