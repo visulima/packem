@@ -31,7 +31,7 @@
         "@visulima/packem": "workspace:*",
         "esbuild": "catalog:build",
         "rimraf": "^6.1.3",
-        "typescript": "^6.0.3"
+        "typescript": "^7.0.2"
     },
     "engines": {
         "node": ">=20"

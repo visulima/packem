@@ -37,12 +37,12 @@
         "react": "^19.2.7"
     },
     "devDependencies": {
-        "@swc/core": "^1.15.40",
+        "@swc/core": "^1.15.43",
         "@swc/helpers": "^0.5.23",
-        "@types/react": "^19.2.16",
+        "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "@visulima/packem": "workspace:*",
-        "typescript": "^6.0.3"
+        "typescript": "^7.0.2"
     },
     "engines": {
         "node": ">=20"

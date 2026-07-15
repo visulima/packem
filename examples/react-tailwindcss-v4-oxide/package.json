@@ -1,9 +1,6 @@
 {
     "name": "examples_packem_react_tailwindcss-v4-oxide",
     "private": true,
-    "sideEffects": [
-        "**/*.css"
-    ],
     "keywords": [
         "tailwind",
         "tailwind-oxide",
@@ -15,6 +12,9 @@
     ],
     "license": "MIT",
     "author": "Visulima Team",
+    "sideEffects": [
+        "**/*.css"
+    ],
     "type": "module",
     "exports": [
         "./dist/index.mjs",
@@ -34,18 +34,18 @@
         "react": "^19.2.7"
     },
     "devDependencies": {
-        "@tailwindcss/node": "4.3.0",
-        "@tailwindcss/oxide": "4.3.0",
-        "@types/react": "^19.2.16",
+        "@tailwindcss/node": "4.3.2",
+        "@tailwindcss/oxide": "4.3.2",
+        "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "@visulima/css-style-inject": "workspace:*",
         "@visulima/packem": "workspace:*",
-        "cssnano": "8.0.1",
+        "cssnano": "8.0.2",
         "esbuild": "catalog:build",
         "react-dom": "^19.2.7",
         "rimraf": "^6.1.3",
-        "tailwindcss": "^4.3.0",
-        "typescript": "^6.0.3"
+        "tailwindcss": "^4.3.2",
+        "typescript": "^7.0.2"
     },
     "engines": {
         "node": ">=18.0.0"

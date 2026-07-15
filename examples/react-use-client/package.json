@@ -39,12 +39,12 @@
         "react": "^19.2.7"
     },
     "devDependencies": {
-        "@types/react": "^19.2.16",
+        "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "@visulima/packem": "workspace:*",
         "esbuild": "catalog:build",
         "rimraf": "^6.1.3",
-        "typescript": "^6.0.3"
+        "typescript": "^7.0.2"
     },
     "engines": {
         "node": ">=20"
