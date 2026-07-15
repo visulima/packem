@@ -105,16 +105,18 @@ const resolveNodeEnvironment = (options: BuildCommandOptions, explicit: string |
 };
 
 /**
- * Expands the repeatable `--external` option. Each value may itself be a
- * comma-separated list, so every entry expands to a `string[]`. The runtime
- * shape is preserved exactly; only the static type is made explicit.
+ * Expands the repeatable `--external` option into a flat list of package names.
+ * Each value may itself be a comma-separated list (`--external lodash,react`), so the
+ * comma-split groups are flattened. The result feeds `externals.include`, which the
+ * externals plugin compiles per-entry with `getRegExps`; a nested `string[][]` there is
+ * rejected as a "wrong entry type", so the flattening is what makes `--external` take effect.
  */
-const collectExternals = (options: BuildCommandOptions): string[][] => {
-    const externals: string[][] = [];
+const collectExternals = (options: BuildCommandOptions): string[] => {
+    const externals: string[] = [];
 
     if (options.external) {
         for (const extension of options.external) {
-            externals.push(extension.split(","));
+            externals.push(...extension.split(","));
         }
     }
 
