@@ -959,6 +959,26 @@ describe("dts plugin", () => {
         expect(resolveOptions({ noCheck: true, tsconfig: false }).tsconfigRaw.compilerOptions?.noCheck).toBe(true);
     });
 
+    it("warns when `moduleSuffixes` is set but the `oxc` resolver (which ignores it) is used (#84)", () => {
+        expect.assertions(3);
+
+        const buildStartWarn = (options: Parameters<typeof dts>[0]) => {
+            const plugin = dts(options).find((p) => p.name === "rollup-plugin-dts:resolver");
+            const warn = vi.fn();
+
+            (plugin?.buildStart as (this: { warn: typeof warn }) => void).call({ warn });
+
+            return warn;
+        };
+
+        // Default (`oxc`) resolver + `moduleSuffixes` → warn, because `resolveDtsSync` ignores it.
+        expect(buildStartWarn({ compilerOptions: { moduleSuffixes: [".ios", ""] }, tsconfig: false })).toHaveBeenCalledOnce();
+        // `tsc` resolver honors `moduleSuffixes` via `ts.bundlerModuleNameResolver` → no warning.
+        expect(buildStartWarn({ compilerOptions: { moduleSuffixes: [".ios", ""] }, resolver: "tsc", tsconfig: false })).not.toHaveBeenCalled();
+        // No `moduleSuffixes` configured → no warning.
+        expect(buildStartWarn({ tsconfig: false })).not.toHaveBeenCalled();
+    });
+
     describe("generator option", () => {
         it("infers the generator from the legacy boolean options", () => {
             expect.assertions(3);

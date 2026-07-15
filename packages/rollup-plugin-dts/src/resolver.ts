@@ -35,6 +35,23 @@ const createDtsResolvePlugin = ({
     const moduleSideEffects = sideEffects ? true : null;
 
     return {
+        buildStart() {
+            // oxc-resolver's `resolveDtsSync` implements TypeScript's `moduleResolution: "bundler"`
+            // algorithm but does NOT honor `moduleSuffixes` — and it ignores any `extensionAlias` /
+            // `extensions` we could pass the factory (the dts entry point does not consult them). So
+            // a platform-suffix setup (e.g. `moduleSuffixes: [".ios", ""]`) silently resolves
+            // `./x.js` to `x.d.ts` instead of the intended `x.ios.d.ts`. The `tsc` resolver goes
+            // through `ts.bundlerModuleNameResolver`, which does honor it. Warn once so users with
+            // this config can opt into the resolver that respects it. See sxzz/rolldown-plugin-dts#84.
+            const moduleSuffixes = tsconfigRaw.compilerOptions?.moduleSuffixes;
+
+            if (resolver !== "tsc" && Array.isArray(moduleSuffixes) && moduleSuffixes.some((suffix) => suffix !== "")) {
+                this.warn(
+                    `\`compilerOptions.moduleSuffixes\` is set to ${JSON.stringify(moduleSuffixes)}, but the \`oxc\` declaration resolver ignores module suffixes, so imports may resolve to the wrong variant (e.g. \`x.d.ts\` instead of \`x.ios.d.ts\`). Set \`dts: { resolver: "tsc" }\` to honor \`moduleSuffixes\` during declaration bundling.`,
+                );
+            }
+        },
+
         name: "rollup-plugin-dts:resolver",
 
         resolveId: {
