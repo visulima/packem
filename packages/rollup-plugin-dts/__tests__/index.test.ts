@@ -295,6 +295,30 @@ describe("dts plugin", () => {
             expect(chunks[0].fileName).toBe("index.asdf.d.ts");
         });
 
+        // A multi-declarator value export (`const a, b`) that shares a name with an interface used
+        // to crash with rollup's "Duplicate export" because the declaration-merge logic only tracked
+        // single-binding declarations. Both orderings must now merge into one export.
+        it("merges a multi-declarator const with a same-name interface (const first)", async () => {
+            expect.assertions(3);
+
+            const { snapshot } = await rollupBuild([path.resolve(dirname, "fixtures/merge-multi-const-interface.d.ts")], [dts({ dtsInput: true })], {});
+
+            expect(snapshot).toContain("export { a, b }");
+            expect(snapshot).toContain("interface a {");
+            // The const's `: number` annotation must not leak onto the interface id.
+            expect(snapshot).not.toContain("interface a:");
+        });
+
+        it("merges a multi-declarator const with a same-name interface (interface first)", async () => {
+            expect.assertions(3);
+
+            const { snapshot } = await rollupBuild([path.resolve(dirname, "fixtures/merge-interface-multi-const.d.ts")], [dts({ dtsInput: true })], {});
+
+            expect(snapshot).toContain("export { c, d }");
+            expect(snapshot).toContain("interface c {");
+            expect(snapshot).not.toContain("interface c:");
+        });
+
         it("default chunk name", async () => {
             expect.assertions(4);
 
@@ -966,7 +990,7 @@ describe("dts plugin", () => {
             const plugin = dts(options).find((p) => p.name === "rollup-plugin-dts:resolver");
             const warn = vi.fn();
 
-            (plugin?.buildStart as (this: { warn: typeof warn }) => void).call({ warn });
+            (plugin?.buildStart as unknown as (this: { warn: typeof warn }) => void).call({ warn });
 
             return warn;
         };

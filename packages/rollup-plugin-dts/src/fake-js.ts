@@ -44,6 +44,12 @@ interface OverloadInfo {
     depsOffset: number;
     params: TypeParams;
     paramsOffset: number;
+    /**
+     * Index into the primary declaration's `bindings` that this overload's name maps to.
+     * The primary can bind several names (`const a, b`), so an overload merged onto `b`
+     * must be renamed to `bindings[1]`, not always `bindings[0]`.
+     */
+    primaryBindingIndex: number;
 }
 
 interface DeclarationInfo {
@@ -60,6 +66,8 @@ interface DeclarationInfo {
     /** Number of params belonging to the primary declaration (before merging overloads) */
     primaryParamsCount?: number;
     resolvedModuleId?: string;
+    /** Original `program.body` index of this declaration's statement (used to drop it on a role swap). */
+    stmtIndex: number;
 }
 
 interface ModuleExports {
@@ -383,34 +391,42 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             // rollup's assertUniqueExportName rejects two exports of the same local name.
             // Both declaration bodies are still rendered in renderChunk, and TypeScript's
             // local declaration-merging rules reunite them via the single final export.
-            if (bindings.length === 1 && bindingToDeclarationId.has(bindings[0].name)) {
-                const existingId = bindingToDeclarationId.get(bindings[0].name)!;
+            const collidingIndex = bindings.findIndex((binding) => bindingToDeclarationId.has(binding.name));
+
+            // A multi-binding declaration (`const a, b`) owns a runtime `var [a, b] = [...]`
+            // array pattern that cannot be demoted to an overload — its extra bindings would
+            // lose their export. So the multi-binding declaration must always be the primary.
+            // When the *incoming* declaration is single-binding it folds into whatever primary
+            // already owns the name; when it is multi-binding and the existing primary is
+            // single-binding (and hasn't itself accumulated overloads yet), we swap roles:
+            // register the incoming declaration as primary below and fold the existing one in.
+            let swapExisting: DeclarationInfo | undefined;
+
+            if (collidingIndex !== -1) {
+                const collidingName = bindings[collidingIndex].name;
+                const existingId = bindingToDeclarationId.get(collidingName)!;
                 const existing = getDeclaration(existingId);
 
-                if (!existing.overloads) {
-                    existing.overloads = [];
-                    existing.primaryDepsCount = existing.deps.length;
-                    existing.primaryParamsCount = existing.params.length;
-                    existing.primaryChildrenCount = existing.children.length;
+                if (bindings.length === 1) {
+                    foldOverload(existing, {
+                        children,
+                        decl,
+                        deps,
+                        params,
+                        primaryBindingIndex: existing.bindings.findIndex((binding) => binding.name === collidingName),
+                    });
+                    stmtsToRemove.add(i);
+
+                    continue;
                 }
 
-                existing.overloads.push({
-                    children,
-                    childrenOffset: existing.children.length,
-                    decl,
-                    deps,
-                    depsOffset: existing.deps.length,
-                    params,
-                    paramsOffset: existing.params.length,
-                });
-                // Merge deps, params, and children into the primary so they go through
-                // Rollup's identifier renaming pipeline
-                existing.deps.push(...deps);
-                existing.params.push(...params);
-                existing.children.push(...children);
-                stmtsToRemove.add(i);
+                if (existing.bindings.length === 1 && !existing.overloads) {
+                    swapExisting = existing;
+                    stmtsToRemove.add(existing.stmtIndex);
+                }
 
-                continue;
+                // Otherwise (two multi-binding declarations share a name — invalid TS) fall
+                // through and register separately; rollup will surface the duplicate.
             }
 
             const declarationId = registerDeclaration({
@@ -420,12 +436,27 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 deps,
                 params,
                 resolvedModuleId,
+                stmtIndex: i,
             });
 
-            // Track this binding so a subsequent declaration with the same name can be
-            // merged as an overload (see the duplicate-binding branch above).
-            if (bindings.length === 1) {
-                bindingToDeclarationId.set(bindings[0].name, declarationId);
+            // Role swap: fold the existing single-binding declaration into the just-registered
+            // multi-binding primary, and re-point its name at the new primary.
+            if (swapExisting) {
+                foldOverload(getDeclaration(declarationId), {
+                    children: swapExisting.children,
+                    decl: swapExisting.decl,
+                    deps: swapExisting.deps,
+                    params: swapExisting.params,
+                    primaryBindingIndex: bindings.findIndex((binding) => binding.name === swapExisting!.bindings[0].name),
+                });
+                bindingToDeclarationId.set(swapExisting.bindings[0].name, declarationId);
+            }
+
+            // Track every binding so a subsequent declaration with the same name can be
+            // merged as an overload (see the duplicate-binding branch above). All bindings of a
+            // multi-declarator `const a, b` are tracked so a later `interface a` still merges.
+            for (const binding of bindings) {
+                bindingToDeclarationId.set(binding.name, declarationId);
             }
 
             const declarationIdNode = b.numericLiteral(declarationId);
@@ -649,9 +680,14 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                             });
                         }
 
-                        // Use the transformed binding name from the primary declaration
+                        // Rename the overload to the primary binding it merged onto — the specific
+                        // one it collided with (a multi-binding primary like `const a, b` can hold
+                        // overloads on either name), not always `bindings[0]`. Only the renamed
+                        // *name* and its span are taken from the primary binding: a `const`'s type
+                        // annotation must not leak onto an `interface`/`function`/`class` id, which
+                        // would emit invalid output like `interface a: number { … }`.
                         if ("id" in overload.decl && overload.decl.id) {
-                            overwriteNode(overload.decl.id, { ...declaration.bindings[0] });
+                            overwriteNode(overload.decl.id, { ...declaration.bindings[overload.primaryBindingIndex], typeAnnotation: null });
                         }
 
                         // Patch overload children locations from the merged children array
@@ -802,6 +838,30 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
     function getDeclaration(declarationId: number) {
         return declarationMap.get(declarationId)!;
+    }
+
+    // Attach `overload` (a single-binding declaration that shares a name with `primary`) so both
+    // bodies render but only the primary emits an export. The overload's deps/params/children are
+    // appended to the primary's arrays — with the pre-merge offsets recorded — so they flow through
+    // rollup's identifier renamer alongside the primary's own.
+    function foldOverload(primary: DeclarationInfo, overload: Omit<OverloadInfo, "childrenOffset" | "depsOffset" | "paramsOffset">) {
+        if (!primary.overloads) {
+            primary.overloads = [];
+            primary.primaryDepsCount = primary.deps.length;
+            primary.primaryParamsCount = primary.params.length;
+            primary.primaryChildrenCount = primary.children.length;
+        }
+
+        primary.overloads.push({
+            ...overload,
+            childrenOffset: primary.children.length,
+            depsOffset: primary.deps.length,
+            paramsOffset: primary.params.length,
+        });
+
+        primary.deps.push(...overload.deps);
+        primary.params.push(...overload.params);
+        primary.children.push(...overload.children);
     }
 
     /**
