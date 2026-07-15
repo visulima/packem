@@ -2,7 +2,10 @@
 
 exports[`packem require-cjs-transformer > should handle multiple entry points with shared chunks correctly > shared 1`] = `
 "import { createRequire as __cjs_createRequire } from "node:module";
-const __cjs_require = __cjs_createRequire(import.meta.url);
+let __cjs_cachedRequire;
+const __cjs_require = (id) => {
+	return (__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id);
+};
 const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
 const __cjs_getBuiltinModule = (module) => {
 	// Check if we're in Node.js and version supports getBuiltinModule
@@ -35,7 +38,10 @@ export { resolvePath as i, getEnv as n, joinPaths as r, getCwd as t };
 
 exports[`packem require-cjs-transformer > should transform ESM imports of CJS modules to require calls > mjs 1`] = `
 "import { createRequire as __cjs_createRequire } from "node:module";
-const __cjs_require = __cjs_createRequire(import.meta.url);
+let __cjs_cachedRequire;
+const __cjs_require = (id) => {
+	return (__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id);
+};
 const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
 const __cjs_getBuiltinModule = (module) => {
 	// Check if we're in Node.js and version supports getBuiltinModule

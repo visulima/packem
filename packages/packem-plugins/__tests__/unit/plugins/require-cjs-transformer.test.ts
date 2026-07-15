@@ -81,7 +81,10 @@ export const test = 'hello';`;
         expect(result.code).toMatchInlineSnapshot(`
           "import { createRequire as __cjs_createRequire } from "node:module";
 
-          const __cjs_require = __cjs_createRequire(import.meta.url);
+          let __cjs_cachedRequire;
+          const __cjs_require = (id) => {
+              return (__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id);
+          };
 
           const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
 
@@ -121,9 +124,9 @@ export const test = 'hello';`;
         // `const __cjs_require = ...createRequire...(...)` shim. Rollup keeps one such
         // declaration with the bare name but renames the `createRequire` import to a
         // deconflicted `createRequire$2`. The renderChunk preamble then prepends a second
-        // bare `const __cjs_require = __cjs_createRequire(import.meta.url);`, so the output
-        // must collapse back to a single declaration or esbuild fails with
-        // "The symbol __cjs_require has already been declared".
+        // (lazy) `const __cjs_require = (id) => { ... };`, so the output must collapse back to
+        // a single declaration — keeping the prepended lazy copy and dropping the eager one —
+        // or esbuild fails with "The symbol __cjs_require has already been declared".
         const code = `const __cjs_require = createRequire$2(import.meta.url);
 import typescript from 'typescript';
 
@@ -140,7 +143,7 @@ export const test = typescript;`;
 
         const declarationCount = [...result.code.matchAll(/const\s+__cjs_require\s*=/g)].length;
 
-        expect(result.code).toContain("const __cjs_require = __cjs_createRequire(import.meta.url);");
+        expect(result.code).toContain("(__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id)");
         expect(result.code).not.toContain("createRequire$2");
         expect(declarationCount).toBe(1);
     });

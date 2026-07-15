@@ -13,7 +13,15 @@ import isPureCJS, { clearPureCjsCache } from "../utils/is-pure-cjs";
 const REQUIRE_VAR = `__cjs_require`;
 
 const CREATE_REQUIRE_IMPORT = `import { createRequire as __cjs_createRequire } from "node:module";`;
-const REQUIRE_DECLARATION = `const ${REQUIRE_VAR} = __cjs_createRequire(import.meta.url);`;
+// Lazy `createRequire` so `import.meta.url` is only dereferenced on the first *use*, not at
+// module-evaluation time. Bundled non-Node runtimes (workerd/Cloudflare Workers, Vite production
+// builds) leave `import.meta.url` undefined, and an eager `createRequire(undefined)` throws while
+// the module graph is still evaluating — a hard boot failure. Keeping it lazy means a runtime that
+// resolves builtins via `getBuiltinModule` (see below) and imports no CJS deps never touches it.
+const REQUIRE_DECLARATION = `let __cjs_cachedRequire;
+const ${REQUIRE_VAR} = (id) => {
+    return (__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id);
+};`;
 const GET_PROCESS_DECLARATION = `const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;`;
 
 const GET_BUILTIN_MODULE_DECLARATION = `const __cjs_getBuiltinModule = (module) => {
@@ -35,9 +43,15 @@ const REGEX_PATTERNS = {
     // `__cjs_getBuiltinModule\s*=` still excludes `$N`-suffixed names (`__cjs_getBuiltinModule$1 =`),
     // which are distinct symbols referenced elsewhere and must survive.
     builtin: /const\s+__cjs_getBuiltinModule\s*=\s*\(\w*\)\s*=>\s*\{[\s\S]*?\};\s*/g,
+    // Deduplicate the `let __cjs_cachedRequire;` backing store for the lazy require (below).
+    cachedRequire: /let\s+__cjs_cachedRequire\s*;\s*/g,
     import: /import\s*\{\s*createRequire(?:\s+as\s+__cjs_createRequire)?\s*\}\s*from\s*["']node:module["'];?\s*/g,
     process: /const\s+__cjs_getProcess\s*=\s*typeof\s+globalThis[^;]*;\s*/g,
-    require: /const\s+__cjs_require\s*=\s*(?:__cjs_)?createRequire(?:\$\w+)?\s*\([^)]*\);\s*/g,
+    // Matches both the current lazy arrow form (`= (id) => { ... };`) and the legacy eager form
+    // (`= createRequire(import.meta.url);`) so that when a chunk inlines an older packem-built dep
+    // whose dist still ships the eager declaration, the prepended lazy copy (kept as the first
+    // match) survives and the eager duplicate is removed instead of throwing at boot.
+    require: /const\s+__cjs_require\s*=\s*(?:(?:__cjs_)?createRequire(?:\$\w+)?\s*\([^)]*\)|\([^)]*\)\s*=>\s*\{[\s\S]*?\})\s*;\s*/g,
 } as const;
 
 const DEFAULT_EXCLUDE = [/node_modules/, /\.d\.[cm]?ts$/];

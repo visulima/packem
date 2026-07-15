@@ -140,7 +140,14 @@ import { cwd } from 'process'
 
 // Output (runtime-detected)
 import { createRequire as __cjs_createRequire } from "node:module";
-const __cjs_require = __cjs_createRequire(import.meta.url);
+// Lazy on purpose: `import.meta.url` is only read on the first CJS `require`, not at module
+// evaluation. Bundles that leave `import.meta.url` undefined (Cloudflare Workers/workerd, Vite
+// production builds) would otherwise throw at load — a hard boot failure — even when no CJS dep
+// is ever used at runtime.
+let __cjs_cachedRequire;
+const __cjs_require = (id) => {
+    return (__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id);
+};
 
 // Runtime capability helpers
 const __cjs_getBuiltinModule = (module) => {
@@ -201,7 +208,14 @@ After transformation:
 ```typescript
 // dist/index.mjs
 import { createRequire as __cjs_createRequire } from "node:module";
-const __cjs_require = __cjs_createRequire(import.meta.url);
+// Lazy on purpose: `import.meta.url` is only read on the first CJS `require`, not at module
+// evaluation. Bundles that leave `import.meta.url` undefined (Cloudflare Workers/workerd, Vite
+// production builds) would otherwise throw at load — a hard boot failure — even when no CJS dep
+// is ever used at runtime.
+let __cjs_cachedRequire;
+const __cjs_require = (id) => {
+    return (__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id);
+};
 
 // Runtime capability helpers
 const __cjs_getBuiltinModule = (module) => {

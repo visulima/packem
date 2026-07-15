@@ -144,7 +144,13 @@ After building, the ESM output (`dist/index.js`) will be transformed:
 ```javascript
 // dist/index.js (transformed)
 import { createRequire as __cjs_createRequire } from "node:module";
-const __cjs_require = __cjs_createRequire(import.meta.url);
+// Lazy on purpose: `import.meta.url` is only read on the first CJS `require`, not at module
+// evaluation — so bundles that leave it undefined (Cloudflare Workers/workerd, Vite production
+// builds) don't crash at load.
+let __cjs_cachedRequire;
+const __cjs_require = (id) => {
+    return (__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id);
+};
 
 // Runtime capability helpers
 const __cjs_getBuiltinModule = (module) => {

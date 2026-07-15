@@ -405,7 +405,7 @@ export const mainIndex2 = () => ({
         const normalizedIndex = normalizeBundleOutput(indexMjsContent);
 
         expect(normalizedIndex).toContain("import { createRequire as __cjs_createRequire } from 'node:module'");
-        expect(normalizedIndex).toContain("const __cjs_require = __cjs_createRequire(import.meta.url)");
+        expect(normalizedIndex).toContain("const __cjs_require = (id) =>");
         expect(normalizedIndex).toContain("__cjs_getBuiltinModule");
         expect(normalizedIndex).toMatch(CJS_GET_BUILTIN_MODULE_REGEX);
         expect(normalizedIndex).toMatch(SHARED_PROCESS_UTILS_REGEX);
