@@ -977,6 +977,21 @@ describe("dts plugin", () => {
             expect(oxcResolved.oxc).toStrictEqual({ sourcemap: false, stripInternal: false });
         });
 
+        it("throws for an explicit `tsc` generator under TypeScript 7", async () => {
+            expect.assertions(1);
+
+            // The classic `tsc` backend needs the synchronous compiler API absent from TS7, so an
+            // explicit request must fail fast with a clear message rather than crash on `ts.sys`.
+            const tsgoModule = await import("../src/tsgo.js");
+            const spy = vi.spyOn(tsgoModule, "isTS70Installed").mockReturnValue(true);
+
+            try {
+                expect(() => resolveOptions({ generator: "tsc", tsconfig: false })).toThrow(/TypeScript 7\.0/);
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
         it("forces tsc for vue and warns that the generator is ignored", () => {
             expect.assertions(3);
 

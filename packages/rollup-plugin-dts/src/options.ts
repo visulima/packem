@@ -518,6 +518,17 @@ const validateOxcCompatibility = (oxc: boolean, vue: boolean, tsMacro: boolean):
 
 const validateGenerator = (generator: Generator, logger: Logger): void => {
     if (generator === "tsc") {
+        // The `tsc` backend uses the classic synchronous compiler API (`ts.sys`,
+        // `ts.createProgram`, …). TypeScript 7.0 (the native compiler) ships `typescript` but
+        // not that surface, so loading the backend would throw a cryptic `ts.sys is undefined`
+        // TypeError. Fail fast with an actionable message (auto-selection already prefers `tsgo`
+        // under TS7; this only triggers when `generator: "tsc"` was requested explicitly).
+        if (isTS70Installed()) {
+            throw new Error(
+                "[@visulima/rollup-plugin-dts] The `tsc` generator requires the classic TypeScript compiler API, which TypeScript 7.0 (the native compiler) does not provide. Use the `tsgo` generator (the default under TypeScript 7) or `oxc` instead.",
+            );
+        }
+
         try {
             createRequire(import.meta.url).resolve("typescript");
         } catch {
