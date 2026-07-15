@@ -17,6 +17,7 @@ type MaybeFalsy<T> = T | false | null | undefined;
 const REGEX_ESCAPE_RE = /[.*+?^${}()|[\]\\]/g;
 const MATCH_ALL_RE = /.*/;
 const RELATIVE_OR_NULL_RE = /^(?:\0|\.{1,2}\/)/;
+const VIRTUAL_ID_RE = /^\0/;
 const NODE_PREFIX_RE = /^node:/;
 
 // packem's CSS plugin injects `import { cssStyleInject } from "@visulima/css-style-inject"`.
@@ -400,10 +401,22 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
 
         resolveId: {
             filter: {
-                id: (id: string) => !id.startsWith("\0"),
+                id: {
+                    exclude: VIRTUAL_ID_RE,
+                },
             },
             // eslint-disable-next-line sonarjs/cognitive-complexity -- resolveId handler covers many distinct external-decision branches that are clearer kept inline
             async handler(id: string, importer: string | undefined, resolveOptions): Promise<ResolveIdResult> {
+                // Virtual modules (rollup convention: id starts with NUL) are never bare
+                // package imports and must never be classified as externals or trigger the
+                // "not declared in package.json" advisory below. The declarative `filter.id`
+                // above should already exclude them, but the compiled filter is skipped for
+                // some hook invocations (and a function-form filter — the prior spelling — is
+                // a no-op that neither rollup nor rolldown honor), so guard explicitly here.
+                if (id.startsWith("\0")) {
+                    return undefined;
+                }
+
                 if (resolveOptions.isEntry) {
                     return undefined;
                 }
@@ -446,6 +459,26 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                 }
 
                 const [specifierPkg] = parseSpecifier(id);
+
+                // This `resolveId` hook runs at `order: "pre"`, so it sees every specifier
+                // before the alias, tsconfig-paths, url/scheme, and node resolvers get a turn.
+                // Those non-package specifiers are not undeclared dependencies — they are owned
+                // by the later resolvers — so externals must hand them off (return undefined)
+                // rather than classify them as bare packages or emit the unlisted-dependency
+                // advisory below. `options.external` already applies these same guards; the
+                // warning path previously did not, which surfaced spurious advisories for
+                // scheme ids (`file:`, `components:Test`) and aliases (`~`, `@/foo`).
+                if (!isValidPackageName(specifierPkg)) {
+                    return undefined;
+                }
+
+                if (Object.keys(resolvedAliases).length > 0 && resolveAlias(id, resolvedAliases) !== id) {
+                    return undefined;
+                }
+
+                if (tsconfigPathPatterns.some((pattern) => pattern.test(id))) {
+                    return undefined;
+                }
 
                 // devDependency — if user externals included it, options.external handles that.
                 // Otherwise resolve and bundle; fail fast on unresolvable declared deps.
