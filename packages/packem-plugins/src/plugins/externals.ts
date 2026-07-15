@@ -239,6 +239,17 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     }
 
     const resolvedAliases = resolveAliases(pkg, context.options);
+
+    // A specifier is "owned by a later resolver" when it is not a real bare package import but
+    // something the alias, tsconfig-paths, url/scheme, or node resolvers (which run after this
+    // `order: "pre"` hook) will handle: an invalid package name (scheme ids like `file:` /
+    // `components:Test`), a configured alias (`~`, `@/foo`), or a tsconfig `paths` pattern. The
+    // externals warning path must hand these off rather than flag them as undeclared dependencies.
+    const isOwnedByLaterResolver = (id: string, specifierPkg: string): boolean =>
+        !isValidPackageName(specifierPkg)
+        || (Object.keys(resolvedAliases).length > 0 && resolveAlias(id, resolvedAliases) !== id)
+        || tsconfigPathPatterns.some((pattern) => pattern.test(id));
+
     const sourceDirectoryPattern = context.options.sourceDir
         ? new RegExp(String.raw`(?:^|/)${context.options.sourceDir.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}/`)
         : undefined;
@@ -460,23 +471,13 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
 
                 const [specifierPkg] = parseSpecifier(id);
 
-                // This `resolveId` hook runs at `order: "pre"`, so it sees every specifier
-                // before the alias, tsconfig-paths, url/scheme, and node resolvers get a turn.
-                // Those non-package specifiers are not undeclared dependencies — they are owned
-                // by the later resolvers — so externals must hand them off (return undefined)
-                // rather than classify them as bare packages or emit the unlisted-dependency
-                // advisory below. `options.external` already applies these same guards; the
-                // warning path previously did not, which surfaced spurious advisories for
-                // scheme ids (`file:`, `components:Test`) and aliases (`~`, `@/foo`).
-                if (!isValidPackageName(specifierPkg)) {
-                    return undefined;
-                }
-
-                if (Object.keys(resolvedAliases).length > 0 && resolveAlias(id, resolvedAliases) !== id) {
-                    return undefined;
-                }
-
-                if (tsconfigPathPatterns.some((pattern) => pattern.test(id))) {
+                // This `resolveId` hook runs at `order: "pre"`, so it sees every specifier before
+                // the alias, tsconfig-paths, url/scheme, and node resolvers get a turn. Specifiers
+                // those later resolvers own are not undeclared dependencies, so hand them off
+                // (return undefined) rather than classify them as bare packages or emit the
+                // unlisted-dependency advisory below. The warning path previously skipped this
+                // check, which surfaced spurious advisories for scheme ids and aliases.
+                if (isOwnedByLaterResolver(id, specifierPkg)) {
                     return undefined;
                 }
 
