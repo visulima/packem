@@ -54,7 +54,8 @@ describe("packem validation", () => {
 
             expect(binProcess.exitCode).toBe(1);
             // Rolldown's region markers + interop bump emit size from 21B (rollup) to 57B.
-            expect(binProcess.stdout).toMatch(FILE_SIZE_LIMIT_REGEX);
+            // @visulima/pail 4.0.0 routes warn-level validation output to stderr (was stdout).
+            expect(binProcess.stderr).toMatch(FILE_SIZE_LIMIT_REGEX);
         });
 
         it("should throw a warning if the size of the file extends the file limit and allowFail is enabled", async () => {
@@ -98,9 +99,11 @@ describe("packem validation", () => {
                 reject: false,
             });
 
-            expect(binProcess.stderr).toBe("");
+            // allowFail keeps the build green but still reports the overage. @visulima/pail 4.0.0
+            // routes warn-level output to stderr (was stdout), so the notice lands on stderr now.
+            expect(binProcess.stderr).toMatch(FILE_SIZE_LIMIT_REGEX);
             expect(binProcess.exitCode).toBe(0);
-            expect(binProcess.stdout).toMatch(FILE_SIZE_LIMIT_REGEX);
+            expect(binProcess.stdout).not.toMatch(FILE_SIZE_LIMIT_REGEX);
         });
 
         it("should throw a error if the size of the bundle extends the limit", async () => {
@@ -133,7 +136,8 @@ describe("packem validation", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expect(binProcess.stdout).toMatch(TOTAL_FILE_SIZE_LIMIT_REGEX);
+            // @visulima/pail 4.0.0 routes warn-level validation output to stderr (was stdout).
+            expect(binProcess.stderr).toMatch(TOTAL_FILE_SIZE_LIMIT_REGEX);
         });
 
         it("should throw a warning if the size of the bundle extends the bundle limit and allowFail is enabled", async () => {
@@ -175,9 +179,11 @@ describe("packem validation", () => {
                 reject: false,
             });
 
-            expect(binProcess.stderr).toBe("");
+            // allowFail keeps the build green but still reports the overage. @visulima/pail 4.0.0
+            // routes warn-level output to stderr (was stdout), so the notice lands on stderr now.
+            expect(binProcess.stderr).toMatch(TOTAL_FILE_SIZE_LIMIT_REGEX);
             expect(binProcess.exitCode).toBe(0);
-            expect(binProcess.stdout).toMatch(TOTAL_FILE_SIZE_LIMIT_REGEX);
+            expect(binProcess.stdout).not.toMatch(TOTAL_FILE_SIZE_LIMIT_REGEX);
         });
     });
 

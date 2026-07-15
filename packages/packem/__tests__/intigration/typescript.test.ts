@@ -416,7 +416,15 @@ console.log(fromBoth, fromTs);
                 cwd: temporaryDirectoryPath,
             });
 
-            expect(binProcess.stderr).toBe("");
+            // The fixture installs `pkg-with-both` / `pkg-with-only-ts` into node_modules but
+            // does not declare them (they exist only to exercise .js-over-.ts resolution), so
+            // packem advises it will bundle those undeclared deps. That advisory is expected
+            // here; assert no OTHER warnings reached stderr.
+            const unexpectedStderr = (binProcess.stderr as string)
+                .split("\n")
+                .filter((line) => line.includes("WARNING") && !line.includes("but not declared in package.json"));
+
+            expect(unexpectedStderr).toStrictEqual([]);
             expect(binProcess.exitCode).toBe(0);
 
             const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);

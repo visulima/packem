@@ -1114,7 +1114,7 @@ export { IString };`,
                 });
 
                 expect(binProcess.exitCode).toBe(0);
-                expect(binProcess.stdout).toContain("Wildcard pattern must include a file extension");
+                expect(binProcess.stderr).toContain("Wildcard pattern must include a file extension");
                 expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
             });
 
@@ -2360,7 +2360,7 @@ console.log('require-module-import', require('require-module-import').resolved);
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain("Wildcard pattern must include a file extension");
+        expect(binProcess.stderr).toContain("Wildcard pattern must include a file extension");
         expect(binProcess.exitCode).toBe(0);
     });
 

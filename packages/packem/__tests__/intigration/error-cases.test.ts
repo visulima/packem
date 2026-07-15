@@ -191,8 +191,8 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(`Conflict detected: The 'module' and 'main' fields both point to 'dist/index`);
-        expect(binProcess.stdout).toContain(`Please ensure they refer to different module types.`);
+        expect(binProcess.stderr).toContain(`Conflict detected: The 'module' and 'main' fields both point to 'dist/index`);
+        expect(binProcess.stderr).toContain(`Please ensure they refer to different module types.`);
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -221,8 +221,8 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(`The 'main' field in your package.json should not use a '.mjs' extension for`);
-        expect(binProcess.stdout).toContain(`CommonJS modules.`);
+        expect(binProcess.stderr).toContain(`The 'main' field in your package.json should not use a '.mjs' extension for`);
+        expect(binProcess.stderr).toContain(`CommonJS modules.`);
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -251,8 +251,8 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(`The 'module' field in your package.json should not use a '.cjs' extension f`);
-        expect(binProcess.stdout).toContain(`or ES modules.`);
+        expect(binProcess.stderr).toContain(`The 'module' field in your package.json should not use a '.cjs' extension f`);
+        expect(binProcess.stderr).toContain(`or ES modules.`);
         expect(binProcess.exitCode).toBe(1);
     });
 

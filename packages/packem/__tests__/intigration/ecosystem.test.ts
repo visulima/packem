@@ -49,7 +49,20 @@ describe("packem ecosystem", () => {
             cwd: fullSuitePath,
         });
 
-        expect(binProcess.stderr).toBe("");
+        // Ecosystem app fixtures import framework packages (e.g. react) that they intentionally
+        // do not declare, so packem advises it will bundle those undeclared deps. Their real-world
+        // tsconfigs also set `verbatimModuleSyntax`, which the rolldown backend reports as
+        // overridden by packem's `onlyRemoveTypeImports`. Both advisories are expected here; assert
+        // no OTHER warnings reached stderr.
+        const unexpectedStderr = (binProcess.stderr as string)
+            .split("\n")
+            .filter(
+                (line) =>
+                    line.includes("WARNING")
+                    && !/but not declared in package\.json|ould not (?:be )?resolve|CONFIGURATION_FIELD_CONFLICT/.test(line),
+            );
+
+        expect(unexpectedStderr).toStrictEqual([]);
         expect(binProcess.exitCode).toBe(0);
 
         const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {

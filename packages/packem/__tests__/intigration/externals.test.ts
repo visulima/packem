@@ -256,7 +256,15 @@ export const transform = svgrTransform;
             cwd: temporaryDirectoryPath,
         });
 
-        expect(binProcess.stderr).toBe("");
+        // The inlined `@svgr/core` types carry deconflicted `$`-suffixed identifiers, so the
+        // patch-types plugin advises they could be renamed via `patchTypes.identifierReplacements`.
+        // That advisory is expected here (the test asserts type *inlining*, not identifier names);
+        // assert no OTHER warnings reached stderr.
+        const unexpectedStderr = (binProcess.stderr as string)
+            .split("\n")
+            .filter((line) => line.includes("WARNING") && !line.includes("contains confusing identifier names"));
+
+        expect(unexpectedStderr).toStrictEqual([]);
         expect(binProcess.exitCode).toBe(0);
 
         // JS output should still have the external import

@@ -654,7 +654,15 @@ export function barFunction() {
             env: {},
         });
 
-        expect(binProcess.stderr).toBe("");
+        // `--external` externalizes `@test/shouldbeexternal` cleanly. `bar-package` is imported
+        // but neither declared nor installed, so packem advises it will bundle the undeclared dep
+        // and rollup reports it as unresolved-but-externalized — both expected for this fixture.
+        // Assert no OTHER warnings reached stderr.
+        const unexpectedStderr = (binProcess.stderr as string)
+            .split("\n")
+            .filter((line) => line.includes("WARNING") && !/but not declared in package\.json|ould not (?:be )?resolve/.test(line));
+
+        expect(unexpectedStderr).toStrictEqual([]);
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).toContain("Preparing build for");

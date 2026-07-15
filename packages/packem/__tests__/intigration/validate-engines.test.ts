@@ -46,9 +46,9 @@ describe("packem validate engines", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain("The 'engines.node' field is missing in your package.json");
-        expect(binProcess.stdout).toContain("Consider adding");
-        expect(binProcess.stdout).toContain(">=18.0.0");
+        expect(binProcess.stderr).toContain("The 'engines.node' field is missing in your package.json");
+        expect(binProcess.stderr).toContain("Consider adding");
+        expect(binProcess.stderr).toContain(">=18.0.0");
         expect(binProcess.exitCode).toBe(1);
     });
 

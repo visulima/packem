@@ -543,10 +543,22 @@ const formatRollupLog = (log: RollupLog): string => {
 };
 
 const handleRollupLog = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts", level: "debug" | "info" | "warn", log: RollupLog): void => {
-    // DTS builds run in emitDtsOnly mode, so the JS chunk for every entry is empty
-    // by design. Suppress the EMPTY_BUNDLE warnings here — onwarn already filters them
-    // but onLog runs first and would otherwise log every empty entry.
-    if (type === "dts" && log.code === "EMPTY_BUNDLE") {
+    // Rollup emits EMPTY_BUNDLE for entries whose JS chunk is empty. DTS builds run in
+    // emitDtsOnly mode so every JS chunk is empty by design; JS builds legitimately produce
+    // empty chunks for CSS-/asset-only entries (the styles are extracted, leaving no JS).
+    // Both are expected, so suppress the advisory. (onwarn already filters it, but rollup
+    // routes EMPTY_BUNDLE through onLog, which runs independently of onwarn.)
+    if (log.code === "EMPTY_BUNDLE") {
+        return;
+    }
+
+    // MIXED_EXPORTS ("using named and default exports together") is advisory. packem
+    // deliberately builds with output.exports:"auto" alongside the cjsInterop plugin, so the
+    // default+named combination is intentional and consumers are handled. Rollup emits this
+    // warning through the input onLog hook rather than onwarn, so sharedOnWarn's suppression
+    // is structurally unreachable here — suppress it directly. (onwarn already swallows it:
+    // its `if (!warning.code)` guard skips any coded warning it doesn't explicitly re-emit.)
+    if (log.code === "MIXED_EXPORTS") {
         return;
     }
 

@@ -222,7 +222,7 @@ const migratePackageJson = async (dryRun: boolean | undefined, logger: CommandLo
     warnInlineConfigFields(parsedPkg, logger);
 
     if (!found) {
-        logger.warn("No migratable bundler dependencies found in package.json");
+        logger.info("No migratable bundler dependencies found in package.json");
 
         return false;
     }
@@ -289,7 +289,7 @@ const migrateConfigFiles = (logger: CommandLogger): boolean => {
         }
 
         logger.info(`Found config file \`${file}\`. Consider creating packem.config.ts instead.`);
-        logger.warn(`Manual migration required for config files. See https://www.visulima.com/docs/package/packem`);
+        logger.info(`Manual migration required for config files. See https://www.visulima.com/docs/package/packem`);
 
         // For now, we just warn about config files but don't auto-migrate them
         // as config migration is complex and requires understanding the specific bundler config
@@ -297,7 +297,7 @@ const migrateConfigFiles = (logger: CommandLogger): boolean => {
     }
 
     if (!found) {
-        logger.warn("No bundler config files found");
+        logger.info("No bundler config files found");
     }
 
     return found;

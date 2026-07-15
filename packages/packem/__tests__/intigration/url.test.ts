@@ -355,7 +355,15 @@ export default svg;`,
             reject: false,
         });
 
-        expect(binProcess.stderr).toBe("");
+        // `@test/images` is installed into node_modules but intentionally not declared in
+        // package.json (the test exercises bundling an image from a node_modules package), so
+        // packem advises it will bundle the undeclared dep. That advisory is expected here;
+        // assert no OTHER warnings reached stderr.
+        const unexpectedStderr = (binProcess.stderr as string)
+            .split("\n")
+            .filter((line) => line.includes("WARNING") && !line.includes("but not declared in package.json"));
+
+        expect(unexpectedStderr).toStrictEqual([]);
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
