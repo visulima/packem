@@ -152,8 +152,8 @@ export { Client };
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 4`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require_ui = require('./packem_shared/ui-CCDytIvA.cjs');
 const require_Client = require('./packem_shared/Client-C9ddnDzS.cjs');
+const require_ui = require('./ui.cjs');
 const require_action = require('./packem_shared/action-PXD57KE3.cjs');
 exports.Button = require_ui.Button;
 exports.Client = require_Client.Client;

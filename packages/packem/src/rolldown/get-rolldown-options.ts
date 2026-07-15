@@ -83,8 +83,18 @@ const getRolldownTransformOptions = (context: BuildContext<InternalBuildOptions>
 
     const oxc = getOxcTransformerConfig(context, resolveNodeTarget(context));
 
+    // `oxc.jsx` carries the Babel-era `useBuiltIns`/`useSpread` knobs the oxc *plugin* accepts.
+    // Rolldown's native `transform.jsx` schema (JsxOptions) has neither — as of rolldown 1.1.5
+    // that surfaces as an "Invalid input options" warning on every build — so drop them before
+    // forwarding. The keys rolldown does accept (runtime, development, pragma, pragmaFrag, pure,
+    // importSource) pass through untouched.
+    const jsx
+        = oxc.jsx && typeof oxc.jsx === "object"
+            ? (({ useBuiltIns: _useBuiltIns, useSpread: _useSpread, ...rest }) => rest)(oxc.jsx as Record<string, unknown>)
+            : oxc.jsx;
+
     return {
-        jsx: oxc.jsx,
+        jsx,
         target: oxc.target,
         typescript: oxc.typescript,
     };
@@ -111,19 +121,48 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
         ...(options as { moduleTypes?: Record<string, string> }).moduleTypes,
     };
 
-    // Rolldown's `output.minify` defaults to `'dce-only'` (no identifier/whitespace
-    // compression), while the rollup backend gets real minification through the
-    // esbuild/swc transformer adapter's renderChunk hook. Without this forward,
-    // a rolldown build with `minify: true` would emit 2x-larger code than the
-    // equivalent rollup build. The shared output array carries `compact:
-    // context.options.minify` for rollup parity; rolldown ignores `compact` and
-    // wants `minify` instead.
-    if (context.options.minify && Array.isArray(options.output)) {
+    // Rolldown 1.1.5 validates input/output options and rejects the rollup-only keys the shared
+    // build config carries for rollup parity, emitting "Invalid options" warnings on every build.
+    // Strip the keys absent from rolldown's schema so the rolldown backend builds cleanly:
+    //   • treeshake.preset            — rolldown has no preset knob (moduleSideEffects is honoured)
+    //   • output.compact              — rolldown minifies via `output.minify` (set below)
+    //   • output.freeze/interop/validate/importAttributesKey — not in rolldown's OutputOptions
+    //   • output.generatedCode.*      — rolldown's GeneratedCodeOptions only has `symbols`/`preset`
+    if (options.treeshake && typeof options.treeshake === "object") {
+        const { preset: _preset, ...treeshakeRest } = options.treeshake as Record<string, unknown>;
+
+        options.treeshake = treeshakeRest as typeof options.treeshake;
+    }
+
+    if (Array.isArray(options.output)) {
         options.output = options.output.map((output: OutputOptions) => {
-            return {
-                ...output,
-                minify: true,
-            };
+            const {
+                compact: _compact,
+                freeze: _freeze,
+                generatedCode,
+                importAttributesKey: _importAttributesKey,
+                interop: _interop,
+                validate: _validate,
+                ...outputRest
+            } = output as Record<string, unknown>;
+            const sanitized: Record<string, unknown> = outputRest;
+
+            if (generatedCode && typeof generatedCode === "object") {
+                // Keep only the sub-keys rolldown's GeneratedCodeOptions defines.
+                const { preset, symbols } = generatedCode as Record<string, unknown>;
+
+                sanitized.generatedCode = { preset, symbols };
+            }
+
+            // Rolldown's `output.minify` defaults to 'dce-only' (no identifier/whitespace
+            // compression); the rollup backend gets real minification through the esbuild/swc
+            // transformer adapter's renderChunk hook. Forward the intent so a rolldown build with
+            // `minify: true` does not emit 2x-larger code than the equivalent rollup build.
+            if (context.options.minify) {
+                sanitized.minify = true;
+            }
+
+            return sanitized as OutputOptions;
         });
     }
 

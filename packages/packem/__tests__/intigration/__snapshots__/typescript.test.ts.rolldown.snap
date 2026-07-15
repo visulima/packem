@@ -544,9 +544,9 @@ export { NativeStringTypes };
 exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > cjs content 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 //#region src/index.ts
-const isUpperCode = new Uint8Array(128);
-const isLowerCode = new Uint8Array(128);
-const isDigitCode = new Uint8Array(128);
+const isUpperCode = /* @__PURE__ */ new Uint8Array(128);
+const isLowerCode = /* @__PURE__ */ new Uint8Array(128);
+const isDigitCode = /* @__PURE__ */ new Uint8Array(128);
 for (let index = 0; index < 128; index++) {
 	isUpperCode[index] = index >= 65 && index <= 90 ? 1 : 0;
 	isLowerCode[index] = index >= 97 && index <= 122 ? 1 : 0;
@@ -585,9 +585,9 @@ export { isDigitCode, isLowerCode, isUpperCode };
 
 exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > mjs content 1`] = `
 "//#region src/index.ts
-const isUpperCode = new Uint8Array(128);
-const isLowerCode = new Uint8Array(128);
-const isDigitCode = new Uint8Array(128);
+const isUpperCode = /* @__PURE__ */ new Uint8Array(128);
+const isLowerCode = /* @__PURE__ */ new Uint8Array(128);
+const isDigitCode = /* @__PURE__ */ new Uint8Array(128);
 for (let index = 0; index < 128; index++) {
 	isUpperCode[index] = index >= 65 && index <= 90 ? 1 : 0;
 	isLowerCode[index] = index >= 97 && index <= 122 ? 1 : 0;
@@ -607,7 +607,7 @@ exports[`packem typescript > should compile only a type file > .d.ts type code o
 
 exports[`packem typescript > should support typescript decorator > cjs code output 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-//#region \\0@oxc-project+runtime@0.133.0/helpers/esm/decorate.js
+//#region \\0@oxc-project+runtime@0.139.0/helpers/esm/decorate.js
 function __decorate(decorators, target, key, desc) {
 	var c = arguments.length, r = c < 3 ? target : desc === null ? desc = /* @__PURE__ */ Object.getOwnPropertyDescriptor(target, key) : desc, d;
 	if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -630,7 +630,7 @@ exports.ExampleClass = ExampleClass;
 `;
 
 exports[`packem typescript > should support typescript decorator > mjs code output 1`] = `
-"//#region \\0@oxc-project+runtime@0.133.0/helpers/esm/decorate.js
+"//#region \\0@oxc-project+runtime@0.139.0/helpers/esm/decorate.js
 function __decorate(decorators, target, key, desc) {
 	var c = arguments.length, r = c < 3 ? target : desc === null ? desc = /* @__PURE__ */ Object.getOwnPropertyDescriptor(target, key) : desc, d;
 	if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);

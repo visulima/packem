@@ -62,9 +62,7 @@ exports[`css > basic > should process 'resolver-assets' css > css 1`] = `
 .foo3 {
     background-image: url("./assets/bg.png?query=#hash");
 }
-
 @import url("https://fonts.googleapis.com/css?family=Gudea:400,700");
-
 .bar {
   background-image: url("./assets/bg1.png");
 }
@@ -80,7 +78,6 @@ exports[`css > basic > should process 'resolver-assets' css > css 1`] = `
   font-weight: 400;
   src: local("Demo"), local("Demo-Regular"), url("./assets/Demo-webfont.woff") format("woff");
 }
-
 .bg {
   background-image: url(./assets/bg1.png);
 }
@@ -113,9 +110,7 @@ exports[`css > basic > should process 'resolvers' css > css 1`] = `
 .foo3 {
     background-image: url("/pubpath/bg.png?query=#hash");
 }
-
 @import url("https://fonts.googleapis.com/css?family=Gudea:400,700");
-
 .bar {
   background-image: url("/pubpath/bg1.png");
 }
@@ -131,7 +126,6 @@ exports[`css > basic > should process 'resolvers' css > css 1`] = `
   font-weight: 400;
   src: local("Demo"), local("Demo-Regular"), url("/pubpath/Demo-webfont.woff") format("woff");
 }
-
 .bg {
   background-image: url(/pubpath/bg1.png);
 }
@@ -164,9 +158,7 @@ exports[`css > basic > should process 'resolvers-hash' css > css 1`] = `
 .foo3 {
     background-image: url("/pubpath/bg-bd25d3fd.png?query=#hash");
 }
-
 @import url("https://fonts.googleapis.com/css?family=Gudea:400,700");
-
 .bar {
   background-image: url("/pubpath/bg-086af782.png");
 }
@@ -182,7 +174,6 @@ exports[`css > basic > should process 'resolvers-hash' css > css 1`] = `
   font-weight: 400;
   src: local("Demo"), local("Demo-Regular"), url("/pubpath/Demo-webfont-423f69d5.woff") format("woff");
 }
-
 .bg {
   background-image: url(/pubpath/bg-086af782.png);
 }
@@ -215,9 +206,7 @@ exports[`css > basic > should process 'resolvers-url-inline' css > css 1`] = `
 .foo3 {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAABmBAMAAADL8flRAAAAG1BMVEXMzMyWlpacnJy+vr6jo6PFxcW3t7eqqqqxsbHbm8QuAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAArUlEQVRYhe3QIQ+CUBTF8cPTB8RHsKMTqQQ/gMqmVRkj4+ZmZQRnNBD42F7Afp3N7fxIN/zH2wGIiIiI6J8ZBKk95NMRo23KdaYksz36oKtv47F14et59HdKY69I7AoX9PMMlTPnIrZOe5sHJ18Hc5fDeXKH2n+mpmzgLz6NPWmJNIlNNkA4NvK2ov6ikQ1kqWKYYdggVxNpgtREER6ygTyzbZaRugERERER/eYNUMwTiwsgIHkAAAAASUVORK5CYII=");
 }
-
 @import url("https://fonts.googleapis.com/css?family=Gudea:400,700");
-
 .bar {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGwAAABsBAMAAAB9SEr+AAAAG1BMVEXMzMyWlpacnJy3t7ejo6O+vr6qqqqxsbHFxcUT5ek+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAsklEQVRYhe3RMQuCQBjG8cek88YzFBo1SRwlHBqLhhrLvoC0uEaINZoFfe3OyNlbmnp+2zP8uRcFiIiIiIj+TiDicTjvB05FPtkPV5mqxSVd9MMpysgOhrOjSuRsqbOrSPUYNW30MMigFHzXB0ZZNyxYB9fgyC7zbhVg+99s+1qZZIkMmzvgfDJ95FQqk6wWVaoPbPNu6E+ysY1eE7Fc74BSnPXQP+DpNQYZEREREdHPvQFNvRay9sR69AAAAABJRU5ErkJggg==");
 }
@@ -233,7 +222,6 @@ exports[`css > basic > should process 'resolvers-url-inline' css > css 1`] = `
   font-weight: 400;
   src: local("Demo"), local("Demo-Regular"), url("data:font/woff;base64,TmVxdWVwb3Jyb3F1aXNxdWFtZXN0cXVpZG9sb3JlbWlwc3VtcXVpYWRvbG9yc2l0YW1ldGNvbnNlY3RldHVyYWRpcGlzY2l2ZWxpdA==") format("woff");
 }
-
 .bg {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGwAAABsBAMAAAB9SEr+AAAAG1BMVEXMzMyWlpacnJy3t7ejo6O+vr6qqqqxsbHFxcUT5ek+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAsklEQVRYhe3RMQuCQBjG8cek88YzFBo1SRwlHBqLhhrLvoC0uEaINZoFfe3OyNlbmnp+2zP8uRcFiIiIiIj+TiDicTjvB05FPtkPV5mqxSVd9MMpysgOhrOjSuRsqbOrSPUYNW30MMigFHzXB0ZZNyxYB9fgyC7zbhVg+99s+1qZZIkMmzvgfDJ95FQqk6wWVaoPbPNu6E+ysY1eE7Fc74BSnPXQP+DpNQYZEREREdHPvQFNvRay9sR69AAAAABJRU5ErkJggg==);
 }
@@ -1079,13 +1067,6 @@ exports[`css > code-splitting > should work with processed 'preserve-modules' cs
 `;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 5`] = `
-".nested-script {
-  color: rebeccapurple;
-}
-/*# sourceMappingURL=nested-script.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 6`] = `
 ".nondynamic {
   color: deepskyblue;
 }
@@ -1095,56 +1076,28 @@ exports[`css > code-splitting > should work with processed 'preserve-modules' cs
 /*# sourceMappingURL=nondynamic.css.map */"
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 7`] = `
-".nondynamic {
-  color: deepskyblue;
-}
-/*# sourceMappingURL=nondynamic.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 8`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 6`] = `
 ".nondynamic2 {
   color: deeppink;
 }
 /*# sourceMappingURL=nondynamic2.scss.css.map */"
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 9`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 7`] = `
 ".other-script {
   color: wheat;
 }
 /*# sourceMappingURL=other-script.css.map */"
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 10`] = `
-".other-script {
-  color: wheat;
-}
-/*# sourceMappingURL=other-script.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 11`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 8`] = `
 ".second {
   color: royalblue;
 }
 /*# sourceMappingURL=second.scss.css.map */"
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 12`] = `
-".third {
-  color: maroon;
-}
-/*# sourceMappingURL=third.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 13`] = `
-".first_sub {
-  color: black;
-}
-/*# sourceMappingURL=first.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 14`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > css 9`] = `
 ".first_sub {
   color: black;
 }
@@ -1164,13 +1117,13 @@ exports[`css > code-splitting > should work with processed 'preserve-modules' cs
 "//#region src/fourth.scss
 var css = ".fourth {\\n  color: magenta;\\n}";
 //#endregion
+exports.css = css;
 exports.default = css;
 "
 `;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 3`] = `
-"require("./third.scss.cjs");
-const require_fourth = require("./fourth.scss.cjs");
+"const require_fourth = require("./fourth.scss.cjs");
 require("./sub/index.cjs");
 //#region src/index.js
 (async () => {
@@ -1179,48 +1132,42 @@ require("./sub/index.cjs");
 	const otherScript = await Promise.resolve().then(() => require("./other-script.cjs"));
 	console.log(first, second, otherScript);
 })();
-console.log(require_fourth.default);
+console.log(require_fourth.css);
 //#endregion
 "
 `;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 4`] = `
-"require("./nested-script.scss.cjs");
-require("./nondynamic.cjs");
+"require("./nondynamic.cjs");
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 5`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 6`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 5`] = `
 "//#region src/noncss.js
 console.log("noncss");
 //#endregion
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 7`] = `
-"require("./nondynamic.scss.cjs");
-const require_nondynamic2 = require("./nondynamic2.scss.cjs");
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 6`] = `
+"const require_nondynamic2 = require("./nondynamic2.scss.cjs");
 //#region src/nondynamic.js
-console.log(require_nondynamic2.default);
+console.log(require_nondynamic2.css);
 //#endregion
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 8`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 9`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 7`] = `
 "//#region src/nondynamic2.scss
 var css = ".nondynamic2 {\\n  color: deeppink;\\n}";
 //#endregion
+exports.css = css;
 exports.default = css;
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 10`] = `
-"require("./other-script.scss.cjs");
-//#region src/other-script.js
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 8`] = `
+"//#region src/other-script.js
 (async () => {
 	await Promise.resolve().then(() => require("./noncss.cjs"));
 	const nestedScript = await Promise.resolve().then(() => require("./nested-script.cjs"));
@@ -1230,9 +1177,7 @@ exports[`css > code-splitting > should work with processed 'preserve-modules' cs
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 11`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 12`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 9`] = `
 "//#region src/second.scss
 var css = ".second {\\n  color: royalblue;\\n}";
 //#endregion
@@ -1241,13 +1186,8 @@ exports.default = css;
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 13`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 14`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 15`] = `
-"require("./first.scss.cjs");
-//#region src/sub/index.js
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > js 10`] = `
+"//#region src/sub/index.js
 console.log("sub");
 //#endregion
 "
@@ -1261,25 +1201,15 @@ exports[`css > code-splitting > should work with processed 'preserve-modules' cs
 
 exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 4`] = `"{"version":3,"sources":["../src/nested-script.scss","../src/nondynamic.scss","../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,oBAAoB;AACtB;ACFA;EACE,kBAAkB;AACpB;ACFA;EACE,eAAe;AACjB","file":"nested-script.css","sourcesContent":[".nested-script {\\n  color: rebeccapurple;\\n}",".nondynamic {\\n  color: deepskyblue;\\n}",".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 5`] = `"{"version":3,"sources":["../src/nested-script.scss"],"names":[],"mappings":"AAAA;EACE,oBAAoB;AACtB","file":"nested-script.scss.css","sourcesContent":[".nested-script {\\n  color: rebeccapurple;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 5`] = `"{"version":3,"sources":["../src/nondynamic.scss","../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,kBAAkB;AACpB;ACFA;EACE,eAAe;AACjB","file":"nondynamic.css","sourcesContent":[".nondynamic {\\n  color: deepskyblue;\\n}",".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 6`] = `"{"version":3,"sources":["../src/nondynamic.scss","../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,kBAAkB;AACpB;ACFA;EACE,eAAe;AACjB","file":"nondynamic.css","sourcesContent":[".nondynamic {\\n  color: deepskyblue;\\n}",".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 6`] = `"{"version":3,"sources":["../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,eAAe;AACjB","file":"nondynamic2.scss.css","sourcesContent":[".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 7`] = `"{"version":3,"sources":["../src/nondynamic.scss"],"names":[],"mappings":"AAAA;EACE,kBAAkB;AACpB","file":"nondynamic.scss.css","sourcesContent":[".nondynamic {\\n  color: deepskyblue;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 7`] = `"{"version":3,"sources":["../src/other-script.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"other-script.css","sourcesContent":[".other-script {\\n  color: wheat;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 8`] = `"{"version":3,"sources":["../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,eAAe;AACjB","file":"nondynamic2.scss.css","sourcesContent":[".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 8`] = `"{"version":3,"sources":["../src/second.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB","file":"second.scss.css","sourcesContent":[".second {\\n  color: royalblue;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 9`] = `"{"version":3,"sources":["../src/other-script.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"other-script.css","sourcesContent":[".other-script {\\n  color: wheat;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 10`] = `"{"version":3,"sources":["../src/other-script.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"other-script.scss.css","sourcesContent":[".other-script {\\n  color: wheat;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 11`] = `"{"version":3,"sources":["../src/second.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB","file":"second.scss.css","sourcesContent":[".second {\\n  color: royalblue;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 12`] = `"{"version":3,"sources":["../src/third.scss"],"names":[],"mappings":"AAAA;EACE,aAAa;AACf","file":"third.scss.css","sourcesContent":[".third {\\n  color: maroon;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 13`] = `"{"version":3,"sources":["../../src/sub/first.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"first.scss.css","sourcesContent":[".first_sub {\\n  color: black;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 14`] = `"{"version":3,"sources":["../../src/sub/first.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"index.css","sourcesContent":[".first_sub {\\n  color: black;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules' css > map 9`] = `"{"version":3,"sources":["../../src/sub/first.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"index.css","sourcesContent":[".first_sub {\\n  color: black;\\n}"]}"`;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 1`] = `
 ".partial {
@@ -1345,13 +1275,6 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-mul
 `;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 7`] = `
-".nested-script {
-  color: rebeccapurple;
-}
-/*# sourceMappingURL=nested-script.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 8`] = `
 ".nondynamic {
   color: deepskyblue;
 }
@@ -1361,63 +1284,28 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-mul
 /*# sourceMappingURL=nondynamic.css.map */"
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 9`] = `
-".nondynamic {
-  color: deepskyblue;
-}
-/*# sourceMappingURL=nondynamic.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 10`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 8`] = `
 ".nondynamic2 {
   color: deeppink;
 }
 /*# sourceMappingURL=nondynamic2.scss.css.map */"
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 11`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 9`] = `
 ".other-script {
   color: wheat;
 }
 /*# sourceMappingURL=other-script.css.map */"
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 12`] = `
-".other-script {
-  color: wheat;
-}
-/*# sourceMappingURL=other-script.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 13`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 10`] = `
 ".second {
   color: royalblue;
 }
 /*# sourceMappingURL=second.scss.css.map */"
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 14`] = `
-".third {
-  color: maroon;
-}
-/*# sourceMappingURL=third.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 15`] = `
-".thirdtwo {
-  color: hotpink;
-}
-/*# sourceMappingURL=thirdtwo.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 16`] = `
-".first_sub {
-  color: black;
-}
-/*# sourceMappingURL=first.scss.css.map */"
-`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 17`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > css 11`] = `
 ".first_sub {
   color: black;
 }
@@ -1437,6 +1325,7 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-mul
 "//#region src/fourth.scss
 var css = ".fourth {\\n  color: magenta;\\n}";
 //#endregion
+exports.css = css;
 exports.default = css;
 "
 `;
@@ -1445,13 +1334,13 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-mul
 "//#region src/fourthtwo.scss
 var css = ".fourthtwo {\\n  color: honeydew;\\n}";
 //#endregion
+exports.css = css;
 exports.default = css;
 "
 `;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 4`] = `
-"require("./third.scss.cjs");
-const require_fourth = require("./fourth.scss.cjs");
+"const require_fourth = require("./fourth.scss.cjs");
 require("./sub/index.cjs");
 //#region src/index.js
 (async () => {
@@ -1460,14 +1349,13 @@ require("./sub/index.cjs");
 	const otherScript = await Promise.resolve().then(() => require("./other-script.cjs"));
 	console.log(first, second, otherScript);
 })();
-console.log(require_fourth.default);
+console.log(require_fourth.css);
 //#endregion
 "
 `;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 5`] = `
 "require("./sub/index.cjs");
-require("./thirdtwo.scss.cjs");
 const require_fourthtwo = require("./fourthtwo.scss.cjs");
 //#region src/indextwo.js
 (async () => {
@@ -1476,48 +1364,42 @@ const require_fourthtwo = require("./fourthtwo.scss.cjs");
 	const otherScript = await Promise.resolve().then(() => require("./other-script.cjs"));
 	console.log(first, second, otherScript);
 })();
-console.log(require_fourthtwo.default);
+console.log(require_fourthtwo.css);
 //#endregion
 "
 `;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 6`] = `
-"require("./nested-script.scss.cjs");
-require("./nondynamic.cjs");
+"require("./nondynamic.cjs");
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 7`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 8`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 7`] = `
 "//#region src/noncss.js
 console.log("noncss");
 //#endregion
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 9`] = `
-"require("./nondynamic.scss.cjs");
-const require_nondynamic2 = require("./nondynamic2.scss.cjs");
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 8`] = `
+"const require_nondynamic2 = require("./nondynamic2.scss.cjs");
 //#region src/nondynamic.js
-console.log(require_nondynamic2.default);
+console.log(require_nondynamic2.css);
 //#endregion
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 10`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 11`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 9`] = `
 "//#region src/nondynamic2.scss
 var css = ".nondynamic2 {\\n  color: deeppink;\\n}";
 //#endregion
+exports.css = css;
 exports.default = css;
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 12`] = `
-"require("./other-script.scss.cjs");
-//#region src/other-script.js
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 10`] = `
+"//#region src/other-script.js
 (async () => {
 	await Promise.resolve().then(() => require("./noncss.cjs"));
 	const nestedScript = await Promise.resolve().then(() => require("./nested-script.cjs"));
@@ -1527,9 +1409,7 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-mul
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 13`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 14`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 11`] = `
 "//#region src/second.scss
 var css = ".second {\\n  color: royalblue;\\n}";
 //#endregion
@@ -1538,15 +1418,8 @@ exports.default = css;
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 15`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 16`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 17`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 18`] = `
-"require("./first.scss.cjs");
-//#region src/sub/index.js
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > js 12`] = `
+"//#region src/sub/index.js
 console.log("sub");
 //#endregion
 "
@@ -1564,30 +1437,21 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-mul
 
 exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 6`] = `"{"version":3,"sources":["../src/nested-script.scss","../src/nondynamic.scss","../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,oBAAoB;AACtB;ACFA;EACE,kBAAkB;AACpB;ACFA;EACE,eAAe;AACjB","file":"nested-script.css","sourcesContent":[".nested-script {\\n  color: rebeccapurple;\\n}",".nondynamic {\\n  color: deepskyblue;\\n}",".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 7`] = `"{"version":3,"sources":["../src/nested-script.scss"],"names":[],"mappings":"AAAA;EACE,oBAAoB;AACtB","file":"nested-script.scss.css","sourcesContent":[".nested-script {\\n  color: rebeccapurple;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 7`] = `"{"version":3,"sources":["../src/nondynamic.scss","../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,kBAAkB;AACpB;ACFA;EACE,eAAe;AACjB","file":"nondynamic.css","sourcesContent":[".nondynamic {\\n  color: deepskyblue;\\n}",".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 8`] = `"{"version":3,"sources":["../src/nondynamic.scss","../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,kBAAkB;AACpB;ACFA;EACE,eAAe;AACjB","file":"nondynamic.css","sourcesContent":[".nondynamic {\\n  color: deepskyblue;\\n}",".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 8`] = `"{"version":3,"sources":["../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,eAAe;AACjB","file":"nondynamic2.scss.css","sourcesContent":[".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 9`] = `"{"version":3,"sources":["../src/nondynamic.scss"],"names":[],"mappings":"AAAA;EACE,kBAAkB;AACpB","file":"nondynamic.scss.css","sourcesContent":[".nondynamic {\\n  color: deepskyblue;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 9`] = `"{"version":3,"sources":["../src/other-script.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"other-script.css","sourcesContent":[".other-script {\\n  color: wheat;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 10`] = `"{"version":3,"sources":["../src/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,eAAe;AACjB","file":"nondynamic2.scss.css","sourcesContent":[".nondynamic2 {\\n  color: deeppink;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 10`] = `"{"version":3,"sources":["../src/second.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB","file":"second.scss.css","sourcesContent":[".second {\\n  color: royalblue;\\n}"]}"`;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 11`] = `"{"version":3,"sources":["../src/other-script.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"other-script.css","sourcesContent":[".other-script {\\n  color: wheat;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 12`] = `"{"version":3,"sources":["../src/other-script.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"other-script.scss.css","sourcesContent":[".other-script {\\n  color: wheat;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 13`] = `"{"version":3,"sources":["../src/second.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB","file":"second.scss.css","sourcesContent":[".second {\\n  color: royalblue;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 14`] = `"{"version":3,"sources":["../src/third.scss"],"names":[],"mappings":"AAAA;EACE,aAAa;AACf","file":"third.scss.css","sourcesContent":[".third {\\n  color: maroon;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 15`] = `"{"version":3,"sources":["../src/thirdtwo.scss"],"names":[],"mappings":"AAAA;EACE,cAAc;AAChB","file":"thirdtwo.scss.css","sourcesContent":[".thirdtwo {\\n  color: hotpink;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 16`] = `"{"version":3,"sources":["../../src/sub/first.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"first.scss.css","sourcesContent":[".first_sub {\\n  color: black;\\n}"]}"`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 17`] = `"{"version":3,"sources":["../../src/sub/first.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"index.css","sourcesContent":[".first_sub {\\n  color: black;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules-multi-entry' css > map 11`] = `"{"version":3,"sources":["../../src/sub/first.scss"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd","file":"index.css","sourcesContent":[".first_sub {\\n  color: black;\\n}"]}"`;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > css 1`] = `
-".partial {
+".third {
+  color: maroon;
+}
+.partial {
     color: rosybrown;
 }
 .first {
@@ -1614,9 +1478,6 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-sin
 .first_sub {
   color: black;
 }
-.third {
-  color: maroon;
-}
 /*# sourceMappingURL=extracted.css.map */"
 `;
 
@@ -1633,13 +1494,13 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-sin
 "//#region src/fourth.scss
 var css = ".fourth {\\n  color: magenta;\\n}";
 //#endregion
+exports.css = css;
 exports.default = css;
 "
 `;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 3`] = `
-"require("./third.scss.cjs");
-const require_fourth = require("./fourth.scss.cjs");
+"const require_fourth = require("./fourth.scss.cjs");
 require("./sub/index.cjs");
 //#region src/index.js
 (async () => {
@@ -1648,48 +1509,42 @@ require("./sub/index.cjs");
 	const otherScript = await Promise.resolve().then(() => require("./other-script.cjs"));
 	console.log(first, second, otherScript);
 })();
-console.log(require_fourth.default);
+console.log(require_fourth.css);
 //#endregion
 "
 `;
 
 exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 4`] = `
-"require("./nested-script.scss.cjs");
-require("./nondynamic.cjs");
+"require("./nondynamic.cjs");
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 5`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 6`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 5`] = `
 "//#region src/noncss.js
 console.log("noncss");
 //#endregion
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 7`] = `
-"require("./nondynamic.scss.cjs");
-const require_nondynamic2 = require("./nondynamic2.scss.cjs");
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 6`] = `
+"const require_nondynamic2 = require("./nondynamic2.scss.cjs");
 //#region src/nondynamic.js
-console.log(require_nondynamic2.default);
+console.log(require_nondynamic2.css);
 //#endregion
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 8`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 9`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 7`] = `
 "//#region src/nondynamic2.scss
 var css = ".nondynamic2 {\\n  color: deeppink;\\n}";
 //#endregion
+exports.css = css;
 exports.default = css;
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 10`] = `
-"require("./other-script.scss.cjs");
-//#region src/other-script.js
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 8`] = `
+"//#region src/other-script.js
 (async () => {
 	await Promise.resolve().then(() => require("./noncss.cjs"));
 	const nestedScript = await Promise.resolve().then(() => require("./nested-script.cjs"));
@@ -1699,9 +1554,7 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-sin
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 11`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 12`] = `
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 9`] = `
 "//#region src/second.scss
 var css = ".second {\\n  color: royalblue;\\n}";
 //#endregion
@@ -1710,19 +1563,14 @@ exports.default = css;
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 13`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 14`] = `""`;
-
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 15`] = `
-"require("./first.scss.cjs");
-//#region src/sub/index.js
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 10`] = `
+"//#region src/sub/index.js
 console.log("sub");
 //#endregion
 "
 `;
 
-exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > map 1`] = `"{"version":3,"sources":["../src/partial.css","../src/first.scss","../src/fourth.scss","../src/nested-script.scss","../src/nondynamic.scss","../src/nondynamic2.scss","../src/other-script.scss","../src/second.scss","../src/sub/first.scss","../src/third.scss"],"names":[],"mappings":"AAAA;IACI,gBAAgB;AACpB;ACDA;EACE,UAAU;AACZ;ACHA;EACE,cAAc;AAChB;ACFA;EACE,oBAAoB;AACtB;ACFA;EACE,kBAAkB;AACpB;ACFA;EACE,eAAe;AACjB;ACFA;EACE,YAAY;AACd;ACFA;EACE,gBAAgB;AAClB;ACFA;EACE,YAAY;AACd;ACFA;EACE,aAAa;AACf","file":"extracted.css","sourcesContent":[".partial {\\n    color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n.first {\\n  color: red;\\n}",".fourth {\\n  color: magenta;\\n}",".nested-script {\\n  color: rebeccapurple;\\n}",".nondynamic {\\n  color: deepskyblue;\\n}",".nondynamic2 {\\n  color: deeppink;\\n}",".other-script {\\n  color: wheat;\\n}",".second {\\n  color: royalblue;\\n}",".first_sub {\\n  color: black;\\n}",".third {\\n  color: maroon;\\n}"]}"`;
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > map 1`] = `"{"version":3,"sources":["../src/third.scss","../src/partial.css","../src/first.scss","../src/fourth.scss","../src/nested-script.scss","../src/nondynamic.scss","../src/nondynamic2.scss","../src/other-script.scss","../src/second.scss","../src/sub/first.scss"],"names":[],"mappings":"AAAA;EACE,aAAa;AACf;ACFA;IACI,gBAAgB;AACpB;ACDA;EACE,UAAU;AACZ;ACHA;EACE,cAAc;AAChB;ACFA;EACE,oBAAoB;AACtB;ACFA;EACE,kBAAkB;AACpB;ACFA;EACE,eAAe;AACjB;ACFA;EACE,YAAY;AACd;ACFA;EACE,gBAAgB;AAClB;ACFA;EACE,YAAY;AACd","file":"extracted.css","sourcesContent":[".third {\\n  color: maroon;\\n}",".partial {\\n    color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n.first {\\n  color: red;\\n}",".fourth {\\n  color: magenta;\\n}",".nested-script {\\n  color: rebeccapurple;\\n}",".nondynamic {\\n  color: deepskyblue;\\n}",".nondynamic2 {\\n  color: deeppink;\\n}",".other-script {\\n  color: wheat;\\n}",".second {\\n  color: royalblue;\\n}",".first_sub {\\n  color: black;\\n}"]}"`;
 
 exports[`css > code-splitting > should work with processed 'single' css > css 1`] = `
 ".third {
@@ -3772,7 +3620,18 @@ var __classPrivateFieldGet = function(receiver, state, kind, f) {
 	if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
 	return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Event_cancelable, _Event_bubbles, _Event_composed, _Event_defaultPrevented, _Event_timestamp, _Event_propagationStopped, _Event_type, _Event_target, _Event_isBeingDispatched, _a$1, _CustomEvent_detail, _b;
+var _Event_cancelable;
+var _Event_bubbles;
+var _Event_composed;
+var _Event_defaultPrevented;
+var _Event_timestamp;
+var _Event_propagationStopped;
+var _Event_type;
+var _Event_target;
+var _Event_isBeingDispatched;
+var _a$1;
+var _CustomEvent_detail;
+var _b;
 const NONE = 0;
 const CAPTURING_PHASE = 1;
 const AT_TARGET = 2;
@@ -4330,7 +4189,10 @@ const windowShim = new WindowShim(constructionToken);
 * Copyright 2019 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t$1 = globalThis, e$1 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, s$2 = /* @__PURE__ */ Symbol(), o$3 = /* @__PURE__ */ new WeakMap();
+const t$1 = globalThis;
+const e$1 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
+const s$2 = /* @__PURE__ */ Symbol();
+const o$3 = /* @__PURE__ */ new WeakMap();
 var n$2 = class {
 	constructor(t, e, o) {
 		if (this._$cssResult$ = !0, o !== s$2) throw Error("CSSResult is not constructable. Use \`unsafeCSS\` or \`css\` instead.");
@@ -4349,19 +4211,22 @@ var n$2 = class {
 		return this.cssText;
 	}
 };
-const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$2 = (t, ...e) => {
+const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2);
+const i$2 = (t, ...e) => {
 	return new n$2(1 === t.length ? t[0] : e.reduce((e, s, o) => e + ((t) => {
 		if (!0 === t._$cssResult$) return t.cssText;
 		if ("number" == typeof t) return t;
 		throw Error("Value passed to 'css' function must be a 'css' function result: " + t + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
 	})(s) + t[o + 1], t[0]), t, s$2);
-}, S$1 = (s, o) => {
+};
+const S$1 = (s, o) => {
 	if (e$1) s.adoptedStyleSheets = o.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
 	else for (const e of o) {
 		const o = document.createElement("style"), n = t$1.litNonce;
 		void 0 !== n && o.setAttribute("nonce", n), o.textContent = e.cssText, s.appendChild(o);
 	}
-}, c$2 = e$1 || void 0 === t$1.CSSStyleSheet ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
+};
+const c$2 = e$1 || void 0 === t$1.CSSStyleSheet ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
 	let e = "";
 	for (const s of t.cssRules) e += s.cssText;
 	return r$2(e);
@@ -4370,7 +4235,11 @@ const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$2 
 //#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/reactive-element.js
 const { is: h$1, defineProperty: r$1, getOwnPropertyDescriptor: o$2, getOwnPropertyNames: n$1, getOwnPropertySymbols: a$1, getPrototypeOf: c$1 } = Object, l$1 = globalThis;
 l$1.customElements ??= customElements;
-const p$1 = l$1.trustedTypes, d$1 = p$1 ? p$1.emptyScript : "", u$1 = l$1.reactiveElementPolyfillSupport, f$1 = (t, s) => t, b$1 = {
+const p$1 = l$1.trustedTypes;
+const d$1 = p$1 ? p$1.emptyScript : "";
+const u$1 = l$1.reactiveElementPolyfillSupport;
+const f$1 = (t, s) => t;
+const b$1 = {
 	toAttribute(t, s) {
 		switch (s) {
 			case Boolean:
@@ -4399,7 +4268,9 @@ const p$1 = l$1.trustedTypes, d$1 = p$1 ? p$1.emptyScript : "", u$1 = l$1.reacti
 		}
 		return i;
 	}
-}, m$1 = (t, s) => !h$1(t, s), y$1 = {
+};
+const m$1 = (t, s) => !h$1(t, s);
+const y$1 = {
 	attribute: !0,
 	type: String,
 	converter: b$1,
@@ -4601,7 +4472,31 @@ g$1.elementStyles = [], g$1.shadowRootOptions = { mode: "open" }, g$1[f$1("eleme
 * Copyright 2017 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t = globalThis, i$1 = (t) => t, s$1 = t.trustedTypes, e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, h = "$lit$", o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`, n = "?" + o$1, r = \`<\${n}>\`, l = void 0 === t.document ? { createTreeWalker: () => ({}) } : document, c = () => l.createComment(""), a = (t) => null === t || "object" != typeof t && "function" != typeof t, u = Array.isArray, d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator], f = "[ 	\\n\\f\\r]", v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g, _ = /-->/g, m = />/g, p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g"), g = /'/g, $ = /"/g, y = /^(?:script|style|textarea|title)$/i, E = /* @__PURE__ */ Symbol.for("lit-noChange"), A = /* @__PURE__ */ Symbol.for("lit-nothing"), C = /* @__PURE__ */ new WeakMap(), P = l.createTreeWalker(l, 129);
+const t = globalThis;
+const i$1 = (t) => t;
+const s$1 = t.trustedTypes;
+const e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0;
+const h = "$lit$";
+const o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`;
+const n = "?" + o$1;
+const r = \`<\${n}>\`;
+const l = void 0 === t.document ? { createTreeWalker: () => ({}) } : document;
+const c = () => l.createComment("");
+const a = (t) => null === t || "object" != typeof t && "function" != typeof t;
+const u = Array.isArray;
+const d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator];
+const f = "[ 	\\n\\f\\r]";
+const v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g;
+const _ = /-->/g;
+const m = />/g;
+const p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g");
+const g = /'/g;
+const $ = /"/g;
+const y = /^(?:script|style|textarea|title)$/i;
+const E = /* @__PURE__ */ Symbol.for("lit-noChange");
+const A = /* @__PURE__ */ Symbol.for("lit-nothing");
+const C = /* @__PURE__ */ new WeakMap();
+const P = l.createTreeWalker(l, 129);
 function V(t, i) {
 	if (!u(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
 	return void 0 !== e ? e.createHTML(i) : i;
@@ -4895,7 +4790,10 @@ exports[`css > emit > should work with emitted processed 'basic-emit' css > js 2
 * Copyright 2019 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t$1 = globalThis, e$2 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, s$2 = /* @__PURE__ */ Symbol(), o$3 = /* @__PURE__ */ new WeakMap();
+const t$1 = globalThis;
+const e$2 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
+const s$2 = /* @__PURE__ */ Symbol();
+const o$3 = /* @__PURE__ */ new WeakMap();
 var n$2 = class {
 	constructor(t, e, o) {
 		if (this._$cssResult$ = !0, o !== s$2) throw Error("CSSResult is not constructable. Use \`unsafeCSS\` or \`css\` instead.");
@@ -4914,19 +4812,22 @@ var n$2 = class {
 		return this.cssText;
 	}
 };
-const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$3 = (t, ...e) => {
+const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2);
+const i$3 = (t, ...e) => {
 	return new n$2(1 === t.length ? t[0] : e.reduce((e, s, o) => e + ((t) => {
 		if (!0 === t._$cssResult$) return t.cssText;
 		if ("number" == typeof t) return t;
 		throw Error("Value passed to 'css' function must be a 'css' function result: " + t + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
 	})(s) + t[o + 1], t[0]), t, s$2);
-}, S$1 = (s, o) => {
+};
+const S$1 = (s, o) => {
 	if (e$2) s.adoptedStyleSheets = o.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
 	else for (const e of o) {
 		const o = document.createElement("style"), n = t$1.litNonce;
 		void 0 !== n && o.setAttribute("nonce", n), o.textContent = e.cssText, s.appendChild(o);
 	}
-}, c$2 = e$2 ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
+};
+const c$2 = e$2 ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
 	let e = "";
 	for (const s of t.cssRules) e += s.cssText;
 	return r$2(e);
@@ -5168,7 +5069,31 @@ y$1.elementStyles = [], y$1.shadowRootOptions = { mode: "open" }, y$1[d$1("eleme
 * Copyright 2017 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t = globalThis, i$1 = (t) => t, s$1 = t.trustedTypes, e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, h = "$lit$", o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`, n = "?" + o$1, r = \`<\${n}>\`, l = document, c = () => l.createComment(""), a = (t) => null === t || "object" != typeof t && "function" != typeof t, u = Array.isArray, d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator], f = "[ 	\\n\\f\\r]", v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g, _ = /-->/g, m = />/g, p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g"), g = /'/g, $ = /"/g, y = /^(?:script|style|textarea|title)$/i, E = /* @__PURE__ */ Symbol.for("lit-noChange"), A = /* @__PURE__ */ Symbol.for("lit-nothing"), C = /* @__PURE__ */ new WeakMap(), P = l.createTreeWalker(l, 129);
+const t = globalThis;
+const i$1 = (t) => t;
+const s$1 = t.trustedTypes;
+const e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0;
+const h = "$lit$";
+const o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`;
+const n = "?" + o$1;
+const r = \`<\${n}>\`;
+const l = document;
+const c = () => l.createComment("");
+const a = (t) => null === t || "object" != typeof t && "function" != typeof t;
+const u = Array.isArray;
+const d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator];
+const f = "[ 	\\n\\f\\r]";
+const v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g;
+const _ = /-->/g;
+const m = />/g;
+const p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g");
+const g = /'/g;
+const $ = /"/g;
+const y = /^(?:script|style|textarea|title)$/i;
+const E = /* @__PURE__ */ Symbol.for("lit-noChange");
+const A = /* @__PURE__ */ Symbol.for("lit-nothing");
+const C = /* @__PURE__ */ new WeakMap();
+const P = l.createTreeWalker(l, 129);
 function V(t, i) {
 	if (!u(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
 	return void 0 !== e ? e.createHTML(i) : i;
@@ -5587,7 +5512,18 @@ var __classPrivateFieldGet = function(receiver, state, kind, f) {
 	if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
 	return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Event_cancelable, _Event_bubbles, _Event_composed, _Event_defaultPrevented, _Event_timestamp, _Event_propagationStopped, _Event_type, _Event_target, _Event_isBeingDispatched, _a$1, _CustomEvent_detail, _b;
+var _Event_cancelable;
+var _Event_bubbles;
+var _Event_composed;
+var _Event_defaultPrevented;
+var _Event_timestamp;
+var _Event_propagationStopped;
+var _Event_type;
+var _Event_target;
+var _Event_isBeingDispatched;
+var _a$1;
+var _CustomEvent_detail;
+var _b;
 const NONE = 0;
 const CAPTURING_PHASE = 1;
 const AT_TARGET = 2;
@@ -6145,7 +6081,10 @@ const windowShim = new WindowShim(constructionToken);
 * Copyright 2019 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t$1 = globalThis, e$1 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, s$2 = /* @__PURE__ */ Symbol(), o$3 = /* @__PURE__ */ new WeakMap();
+const t$1 = globalThis;
+const e$1 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
+const s$2 = /* @__PURE__ */ Symbol();
+const o$3 = /* @__PURE__ */ new WeakMap();
 var n$2 = class {
 	constructor(t, e, o) {
 		if (this._$cssResult$ = !0, o !== s$2) throw Error("CSSResult is not constructable. Use \`unsafeCSS\` or \`css\` instead.");
@@ -6164,19 +6103,22 @@ var n$2 = class {
 		return this.cssText;
 	}
 };
-const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$2 = (t, ...e) => {
+const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2);
+const i$2 = (t, ...e) => {
 	return new n$2(1 === t.length ? t[0] : e.reduce((e, s, o) => e + ((t) => {
 		if (!0 === t._$cssResult$) return t.cssText;
 		if ("number" == typeof t) return t;
 		throw Error("Value passed to 'css' function must be a 'css' function result: " + t + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
 	})(s) + t[o + 1], t[0]), t, s$2);
-}, S$1 = (s, o) => {
+};
+const S$1 = (s, o) => {
 	if (e$1) s.adoptedStyleSheets = o.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
 	else for (const e of o) {
 		const o = document.createElement("style"), n = t$1.litNonce;
 		void 0 !== n && o.setAttribute("nonce", n), o.textContent = e.cssText, s.appendChild(o);
 	}
-}, c$2 = e$1 || void 0 === t$1.CSSStyleSheet ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
+};
+const c$2 = e$1 || void 0 === t$1.CSSStyleSheet ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
 	let e = "";
 	for (const s of t.cssRules) e += s.cssText;
 	return r$2(e);
@@ -6185,7 +6127,11 @@ const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$2 
 //#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/reactive-element.js
 const { is: h$1, defineProperty: r$1, getOwnPropertyDescriptor: o$2, getOwnPropertyNames: n$1, getOwnPropertySymbols: a$1, getPrototypeOf: c$1 } = Object, l$1 = globalThis;
 l$1.customElements ??= customElements;
-const p$1 = l$1.trustedTypes, d$1 = p$1 ? p$1.emptyScript : "", u$1 = l$1.reactiveElementPolyfillSupport, f$1 = (t, s) => t, b$1 = {
+const p$1 = l$1.trustedTypes;
+const d$1 = p$1 ? p$1.emptyScript : "";
+const u$1 = l$1.reactiveElementPolyfillSupport;
+const f$1 = (t, s) => t;
+const b$1 = {
 	toAttribute(t, s) {
 		switch (s) {
 			case Boolean:
@@ -6214,7 +6160,9 @@ const p$1 = l$1.trustedTypes, d$1 = p$1 ? p$1.emptyScript : "", u$1 = l$1.reacti
 		}
 		return i;
 	}
-}, m$1 = (t, s) => !h$1(t, s), y$1 = {
+};
+const m$1 = (t, s) => !h$1(t, s);
+const y$1 = {
 	attribute: !0,
 	type: String,
 	converter: b$1,
@@ -6416,7 +6364,31 @@ g$1.elementStyles = [], g$1.shadowRootOptions = { mode: "open" }, g$1[f$1("eleme
 * Copyright 2017 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t = globalThis, i$1 = (t) => t, s$1 = t.trustedTypes, e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, h = "$lit$", o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`, n = "?" + o$1, r = \`<\${n}>\`, l = void 0 === t.document ? { createTreeWalker: () => ({}) } : document, c = () => l.createComment(""), a = (t) => null === t || "object" != typeof t && "function" != typeof t, u = Array.isArray, d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator], f = "[ 	\\n\\f\\r]", v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g, _ = /-->/g, m = />/g, p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g"), g = /'/g, $ = /"/g, y = /^(?:script|style|textarea|title)$/i, E = /* @__PURE__ */ Symbol.for("lit-noChange"), A = /* @__PURE__ */ Symbol.for("lit-nothing"), C = /* @__PURE__ */ new WeakMap(), P = l.createTreeWalker(l, 129);
+const t = globalThis;
+const i$1 = (t) => t;
+const s$1 = t.trustedTypes;
+const e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0;
+const h = "$lit$";
+const o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`;
+const n = "?" + o$1;
+const r = \`<\${n}>\`;
+const l = void 0 === t.document ? { createTreeWalker: () => ({}) } : document;
+const c = () => l.createComment("");
+const a = (t) => null === t || "object" != typeof t && "function" != typeof t;
+const u = Array.isArray;
+const d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator];
+const f = "[ 	\\n\\f\\r]";
+const v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g;
+const _ = /-->/g;
+const m = />/g;
+const p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g");
+const g = /'/g;
+const $ = /"/g;
+const y = /^(?:script|style|textarea|title)$/i;
+const E = /* @__PURE__ */ Symbol.for("lit-noChange");
+const A = /* @__PURE__ */ Symbol.for("lit-nothing");
+const C = /* @__PURE__ */ new WeakMap();
+const P = l.createTreeWalker(l, 129);
 function V(t, i) {
 	if (!u(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
 	return void 0 !== e ? e.createHTML(i) : i;
@@ -6711,7 +6683,10 @@ exports[`css > emit > should work with emitted processed 'sourcemap-emit' css > 
 * Copyright 2019 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t$1 = globalThis, e$2 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, s$2 = /* @__PURE__ */ Symbol(), o$3 = /* @__PURE__ */ new WeakMap();
+const t$1 = globalThis;
+const e$2 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
+const s$2 = /* @__PURE__ */ Symbol();
+const o$3 = /* @__PURE__ */ new WeakMap();
 var n$2 = class {
 	constructor(t, e, o) {
 		if (this._$cssResult$ = !0, o !== s$2) throw Error("CSSResult is not constructable. Use \`unsafeCSS\` or \`css\` instead.");
@@ -6730,19 +6705,22 @@ var n$2 = class {
 		return this.cssText;
 	}
 };
-const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$3 = (t, ...e) => {
+const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2);
+const i$3 = (t, ...e) => {
 	return new n$2(1 === t.length ? t[0] : e.reduce((e, s, o) => e + ((t) => {
 		if (!0 === t._$cssResult$) return t.cssText;
 		if ("number" == typeof t) return t;
 		throw Error("Value passed to 'css' function must be a 'css' function result: " + t + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
 	})(s) + t[o + 1], t[0]), t, s$2);
-}, S$1 = (s, o) => {
+};
+const S$1 = (s, o) => {
 	if (e$2) s.adoptedStyleSheets = o.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
 	else for (const e of o) {
 		const o = document.createElement("style"), n = t$1.litNonce;
 		void 0 !== n && o.setAttribute("nonce", n), o.textContent = e.cssText, s.appendChild(o);
 	}
-}, c$2 = e$2 ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
+};
+const c$2 = e$2 ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
 	let e = "";
 	for (const s of t.cssRules) e += s.cssText;
 	return r$2(e);
@@ -6984,7 +6962,31 @@ y$1.elementStyles = [], y$1.shadowRootOptions = { mode: "open" }, y$1[d$1("eleme
 * Copyright 2017 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t = globalThis, i$1 = (t) => t, s$1 = t.trustedTypes, e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, h = "$lit$", o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`, n = "?" + o$1, r = \`<\${n}>\`, l = document, c = () => l.createComment(""), a = (t) => null === t || "object" != typeof t && "function" != typeof t, u = Array.isArray, d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator], f = "[ 	\\n\\f\\r]", v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g, _ = /-->/g, m = />/g, p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g"), g = /'/g, $ = /"/g, y = /^(?:script|style|textarea|title)$/i, E = /* @__PURE__ */ Symbol.for("lit-noChange"), A = /* @__PURE__ */ Symbol.for("lit-nothing"), C = /* @__PURE__ */ new WeakMap(), P = l.createTreeWalker(l, 129);
+const t = globalThis;
+const i$1 = (t) => t;
+const s$1 = t.trustedTypes;
+const e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0;
+const h = "$lit$";
+const o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`;
+const n = "?" + o$1;
+const r = \`<\${n}>\`;
+const l = document;
+const c = () => l.createComment("");
+const a = (t) => null === t || "object" != typeof t && "function" != typeof t;
+const u = Array.isArray;
+const d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator];
+const f = "[ 	\\n\\f\\r]";
+const v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g;
+const _ = /-->/g;
+const m = />/g;
+const p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g");
+const g = /'/g;
+const $ = /"/g;
+const y = /^(?:script|style|textarea|title)$/i;
+const E = /* @__PURE__ */ Symbol.for("lit-noChange");
+const A = /* @__PURE__ */ Symbol.for("lit-nothing");
+const C = /* @__PURE__ */ new WeakMap();
+const P = l.createTreeWalker(l, 129);
 function V(t, i) {
 	if (!u(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
 	return void 0 !== e ? e.createHTML(i) : i;
@@ -7372,7 +7374,18 @@ var __classPrivateFieldGet = function(receiver, state, kind, f) {
 	if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
 	return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Event_cancelable, _Event_bubbles, _Event_composed, _Event_defaultPrevented, _Event_timestamp, _Event_propagationStopped, _Event_type, _Event_target, _Event_isBeingDispatched, _a$1, _CustomEvent_detail, _b;
+var _Event_cancelable;
+var _Event_bubbles;
+var _Event_composed;
+var _Event_defaultPrevented;
+var _Event_timestamp;
+var _Event_propagationStopped;
+var _Event_type;
+var _Event_target;
+var _Event_isBeingDispatched;
+var _a$1;
+var _CustomEvent_detail;
+var _b;
 const NONE = 0;
 const CAPTURING_PHASE = 1;
 const AT_TARGET = 2;
@@ -7930,7 +7943,10 @@ const windowShim = new WindowShim(constructionToken);
 * Copyright 2019 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t$1 = globalThis, e$1 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, s$2 = /* @__PURE__ */ Symbol(), o$3 = /* @__PURE__ */ new WeakMap();
+const t$1 = globalThis;
+const e$1 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
+const s$2 = /* @__PURE__ */ Symbol();
+const o$3 = /* @__PURE__ */ new WeakMap();
 var n$2 = class {
 	constructor(t, e, o) {
 		if (this._$cssResult$ = !0, o !== s$2) throw Error("CSSResult is not constructable. Use \`unsafeCSS\` or \`css\` instead.");
@@ -7949,19 +7965,22 @@ var n$2 = class {
 		return this.cssText;
 	}
 };
-const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$2 = (t, ...e) => {
+const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2);
+const i$2 = (t, ...e) => {
 	return new n$2(1 === t.length ? t[0] : e.reduce((e, s, o) => e + ((t) => {
 		if (!0 === t._$cssResult$) return t.cssText;
 		if ("number" == typeof t) return t;
 		throw Error("Value passed to 'css' function must be a 'css' function result: " + t + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
 	})(s) + t[o + 1], t[0]), t, s$2);
-}, S$1 = (s, o) => {
+};
+const S$1 = (s, o) => {
 	if (e$1) s.adoptedStyleSheets = o.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
 	else for (const e of o) {
 		const o = document.createElement("style"), n = t$1.litNonce;
 		void 0 !== n && o.setAttribute("nonce", n), o.textContent = e.cssText, s.appendChild(o);
 	}
-}, c$2 = e$1 || void 0 === t$1.CSSStyleSheet ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
+};
+const c$2 = e$1 || void 0 === t$1.CSSStyleSheet ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
 	let e = "";
 	for (const s of t.cssRules) e += s.cssText;
 	return r$2(e);
@@ -7970,7 +7989,11 @@ const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$2 
 //#region <root>/node_modules/.pnpm/@lit+reactive-element@2.1.2/node_modules/@lit/reactive-element/node/reactive-element.js
 const { is: h$1, defineProperty: r$1, getOwnPropertyDescriptor: o$2, getOwnPropertyNames: n$1, getOwnPropertySymbols: a$1, getPrototypeOf: c$1 } = Object, l$1 = globalThis;
 l$1.customElements ??= customElements;
-const p$1 = l$1.trustedTypes, d$1 = p$1 ? p$1.emptyScript : "", u$1 = l$1.reactiveElementPolyfillSupport, f$1 = (t, s) => t, b$1 = {
+const p$1 = l$1.trustedTypes;
+const d$1 = p$1 ? p$1.emptyScript : "";
+const u$1 = l$1.reactiveElementPolyfillSupport;
+const f$1 = (t, s) => t;
+const b$1 = {
 	toAttribute(t, s) {
 		switch (s) {
 			case Boolean:
@@ -7999,7 +8022,9 @@ const p$1 = l$1.trustedTypes, d$1 = p$1 ? p$1.emptyScript : "", u$1 = l$1.reacti
 		}
 		return i;
 	}
-}, m$1 = (t, s) => !h$1(t, s), y$1 = {
+};
+const m$1 = (t, s) => !h$1(t, s);
+const y$1 = {
 	attribute: !0,
 	type: String,
 	converter: b$1,
@@ -8201,7 +8226,31 @@ g$1.elementStyles = [], g$1.shadowRootOptions = { mode: "open" }, g$1[f$1("eleme
 * Copyright 2017 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t = globalThis, i$1 = (t) => t, s$1 = t.trustedTypes, e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, h = "$lit$", o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`, n = "?" + o$1, r = \`<\${n}>\`, l = void 0 === t.document ? { createTreeWalker: () => ({}) } : document, c = () => l.createComment(""), a = (t) => null === t || "object" != typeof t && "function" != typeof t, u = Array.isArray, d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator], f = "[ 	\\n\\f\\r]", v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g, _ = /-->/g, m = />/g, p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g"), g = /'/g, $ = /"/g, y = /^(?:script|style|textarea|title)$/i, E = /* @__PURE__ */ Symbol.for("lit-noChange"), A = /* @__PURE__ */ Symbol.for("lit-nothing"), C = /* @__PURE__ */ new WeakMap(), P = l.createTreeWalker(l, 129);
+const t = globalThis;
+const i$1 = (t) => t;
+const s$1 = t.trustedTypes;
+const e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0;
+const h = "$lit$";
+const o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`;
+const n = "?" + o$1;
+const r = \`<\${n}>\`;
+const l = void 0 === t.document ? { createTreeWalker: () => ({}) } : document;
+const c = () => l.createComment("");
+const a = (t) => null === t || "object" != typeof t && "function" != typeof t;
+const u = Array.isArray;
+const d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator];
+const f = "[ 	\\n\\f\\r]";
+const v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g;
+const _ = /-->/g;
+const m = />/g;
+const p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g");
+const g = /'/g;
+const $ = /"/g;
+const y = /^(?:script|style|textarea|title)$/i;
+const E = /* @__PURE__ */ Symbol.for("lit-noChange");
+const A = /* @__PURE__ */ Symbol.for("lit-nothing");
+const C = /* @__PURE__ */ new WeakMap();
+const P = l.createTreeWalker(l, 129);
 function V(t, i) {
 	if (!u(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
 	return void 0 !== e ? e.createHTML(i) : i;
@@ -8496,7 +8545,10 @@ exports[`css > emit > should work with emitted processed 'sourcemap-transform' c
 * Copyright 2019 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t$1 = globalThis, e$2 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, s$2 = /* @__PURE__ */ Symbol(), o$3 = /* @__PURE__ */ new WeakMap();
+const t$1 = globalThis;
+const e$2 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
+const s$2 = /* @__PURE__ */ Symbol();
+const o$3 = /* @__PURE__ */ new WeakMap();
 var n$2 = class {
 	constructor(t, e, o) {
 		if (this._$cssResult$ = !0, o !== s$2) throw Error("CSSResult is not constructable. Use \`unsafeCSS\` or \`css\` instead.");
@@ -8515,19 +8567,22 @@ var n$2 = class {
 		return this.cssText;
 	}
 };
-const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2), i$3 = (t, ...e) => {
+const r$2 = (t) => new n$2("string" == typeof t ? t : t + "", void 0, s$2);
+const i$3 = (t, ...e) => {
 	return new n$2(1 === t.length ? t[0] : e.reduce((e, s, o) => e + ((t) => {
 		if (!0 === t._$cssResult$) return t.cssText;
 		if ("number" == typeof t) return t;
 		throw Error("Value passed to 'css' function must be a 'css' function result: " + t + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
 	})(s) + t[o + 1], t[0]), t, s$2);
-}, S$1 = (s, o) => {
+};
+const S$1 = (s, o) => {
 	if (e$2) s.adoptedStyleSheets = o.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
 	else for (const e of o) {
 		const o = document.createElement("style"), n = t$1.litNonce;
 		void 0 !== n && o.setAttribute("nonce", n), o.textContent = e.cssText, s.appendChild(o);
 	}
-}, c$2 = e$2 ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
+};
+const c$2 = e$2 ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
 	let e = "";
 	for (const s of t.cssRules) e += s.cssText;
 	return r$2(e);
@@ -8769,7 +8824,31 @@ y$1.elementStyles = [], y$1.shadowRootOptions = { mode: "open" }, y$1[d$1("eleme
 * Copyright 2017 Google LLC
 * SPDX-License-Identifier: BSD-3-Clause
 */
-const t = globalThis, i$1 = (t) => t, s$1 = t.trustedTypes, e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, h = "$lit$", o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`, n = "?" + o$1, r = \`<\${n}>\`, l = document, c = () => l.createComment(""), a = (t) => null === t || "object" != typeof t && "function" != typeof t, u = Array.isArray, d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator], f = "[ 	\\n\\f\\r]", v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g, _ = /-->/g, m = />/g, p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g"), g = /'/g, $ = /"/g, y = /^(?:script|style|textarea|title)$/i, E = /* @__PURE__ */ Symbol.for("lit-noChange"), A = /* @__PURE__ */ Symbol.for("lit-nothing"), C = /* @__PURE__ */ new WeakMap(), P = l.createTreeWalker(l, 129);
+const t = globalThis;
+const i$1 = (t) => t;
+const s$1 = t.trustedTypes;
+const e = s$1 ? s$1.createPolicy("lit-html", { createHTML: (t) => t }) : void 0;
+const h = "$lit$";
+const o$1 = \`lit$\${/* @__PURE__ */ Math.random().toFixed(9).slice(2)}$\`;
+const n = "?" + o$1;
+const r = \`<\${n}>\`;
+const l = document;
+const c = () => l.createComment("");
+const a = (t) => null === t || "object" != typeof t && "function" != typeof t;
+const u = Array.isArray;
+const d = (t) => u(t) || "function" == typeof t?.[Symbol.iterator];
+const f = "[ 	\\n\\f\\r]";
+const v = /<(?:(!--|\\/[^a-zA-Z])|(\\/?[a-zA-Z][^>\\s]*)|(\\/?$))/g;
+const _ = /-->/g;
+const m = />/g;
+const p = RegExp(\`>|\${f}(?:([^\\\\s"'>=/]+)(\${f}*=\${f}*(?:[^ \\t\\n\\f\\r"'\\\`<>=]|("|')|))|$)\`, "g");
+const g = /'/g;
+const $ = /"/g;
+const y = /^(?:script|style|textarea|title)$/i;
+const E = /* @__PURE__ */ Symbol.for("lit-noChange");
+const A = /* @__PURE__ */ Symbol.for("lit-nothing");
+const C = /* @__PURE__ */ new WeakMap();
+const P = l.createTreeWalker(l, 129);
 function V(t, i) {
 	if (!u(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
 	return void 0 !== e ? e.createHTML(i) : i;
@@ -9193,39 +9272,11 @@ exports[`css > extract > should generate sourcemap for processed 'preserve-modul
 /*# sourceMappingURL=style.css.map */"
 `;
 
-exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > css 4`] = `
-".less {
-  color: #6c94be;
-}
-/*# sourceMappingURL=style.css.map */"
-`;
-
-exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > css 5`] = `
-".pcss {
-    color: red;
-}
-"
-`;
-
-exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > css 6`] = `
-".sass {
-  width: 30%;
-  color: red;
-}"
-`;
-
-exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > css 7`] = `
-".stylus {
-  color: #f00;
-  background: #f00;
-}
-"
-`;
-
 exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > js 1`] = `
 "//#region src/bar.css
 var css = ".bar {\\n    color: red;\\n}\\n";
 //#endregion
+exports.css = css;
 exports.default = css;
 "
 `;
@@ -9234,6 +9285,7 @@ exports[`css > extract > should generate sourcemap for processed 'preserve-modul
 "//#region src/foo.css
 var css = ".foo {\\n    color: red;\\n}\\n";
 //#endregion
+exports.css = css;
 exports.default = css;
 "
 `;
@@ -9241,23 +9293,11 @@ exports.default = css;
 exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > js 3`] = `
 "const require_foo = require("./foo.css.cjs");
 const require_bar = require("./bar.css.cjs");
-require("./style.styl.cjs");
-require("./style.pcss.cjs");
-require("./style.sass.cjs");
-require("./style.less.cjs");
 //#region src/index.js
-console.log(require_foo.default, require_bar.default);
+console.log(require_foo.css, require_bar.css);
 //#endregion
 "
 `;
-
-exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > js 4`] = `""`;
-
-exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > js 5`] = `""`;
-
-exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > js 6`] = `""`;
-
-exports[`css > extract > should generate sourcemap for processed 'preserve-modules' css > js 7`] = `""`;
 
 exports[`css > extract > should generate sourcemap for processed 'sourcemap-inline' css > css 1`] = `
 ".foo {
@@ -10440,14 +10480,14 @@ cssStyleInject(".style {\\n  width: 30%;\\n  color: red;\\n}", {});
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - import' css > js 1`] = `
-"(0, require("@visulima/css-style-inject").cssStyleInject)(".a {\\n  color: magenta;\\n}\\n\\n.b {\\n  color: red;\\n}\\n\\n.c {\\n  color: red;\\n}\\n\\n.foo {\\n  color: royalblue;\\n}\\n\\n/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\n\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\n\\nul {\\n  list-style: none;\\n}\\n\\nbutton, input, select {\\n  margin: 0;\\n}\\n\\nhtml {\\n  box-sizing: border-box;\\n}\\n\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\n\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\n\\niframe {\\n  border: 0;\\n}\\n\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\n\\ntd, th {\\n  padding: 0;\\n}", {});
+"(0, require("@visulima/css-style-inject").cssStyleInject)(".a {\\n  color: magenta;\\n}\\n\\n.b {\\n  color: red;\\n}\\n\\n.c {\\n  color: red;\\n}\\n\\n.foo {\\n  color: royalblue;\\n}\\n\\n/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\n\\nul {\\n  list-style: none;\\n}\\n\\nbutton, input, select {\\n  margin: 0;\\n}\\n\\nhtml {\\n  box-sizing: border-box;\\n}\\n\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\n\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\n\\niframe {\\n  border: 0;\\n}\\n\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\n\\ntd, th {\\n  padding: 0;\\n}", {});
 //#endregion
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - import' css > js 2`] = `
 "import { cssStyleInject } from "@visulima/css-style-inject";
-cssStyleInject(".a {\\n  color: magenta;\\n}\\n\\n.b {\\n  color: red;\\n}\\n\\n.c {\\n  color: red;\\n}\\n\\n.foo {\\n  color: royalblue;\\n}\\n\\n/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\n\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\n\\nul {\\n  list-style: none;\\n}\\n\\nbutton, input, select {\\n  margin: 0;\\n}\\n\\nhtml {\\n  box-sizing: border-box;\\n}\\n\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\n\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\n\\niframe {\\n  border: 0;\\n}\\n\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\n\\ntd, th {\\n  padding: 0;\\n}", {});
+cssStyleInject(".a {\\n  color: magenta;\\n}\\n\\n.b {\\n  color: red;\\n}\\n\\n.c {\\n  color: red;\\n}\\n\\n.foo {\\n  color: royalblue;\\n}\\n\\n/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\n\\nul {\\n  list-style: none;\\n}\\n\\nbutton, input, select {\\n  margin: 0;\\n}\\n\\nhtml {\\n  box-sizing: border-box;\\n}\\n\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\n\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\n\\niframe {\\n  border: 0;\\n}\\n\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\n\\ntd, th {\\n  padding: 0;\\n}", {});
 //#endregion
 "
 `;
@@ -10490,14 +10530,14 @@ cssStyleInject(".style {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMapping
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - use' css > js 1`] = `
-"(0, require("@visulima/css-style-inject").cssStyleInject)("/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\nul {\\n  list-style: none;\\n}\\nbutton, input, select {\\n  margin: 0;\\n}\\nhtml {\\n  box-sizing: border-box;\\n}\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\niframe {\\n  border: 0;\\n}\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\ntd, th {\\n  padding: 0;\\n}\\n.button {\\n  border-radius: 3px;\\n  padding: 8px;\\n}", {});
+"(0, require("@visulima/css-style-inject").cssStyleInject)("/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\n\\nul {\\n  list-style: none;\\n}\\n\\nbutton, input, select {\\n  margin: 0;\\n}\\n\\nhtml {\\n  box-sizing: border-box;\\n}\\n\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\n\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\n\\niframe {\\n  border: 0;\\n}\\n\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\n\\ntd, th {\\n  padding: 0;\\n}\\n\\n.button {\\n  border-radius: 3px;\\n  padding: 8px;\\n}", {});
 //#endregion
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - use' css > js 2`] = `
 "import { cssStyleInject } from "@visulima/css-style-inject";
-cssStyleInject("/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\nul {\\n  list-style: none;\\n}\\nbutton, input, select {\\n  margin: 0;\\n}\\nhtml {\\n  box-sizing: border-box;\\n}\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\niframe {\\n  border: 0;\\n}\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\ntd, th {\\n  padding: 0;\\n}\\n.button {\\n  border-radius: 3px;\\n  padding: 8px;\\n}", {});
+cssStyleInject("/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\n\\nul {\\n  list-style: none;\\n}\\n\\nbutton, input, select {\\n  margin: 0;\\n}\\n\\nhtml {\\n  box-sizing: border-box;\\n}\\n\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\n\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\n\\niframe {\\n  border: 0;\\n}\\n\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\n\\ntd, th {\\n  padding: 0;\\n}\\n\\n.button {\\n  border-radius: 3px;\\n  padding: 8px;\\n}", {});
 //#endregion
 "
 `;
@@ -11023,7 +11063,7 @@ exports[`css > stylus > should work with stylus processed 'sourcemap' css > map 
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'basic' css > js 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-(0, require("@visulima/css-style-inject").cssStyleInject)("/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */\\n@layer properties;\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities {\\n  .mb-3 {\\n    margin-bottom: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .transform {\\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\\n  }\\n  .rounded-xl {\\n    border-radius: var(--radius-xl, 0.75rem);\\n  }\\n  .border {\\n    border-style: var(--tw-border-style);\\n    border-width: 1px;\\n  }\\n  .border-2 {\\n    border-style: var(--tw-border-style);\\n    border-width: 2px;\\n  }\\n  .border-blue-600 {\\n    border-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .border-gray-200 {\\n    border-color: var(--color-gray-200, oklch(92.8% 0.006 264.531));\\n  }\\n  .border-gray-300 {\\n    border-color: var(--color-gray-300, oklch(87.2% 0.01 258.338));\\n  }\\n  .bg-blue-600 {\\n    background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .bg-gray-600 {\\n    background-color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .bg-transparent {\\n    background-color: transparent;\\n  }\\n  .bg-white {\\n    background-color: var(--color-white, #fff);\\n  }\\n  .px-3 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .px-4 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 4);\\n  }\\n  .px-6 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 6);\\n  }\\n  .py-1\\\\.5 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 1.5);\\n  }\\n  .py-2 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 2);\\n  }\\n  .py-3 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .text-base {\\n    font-size: var(--text-base, 1rem);\\n    line-height: var(--tw-leading, var(--text-base--line-height, calc(1.5 / 1)));\\n  }\\n  .text-lg {\\n    font-size: var(--text-lg, 1.125rem);\\n    line-height: var(--tw-leading, var(--text-lg--line-height, calc(1.75 / 1.125)));\\n  }\\n  .text-sm {\\n    font-size: var(--text-sm, 0.875rem);\\n    line-height: var(--tw-leading, var(--text-sm--line-height, calc(1.25 / 0.875)));\\n  }\\n  .text-xl {\\n    font-size: var(--text-xl, 1.25rem);\\n    line-height: var(--tw-leading, var(--text-xl--line-height, calc(1.75 / 1.25)));\\n  }\\n  .font-medium {\\n    --tw-font-weight: var(--font-weight-medium, 500);\\n    font-weight: var(--font-weight-medium, 500);\\n  }\\n  .font-semibold {\\n    --tw-font-weight: var(--font-weight-semibold, 600);\\n    font-weight: var(--font-weight-semibold, 600);\\n  }\\n  .text-blue-600 {\\n    color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .text-gray-600 {\\n    color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .text-gray-800 {\\n    color: var(--color-gray-800, oklch(27.8% 0.033 256.848));\\n  }\\n  .text-white {\\n    color: var(--color-white, #fff);\\n  }\\n  .shadow-2xl {\\n    --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .shadow-lg {\\n    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .outline {\\n    outline-style: var(--tw-outline-style);\\n    outline-width: 1px;\\n  }\\n  .transition-all {\\n    transition-property: all;\\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n    transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  }\\n  .duration-200 {\\n    --tw-duration: 200ms;\\n    transition-duration: 200ms;\\n  }\\n  .hover\\\\:scale-105 {\\n    &:hover {\\n      @media (hover: hover) {\\n        --tw-scale-x: 105%;\\n        --tw-scale-y: 105%;\\n        --tw-scale-z: 105%;\\n        scale: var(--tw-scale-x) var(--tw-scale-y);\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-600 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-700, oklch(48.8% 0.243 264.376));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-gray-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-gray-700, oklch(37.3% 0.034 259.733));\\n      }\\n    }\\n  }\\n  .hover\\\\:text-white {\\n    &:hover {\\n      @media (hover: hover) {\\n        color: var(--color-white, #fff);\\n      }\\n    }\\n  }\\n}\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities;\\n.button {\\n  border-radius: var(--radius-lg, 0.5rem);\\n  --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n}\\n.button:focus {\\n  --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  --tw-ring-color: var(--color-blue-500, oklch(62.3% 0.214 259.815));\\n  --tw-ring-offset-width: 2px;\\n  --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);\\n  --tw-outline-style: none;\\n  outline-style: none;\\n}\\n.button:disabled {\\n  cursor: not-allowed;\\n  opacity: 50%;\\n}\\n.card {\\n  padding: calc(var(--spacing, 0.25rem) * 6);\\n}\\n.card.elevated {\\n  transition-property: all;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 300ms;\\n  transition-duration: 300ms;\\n  --tw-ease: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n  transition-timing-function: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n}\\n.card.outlined {\\n  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 200ms;\\n  transition-duration: 200ms;\\n  &:hover {\\n    @media (hover: hover) {\\n      border-color: var(--color-gray-400, oklch(70.7% 0.022 261.325));\\n    }\\n  }\\n}\\n.container {\\n  max-width: 1200px;\\n  margin: 0 auto;\\n  padding: 0 1rem;\\n}\\n.button {\\n  display: inline-block;\\n  padding: 0.5rem 1rem;\\n  background-color: #3b82f6;\\n  color: white;\\n  border-radius: 0.375rem;\\n  text-decoration: none;\\n  transition: background-color 0.2s;\\n}\\n.button:hover {\\n  background-color: #2563eb;\\n}\\n.card {\\n  background: white;\\n  border-radius: 0.5rem;\\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\\n  padding: 1.5rem;\\n}\\n.text-gradient {\\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\\n  -webkit-background-clip: text;\\n  -webkit-text-fill-color: transparent;\\n  background-clip: text;\\n}\\n.animate-fade-in {\\n  animation: fadeIn 0.5s ease-in-out;\\n}\\n@keyframes fadeIn {\\n  from {\\n    opacity: 0;\\n    transform: translateY(10px);\\n  }\\n  to {\\n    opacity: 1;\\n    transform: translateY(0);\\n  }\\n}\\n@property --tw-rotate-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-border-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-font-weight {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-inset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-ring-inset {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-offset-width {\\n  syntax: \\"<length>\\";\\n  inherits: false;\\n  initial-value: 0px;\\n}\\n@property --tw-ring-offset-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: #fff;\\n}\\n@property --tw-ring-offset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-outline-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-duration {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-scale-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-ease {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@layer properties {\\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\\n    *, ::before, ::after, ::backdrop {\\n      --tw-rotate-x: initial;\\n      --tw-rotate-y: initial;\\n      --tw-rotate-z: initial;\\n      --tw-skew-x: initial;\\n      --tw-skew-y: initial;\\n      --tw-border-style: solid;\\n      --tw-font-weight: initial;\\n      --tw-shadow: 0 0 #0000;\\n      --tw-shadow-color: initial;\\n      --tw-shadow-alpha: 100%;\\n      --tw-inset-shadow: 0 0 #0000;\\n      --tw-inset-shadow-color: initial;\\n      --tw-inset-shadow-alpha: 100%;\\n      --tw-ring-color: initial;\\n      --tw-ring-shadow: 0 0 #0000;\\n      --tw-inset-ring-color: initial;\\n      --tw-inset-ring-shadow: 0 0 #0000;\\n      --tw-ring-inset: initial;\\n      --tw-ring-offset-width: 0px;\\n      --tw-ring-offset-color: #fff;\\n      --tw-ring-offset-shadow: 0 0 #0000;\\n      --tw-outline-style: solid;\\n      --tw-duration: initial;\\n      --tw-scale-x: 1;\\n      --tw-scale-y: 1;\\n      --tw-scale-z: 1;\\n      --tw-ease: initial;\\n    }\\n  }\\n}\\n", {});
+(0, require("@visulima/css-style-inject").cssStyleInject)("/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */\\n@layer properties;\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities {\\n  .mb-3 {\\n    margin-bottom: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .transform {\\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\\n  }\\n  .rounded-xl {\\n    border-radius: var(--radius-xl, 0.75rem);\\n  }\\n  .border {\\n    border-style: var(--tw-border-style);\\n    border-width: 1px;\\n  }\\n  .border-2 {\\n    border-style: var(--tw-border-style);\\n    border-width: 2px;\\n  }\\n  .border-blue-600 {\\n    border-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .border-gray-200 {\\n    border-color: var(--color-gray-200, oklch(92.8% 0.006 264.531));\\n  }\\n  .border-gray-300 {\\n    border-color: var(--color-gray-300, oklch(87.2% 0.01 258.338));\\n  }\\n  .bg-blue-600 {\\n    background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .bg-gray-600 {\\n    background-color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .bg-transparent {\\n    background-color: transparent;\\n  }\\n  .bg-white {\\n    background-color: var(--color-white, #fff);\\n  }\\n  .px-3 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .px-4 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 4);\\n  }\\n  .px-6 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 6);\\n  }\\n  .py-1\\\\.5 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 1.5);\\n  }\\n  .py-2 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 2);\\n  }\\n  .py-3 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .text-base {\\n    font-size: var(--text-base, 1rem);\\n    line-height: var(--tw-leading, var(--text-base--line-height, calc(1.5 / 1)));\\n  }\\n  .text-lg {\\n    font-size: var(--text-lg, 1.125rem);\\n    line-height: var(--tw-leading, var(--text-lg--line-height, calc(1.75 / 1.125)));\\n  }\\n  .text-sm {\\n    font-size: var(--text-sm, 0.875rem);\\n    line-height: var(--tw-leading, var(--text-sm--line-height, calc(1.25 / 0.875)));\\n  }\\n  .text-xl {\\n    font-size: var(--text-xl, 1.25rem);\\n    line-height: var(--tw-leading, var(--text-xl--line-height, calc(1.75 / 1.25)));\\n  }\\n  .font-medium {\\n    --tw-font-weight: var(--font-weight-medium, 500);\\n    font-weight: var(--font-weight-medium, 500);\\n  }\\n  .font-semibold {\\n    --tw-font-weight: var(--font-weight-semibold, 600);\\n    font-weight: var(--font-weight-semibold, 600);\\n  }\\n  .text-blue-600 {\\n    color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .text-gray-600 {\\n    color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .text-gray-800 {\\n    color: var(--color-gray-800, oklch(27.8% 0.033 256.848));\\n  }\\n  .text-white {\\n    color: var(--color-white, #fff);\\n  }\\n  .shadow-2xl {\\n    --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .shadow-lg {\\n    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .outline {\\n    outline-style: var(--tw-outline-style);\\n    outline-width: 1px;\\n  }\\n  .transition-all {\\n    transition-property: all;\\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n    transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  }\\n  .duration-200 {\\n    --tw-duration: 200ms;\\n    transition-duration: 200ms;\\n  }\\n  .hover\\\\:scale-105 {\\n    &:hover {\\n      @media (hover: hover) {\\n        --tw-scale-x: 105%;\\n        --tw-scale-y: 105%;\\n        --tw-scale-z: 105%;\\n        scale: var(--tw-scale-x) var(--tw-scale-y);\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-600 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-700, oklch(48.8% 0.243 264.376));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-gray-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-gray-700, oklch(37.3% 0.034 259.733));\\n      }\\n    }\\n  }\\n  .hover\\\\:text-white {\\n    &:hover {\\n      @media (hover: hover) {\\n        color: var(--color-white, #fff);\\n      }\\n    }\\n  }\\n}\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities;\\n.button {\\n  border-radius: var(--radius-lg, 0.5rem);\\n  --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n}\\n.button:focus {\\n  --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  --tw-ring-color: var(--color-blue-500, oklch(62.3% 0.214 259.815));\\n  --tw-ring-offset-width: 2px;\\n  --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);\\n  --tw-outline-style: none;\\n  outline-style: none;\\n}\\n.button:disabled {\\n  cursor: not-allowed;\\n  opacity: 50%;\\n}\\n.card {\\n  padding: calc(var(--spacing, 0.25rem) * 6);\\n}\\n.card.elevated {\\n  transition-property: all;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 300ms;\\n  transition-duration: 300ms;\\n  --tw-ease: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n  transition-timing-function: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n}\\n.card.outlined {\\n  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 200ms;\\n  transition-duration: 200ms;\\n  &:hover {\\n    @media (hover: hover) {\\n      border-color: var(--color-gray-400, oklch(70.7% 0.022 261.325));\\n    }\\n  }\\n}\\n.container {\\n  max-width: 1200px;\\n  margin: 0 auto;\\n  padding: 0 1rem;\\n}\\n.button {\\n  display: inline-block;\\n  padding: 0.5rem 1rem;\\n  background-color: #3b82f6;\\n  color: white;\\n  border-radius: 0.375rem;\\n  text-decoration: none;\\n  transition: background-color 0.2s;\\n}\\n.button:hover {\\n  background-color: #2563eb;\\n}\\n.card {\\n  background: white;\\n  border-radius: 0.5rem;\\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\\n  padding: 1.5rem;\\n}\\n.text-gradient {\\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\\n  -webkit-background-clip: text;\\n  -webkit-text-fill-color: transparent;\\n  background-clip: text;\\n}\\n.animate-fade-in {\\n  animation: fadeIn 0.5s ease-in-out;\\n}\\n@keyframes fadeIn {\\n  from {\\n    opacity: 0;\\n    transform: translateY(10px);\\n  }\\n  to {\\n    opacity: 1;\\n    transform: translateY(0);\\n  }\\n}\\n@property --tw-rotate-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-border-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-font-weight {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-inset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-ring-inset {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-offset-width {\\n  syntax: \\"<length>\\";\\n  inherits: false;\\n  initial-value: 0px;\\n}\\n@property --tw-ring-offset-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: #fff;\\n}\\n@property --tw-ring-offset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-outline-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-duration {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-scale-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-ease {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@layer properties {\\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\\n    *, ::before, ::after, ::backdrop {\\n      --tw-rotate-x: initial;\\n      --tw-rotate-y: initial;\\n      --tw-rotate-z: initial;\\n      --tw-skew-x: initial;\\n      --tw-skew-y: initial;\\n      --tw-border-style: solid;\\n      --tw-font-weight: initial;\\n      --tw-shadow: 0 0 #0000;\\n      --tw-shadow-color: initial;\\n      --tw-shadow-alpha: 100%;\\n      --tw-inset-shadow: 0 0 #0000;\\n      --tw-inset-shadow-color: initial;\\n      --tw-inset-shadow-alpha: 100%;\\n      --tw-ring-color: initial;\\n      --tw-ring-shadow: 0 0 #0000;\\n      --tw-inset-ring-color: initial;\\n      --tw-inset-ring-shadow: 0 0 #0000;\\n      --tw-ring-inset: initial;\\n      --tw-ring-offset-width: 0px;\\n      --tw-ring-offset-color: #fff;\\n      --tw-ring-offset-shadow: 0 0 #0000;\\n      --tw-outline-style: solid;\\n      --tw-duration: initial;\\n      --tw-scale-x: 1;\\n      --tw-scale-y: 1;\\n      --tw-scale-z: 1;\\n      --tw-ease: initial;\\n    }\\n  }\\n}\\n", {});
 //#endregion
 //#region src/components/Button.jsx
 var _jsxFileName$1 = "src/components/Button.jsx";
@@ -11093,7 +11133,7 @@ exports.Card = Card;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'basic' css > js 2`] = `
 "import { cssStyleInject } from "@visulima/css-style-inject";
-cssStyleInject("/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */\\n@layer properties;\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities {\\n  .mb-3 {\\n    margin-bottom: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .transform {\\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\\n  }\\n  .rounded-xl {\\n    border-radius: var(--radius-xl, 0.75rem);\\n  }\\n  .border {\\n    border-style: var(--tw-border-style);\\n    border-width: 1px;\\n  }\\n  .border-2 {\\n    border-style: var(--tw-border-style);\\n    border-width: 2px;\\n  }\\n  .border-blue-600 {\\n    border-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .border-gray-200 {\\n    border-color: var(--color-gray-200, oklch(92.8% 0.006 264.531));\\n  }\\n  .border-gray-300 {\\n    border-color: var(--color-gray-300, oklch(87.2% 0.01 258.338));\\n  }\\n  .bg-blue-600 {\\n    background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .bg-gray-600 {\\n    background-color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .bg-transparent {\\n    background-color: transparent;\\n  }\\n  .bg-white {\\n    background-color: var(--color-white, #fff);\\n  }\\n  .px-3 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .px-4 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 4);\\n  }\\n  .px-6 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 6);\\n  }\\n  .py-1\\\\.5 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 1.5);\\n  }\\n  .py-2 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 2);\\n  }\\n  .py-3 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .text-base {\\n    font-size: var(--text-base, 1rem);\\n    line-height: var(--tw-leading, var(--text-base--line-height, calc(1.5 / 1)));\\n  }\\n  .text-lg {\\n    font-size: var(--text-lg, 1.125rem);\\n    line-height: var(--tw-leading, var(--text-lg--line-height, calc(1.75 / 1.125)));\\n  }\\n  .text-sm {\\n    font-size: var(--text-sm, 0.875rem);\\n    line-height: var(--tw-leading, var(--text-sm--line-height, calc(1.25 / 0.875)));\\n  }\\n  .text-xl {\\n    font-size: var(--text-xl, 1.25rem);\\n    line-height: var(--tw-leading, var(--text-xl--line-height, calc(1.75 / 1.25)));\\n  }\\n  .font-medium {\\n    --tw-font-weight: var(--font-weight-medium, 500);\\n    font-weight: var(--font-weight-medium, 500);\\n  }\\n  .font-semibold {\\n    --tw-font-weight: var(--font-weight-semibold, 600);\\n    font-weight: var(--font-weight-semibold, 600);\\n  }\\n  .text-blue-600 {\\n    color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .text-gray-600 {\\n    color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .text-gray-800 {\\n    color: var(--color-gray-800, oklch(27.8% 0.033 256.848));\\n  }\\n  .text-white {\\n    color: var(--color-white, #fff);\\n  }\\n  .shadow-2xl {\\n    --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .shadow-lg {\\n    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .outline {\\n    outline-style: var(--tw-outline-style);\\n    outline-width: 1px;\\n  }\\n  .transition-all {\\n    transition-property: all;\\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n    transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  }\\n  .duration-200 {\\n    --tw-duration: 200ms;\\n    transition-duration: 200ms;\\n  }\\n  .hover\\\\:scale-105 {\\n    &:hover {\\n      @media (hover: hover) {\\n        --tw-scale-x: 105%;\\n        --tw-scale-y: 105%;\\n        --tw-scale-z: 105%;\\n        scale: var(--tw-scale-x) var(--tw-scale-y);\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-600 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-700, oklch(48.8% 0.243 264.376));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-gray-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-gray-700, oklch(37.3% 0.034 259.733));\\n      }\\n    }\\n  }\\n  .hover\\\\:text-white {\\n    &:hover {\\n      @media (hover: hover) {\\n        color: var(--color-white, #fff);\\n      }\\n    }\\n  }\\n}\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities;\\n.button {\\n  border-radius: var(--radius-lg, 0.5rem);\\n  --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n}\\n.button:focus {\\n  --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  --tw-ring-color: var(--color-blue-500, oklch(62.3% 0.214 259.815));\\n  --tw-ring-offset-width: 2px;\\n  --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);\\n  --tw-outline-style: none;\\n  outline-style: none;\\n}\\n.button:disabled {\\n  cursor: not-allowed;\\n  opacity: 50%;\\n}\\n.card {\\n  padding: calc(var(--spacing, 0.25rem) * 6);\\n}\\n.card.elevated {\\n  transition-property: all;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 300ms;\\n  transition-duration: 300ms;\\n  --tw-ease: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n  transition-timing-function: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n}\\n.card.outlined {\\n  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 200ms;\\n  transition-duration: 200ms;\\n  &:hover {\\n    @media (hover: hover) {\\n      border-color: var(--color-gray-400, oklch(70.7% 0.022 261.325));\\n    }\\n  }\\n}\\n.container {\\n  max-width: 1200px;\\n  margin: 0 auto;\\n  padding: 0 1rem;\\n}\\n.button {\\n  display: inline-block;\\n  padding: 0.5rem 1rem;\\n  background-color: #3b82f6;\\n  color: white;\\n  border-radius: 0.375rem;\\n  text-decoration: none;\\n  transition: background-color 0.2s;\\n}\\n.button:hover {\\n  background-color: #2563eb;\\n}\\n.card {\\n  background: white;\\n  border-radius: 0.5rem;\\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\\n  padding: 1.5rem;\\n}\\n.text-gradient {\\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\\n  -webkit-background-clip: text;\\n  -webkit-text-fill-color: transparent;\\n  background-clip: text;\\n}\\n.animate-fade-in {\\n  animation: fadeIn 0.5s ease-in-out;\\n}\\n@keyframes fadeIn {\\n  from {\\n    opacity: 0;\\n    transform: translateY(10px);\\n  }\\n  to {\\n    opacity: 1;\\n    transform: translateY(0);\\n  }\\n}\\n@property --tw-rotate-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-border-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-font-weight {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-inset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-ring-inset {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-offset-width {\\n  syntax: \\"<length>\\";\\n  inherits: false;\\n  initial-value: 0px;\\n}\\n@property --tw-ring-offset-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: #fff;\\n}\\n@property --tw-ring-offset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-outline-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-duration {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-scale-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-ease {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@layer properties {\\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\\n    *, ::before, ::after, ::backdrop {\\n      --tw-rotate-x: initial;\\n      --tw-rotate-y: initial;\\n      --tw-rotate-z: initial;\\n      --tw-skew-x: initial;\\n      --tw-skew-y: initial;\\n      --tw-border-style: solid;\\n      --tw-font-weight: initial;\\n      --tw-shadow: 0 0 #0000;\\n      --tw-shadow-color: initial;\\n      --tw-shadow-alpha: 100%;\\n      --tw-inset-shadow: 0 0 #0000;\\n      --tw-inset-shadow-color: initial;\\n      --tw-inset-shadow-alpha: 100%;\\n      --tw-ring-color: initial;\\n      --tw-ring-shadow: 0 0 #0000;\\n      --tw-inset-ring-color: initial;\\n      --tw-inset-ring-shadow: 0 0 #0000;\\n      --tw-ring-inset: initial;\\n      --tw-ring-offset-width: 0px;\\n      --tw-ring-offset-color: #fff;\\n      --tw-ring-offset-shadow: 0 0 #0000;\\n      --tw-outline-style: solid;\\n      --tw-duration: initial;\\n      --tw-scale-x: 1;\\n      --tw-scale-y: 1;\\n      --tw-scale-z: 1;\\n      --tw-ease: initial;\\n    }\\n  }\\n}\\n", {});
+cssStyleInject("/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */\\n@layer properties;\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities {\\n  .mb-3 {\\n    margin-bottom: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .transform {\\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\\n  }\\n  .rounded-xl {\\n    border-radius: var(--radius-xl, 0.75rem);\\n  }\\n  .border {\\n    border-style: var(--tw-border-style);\\n    border-width: 1px;\\n  }\\n  .border-2 {\\n    border-style: var(--tw-border-style);\\n    border-width: 2px;\\n  }\\n  .border-blue-600 {\\n    border-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .border-gray-200 {\\n    border-color: var(--color-gray-200, oklch(92.8% 0.006 264.531));\\n  }\\n  .border-gray-300 {\\n    border-color: var(--color-gray-300, oklch(87.2% 0.01 258.338));\\n  }\\n  .bg-blue-600 {\\n    background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .bg-gray-600 {\\n    background-color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .bg-transparent {\\n    background-color: transparent;\\n  }\\n  .bg-white {\\n    background-color: var(--color-white, #fff);\\n  }\\n  .px-3 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .px-4 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 4);\\n  }\\n  .px-6 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 6);\\n  }\\n  .py-1\\\\.5 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 1.5);\\n  }\\n  .py-2 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 2);\\n  }\\n  .py-3 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .text-base {\\n    font-size: var(--text-base, 1rem);\\n    line-height: var(--tw-leading, var(--text-base--line-height, calc(1.5 / 1)));\\n  }\\n  .text-lg {\\n    font-size: var(--text-lg, 1.125rem);\\n    line-height: var(--tw-leading, var(--text-lg--line-height, calc(1.75 / 1.125)));\\n  }\\n  .text-sm {\\n    font-size: var(--text-sm, 0.875rem);\\n    line-height: var(--tw-leading, var(--text-sm--line-height, calc(1.25 / 0.875)));\\n  }\\n  .text-xl {\\n    font-size: var(--text-xl, 1.25rem);\\n    line-height: var(--tw-leading, var(--text-xl--line-height, calc(1.75 / 1.25)));\\n  }\\n  .font-medium {\\n    --tw-font-weight: var(--font-weight-medium, 500);\\n    font-weight: var(--font-weight-medium, 500);\\n  }\\n  .font-semibold {\\n    --tw-font-weight: var(--font-weight-semibold, 600);\\n    font-weight: var(--font-weight-semibold, 600);\\n  }\\n  .text-blue-600 {\\n    color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .text-gray-600 {\\n    color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .text-gray-800 {\\n    color: var(--color-gray-800, oklch(27.8% 0.033 256.848));\\n  }\\n  .text-white {\\n    color: var(--color-white, #fff);\\n  }\\n  .shadow-2xl {\\n    --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .shadow-lg {\\n    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .outline {\\n    outline-style: var(--tw-outline-style);\\n    outline-width: 1px;\\n  }\\n  .transition-all {\\n    transition-property: all;\\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n    transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  }\\n  .duration-200 {\\n    --tw-duration: 200ms;\\n    transition-duration: 200ms;\\n  }\\n  .hover\\\\:scale-105 {\\n    &:hover {\\n      @media (hover: hover) {\\n        --tw-scale-x: 105%;\\n        --tw-scale-y: 105%;\\n        --tw-scale-z: 105%;\\n        scale: var(--tw-scale-x) var(--tw-scale-y);\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-600 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-700, oklch(48.8% 0.243 264.376));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-gray-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-gray-700, oklch(37.3% 0.034 259.733));\\n      }\\n    }\\n  }\\n  .hover\\\\:text-white {\\n    &:hover {\\n      @media (hover: hover) {\\n        color: var(--color-white, #fff);\\n      }\\n    }\\n  }\\n}\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities;\\n.button {\\n  border-radius: var(--radius-lg, 0.5rem);\\n  --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n}\\n.button:focus {\\n  --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  --tw-ring-color: var(--color-blue-500, oklch(62.3% 0.214 259.815));\\n  --tw-ring-offset-width: 2px;\\n  --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);\\n  --tw-outline-style: none;\\n  outline-style: none;\\n}\\n.button:disabled {\\n  cursor: not-allowed;\\n  opacity: 50%;\\n}\\n.card {\\n  padding: calc(var(--spacing, 0.25rem) * 6);\\n}\\n.card.elevated {\\n  transition-property: all;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 300ms;\\n  transition-duration: 300ms;\\n  --tw-ease: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n  transition-timing-function: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n}\\n.card.outlined {\\n  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 200ms;\\n  transition-duration: 200ms;\\n  &:hover {\\n    @media (hover: hover) {\\n      border-color: var(--color-gray-400, oklch(70.7% 0.022 261.325));\\n    }\\n  }\\n}\\n.container {\\n  max-width: 1200px;\\n  margin: 0 auto;\\n  padding: 0 1rem;\\n}\\n.button {\\n  display: inline-block;\\n  padding: 0.5rem 1rem;\\n  background-color: #3b82f6;\\n  color: white;\\n  border-radius: 0.375rem;\\n  text-decoration: none;\\n  transition: background-color 0.2s;\\n}\\n.button:hover {\\n  background-color: #2563eb;\\n}\\n.card {\\n  background: white;\\n  border-radius: 0.5rem;\\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\\n  padding: 1.5rem;\\n}\\n.text-gradient {\\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\\n  -webkit-background-clip: text;\\n  -webkit-text-fill-color: transparent;\\n  background-clip: text;\\n}\\n.animate-fade-in {\\n  animation: fadeIn 0.5s ease-in-out;\\n}\\n@keyframes fadeIn {\\n  from {\\n    opacity: 0;\\n    transform: translateY(10px);\\n  }\\n  to {\\n    opacity: 1;\\n    transform: translateY(0);\\n  }\\n}\\n@property --tw-rotate-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-border-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-font-weight {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-inset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-ring-inset {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-offset-width {\\n  syntax: \\"<length>\\";\\n  inherits: false;\\n  initial-value: 0px;\\n}\\n@property --tw-ring-offset-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: #fff;\\n}\\n@property --tw-ring-offset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-outline-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-duration {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-scale-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-ease {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@layer properties {\\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\\n    *, ::before, ::after, ::backdrop {\\n      --tw-rotate-x: initial;\\n      --tw-rotate-y: initial;\\n      --tw-rotate-z: initial;\\n      --tw-skew-x: initial;\\n      --tw-skew-y: initial;\\n      --tw-border-style: solid;\\n      --tw-font-weight: initial;\\n      --tw-shadow: 0 0 #0000;\\n      --tw-shadow-color: initial;\\n      --tw-shadow-alpha: 100%;\\n      --tw-inset-shadow: 0 0 #0000;\\n      --tw-inset-shadow-color: initial;\\n      --tw-inset-shadow-alpha: 100%;\\n      --tw-ring-color: initial;\\n      --tw-ring-shadow: 0 0 #0000;\\n      --tw-inset-ring-color: initial;\\n      --tw-inset-ring-shadow: 0 0 #0000;\\n      --tw-ring-inset: initial;\\n      --tw-ring-offset-width: 0px;\\n      --tw-ring-offset-color: #fff;\\n      --tw-ring-offset-shadow: 0 0 #0000;\\n      --tw-outline-style: solid;\\n      --tw-duration: initial;\\n      --tw-scale-x: 1;\\n      --tw-scale-y: 1;\\n      --tw-scale-z: 1;\\n      --tw-ease: initial;\\n    }\\n  }\\n}\\n", {});
 //#endregion
 //#region src/components/Button.jsx
 var _jsxFileName$1 = "src/components/Button.jsx";
@@ -11161,7 +11201,7 @@ export { Button, Card };
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract' css > css 1`] = `
-"/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+"/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -11604,7 +11644,7 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
@@ -11865,7 +11905,7 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
   }
 }
 
-/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 .footer {
   margin-top: auto;
@@ -11887,7 +11927,7 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
@@ -12294,7 +12334,7 @@ export { Button, Card, Footer, Header };
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract-sourcemap' css > css 1`] = `
-"/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+"/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -12737,7 +12777,7 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
@@ -12998,7 +13038,7 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
   }
 }
 
-/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 .footer {
   margin-top: auto;
@@ -13020,7 +13060,7 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
@@ -13430,7 +13470,7 @@ export { Button, Card, Footer, Header };
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract-sourcemap' css > map 1`] = `"{"version":3,"sources":[],"names":[],"mappings":"","file":"index.css"}"`;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract-sourcemap-inline' css > css 1`] = `
-"/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+"/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -13873,7 +13913,7 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
@@ -14134,7 +14174,7 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
   }
 }
 
-/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 .footer {
   margin-top: auto;
@@ -14156,7 +14196,7 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
@@ -14565,7 +14605,7 @@ export { Button, Card, Footer, Header };
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'emit' css > js 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-require("lit").css\`/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+require("lit").css\`/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -15334,7 +15374,7 @@ exports.Card = Card;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'emit' css > js 2`] = `
 "import { css } from "lit";
-css\`/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+css\`/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -16102,7 +16142,7 @@ export { Button, Card };
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'emit-sourcemap' css > js 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-require("lit").css\`/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+require("lit").css\`/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -16871,7 +16911,7 @@ exports.Card = Card;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'emit-sourcemap' css > js 2`] = `
 "import { css } from "lit";
-css\`/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+css\`/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -17639,7 +17679,7 @@ export { Button, Card };
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'emit-sourcemap-inline' css > js 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-require("lit").css\`/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+require("lit").css\`/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -18408,7 +18448,7 @@ exports.Card = Card;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'emit-sourcemap-inline' css > js 2`] = `
 "import { css } from "lit";
-css\`/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+css\`/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -19175,7 +19215,7 @@ export { Button, Card };
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract' css > css 1`] = `
-"/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+"/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -20012,7 +20052,7 @@ export { Button, Card };
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract-sourcemap' css > css 1`] = `
-"/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+"/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -20852,7 +20892,7 @@ export { Button, Card };
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract-sourcemap' css > map 1`] = `"{"version":3,"sources":[],"names":[],"mappings":"","file":"index.css"}"`;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract-sourcemap-inline' css > css 1`] = `
-"/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+"/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -21690,7 +21730,7 @@ export { Button, Card };
 `;
 
 exports[`css > tailwind-oxide-cross-folder > should discover and include all classes from components in different folders 1`] = `
-"/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+"/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -22133,7 +22173,7 @@ exports[`css > tailwind-oxide-cross-folder > should discover and include all cla
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
@@ -22394,7 +22434,7 @@ exports[`css > tailwind-oxide-cross-folder > should discover and include all cla
   }
 }
 
-/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 .footer {
   margin-top: auto;
@@ -22416,7 +22456,7 @@ exports[`css > tailwind-oxide-cross-folder > should discover and include all cla
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
@@ -22467,7 +22507,7 @@ exports[`css > tailwind-oxide-cross-folder > should discover and include all cla
 `;
 
 exports[`css > tailwind-oxide-cross-folder > tailwind-oxide-cross-folder > should discover and include all classes from components in different folders 1`] = `
-"/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+"/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme;
@@ -22910,7 +22950,7 @@ exports[`css > tailwind-oxide-cross-folder > tailwind-oxide-cross-folder > shoul
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
@@ -23171,7 +23211,7 @@ exports[`css > tailwind-oxide-cross-folder > tailwind-oxide-cross-folder > shoul
   }
 }
 
-/*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 .footer {
   margin-top: auto;
@@ -23193,7 +23233,7 @@ exports[`css > tailwind-oxide-cross-folder > tailwind-oxide-cross-folder > shoul
 .footer-copyright {
   margin-bottom: calc(var(--spacing, 0.25rem) * 4);
   @media (width >= 48rem) {
-    margin-bottom: calc(var(--spacing, 0.25rem) * 0);
+    margin-bottom: 0;
   }
 }
 .footer-nav {
