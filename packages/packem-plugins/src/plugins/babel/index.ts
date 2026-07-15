@@ -3,7 +3,7 @@ import { cpus } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { TransformOptions } from "@babel/core";
+import type { InputOptions as TransformOptions } from "@babel/core";
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
@@ -11,7 +11,7 @@ import type { Plugin } from "rollup";
 import type { Pool } from "workerpool";
 import workerpool from "workerpool";
 
-import type { TransformCodeOptions } from "./transform-code";
+import type { TransformCodeOptions, TransformCodeResult } from "./transform-code";
 import { MISSING_OPTIONS_SENTINEL, OPTIONS_KEY, transformCode } from "./transform-code";
 
 /** Default number of matched files before the worker pool is created. */
@@ -244,7 +244,7 @@ export const babelTransformPlugin = ({
                 // workerpool round-robins and we cannot target a worker, a worker that
                 // has not yet seen the key throws MISSING_OPTIONS_SENTINEL; we retry that
                 // single call once with the full payload attached.
-                type PoolResult = { code: string; map: TransformOptions["inputSourceMap"] } | undefined;
+                type PoolResult = TransformCodeResult | undefined;
 
                 try {
                     return (await pool.exec("transform", [sourcecode, id, OPTIONS_KEY])) as PoolResult;

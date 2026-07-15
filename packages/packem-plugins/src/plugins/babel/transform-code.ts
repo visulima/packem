@@ -1,4 +1,4 @@
-import type { PluginItem, TransformOptions } from "@babel/core";
+import type { FileResult, InputOptions as TransformOptions, PluginItem } from "@babel/core";
 import { transformAsync as babelTransform } from "@babel/core";
 
 const tsRE = /\.tsx?$/;
@@ -60,7 +60,7 @@ export interface TransformCodeOptions extends Omit<TransformOptions, "filename" 
 
 export interface TransformCodeResult {
     code: string;
-    map: TransformOptions["inputSourceMap"] | undefined;
+    map: FileResult["map"] | undefined;
 }
 
 /**
@@ -121,12 +121,9 @@ export const transformCode = async (
     const result = await babelTransform(sourcecode, {
         ...transformOptions,
         filename: id,
-        generatorOpts: {
-            ...generatorOpts,
-            decoratorsBeforeExport: true,
-            // import attributes parsing available without plugin since 7.26
-            importAttributesKeyword: "with",
-        },
+        // Babel 8 emits decorators before `export` and uses the `with` import-attributes
+        // keyword by default, so the former explicit generator overrides are no longer needed.
+        generatorOpts,
         parserOpts: {
             ...transformOptions.parserOpts,
             allowAwaitOutsideFunction: true,
