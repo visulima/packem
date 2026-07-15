@@ -951,6 +951,14 @@ describe("dts plugin", () => {
         expect(resolveOptions({ tsgo: { enabled: true, path: "custom-tsgo" } }).tsgo).toStrictEqual({ path: "custom-tsgo" });
     });
 
+    it("`noCheck` writes `noCheck: true` into the resolved compiler options", () => {
+        expect.assertions(2);
+
+        // Off by default so the tsc semantic pass keeps running.
+        expect(resolveOptions({ tsconfig: false }).tsconfigRaw.compilerOptions?.noCheck).toBeUndefined();
+        expect(resolveOptions({ noCheck: true, tsconfig: false }).tsconfigRaw.compilerOptions?.noCheck).toBe(true);
+    });
+
     describe("generator option", () => {
         it("infers the generator from the legacy boolean options", () => {
             expect.assertions(3);

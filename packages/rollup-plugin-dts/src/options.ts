@@ -275,6 +275,17 @@ export interface TscOptions {
     newContext?: boolean;
 
     /**
+     * Skip the TypeScript semantic type-check while still emitting declarations (the compiler's
+     * `noCheck` option), so a type error does not fail declaration generation.
+     *
+     * Applies to the `tsc` generator on the non-`build` path. The `tsgo` generator always runs
+     * with `--noCheck`, and the `oxc` (isolated-declarations) generator does not type-check, so
+     * this option has no effect for them.
+     * @default false
+     */
+    noCheck?: boolean;
+
+    /**
      * If `true`, the plugin will launch a separate process for `tsc` or `vue-tsc`.
      * This enables processing multiple projects in parallel.
      */
@@ -660,6 +671,7 @@ export const resolveOptions = ({
     incremental: incrementalOption = false,
     logger = console,
     newContext = false,
+    noCheck = false,
     oxc: oxcOption,
 
     parallel = false,
@@ -705,6 +717,14 @@ export const resolveOptions = ({
     const sourcemap = sourcemapOption ?? Boolean(compilerOptions.declarationMap);
 
     compilerOptions.declarationMap = sourcemap;
+
+    // `noCheck` skips the tsc semantic pass while still emitting declarations, so a package can
+    // generate `.d.ts` without a type error failing the build. It rides the shared
+    // `compilerOptions` (like every other plugin compiler option, it applies to the non-`build`
+    // tsc path; `build` mode reads the on-disk tsconfig, and tsgo already passes `--noCheck`).
+    if (noCheck) {
+        compilerOptions.noCheck = true;
+    }
 
     let resolvedEntry: string[] | undefined;
 
@@ -768,6 +788,7 @@ export const resolveOptions = ({
         incremental,
         logger,
         newContext,
+        noCheck,
         oxc: oxcResolved,
 
         parallel,
