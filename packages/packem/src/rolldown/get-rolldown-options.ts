@@ -25,6 +25,7 @@ import {
     createNodeResolver,
     getLogger,
     getOxcTransformerConfig,
+    isSuppressedBundlerLogCode,
     memoizeDtsPluginByKey,
     resolveNodeTarget,
     SCRIPT_OR_JSON_EXTENSION_REGEX,
@@ -285,8 +286,9 @@ export const getRolldownDtsOptions = async (context: BuildContext<InternalBuildO
         logLevel: context.options.debug ? "debug" : "info",
 
         onLog: (level: "debug" | "info" | "warn", log: RollupLog) => {
-            // Suppress EMPTY_BUNDLE in the log handler (same as rollup path)
-            if (log.code === "EMPTY_BUNDLE") {
+            // Suppress the same advisory codes (EMPTY_BUNDLE, MIXED_EXPORTS) the rollup path drops,
+            // via the shared predicate so the two lanes cannot drift.
+            if (isSuppressedBundlerLogCode(log.code)) {
                 return;
             }
 
@@ -308,7 +310,7 @@ export const getRolldownDtsOptions = async (context: BuildContext<InternalBuildO
                 return;
             }
 
-            if (warning.code === "EMPTY_BUNDLE") {
+            if (isSuppressedBundlerLogCode(warning.code)) {
                 return;
             }
 

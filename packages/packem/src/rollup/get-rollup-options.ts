@@ -542,25 +542,22 @@ const formatRollupLog = (log: RollupLog): string => {
     return log.message;
 };
 
-const handleRollupLog = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts", level: "debug" | "info" | "warn", log: RollupLog): void => {
-    // Rollup emits EMPTY_BUNDLE for entries whose JS chunk is empty. DTS builds run in
-    // emitDtsOnly mode so every JS chunk is empty by design; JS builds legitimately produce
-    // empty chunks for CSS-/asset-only entries (the styles are extracted, leaving no JS).
-    // Both are expected, so suppress the advisory. (onwarn already filters it, but rollup
-    // routes EMPTY_BUNDLE through onLog, which runs independently of onwarn.)
-    if (log.code === "EMPTY_BUNDLE") {
-        return;
-    }
+// Advisory log codes rollup/rolldown emit through the input `onLog` hook (independently of
+// `onwarn`) that packem suppresses in every configuration. Shared by the rollup `handleRollupLog`
+// and the rolldown `onLog` handler so the two bundler lanes cannot drift:
+//   • EMPTY_BUNDLE   — DTS builds run emitDtsOnly (every JS chunk empty by design) and JS builds
+//                      legitimately produce empty chunks for CSS-/asset-only entries.
+//   • MIXED_EXPORTS  — packem always builds output.exports:"auto", so "named and default exports
+//                      together" is inherent to every multi-export entry, not a user mistake. It is
+//                      suppressed unconditionally (not gated on cjsInterop): the integration suite
+//                      asserts clean stderr for cjsInterop-disabled fixtures, and this onLog path is
+//                      the only one that reaches stderr for it (onwarn's `!warning.code` guard
+//                      already drops every coded warning on the rollup side).
+// eslint-disable-next-line import/exports-last -- consumed by the rolldown options builder's onLog
+export const isSuppressedBundlerLogCode = (code: string | undefined): boolean => code === "EMPTY_BUNDLE" || code === "MIXED_EXPORTS";
 
-    // MIXED_EXPORTS ("using named and default exports together") is advisory and non-actionable
-    // in packem: packem always builds with output.exports:"auto", so the default+named
-    // combination is inherent to every multi-export entry rather than a user mistake. Suppress it
-    // unconditionally. Rollup emits this warning through the input onLog hook rather than onwarn,
-    // so sharedOnWarn's suppression is structurally unreachable here — suppress it directly.
-    // (Gating this on cjsInterop is deliberately avoided: the integration suite asserts clean
-    // stderr for cjsInterop-disabled fixtures, i.e. packem treats MIXED_EXPORTS as noise in every
-    // configuration, and handleRollupLog is the only path that reaches stderr for it.)
-    if (log.code === "MIXED_EXPORTS") {
+const handleRollupLog = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts", level: "debug" | "info" | "warn", log: RollupLog): void => {
+    if (isSuppressedBundlerLogCode(log.code)) {
         return;
     }
 
