@@ -35,7 +35,8 @@ const LEADING_SLASH_REGEXP = /^\//;
 const LEADING_DOT_SLASH_REGEXP = /^\.\//;
 const TRAILING_SLASH_REGEXP = /\/$/;
 const WORD_EXTENSION_REGEXP = /\.\w+$/;
-// eslint-disable-next-line sonarjs/slow-regex -- trailing wildcard strip on short export path segments
+
+// eslint-disable-next-line sonarjs/super-linear-regex -- trailing glob-tail match on short entry patterns; not a ReDoS risk
 const GLOB_TAIL_REGEXP = /\*.*$/;
 const TS_SOURCE_REGEXP = /\.(?:tsx?|cts|mts)$/;
 const TS_LIKE_REGEXP = /\.[cm]?tsx?$/;

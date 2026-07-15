@@ -121,7 +121,7 @@ interface AppendModulesDtsOptions {
     cssVariableName: string;
     defaultExport: string;
     dtsOutput: string[];
-    inject?: JsExportOptions["inject"];
+    inject?: NonNullable<JsExportOptions["inject"]>;
     modulesExports: Record<string, string>;
     modulesVariableName: string;
     supportModules: boolean;
@@ -230,7 +230,7 @@ interface AppendClassExportsOptions {
     dts?: boolean;
     dtsOutput: string[];
     id: string;
-    logger?: JsExportOptions["logger"];
+    logger?: NonNullable<JsExportOptions["logger"]>;
     modulesExports: Record<string, string>;
     namedExports?: boolean | ((name: string) => string);
     output: string[];
@@ -280,7 +280,7 @@ interface GenerateInlineExportsParameters {
     dts?: boolean;
     dtsOutput: string[];
     id: string;
-    logger?: JsExportOptions["logger"];
+    logger?: NonNullable<JsExportOptions["logger"]>;
     modulesExports: Record<string, string>;
     modulesVariableName: string;
     namedExports?: boolean | ((name: string) => string);

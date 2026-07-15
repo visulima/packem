@@ -26,12 +26,12 @@ export interface ReactPresetOptions {
     /**
      * Custom Babel plugins to add
      */
-    plugins?: BabelPluginConfig["plugins"];
+    plugins?: NonNullable<BabelPluginConfig["plugins"]>;
 
     /**
      * Custom Babel presets to add
      */
-    presets?: BabelPluginConfig["presets"];
+    presets?: NonNullable<BabelPluginConfig["presets"]>;
 }
 
 /**
@@ -98,15 +98,16 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
                 const babelConfig = context.options.rollup.babel;
 
                 if (babelConfig && typeof babelConfig === "object" && babelConfig.presets) {
-                    const presetIndex = babelConfig.presets.findIndex((preset) => Array.isArray(preset) && preset[0] === "@babel/preset-react");
+                    const presetList = babelConfig.presets as NonNullable<BabelPluginConfig["presets"]>;
+                    const presetIndex = presetList.findIndex((preset) => Array.isArray(preset) && preset[0] === "@babel/preset-react");
 
                     if (presetIndex !== -1) {
-                        const preset = babelConfig.presets[presetIndex] as [string, Record<string, unknown>];
+                        const preset = presetList[presetIndex] as [string, Record<string, unknown>];
 
-                        babelConfig.presets[presetIndex] = [
+                        presetList[presetIndex] = [
                             preset[0],
                             {
-                                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- `typeof x === "object"` is also true for null, so the explicit null check is a real runtime guard; relaxed strictNullChecks hides the union from the type checker.
+                                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `typeof x === "object"` is also true for null, so the explicit null check is a real runtime guard; relaxed strictNullChecks hides the union from the type checker.
                                 ...typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {},
                                 development: context.environment === "development",
                             },

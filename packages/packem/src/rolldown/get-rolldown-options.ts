@@ -43,12 +43,15 @@ const REGION_MARKER_RE = /^\s*\/\/#(?:end)?region\b/;
 const LEADING_WHITESPACE_RE = /^\s+/;
 const CJS_MJS_RE = /\.[cm]js$/;
 
+/* eslint-disable no-secrets/no-secrets -- the doc comment below references internal function names, which the entropy heuristic flags as secrets */
+
 /**
  * Return a shallow copy of `object` without the given keys. Used to drop the
  * rollup-only option keys that rolldown 1.1.5's stricter schema rejects (see the
  * key lists in `getRolldownTransformOptions` / `getRolldownOptions`).
  */
-const omit = (object: Record<string, unknown>, keys: readonly string[]): Record<string, unknown> => {
+/* eslint-enable no-secrets/no-secrets */
+const omit = (object: Record<string, unknown>, keys: ReadonlyArray<string>): Record<string, unknown> => {
     const result: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(object)) {
@@ -149,7 +152,7 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
     // Strip the rollup-only keys rolldown 1.1.5 rejects (see ROLLDOWN_UNSUPPORTED_* above) so the
     // rolldown backend builds without "Invalid options" warnings.
     if (options.treeshake && typeof options.treeshake === "object") {
-        options.treeshake = omit(options.treeshake as Record<string, unknown>, ["preset"]) as typeof options.treeshake;
+        options.treeshake = omit(options.treeshake as Record<string, unknown>, ["preset"]);
     }
 
     if (Array.isArray(options.output)) {
@@ -175,7 +178,7 @@ export const getRolldownOptions = async (context: BuildContext<InternalBuildOpti
                 sanitized.minify = true;
             }
 
-            return sanitized as OutputOptions;
+            return sanitized;
         });
     }
 

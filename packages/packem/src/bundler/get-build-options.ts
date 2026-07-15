@@ -369,7 +369,10 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                     include: context.options.rollup.babel.include ?? BABEL_DEFAULT_INCLUDE_REGEX,
                     ...context.options.rollup.babel,
                     root: context.options.rootDir,
-                    sourceMaps: context.options.rollup.babel.sourceMaps ?? context.options.sourcemap,
+                    // `sourceMaps` is not part of Babel 8's `InputOptions` type (so the property
+                    // access is otherwise an `any`/error type); cast to the concrete shape to read
+                    // it type-safely while preserving the runtime fallback to the build sourcemap.
+                    sourceMaps: (context.options.rollup.babel as { sourceMaps?: boolean | "both" | "inline" }).sourceMaps ?? context.options.sourcemap,
                 }),
                 fileCache,
             ),

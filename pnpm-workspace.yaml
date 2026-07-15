@@ -324,6 +324,7 @@ onlyBuiltDependencies:
   - rs-module-lexer
   - unrs-resolver
 overrides:
+  "eslint-plugin-sonarjs@<4.1.0": ">=4.2.0"
   "@hono/node-server@<1.19.13": ">=1.19.13"
   ajv@>=7.0.0-alpha.0 <8.18.0: ">=8.18.0"
   axios@>=1.0.0 <1.15.0: ">=1.15.0"

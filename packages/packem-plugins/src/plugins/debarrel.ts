@@ -48,11 +48,11 @@ const POSSIBLE_BARREL_SPECIFIER = /(?:\.[tj]sx?|\/index\.[tj]sx?)(?:\?.*)?$/;
 const IS_EXPORT_PREFIXED = /^\s*export/;
 
 const DEFAULT_IMPORT_RE = /^(?:import|export)\s+([\w$]+)/;
-// eslint-disable-next-line sonarjs/slow-regex -- pattern is bounded by `{` or `,` separators in import specifier lists; inputs are short.
+// eslint-disable-next-line sonarjs/super-linear-regex -- pattern is bounded by `{` or `,` separators in import specifier lists; inputs are short.
 const LEADING_TRAILING_DEFAULT_RE = /([\w$]+)\s*,\s*\{|\}\s*,\s*([\w$]+)/;
 const IMPORT_NAMES_TOKENIZER_RE = /[{,]\s*(type\s+)?([\w$]+)(?:\s+as\s+([\w$]+))?/gi;
 const DEFAULT_RE_EXPORT_NAME_RE = /default\s+([a-zA-Z_$][\w$]*)(?:[;\n]|$)/;
-// eslint-disable-next-line sonarjs/slow-regex -- pattern is anchored at end of string and inputs are short import-clause slices.
+// eslint-disable-next-line sonarjs/super-linear-regex -- pattern is anchored at end of string and inputs are short import-clause slices.
 const TRAILING_AS_ALIAS_RE = /([\w$]+)\s*as\s*$/;
 const WILDCARD_EXPORT_RE = /^export\s+\*(?!\s+as)/;
 const AS_KEYWORD_RE = /\bas\b/;

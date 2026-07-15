@@ -9,7 +9,7 @@ import type { BuildConfig, InternalBuildOptions } from "../../types";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 
-// eslint-disable-next-line sonarjs/slow-regex -- bounded path segment match against collected file list
+// eslint-disable-next-line sonarjs/super-linear-regex -- simple `/dist/` path match; the `.*` segments are intentional and not a ReDoS risk on file paths
 const DIST_PATH_REGEXP = /.*\/dist\/.*/;
 
 const TRAILING_SLASH_REGEXP = /\/$/;

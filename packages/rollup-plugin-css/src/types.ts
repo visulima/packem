@@ -135,7 +135,7 @@ export interface PostCSSOptions {
      * Set PostCSS parser, e.g. `sugarss`.
      * Overrides the one loaded from PostCSS config file, if any.
      */
-    parser?: PostCSSConfig["parser"] | string;
+    parser?: NonNullable<PostCSSConfig["parser"]> | string;
 
     /**
      * A list of plugins for PostCSS,
@@ -149,16 +149,16 @@ export interface PostCSSOptions {
      * Set PostCSS stringifier.
      * Overrides the one loaded from PostCSS config file, if any.
      */
-    stringifier?: PostCSSConfig["stringifier"] | string;
+    stringifier?: NonNullable<PostCSSConfig["stringifier"]> | string;
 
     /**
      * Set PostCSS syntax.
      * Overrides the one loaded from PostCSS config file, if any.
      */
-    syntax?: PostCSSConfig["syntax"] | string;
+    syntax?: NonNullable<PostCSSConfig["syntax"]> | string;
 
     /** `to` option for PostCSS, required for some plugins. */
-    to?: PostCSSConfig["to"];
+    to?: NonNullable<PostCSSConfig["to"]>;
 
     /**
      * Enable/disable or pass options for CSS URL resolver.

@@ -31,4 +31,10 @@ export default createConfig(
             "unicorn/prefer-module": "off",
         },
     },
+    {
+        files: ["__tests__/**"],
+        rules: {
+            "sonarjs/parameterized-tests": "off",
+        },
+    },
 );

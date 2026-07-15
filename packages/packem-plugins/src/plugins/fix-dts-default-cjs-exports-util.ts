@@ -8,9 +8,9 @@ import type { LoggingFunction, SourceMapInput } from "rollup";
 
 const DIRECT_DEFAULT_RE = /^export\s+default\s+(\w+);/m;
 const EXPORT_BRACES_RE = /export\s*\{([^}]*)\}/;
-// eslint-disable-next-line sonarjs/slow-regex -- short export specifier strings
+// eslint-disable-next-line sonarjs/super-linear-regex -- short export specifier strings
 const AS_DEFAULT_RE = /\s*as\s+default\s*/;
-// eslint-disable-next-line sonarjs/slow-regex -- bounded whitespace prior to a literal `}`
+// eslint-disable-next-line sonarjs/super-linear-regex -- bounded whitespace prior to a literal `}`
 const TRIM_TRAILING_BRACE_RE = /\s+\}$/;
 const TRAILING_SEMI_RE = /;$/;
 const MULTI_NEWLINE_RE = /(?:\r?\n\s*){2,}/g;

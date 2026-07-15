@@ -13,7 +13,7 @@ const svgEncoder = (buffer: Buffer): string => {
     svgString = stripSvgComments(svgString);
     // Safe regex that matches only the exact 'class' attribute without backtracking
     // Uses word boundaries and explicit character sets to avoid ReDoS
-    // eslint-disable-next-line sonarjs/slow-regex
+    // eslint-disable-next-line sonarjs/super-linear-regex
     svgString = svgString.replaceAll(/\s*\bclass\s*=\s*(?:"[^"]*"|'[^']*')/gi, "");
     // Normalize all whitespace (newlines, tabs, runs of spaces) in a single pass,
     // then trim. Folding the previous separate `\s{2,}` / `[\n\r\t]` / `\s{2,}`
