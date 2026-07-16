@@ -102,7 +102,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@aa162a984a4909f412bc4dbae712def066a0a681" # v20.2.5
+              uses: "anolilab/workflows/step/setup@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
               with:
                   node-version: "${{ matrix.node_version }}"
                   # npm@latest (12.x) requires node ^22.22 || ^24.15 || >=26, so it refuses
@@ -161,7 +161,7 @@ jobs:
 
             - name: "Upload code coverage to codecov"
               if: "matrix.bundler == 'rollup' && matrix.os == 'ubuntu-latest' && matrix.node_version == 22"
-              uses: "anolilab/workflows/step/codecov@aa162a984a4909f412bc4dbae712def066a0a681" # v20.2.5
+              uses: "anolilab/workflows/step/codecov@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
               with:
                   run-lint: "needs.files-changed.outputs.codecov == 'true'"
                   codecov-token: "${{ secrets.CODECOV_TOKEN }}"
