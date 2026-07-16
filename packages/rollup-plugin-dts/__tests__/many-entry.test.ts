@@ -30,8 +30,11 @@ describe("many-entry dts (packem#216)", () => {
 
     afterAll(async () => {
         await rm(temporaryDirectory, { force: true, recursive: true });
-    });
+    }, 30_000);
 
+    // Each entry roots its own tsc program, so this deliberately builds more programs than most
+    // tests. Under v8 coverage instrumentation on a loaded CI runner that comfortably exceeds the
+    // default 30s test timeout, so give it a generous explicit budget.
     it("emits a correct declaration for every entry when a build has many independent entries", async () => {
         expect.hasAssertions();
 
@@ -76,5 +79,5 @@ describe("many-entry dts (packem#216)", () => {
         // capped (a revert of the eviction would leave one per entry, i.e. `entryCount`).
         expect(globalContext.programs.length).toBeGreaterThan(1);
         expect(globalContext.programs.length).toBeLessThanOrEqual(MAX_RETAINED_PROGRAMS);
-    });
+    }, 120_000);
 });
