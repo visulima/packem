@@ -51,6 +51,7 @@ const REGEX_PATTERNS = {
     // (`= createRequire(import.meta.url);`) so that when a chunk inlines an older packem-built dep
     // whose dist still ships the eager declaration, the prepended lazy copy (kept as the first
     // match) survives and the eager duplicate is removed instead of throwing at boot.
+    // eslint-disable-next-line sonarjs/regex-complexity -- the pattern is intentionally explicit; simplifying it would change matching behavior
     require: /const\s+__cjs_require\s*=\s*(?:(?:__cjs_)?createRequire(?:\$\w+)?\s*\([^)]*\)|\([^)]*\)\s*=>\s*\{[\s\S]*?\})\s*;\s*/g,
 } as const;
 

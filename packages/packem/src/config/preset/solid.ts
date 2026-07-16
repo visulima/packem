@@ -72,12 +72,12 @@ export interface SolidPresetOptions {
     /**
      * Custom Babel plugins to add
      */
-    plugins?: BabelPluginConfig["plugins"];
+    plugins?: NonNullable<BabelPluginConfig["plugins"]>;
 
     /**
      * Custom Babel presets to add
      */
-    presets?: BabelPluginConfig["presets"];
+    presets?: NonNullable<BabelPluginConfig["presets"]>;
 
     /**
      * SolidJS-specific options for babel-preset-solid

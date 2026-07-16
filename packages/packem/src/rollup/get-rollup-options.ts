@@ -521,7 +521,7 @@ export const buildInputMap = (context: BuildContext<InternalBuildOptions>): Reco
         const { name } = entry;
         const resolved = resolve(context.options.rootDir, entry.input);
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Record index type lies without noUncheckedIndexedAccess; input[name] is undefined at runtime for not-yet-seen names
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Record index type lies without noUncheckedIndexedAccess; input[name] is undefined at runtime for not-yet-seen names
         if (input[name] !== undefined && input[name] !== resolved) {
             throw new Error(
                 `Duplicate rollup input name "${name}" — one maps to "${input[name]}", another to "${resolved}". Each entry must have a unique name.`,
@@ -556,8 +556,16 @@ const formatRollupLog = (log: RollupLog): string => {
 //                      without breaking CJS interop. Suppressing it conditionally (on cjsInterop) or
 //                      surfacing it under `--debug` were both tried and rejected by the suite, which
 //                      asserts clean stderr for cjsInterop-disabled and `--debug` builds alike.
+//   • PLUGIN_TIMINGS — a rolldown-only performance advisory ("your build spent significant time in
+//                      plugin X"). It fires non-deterministically based on wall-clock time, so it
+//                      only appears when the machine is under load (e.g. a busy CI runner) and is
+//                      absent on the rollup lane entirely. Because pail routes warnings to stderr,
+//                      it randomly broke the integration suite's `stderr === ""` assertions. It is a
+//                      timing hint, not an actionable defect (dts generation is inherently slow), so
+//                      it is dropped to keep stderr deterministic.
 // eslint-disable-next-line import/exports-last -- consumed by the rolldown options builder's onLog
-export const isSuppressedBundlerLogCode = (code: string | undefined): boolean => code === "EMPTY_BUNDLE" || code === "MIXED_EXPORTS";
+export const isSuppressedBundlerLogCode = (code: string | undefined): boolean =>
+    code === "EMPTY_BUNDLE" || code === "MIXED_EXPORTS" || code === "PLUGIN_TIMINGS";
 
 const handleRollupLog = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts", level: "debug" | "info" | "warn", log: RollupLog): void => {
     if (isSuppressedBundlerLogCode(log.code)) {

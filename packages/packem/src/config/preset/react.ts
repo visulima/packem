@@ -26,12 +26,12 @@ export interface ReactPresetOptions {
     /**
      * Custom Babel plugins to add
      */
-    plugins?: BabelPluginConfig["plugins"];
+    plugins?: NonNullable<BabelPluginConfig["plugins"]>;
 
     /**
      * Custom Babel presets to add
      */
-    presets?: BabelPluginConfig["presets"];
+    presets?: NonNullable<BabelPluginConfig["presets"]>;
 }
 
 /**
@@ -106,7 +106,7 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
                         babelConfig.presets[presetIndex] = [
                             preset[0],
                             {
-                                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- `typeof x === "object"` is also true for null, so the explicit null check is a real runtime guard; relaxed strictNullChecks hides the union from the type checker.
+                                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `typeof x === "object"` is also true for null, so the explicit null check is a real runtime guard; relaxed strictNullChecks hides the union from the type checker.
                                 ...typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {},
                                 development: context.environment === "development",
                             },

@@ -35,9 +35,9 @@ const RE_INLINE_IMPORT = /\bimport\(\s*["']([^"']+)["']\s*\)\.(\w+)/g;
 // quote; greedy `[^'"]*` cannot cross a quote, so the match is bounded and the
 // pattern has no overlapping quantifiers (no super-linear backtracking).
 const RE_IMPORT_STATEMENT = /\bimport\b([^'"]*)["']([^"']+)["']/g;
-// eslint-disable-next-line sonarjs/slow-regex -- `[^}]*` is bounded by the closing brace; linear, no backtracking
+// eslint-disable-next-line sonarjs/super-linear-regex -- `[^}]*` is bounded by the closing brace; linear, no backtracking
 const RE_BRACED = /\{([^}]*)\}/;
-// eslint-disable-next-line sonarjs/slow-regex -- two `\s+` separated by the literal `as`; no overlapping quantifiers
+// eslint-disable-next-line sonarjs/super-linear-regex -- two `\s+` separated by the literal `as`; no overlapping quantifiers
 const RE_AS = /\s+as\s+/;
 const RE_TYPE_PREFIX = /^type\s+/;
 // `export * from "X"` (but not `export * as ns from "X"`, which only exposes a namespace).

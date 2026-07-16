@@ -159,7 +159,6 @@ export const urlPlugin = ({
             if ((limit && stats.size > limit) || limit === 0) {
                 // sha1 is intentional here: this hash is a CONTENT FINGERPRINT for cache busting,
                 // not a cryptographic signature; collisions on asset contents are not a security concern.
-                // eslint-disable-next-line sonarjs/hashing -- non-security content fingerprint
                 const hash = crypto.createHash("sha1").update(buffer).digest("hex").slice(0, 16);
                 const extension = extname(id);
                 const name = basename(id, extension);

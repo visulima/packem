@@ -39,4 +39,11 @@ export default createConfig(
             "vitest/require-mock-type-parameters": "off",
         },
     },
+    {
+        files: ["__tests__/**"],
+        rules: {
+            // These simple test suites read clearer as individual cases than parameterized ones.
+            "sonarjs/parameterized-tests": "off",
+        },
+    },
 );

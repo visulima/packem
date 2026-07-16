@@ -7,7 +7,7 @@ import { DATA_URI_REGEXP } from "../loaders/postcss/constants";
 
 // The capturing group is consumed by `getMap` below via a `.source`-cloned regex,
 // which the regexp plugin cannot trace, so no-unused-capturing-group is a false positive.
-// eslint-disable-next-line regexp/no-misleading-capturing-group, regexp/no-super-linear-backtracking, regexp/no-unused-capturing-group, sonarjs/slow-regex
+// eslint-disable-next-line regexp/no-misleading-capturing-group, regexp/no-super-linear-backtracking, regexp/no-unused-capturing-group, sonarjs/super-linear-regex
 const mapBlockRe = /(?:\n|\r\n)?\/\*[#*@]+\s*sourceMappingURL\s*=\s*(\S+)\s*\*+\//g;
 // eslint-disable-next-line regexp/no-unused-capturing-group -- group consumed via the `.source`-cloned regex in getMap
 const mapLineRe = /(?:\n|\r\n)?\/\/[#@]+\s*sourceMappingURL\s*=\s*(\S+)\s*/g;

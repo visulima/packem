@@ -26,13 +26,12 @@ const defaultCompilerOptions: ts.CompilerOptions = {
 
 const createTsProgramFromParsedConfig = ({
     baseDirectory,
-    entries,
     fsSystem,
     id,
     parsedConfig,
     tsMacro,
     vue,
-}: Pick<TscOptions, "entries" | "vue" | "tsMacro" | "id"> & {
+}: Pick<TscOptions, "vue" | "tsMacro" | "id"> & {
     baseDirectory: string;
     fsSystem: ts.System;
     parsedConfig: ts.ParsedCommandLine;
@@ -60,7 +59,12 @@ const createTsProgramFromParsedConfig = ({
         ...vue || tsMacro ? { allowNonTsExtensions: true } : undefined,
     };
 
-    const rootNames = [...new Set([id, ...entries ?? parsedConfig.fileNames].map((f) => fsSystem.resolvePath(f)))];
+    // Root the program at only this module. TypeScript still pulls in everything `id`
+    // transitively imports, which is all that emitting `id`'s declaration requires. Rooting at
+    // every build entry (the previous `[id, ...entries]`) made one shared program full-type-check
+    // the union of all entries at once, so peak memory scaled with total entry count and OOM'd on
+    // many-entry packages (visulima/packem#216).
+    const rootNames = [fsSystem.resolvePath(id)];
 
     const host = ts.createCompilerHost(compilerOptions, true);
 
@@ -102,7 +106,7 @@ const createTsProgramFromParsedConfig = ({
     };
 };
 
-const createTsProgram = ({ context = globalContext, cwd, entries, id, tsconfig, tsconfigRaw, tsMacro, vue }: TscOptions): TscModule => {
+const createTsProgram = ({ context = globalContext, cwd, id, tsconfig, tsconfigRaw, tsMacro, vue }: TscOptions): TscModule => {
     const fsSystem = createFsSystem(context.files);
     const baseDirectory = tsconfig ? dirname(tsconfig) : cwd;
     const parsedConfig = ts.parseJsonConfigFileContent(tsconfigRaw, fsSystem, baseDirectory);
@@ -111,7 +115,6 @@ const createTsProgram = ({ context = globalContext, cwd, entries, id, tsconfig, 
 
     return createTsProgramFromParsedConfig({
         baseDirectory,
-        entries,
         fsSystem,
         id,
         parsedConfig,
@@ -120,39 +123,27 @@ const createTsProgram = ({ context = globalContext, cwd, entries, id, tsconfig, 
     });
 };
 
-// Cache the set of root file names per program so membership checks during program
-// lookup are O(1) instead of re-allocating the roots array and doing an O(roots) scan
-// per candidate, per module load.
-const programRootsCache = new WeakMap<ts.Program, Set<string>>();
-
-const getProgramRoots = (program: ts.Program): Set<string> => {
-    let roots = programRootsCache.get(program);
-
-    if (!roots) {
-        roots = new Set(program.getRootFileNames());
-        programRootsCache.set(program, roots);
-    }
-
-    return roots;
-};
+// Cap on retained programs. Rooting each program at a single module (see
+// `createTsProgramFromParsedConfig`) keeps peak memory proportional to a few entry closures
+// rather than the whole entry set, but retaining one program per entry would still accumulate on a
+// package with dozens of independent entries — each program holds its own copy of the default
+// library. Evict the oldest beyond this window; a later module that needed an evicted program
+// simply rebuilds it (correct, only recomputed). Exported for the many-entry regression test.
+// eslint-disable-next-line import/exports-last -- co-located with the retention logic it caps
+export const MAX_RETAINED_PROGRAMS = 8;
 
 const createOrGetTsModule = (options: TscOptions): TscModule => {
-    const { context = globalContext, entries, id } = options;
-    const existingProgram = context.programs.find((candidate) => {
-        const roots = getProgramRoots(candidate);
+    const { context = globalContext, id } = options;
 
-        if (entries) {
-            return entries.every((entry) => roots.has(entry));
-        }
-
-        return roots.has(id);
-    });
-
-    if (existingProgram) {
-        const sourceFile = existingProgram.getSourceFile(id);
+    // Reuse any retained program that already contains `id` as a source file — whether `id` is
+    // that program's own root or a module pulled into a sibling entry's import closure. This
+    // recovers cross-entry sharing without rooting every program at all entries (which made one
+    // shared program full-type-check the whole entry set and OOM on many-entry packages, #216).
+    for (const candidate of context.programs) {
+        const sourceFile = candidate.getSourceFile(id);
 
         if (sourceFile) {
-            return { file: sourceFile, program: existingProgram };
+            return { file: sourceFile, program: candidate };
         }
     }
 
@@ -162,6 +153,11 @@ const createOrGetTsModule = (options: TscOptions): TscModule => {
     debug(`created program for module: ${id}`);
 
     context.programs.push(module.program);
+
+    // Bound retention so many-entry builds don't accumulate one program per entry.
+    while (context.programs.length > MAX_RETAINED_PROGRAMS) {
+        context.programs.shift();
+    }
 
     return module;
 };

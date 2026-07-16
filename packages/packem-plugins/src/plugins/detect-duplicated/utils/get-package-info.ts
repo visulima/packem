@@ -11,7 +11,7 @@ export interface PackageInfo {
     version: string;
 }
 
-// eslint-disable-next-line import/exports-last, sonarjs/slow-regex -- consumed below; inputs are resolved filesystem ids of bounded length, not user-controlled DoS vectors.
+// eslint-disable-next-line import/exports-last, sonarjs/super-linear-regex -- consumed below; inputs are resolved filesystem ids of bounded length, not user-controlled DoS vectors.
 export const packagePathRegex = /.*\/node_modules\/(?:@[^/]+\/)?[^/]+/;
 
 /**

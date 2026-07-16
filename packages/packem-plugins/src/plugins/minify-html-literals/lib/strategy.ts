@@ -52,7 +52,7 @@ const optimizationLevelFrom = (level: CleanCSS.Options["level"]): OptimizationLe
     return level as unknown as OptimizationLevels;
 };
 
-// eslint-disable-next-line sonarjs/slow-regex -- bounded character class with no overlapping quantifiers; input is css from clean-css output, not user controlled
+// eslint-disable-next-line sonarjs/super-linear-regex -- bounded character class with no overlapping quantifiers; input is css from clean-css output, not user controlled
 const PSEUDO_CLASS_WITH_ARGS_RE = /(:[^()\s]+\(([^()]*)\))\s*\{/g;
 const WHITESPACE_RE = /\s/g;
 const HAS_WHITESPACE_RE = /\s/;
@@ -159,8 +159,8 @@ export const defaultMinifyOptions: HTMLOptions = {
     minifyJS: true,
     removeAttributeQuotes: false,
     removeComments: true,
-    removeEmptyAttributes: true,
     removeDefaultTypeAttributes: true,
+    removeEmptyAttributes: true,
     useShortDoctype: true,
 };
 

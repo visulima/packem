@@ -119,12 +119,12 @@ export interface PackemRollupOptions {
     sourcemap?: SourcemapsPluginOptions;
     sucrase?: SucrasePluginConfig | false;
     swc?: SwcPluginConfig | false;
-    treeshake?: RollupOptions["treeshake"];
+    treeshake?: NonNullable<RollupOptions["treeshake"]>;
     tsconfigPaths?: TsconfigPathsPluginOptions | false;
     url?: UrlOptions | false;
     visualizer?: PluginVisualizerOptions | false;
     wasm?: RollupWasmOptions | false;
-    watch?: RollupOptions["watch"];
+    watch?: NonNullable<RollupOptions["watch"]>;
 }
 
 export type RollupPlugins = {
