@@ -177,13 +177,12 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
                 const isProduction = context.environment === "production";
 
                 if (babelConfig && typeof babelConfig === "object" && babelConfig.presets) {
-                    const presetList = babelConfig.presets as NonNullable<BabelPluginConfig["presets"]>;
-                    const presetIndex = presetList.findIndex((preset) => Array.isArray(preset) && preset[0] === "@babel/preset-react");
+                    const presetIndex = babelConfig.presets.findIndex((preset) => Array.isArray(preset) && preset[0] === "@babel/preset-react");
 
                     if (presetIndex !== -1) {
-                        const preset = presetList[presetIndex] as [string, Record<string, unknown>];
+                        const preset = babelConfig.presets[presetIndex] as [string, Record<string, unknown>];
 
-                        presetList[presetIndex] = [
+                        babelConfig.presets[presetIndex] = [
                             preset[0],
                             {
                                 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `typeof x === "object"` is also true for null, so the explicit null check is a real runtime guard; relaxed strictNullChecks hides the union from the type checker.
