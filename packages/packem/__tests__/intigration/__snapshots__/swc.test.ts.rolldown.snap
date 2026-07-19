@@ -3,7 +3,7 @@
 exports[`packem swc > should generate shared common chunks with SWC transformer > entry1.cjs output 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const require_foo = require("./chunks/foo-SZ0x3kzp.js");
-//#region \\0@oxc-project+runtime@0.139.0/helpers/esm/usingCtx.js
+//#region \\0@oxc-project+runtime@0.140.0/helpers/esm/usingCtx.js
 function _usingCtx() {
 	var r = "function" == typeof SuppressedError ? SuppressedError : function(r, e) {
 		var n = Error();
@@ -93,7 +93,7 @@ exports.entry1 = entry1;
 
 exports[`packem swc > should generate shared common chunks with SWC transformer > entry1.mjs output 1`] = `
 "import { t as Foo } from "./chunks/foo-BMvk-HZX.js";
-//#region \\0@oxc-project+runtime@0.139.0/helpers/esm/usingCtx.js
+//#region \\0@oxc-project+runtime@0.140.0/helpers/esm/usingCtx.js
 function _usingCtx() {
 	var r = "function" == typeof SuppressedError ? SuppressedError : function(r, e) {
 		var n = Error();
@@ -238,7 +238,7 @@ export { entry2 };
 
 exports[`packem swc > should handle modern TypeScript syntax with SWC transformer > modern features index.cjs output 1`] = `
 "Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const require_modern = require("./packem_shared/modern-C1335pVP.cjs");
+const require_modern = require("./packem_shared/modern-BZ_1BLuC.cjs");
 exports.ModernFeatures = require_modern.ModernFeatures;
 "
 `;
@@ -263,7 +263,7 @@ export { ModernFeatures };
 `;
 
 exports[`packem swc > should handle modern TypeScript syntax with SWC transformer > modern features index.mjs output 1`] = `
-"import { t as ModernFeatures } from "./packem_shared/modern-BSFKtadS.mjs";
+"import { t as ModernFeatures } from "./packem_shared/modern-BmznnRIo.mjs";
 export { ModernFeatures };
 "
 `;
