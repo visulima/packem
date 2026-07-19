@@ -1,3 +1,5 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.39](https://github.com/visulima/packem/compare/%40visulima%2Frollup-plugin-dts%401.0.0-alpha.38...%40visulima%2Frollup-plugin-dts%401.0.0-alpha.39) (2026-07-19)
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.38](https://github.com/visulima/packem/compare/%40visulima%2Frollup-plugin-dts%401.0.0-alpha.37...%40visulima%2Frollup-plugin-dts%401.0.0-alpha.38) (2026-07-16)
 
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.37](https://github.com/visulima/packem/compare/%40visulima%2Frollup-plugin-dts%401.0.0-alpha.36...%40visulima%2Frollup-plugin-dts%401.0.0-alpha.37) (2026-07-16)
