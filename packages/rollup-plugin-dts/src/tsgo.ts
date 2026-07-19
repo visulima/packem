@@ -1,11 +1,12 @@
 import { spawn } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { styleText } from "node:util";
 
 import type { TsConfigJson } from "@visulima/tsconfig";
+import { writeTsConfig } from "@visulima/tsconfig";
 import { createDebug } from "obug";
 
 import type { Logger } from "./options";
@@ -148,11 +149,18 @@ export const runTsgo = async (
         const baseDirectory = tsconfig ? path.dirname(tsconfig) : rootDirectory;
         const { compilerOptions, ...rest } = tsconfigRaw;
 
-        temporaryProject = path.join(baseDirectory, `tsconfig.tsgo-${path.basename(tsgoDist)}.json`);
+        const temporaryFileName = `tsconfig.tsgo-${path.basename(tsgoDist)}.json`;
+
+        temporaryProject = path.join(baseDirectory, temporaryFileName);
 
         const merged = tsconfig ? { compilerOptions, extends: tsconfig } : { ...rest, compilerOptions };
 
-        await writeFile(temporaryProject, JSON.stringify(merged), "utf8");
+        // `writeTsConfig` normalizes the resolved `compilerOptions` into a shape the tsgo JSON
+        // project parser accepts: numeric enum values (e.g. `target: 99`, `moduleResolution: 100`,
+        // which the classic backends consume directly) become their string names, and
+        // `typescriptMajor: 7` drops options TS7 removed (e.g. `baseUrl`). Without this tsgo fails
+        // with `TS5024: … requires a value of type enum` / `TS5102: Option 'baseUrl' has been removed`.
+        await writeTsConfig(merged, { cwd: baseDirectory, fileName: temporaryFileName, typescriptMajor: 7 });
         debug("[tsgo] wrote temp project %s", temporaryProject);
         project = temporaryProject;
     }

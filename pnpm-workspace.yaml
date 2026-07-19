@@ -278,7 +278,7 @@ catalogs:
     "@visulima/path": 3.0.0
     "@visulima/source-map": 3.0.0
     "@visulima/tabular": 4.0.0
-    "@visulima/tsconfig": 3.0.2
+    "@visulima/tsconfig": 3.2.0
 dedupeInjectedDeps: true
 dedupePeerDependents: true
 disallowWorkspaceCycles: false
@@ -310,9 +310,9 @@ minimumReleaseAgeExclude:
   - yuku-codegen
   - "@yuku-parser/*"
   - "@yuku-codegen/*"
-  - '@visulima/fs@5.0.2'
-  - '@visulima/package@5.0.2'
-  - '@visulima/tsconfig@3.0.2'
+  # @visulima/* is our own org — we publish these and adopt them immediately, so exempt the
+  # whole family by name rather than pinning each version (which every renovate/lockfile bump churns).
+  - "@visulima/*"
   - '@vue/compiler-core@3.5.40'
   - '@vue/compiler-dom@3.5.40'
   - '@vue/compiler-sfc@3.5.40'
@@ -324,11 +324,6 @@ minimumReleaseAgeExclude:
   - '@vue/shared@3.5.40'
   - rolldown@1.2.0
   - vue@3.5.40
-  - '@visulima/packem-rollup@1.0.0-alpha.76'
-  - '@visulima/packem-share@1.0.0-alpha.51'
-  - '@visulima/packem@2.0.0-alpha.94'
-  - '@visulima/rollup-plugin-css@1.0.0-alpha.55'
-  - '@visulima/rollup-plugin-dts@1.0.0-alpha.36'
 
 onlyBuiltDependencies:
   - "@parcel/watcher"
