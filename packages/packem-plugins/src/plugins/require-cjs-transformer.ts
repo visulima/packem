@@ -111,9 +111,17 @@ const generateRequireCode = (source: string, isBuiltin: boolean): { code: string
 const removeDuplicates = (code: string): string => {
     const s = new MagicString(code);
 
-    // Find all matches for each pattern
+    // Find all matches for each pattern.
+    //
+    // Every pattern in REGEX_PATTERNS must appear here. `cachedRequire` was
+    // omitted when the lazy require landed, so the `const __cjs_require`
+    // half of the shim was deduped while its `let __cjs_cachedRequire;`
+    // backing store was left duplicated — a `SyntaxError: Identifier
+    // '__cjs_cachedRequire' has already been declared` at module load, and
+    // an outright build failure for anything bundling the affected chunk.
     const matches = {
         builtin: [...code.matchAll(REGEX_PATTERNS.builtin)],
+        cachedRequire: [...code.matchAll(REGEX_PATTERNS.cachedRequire)],
         import: [...code.matchAll(REGEX_PATTERNS.import)],
         process: [...code.matchAll(REGEX_PATTERNS.process)],
         require: [...code.matchAll(REGEX_PATTERNS.require)],

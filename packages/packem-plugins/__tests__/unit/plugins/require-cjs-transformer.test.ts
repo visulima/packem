@@ -148,6 +148,91 @@ export const test = typescript;`;
         expect(declarationCount).toBe(1);
     });
 
+    it("dedupes every declared REGEX_PATTERN, so a new shim line cannot be forgotten", async () => {
+        expect.assertions(1);
+
+        const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, {
+            debug: vi.fn<() => void>(),
+            error: vi.fn<() => void>(),
+            info: vi.fn<() => void>(),
+            warn: vi.fn<() => void>(),
+        } as unknown as Console);
+
+        // The real defect was a pattern that existed but was never consumed.
+        // Feed the whole shim in twice: whatever REGEX_PATTERNS covers must
+        // collapse to one copy, so adding a pattern without wiring it into
+        // removeDuplicates fails here rather than at a consumer's build.
+        const shim = `import { createRequire as __cjs_createRequire } from "node:module";
+let __cjs_cachedRequire;
+const __cjs_require = (id) => {
+    return (__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id);
+};
+const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+const __cjs_getBuiltinModule = (module) => {
+    return __cjs_require(module);
+};`;
+
+        const result = (await getRenderChunkHandler(plugin).call(
+            { debug: vi.fn<() => void>() } as unknown as ThisParameterType<RenderChunkHandler>,
+            `${shim}\n${shim}\nimport typescript from 'typescript';\n\nexport const test = typescript;`,
+            { fileName: "test.js" } as RenderedChunk,
+            { format: "es" } as Parameters<RenderChunkHandler>[2],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            {} as any,
+        )) as RenderChunkResult;
+
+        const duplicated = [
+            ["let __cjs_cachedRequire", /let\s+__cjs_cachedRequire\s*;/g],
+            ["const __cjs_require", /const\s+__cjs_require\s*=/g],
+            ["const __cjs_getProcess", /const\s+__cjs_getProcess\s*=/g],
+            ["const __cjs_getBuiltinModule", /const\s+__cjs_getBuiltinModule\s*=/g],
+            ["createRequire import", /import\s*\{\s*createRequire/g],
+        ].filter(([, pattern]) => [...result.code.matchAll(pattern as RegExp)].length > 1).map(([name]) => name);
+
+        expect(duplicated).toStrictEqual([]);
+    });
+
+    it("dedupes the `let __cjs_cachedRequire` backing store, not just the require arrow", async () => {
+        expect.assertions(3);
+
+        const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, {
+            debug: vi.fn<() => void>(),
+            error: vi.fn<() => void>(),
+            info: vi.fn<() => void>(),
+            warn: vi.fn<() => void>(),
+        } as unknown as Console);
+
+        // A chunk that inlines a dependency already carrying the *current* lazy shim.
+        // Both halves get duplicated, and the `const __cjs_require` half was the only one
+        // being deduped — leaving two `let __cjs_cachedRequire;` declarations behind, which
+        // is a hard `SyntaxError: Identifier '__cjs_cachedRequire' has already been declared`
+        // at module load. Bundling anything built by such a chunk then fails outright.
+        const code = `let __cjs_cachedRequire;
+const __cjs_require = (id) => {
+    return (__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id);
+};
+import typescript from 'typescript';
+
+export const test = typescript;`;
+
+        const result = (await getRenderChunkHandler(plugin).call(
+            { debug: vi.fn<() => void>() } as unknown as ThisParameterType<RenderChunkHandler>,
+            code,
+            { fileName: "test.js" } as RenderedChunk,
+            { format: "es" } as Parameters<RenderChunkHandler>[2],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            {} as any,
+        )) as RenderChunkResult;
+
+        const cachedCount = [...result.code.matchAll(/let\s+__cjs_cachedRequire\s*;/g)].length;
+        const requireCount = [...result.code.matchAll(/const\s+__cjs_require\s*=/g)].length;
+
+        expect(cachedCount).toBe(1);
+        expect(requireCount).toBe(1);
+        // The surviving pair must still be wired together.
+        expect(result.code).toContain("(__cjs_cachedRequire ??= __cjs_createRequire(import.meta.url))(id)");
+    });
+
     it("dedupes __cjs_getBuiltinModule even when rollup renamed the arrow param", async () => {
         expect.assertions(3);
 
