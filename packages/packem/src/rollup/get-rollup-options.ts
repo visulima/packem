@@ -596,6 +596,8 @@ const handleRollupLog = (context: BuildContext<InternalBuildOptions>, type: "bui
 
 // eslint-disable-next-line import/exports-last -- consumed by the shared bundler builder
 export const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts"): RollupOptions => {
+    const userTreeshake = typeof context.options.rollup.treeshake === "object" ? context.options.rollup.treeshake : undefined;
+
     return {
         input: buildInputMap(context),
 
@@ -622,6 +624,9 @@ export const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, t
             moduleSideEffects: true,
             // use Rollup's most optimal tree-shaking: (drops unused getter reads)
             preset: "smallest",
+            // `rollup.treeshake` is a documented option and the rolldown path already honours it;
+            // without this spread the rollup path accepted it and silently ignored it.
+            ...userTreeshake,
         },
 
         watch: context.mode === "watch" ? context.options.rollup.watch : false,
