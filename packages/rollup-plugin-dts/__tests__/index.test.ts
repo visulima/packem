@@ -21,6 +21,17 @@ const TYPE_TASK_RE = /export\s+type\s*\{[^}]*\bTask\b|export\s*\{[^}]*\btype\s+T
 const TYPE_FOO_RE = /export\s+type\s*\{[^}]*\bFoo\b|export\s*\{[^}]*\btype\s+Foo\b/u;
 const EXPORT_BRACE_RE = /export\s*\{/u;
 const TRIPLE_SLASH_NODE_RE = /\/\/\/ <reference types="node" \/>/g;
+// #240: JSDoc recovered for a re-export lands on the specifier, so the comment is followed by
+// (whitespace and) the exported name rather than by a statement.
+const DEPRECATED_LEGACY_HELPER_RE = /\/\*\* @deprecated Import from `some-other-package` instead\. \*\/\s*legacyHelper\b/u;
+const DEPRECATED_LEGACY_OPTIONS_RE = /\/\*\* @deprecated Use `NewOptions` instead\. \*\/\s*type LegacyOptions\b/u;
+const DEPRECATED_PLUGIN_RE = /\/\*\* @deprecated Re-exported from an external package\. \*\/\s*Plugin\b/u;
+const DEPRECATED_ROLLUP_OPTIONS_RE = /\/\*\* @deprecated Also from the same external package\. \*\/\s*RollupOptions\b/u;
+const DEPRECATED_ALIASED_HELPER_RE = /\/\*\* @deprecated Written inside the braces\. \*\/\s*renamedHelper as aliasedHelper\b/u;
+const DEPRECATED_LOCAL_HELPER_RE = /\/\*\* @deprecated A local binding exported through a specifier\. \*\/\s*localHelper\b/u;
+const DEPRECATED_NAMESPACE_RE = /\/\*\* @deprecated The whole namespace is going away\. \*\/\s*\w+ as helpers\b/u;
+const DEPRECATED_KEPT_HELPER_RE = /@deprecated[^\n]*\*\/\s*keptHelper\b/u;
+const DEPRECATED_IMPORT_FROM_RE = /@deprecated Import from/gu;
 
 describe("dts plugin", () => {
     it("basic", async () => {
@@ -1039,6 +1050,58 @@ describe("dts plugin", () => {
         expect(snapshot).toContain("/** Comment A1 */");
         expect(snapshot).toContain("/** Comment A2 */");
         expect(snapshot).toContain("/** Comment B1 */");
+    });
+
+    // Regression for #240: leading JSDoc on `export { … } from "…"` never reached the emitted
+    // declaration file, so `@deprecated` on a barrel re-export was invisible to consumers.
+    // Comments land on the *specifier* — TypeScript ignores a block leading the statement, and
+    // rollup is free to merge same-source re-exports into a single statement.
+    describe("jSDoc on re-export statements (#240)", () => {
+        const buildFixture = async () => {
+            const { snapshot } = await rollupBuild(path.resolve(dirname, "fixtures/jsdoc-reexport/index.ts"), [dts({ emitDtsOnly: true, oxc: true })]);
+
+            return snapshot;
+        };
+
+        it("keeps the JSDoc of a re-export whose target is bundled into the chunk", async () => {
+            expect.assertions(2);
+
+            const snapshot = await buildFixture();
+
+            expect(snapshot).toMatch(DEPRECATED_LEGACY_HELPER_RE);
+            expect(snapshot).toMatch(DEPRECATED_LEGACY_OPTIONS_RE);
+        });
+
+        it("keeps the JSDoc of merged re-exports from an external package", async () => {
+            expect.assertions(2);
+
+            const snapshot = await buildFixture();
+
+            expect(snapshot).toMatch(DEPRECATED_PLUGIN_RE);
+            expect(snapshot).toMatch(DEPRECATED_ROLLUP_OPTIONS_RE);
+        });
+
+        it("keeps JSDoc written inside the braces, on a renamed specifier and on a local binding", async () => {
+            expect.assertions(3);
+
+            const snapshot = await buildFixture();
+
+            expect(snapshot).toMatch(DEPRECATED_ALIASED_HELPER_RE);
+            expect(snapshot).toMatch(DEPRECATED_LOCAL_HELPER_RE);
+            expect(snapshot).toMatch(DEPRECATED_NAMESPACE_RE);
+        });
+
+        it("does not smear a re-export comment onto unrelated members", async () => {
+            expect.assertions(3);
+
+            const snapshot = await buildFixture();
+
+            // Control: JSDoc on a declaration keeps working, and stays on the declaration.
+            expect(snapshot).toContain("/** Control: this one is on a declaration. */\ndeclare const keptHelper");
+            expect(snapshot).not.toMatch(DEPRECATED_KEPT_HELPER_RE);
+            // Each comment is emitted once per name it documents, never duplicated.
+            expect(snapshot.match(DEPRECATED_IMPORT_FROM_RE)).toHaveLength(1);
+        });
     });
 
     it("triple-slash directives are preserved and deduplicated in dtsInput mode", async () => {
