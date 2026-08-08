@@ -22,14 +22,18 @@ const TYPE_FOO_RE = /export\s+type\s*\{[^}]*\bFoo\b|export\s*\{[^}]*\btype\s+Foo
 const EXPORT_BRACE_RE = /export\s*\{/u;
 const TRIPLE_SLASH_NODE_RE = /\/\/\/ <reference types="node" \/>/g;
 // #240: JSDoc recovered for a re-export lands on the specifier, so the comment is followed by
-// (whitespace and) the exported name rather than by a statement.
-const DEPRECATED_LEGACY_HELPER_RE = /\/\*\* @deprecated Import from `some-other-package` instead\. \*\/\s*legacyHelper\b/u;
-const DEPRECATED_LEGACY_OPTIONS_RE = /\/\*\* @deprecated Use `NewOptions` instead\. \*\/\s*type LegacyOptions\b/u;
-const DEPRECATED_PLUGIN_RE = /\/\*\* @deprecated Re-exported from an external package\. \*\/\s*Plugin\b/u;
-const DEPRECATED_ROLLUP_OPTIONS_RE = /\/\*\* @deprecated Also from the same external package\. \*\/\s*RollupOptions\b/u;
-const DEPRECATED_ALIASED_HELPER_RE = /\/\*\* @deprecated Written inside the braces\. \*\/\s*renamedHelper as aliasedHelper\b/u;
-const DEPRECATED_LOCAL_HELPER_RE = /\/\*\* @deprecated A local binding exported through a specifier\. \*\/\s*localHelper\b/u;
-const DEPRECATED_NAMESPACE_RE = /\/\*\* @deprecated The whole namespace is going away\. \*\/\s*\w+ as helpers\b/u;
+// (whitespace and) the exported name rather than by a statement. The optional `type ` allows for
+// the inline type-modifier form some bundlers emit instead of hoisting to `export type { … }`.
+const REEXPORT_JSDOC_PROBES = [
+    /\/\*\* @deprecated Import from `some-other-package` instead\. \*\/\s*legacyHelper\b/u,
+    /\/\*\* @deprecated Use `NewOptions` instead\. \*\/\s*type LegacyOptions\b/u,
+    /\/\*\* @deprecated Re-exported from an external package\. \*\/\s*(?:type )?Plugin\b/u,
+    /\/\*\* @deprecated Also from the same external package\. \*\/\s*(?:type )?RollupOptions\b/u,
+    /\/\*\* @deprecated Written inside the braces\. \*\/\s*renamedHelper as aliasedHelper\b/u,
+    /\/\*\* @deprecated A local binding exported through a specifier\. \*\/\s*localHelper\b/u,
+    /\/\*\* @deprecated The whole namespace is going away\. \*\/\s*\w+ as helpers\b/u,
+    /\/\*\* Doc written on the declaration itself\. \*\/\s*(?:type )?DocumentedOptions\b/u,
+];
 const DEPRECATED_KEPT_HELPER_RE = /@deprecated[^\n]*\*\/\s*keptHelper\b/u;
 const DEPRECATED_IMPORT_FROM_RE = /@deprecated Import from/gu;
 
@@ -1057,38 +1061,55 @@ describe("dts plugin", () => {
     // Comments land on the *specifier* — TypeScript ignores a block leading the statement, and
     // rollup is free to merge same-source re-exports into a single statement.
     describe("jSDoc on re-export statements (#240)", () => {
+        const root = path.resolve(dirname, "fixtures/jsdoc-reexport");
+        const entry = path.resolve(root, "index.ts");
         const buildFixture = async () => {
-            const { snapshot } = await rollupBuild(path.resolve(dirname, "fixtures/jsdoc-reexport/index.ts"), [dts({ emitDtsOnly: true, oxc: true })]);
+            const { snapshot } = await rollupBuild(entry, [dts({ emitDtsOnly: true, oxc: true })]);
 
             return snapshot;
         };
 
-        it("keeps the JSDoc of a re-export whose target is bundled into the chunk", async () => {
-            expect.assertions(2);
+        // Recovery happens in the shared fake-JS pass, downstream of whichever generator produced
+        // the intermediate `.d.ts`, so every generator — and a pre-built `.d.ts` input, which uses
+        // no generator at all — has to come out the same. The issue reported oxc and tsc as equally
+        // affected; this pins all of them.
+        const lanes: [string, () => Promise<{ snapshot: string }>][] = [
+            ["the oxc generator", async () => await rollupBuild(entry, [dts({ emitDtsOnly: true, oxc: true })])],
+            [
+                // `removeComments` is inherited from the repo's tsconfig and *does* apply to
+                // declaration emit: with it on, tsc strips every JSDoc before the plugin runs, so
+                // nothing — re-export or declaration — can be recovered. Same caveat as the
+                // "jSDoc comments in types are preserved when tsc emits them" case above.
+                "the tsc generator",
+                async () =>
+                    await rollupBuild(entry, [
+                        dts({ compilerOptions: { isolatedDeclarations: false, removeComments: false }, emitDtsOnly: true, generator: "tsc" }),
+                    ]),
+            ],
+            [
+                "the tsgo generator",
+                async () =>
+                    await rollupBuild(entry, [
+                        dts({ emitDtsOnly: true, tsconfig: path.resolve(root, "tsconfig.json"), tsgo: { path: getTsgoPathFromNodeModules() } }),
+                    ]),
+            ],
+            [
+                "a pre-built .d.ts input",
+                async () =>
+                    await rollupBuild(path.resolve(dirname, "fixtures/jsdoc-reexport-dts/index.d.ts"), [
+                        dts({ dtsInput: true, emitDtsOnly: true, sourcemap: false, tsconfig: false }),
+                    ]),
+            ],
+        ];
 
-            const snapshot = await buildFixture();
+        it.each(lanes)("keeps every re-export JSDoc with %s", async (_lane, build) => {
+            expect.assertions(REEXPORT_JSDOC_PROBES.length);
 
-            expect(snapshot).toMatch(DEPRECATED_LEGACY_HELPER_RE);
-            expect(snapshot).toMatch(DEPRECATED_LEGACY_OPTIONS_RE);
-        });
+            const { snapshot } = await build();
 
-        it("keeps the JSDoc of merged re-exports from an external package", async () => {
-            expect.assertions(2);
-
-            const snapshot = await buildFixture();
-
-            expect(snapshot).toMatch(DEPRECATED_PLUGIN_RE);
-            expect(snapshot).toMatch(DEPRECATED_ROLLUP_OPTIONS_RE);
-        });
-
-        it("keeps JSDoc written inside the braces, on a renamed specifier and on a local binding", async () => {
-            expect.assertions(3);
-
-            const snapshot = await buildFixture();
-
-            expect(snapshot).toMatch(DEPRECATED_ALIASED_HELPER_RE);
-            expect(snapshot).toMatch(DEPRECATED_LOCAL_HELPER_RE);
-            expect(snapshot).toMatch(DEPRECATED_NAMESPACE_RE);
+            for (const probe of REEXPORT_JSDOC_PROBES) {
+                expect(snapshot).toMatch(probe);
+            }
         });
 
         it("does not smear a re-export comment onto unrelated members", async () => {
