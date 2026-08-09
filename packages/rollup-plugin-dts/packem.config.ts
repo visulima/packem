@@ -46,6 +46,17 @@ export default defineConfig({
         writeToPackageJson: true,
     },
     rollup: {
+        dts: {
+            // `rollup` is an optional peer here (the package also drives rolldown), and
+            // the DTS build inlines the types of optional peers on the assumption that
+            // consumers may not have them installed. That copied `Plugin` competes with
+            // the real one for consumers who *do* have rollup: it drifted the moment
+            // rollup 4.62 reshaped `ProgramNode`, and `dts()` stopped being assignable
+            // to `Plugin[]`. Keep every dependency external instead — the emitted
+            // declarations only reach for `rollup`, `oxc-transform` and
+            // `@visulima/tsconfig`, all of which we declare.
+            resolve: false,
+        },
         license: {
             path: "./LICENSE.md",
         },
