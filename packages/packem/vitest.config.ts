@@ -18,9 +18,12 @@ if (isSnapshotUpdate && !process.env.PACKEM_TEST_BUNDLER) {
         "Refusing to update snapshots without PACKEM_TEST_BUNDLER set.\n"
         + "The .rolldown snapshot suffix only applies when vitest runs from inside packages/packem.\n"
         + "Regenerate from packages/packem with one of:\n"
-        + "  rollup   (CI-checked .snap):     env -u PACKEM_TEST_BUNDLER pnpm exec vitest run \"<path>\" -u\n"
+        + "  rollup   (CI-checked .snap):     PACKEM_TEST_BUNDLER=rollup pnpm exec vitest run \"<path>\" -u\n"
         + "  rolldown (.rolldown.snap):       PACKEM_TEST_BUNDLER=rolldown pnpm exec vitest run \"<path>\" -u\n"
-        + "Or use the package scripts: pnpm run test:rollup -- -u / pnpm run test:rolldown -- -u",
+        + "Or use the package scripts: pnpm run test:rollup -- -u / pnpm run test:rolldown -- -u\n"
+        + "Run `pnpm install --frozen-lockfile` first: snapshots capture minified output, "
+        + "so a node_modules that has drifted from the lock file regenerates them against "
+        + "the wrong toolchain and CI will disagree.",
     );
 }
 
