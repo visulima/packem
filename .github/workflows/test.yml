@@ -93,9 +93,14 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@main"
+              uses: "anolilab/workflows/step/setup@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
               with:
                   node-version: "${{ matrix.node_version }}"
+                  # The matrix spans node versions npm@latest (12.x, engines
+                  # `^22.22 || ^24.15 || >=26`) refuses to install on, which fails the whole
+                  # setup step with EBADENGINE. Tests run through pnpm and never touch npm,
+                  # so skip the upgrade instead of pinning a version per lane.
+                  upgrade-npm-version: "false"
                   install-packages: "false"
 
             - name: "Remove node-sass from unsupported node versions"

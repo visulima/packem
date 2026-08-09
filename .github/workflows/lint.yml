@@ -1,5 +1,5 @@
 name: "Lint"
-on:
+on: # yamllint disable-line rule:truthy
     pull_request:
         branches: ["main", "alpha"]
 permissions: {}
