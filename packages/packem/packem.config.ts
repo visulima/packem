@@ -50,8 +50,10 @@ export default defineConfig({
         },
         dts: {
             oxc: true,
-            // disabled till visulima is fixed
-            resolve: false,
+            // packem-plugins is private and bundled into our JS, so its types have to
+            // come along too — otherwise the emitted declarations import a package no
+            // consumer can install.
+            resolve: ["@visulima/packem-plugins", /^@visulima\/packem-plugins\//],
         },
         license: {
             path: "./LICENSE.md",
