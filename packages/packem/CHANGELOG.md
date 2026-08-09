@@ -1,3 +1,5 @@
+## @visulima/packem [2.0.0-alpha.103](https://github.com/visulima/packem/compare/%40visulima%2Fpackem%402.0.0-alpha.102...%40visulima%2Fpackem%402.0.0-alpha.103) (2026-08-09)
+
 ## @visulima/packem [2.0.0-alpha.102](https://github.com/visulima/packem/compare/%40visulima%2Fpackem%402.0.0-alpha.101...%40visulima%2Fpackem%402.0.0-alpha.102) (2026-08-09)
 
 
