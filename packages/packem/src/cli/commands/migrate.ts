@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import process from "node:process";
-// eslint-disable-next-line n/no-unsupported-features/node-builtins -- node:readline/promises is stable since Node 17; the rule's version metadata is stale and the package engines (^22.23.2) already satisfy it.
+// eslint-disable-next-line n/no-unsupported-features/node-builtins -- node:readline/promises is stable since Node 17; the rule's version metadata is stale and the package engines (^22.22.2) already satisfy it.
 import { createInterface } from "node:readline/promises";
 
 import type { Cli } from "@visulima/cerebro";

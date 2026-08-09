@@ -110,7 +110,7 @@ export const createGeneratePlugin = ({
         ? (file: string): boolean => {
             const normalized = file.split(path.sep).join("/");
 
-            // eslint-disable-next-line n/no-unsupported-features/node-builtins -- path.posix.matchesGlob is available on all supported Node versions (>=22.23)
+            // eslint-disable-next-line n/no-unsupported-features/node-builtins -- path.posix.matchesGlob is available on all supported Node versions (>=22.22)
             return entryIncludes!.some((p) => path.posix.matchesGlob(normalized, p)) && !entryIgnores!.some((p) => path.posix.matchesGlob(normalized, p));
         }
         : undefined;
