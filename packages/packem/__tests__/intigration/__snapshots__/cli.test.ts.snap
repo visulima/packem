@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`packem cli > should enable minify when --production option is used > minified output 1`] = `
-"const n=42;function t(){return 84}export{t as myFunction,n as myVariable};
+"const n=42;function r(){return 84}export{r as myFunction,n as myVariable};
 "
 `;
 
