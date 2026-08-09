@@ -3795,6 +3795,13 @@ var _a = class CSSRule {
 };
 _a.STYLE_RULE = 1, _a.CHARSET_RULE = 2, _a.IMPORT_RULE = 3, _a.MEDIA_RULE = 4, _a.FONT_FACE_RULE = 5, _a.PAGE_RULE = 6, _a.NAMESPACE_RULE = 10, _a.KEYFRAMES_RULE = 7, _a.KEYFRAME_RULE = 8, _a.SUPPORTS_RULE = 12, _a.COUNTER_STYLE_RULE = 11, _a.FONT_FEATURE_VALUES_RULE = 14, _a.MARGIN_RULE = 9;
 //#endregion
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/observers.js
+/**
+* @license
+* Copyright 2024 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
+//#endregion
 //#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/index.js
 /**
 * @license
@@ -4770,6 +4777,13 @@ i._$litElement$ = !0, i["finalized"] = !0, s.litElementHydrateSupport?.({ LitEle
 const o = s.litElementPolyfillSupport;
 o?.({ LitElement: i });
 (s.litElementVersions ??= []).push("4.2.2");
+//#endregion
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/node/is-server.js
+/**
+* @license
+* Copyright 2022 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
 //#endregion
 //#region src/style.css
 const styles = i$2\`main {
@@ -5368,6 +5382,13 @@ const o = s.litElementPolyfillSupport;
 o?.({ LitElement: i });
 (s.litElementVersions ??= []).push("4.2.2");
 //#endregion
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/is-server.js
+/**
+* @license
+* Copyright 2022 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
+//#endregion
 //#region src/style.css
 const styles = i$3\`main {
     display: flex;
@@ -5686,6 +5707,13 @@ var _a = class CSSRule {
 	}
 };
 _a.STYLE_RULE = 1, _a.CHARSET_RULE = 2, _a.IMPORT_RULE = 3, _a.MEDIA_RULE = 4, _a.FONT_FACE_RULE = 5, _a.PAGE_RULE = 6, _a.NAMESPACE_RULE = 10, _a.KEYFRAMES_RULE = 7, _a.KEYFRAME_RULE = 8, _a.SUPPORTS_RULE = 12, _a.COUNTER_STYLE_RULE = 11, _a.FONT_FEATURE_VALUES_RULE = 14, _a.MARGIN_RULE = 9;
+//#endregion
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/observers.js
+/**
+* @license
+* Copyright 2024 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
 //#endregion
 //#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/index.js
 /**
@@ -6662,6 +6690,13 @@ i._$litElement$ = !0, i["finalized"] = !0, s.litElementHydrateSupport?.({ LitEle
 const o = s.litElementPolyfillSupport;
 o?.({ LitElement: i });
 (s.litElementVersions ??= []).push("4.2.2");
+//#endregion
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/node/is-server.js
+/**
+* @license
+* Copyright 2022 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
 //#endregion
 //#region src/style.css
 const styles = i$2\`main {
@@ -7261,6 +7296,13 @@ const o = s.litElementPolyfillSupport;
 o?.({ LitElement: i });
 (s.litElementVersions ??= []).push("4.2.2");
 //#endregion
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/is-server.js
+/**
+* @license
+* Copyright 2022 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
+//#endregion
 //#region src/style.css
 const styles = i$3\`main {
     display: flex;
@@ -7548,6 +7590,13 @@ var _a = class CSSRule {
 	}
 };
 _a.STYLE_RULE = 1, _a.CHARSET_RULE = 2, _a.IMPORT_RULE = 3, _a.MEDIA_RULE = 4, _a.FONT_FACE_RULE = 5, _a.PAGE_RULE = 6, _a.NAMESPACE_RULE = 10, _a.KEYFRAMES_RULE = 7, _a.KEYFRAME_RULE = 8, _a.SUPPORTS_RULE = 12, _a.COUNTER_STYLE_RULE = 11, _a.FONT_FEATURE_VALUES_RULE = 14, _a.MARGIN_RULE = 9;
+//#endregion
+//#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/lib/observers.js
+/**
+* @license
+* Copyright 2024 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
 //#endregion
 //#region <root>/node_modules/.pnpm/@lit-labs+ssr-dom-shim@1.6.0/node_modules/@lit-labs/ssr-dom-shim/index.js
 /**
@@ -8525,6 +8574,13 @@ const o = s.litElementPolyfillSupport;
 o?.({ LitElement: i });
 (s.litElementVersions ??= []).push("4.2.2");
 //#endregion
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/node/is-server.js
+/**
+* @license
+* Copyright 2022 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
+//#endregion
 //#region src/style.css
 const styles = i$2\`main {
     display: flex;
@@ -9122,6 +9178,13 @@ i._$litElement$ = !0, i["finalized"] = !0, s.litElementHydrateSupport?.({ LitEle
 const o = s.litElementPolyfillSupport;
 o?.({ LitElement: i });
 (s.litElementVersions ??= []).push("4.2.2");
+//#endregion
+//#region <root>/node_modules/.pnpm/lit-html@3.3.3/node_modules/lit-html/is-server.js
+/**
+* @license
+* Copyright 2022 Google LLC
+* SPDX-License-Identifier: BSD-3-Clause
+*/
 //#endregion
 //#region src/style.css
 const styles = i$3\`main {
