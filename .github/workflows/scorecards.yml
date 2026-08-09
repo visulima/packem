@@ -1,5 +1,5 @@
 name: "Scorecards supply-chain security"
-on:
+on: # yamllint disable-line rule:truthy
     # Only the default branch is supported for the Branch-Protection check, and the
     # trigger takes no configuration.
     branch_protection_rule: # yamllint disable-line rule:empty-values
