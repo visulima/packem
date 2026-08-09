@@ -36,7 +36,7 @@ overrides:
   tar@<=7.5.9: '>=7.5.10'
   tar@<=7.5.10: '>=7.5.11'
   flatted@<3.4.0: '>=3.4.0'
-  undici@>=7.0.0 <7.24.0: '>=7.24.0'
+  undici@>=7.0.0 <7.24.0: '>=7.29.0'
   tar@<=7.5.3: '>=7.5.4'
   flatted@<=3.4.1: '>=3.4.2'
   handlebars@>=4.0.0 <=4.7.8: '>=4.7.9'
@@ -10516,9 +10516,9 @@ packages:
     resolution: {integrity: sha512-ZgpWDC5gmNiuY9CnLVXEH8rl50xhRCuLNA97fAUnKi8RRuV4E6KG31pDTsLVUKnohJE0I3XDrTeEydAXRw47xg==}
     engines: {node: '>=18.17'}
 
-  undici@7.25.0:
-    resolution: {integrity: sha512-xXnp4kTyor2Zq+J1FfPI6Eq3ew5h6Vl0F/8d9XU5zZQf1tX9s2Su1/3PiMmUANFULpmksxkClamIZcaUqryHsQ==}
-    engines: {node: '>=20.18.1'}
+  undici@8.10.0:
+    resolution: {integrity: sha512-HvltHd7avK13QIw/oLe4qoOLyoVSoafqJ2jYOrtMRBkbYT31eiBQ8O0ehRKZiEZCMEyLFQNIADpgCWC5fALvYQ==}
+    engines: {node: '>=22.19.0'}
 
   unherit@3.0.1:
     resolution: {integrity: sha512-akOOQ/Yln8a2sgcLj4U0Jmx0R5jpIg2IUyRrWOzmEbjBtGzBdHtSeFKgoEcoH4KYIG/Pb8GQ/BwtYm0GCq1Sqg==}
@@ -10799,7 +10799,7 @@ packages:
       '@vitest/coverage-istanbul': 4.1.7
       '@vitest/coverage-v8': 4.1.7
       '@vitest/ui': 4.1.7
-      happy-dom: '>=20.8.8'
+      happy-dom: '>=20.8.9'
       jsdom: '*'
     peerDependenciesMeta:
       '@edge-runtime/vm':
@@ -13094,7 +13094,7 @@ snapshots:
       p-filter: 4.1.0
       semantic-release: 25.0.3(typescript@6.0.3)
       tinyglobby: 0.2.14
-      undici: 7.25.0
+      undici: 8.10.0
       url-join: 5.0.0
     transitivePeerDependencies:
       - supports-color
@@ -14824,7 +14824,7 @@ snapshots:
       parse5: 7.3.0
       parse5-htmlparser2-tree-adapter: 7.1.0
       parse5-parser-stream: 7.1.2
-      undici: 7.25.0
+      undici: 8.10.0
       whatwg-mimetype: 4.0.0
 
   chokidar@3.6.0:
@@ -21804,7 +21804,7 @@ snapshots:
 
   undici@6.25.0: {}
 
-  undici@7.25.0: {}
+  undici@8.10.0: {}
 
   unherit@3.0.1: {}
 
