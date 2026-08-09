@@ -449,8 +449,10 @@ const generateOptions = (
             },
             treeshake: {
                 moduleSideEffects: getPackageSideEffect(rootDirectory, packageJson),
+                // `propertyReadSideEffects` is left to the preset, which already sets it
+                // to `true`. Rollup 4.62 validates the option as `false | "always"` — the
+                // default is no longer accepted as an explicit value and warns.
                 preset: "recommended",
-                propertyReadSideEffects: true,
             },
             tsconfigPaths: {
                 // Default is false to avoid performance issues
