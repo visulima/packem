@@ -33,7 +33,7 @@ overrides:
   ajv@<6.14.0: '>=6.14.0'
   ajv@>=7.0.0-alpha.0 <8.18.0: '>=8.18.0'
   svgo@=4.0.0: '>=4.0.1'
-  tar@<=7.5.9: '>=7.5.10'
+  tar@<=7.5.9: '>=7.5.21'
   tar@<=7.5.10: '>=7.5.11'
   flatted@<3.4.0: '>=3.4.0'
   undici@>=7.0.0 <7.24.0: '>=7.24.0'
@@ -10799,7 +10799,7 @@ packages:
       '@vitest/coverage-istanbul': 4.1.7
       '@vitest/coverage-v8': 4.1.7
       '@vitest/ui': 4.1.7
-      happy-dom: '>=20.8.8'
+      happy-dom: '>=20.8.9'
       jsdom: '*'
     peerDependenciesMeta:
       '@edge-runtime/vm':
