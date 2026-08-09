@@ -13,15 +13,11 @@ export const getVitestConfig = (options: UserConfig = {}) => {
         test: {
             ...configDefaults,
             pool: "threads",
-            poolOptions: {
-                threads: {
-                    // Conservative thread settings for stability
-                    maxThreads: 2,
-                    minThreads: 1,
-                    isolate: true,
-                    useAtomics: true,
-                },
-            },
+            // Conservative worker settings for stability. Vitest 4 removed
+            // `poolOptions` in favour of these top-level options; `minThreads` and
+            // `useAtomics` have no successor and are gone.
+            maxWorkers: 2,
+            isolate: true,
             maxConcurrency: 2,
             // Enhanced coverage configuration
             coverage: {
