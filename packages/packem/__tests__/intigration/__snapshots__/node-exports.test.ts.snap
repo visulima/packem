@@ -368,7 +368,7 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > cjs output 1`] = `
-""use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});class o{constructor(){}}class r{constructor(){}}class s extends o{feature=new r;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=s;
+""use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});class o{constructor(){}}class t{constructor(){}}class r extends o{feature=new t;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=r;
 //# sourceMappingURL=index.cjs.map
 "
 `;
@@ -404,7 +404,7 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs output 1`] = `
-"class s{constructor(){}}class e{constructor(){}}class r extends s{feature=new e;constructor(){console.log("before"),super(),console.log("after")}}export{r as Child};
+"class o{constructor(){}}class r{constructor(){}}class s extends o{feature=new r;constructor(){console.log("before"),super(),console.log("after")}}export{s as Child};
 //# sourceMappingURL=index.mjs.map
 "
 `;
