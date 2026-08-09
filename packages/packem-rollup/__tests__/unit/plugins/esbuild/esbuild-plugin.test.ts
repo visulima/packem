@@ -160,6 +160,21 @@ describe("esbuildPlugin", () => {
         expect((logger as unknown as { debug: ReturnType<typeof vi.fn> }).debug).not.toHaveBeenCalled();
     });
 
+    it("should keep `@__PURE__` annotations through transform even when minifying", async () => {
+        expect.assertions(2);
+
+        // `transform` runs per module, before Rollup tree-shakes. esbuild's `minifyWhitespace`
+        // drops annotation comments, so minifying here would delete a dependency's `@__PURE__`
+        // markers while they still decide whether Rollup may drop the call. `renderChunk`
+        // minifies the finished chunk anyway.
+        const plugin = esbuildPlugin(baseConfig({ minify: true, minifyWhitespace: true }));
+
+        const result = await callTransform(plugin, "export const x = /* @__PURE__ */ factory();\n", "/foo.ts");
+
+        expect(result?.code).toContain("@__PURE__");
+        expect(result?.code).toContain("factory()");
+    });
+
     it("should run renderChunk as a no-op when no minify flag is supplied", async () => {
         expect.assertions(1);
 

@@ -25,6 +25,9 @@ const SOURCE_FILE_TS_RE = /\.[cm]ts/;
 // `Loader` value without a per-call cast.
 const ESM_FORMAT_LOADERS = new Set<Loader>(["base64", "binary", "dataurl", "json", "text"]);
 
+/** esbuild options that must not reach the per-module `transform`; see `transformOptions` below. */
+const MINIFY_OPTION_KEYS = new Set(["minify", "minifyIdentifiers", "minifySyntax", "minifyWhitespace"]);
+
 const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap, ...esbuildOptions }: EsbuildPluginConfig): RollupPlugin => {
     // Clone the shared singleton so per-plugin loader customizations stay local
     // to this plugin instance and don't leak into other esbuild/swc/oxc paths or
@@ -65,6 +68,19 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
 
     let optimizeDepsResult: OptimizeDepsResult | undefined;
     const cwd = process.cwd();
+
+    /*
+     * Minification belongs to `renderChunk`, not to `transform`.
+     *
+     * `transform` runs per module, before Rollup tree-shakes, and esbuild's `minifyWhitespace`
+     * discards annotation comments — `@__PURE__` among them. Minifying here therefore deletes
+     * those annotations while they are still load-bearing: a dependency that marks a module-scope
+     * call pure so consumers can drop it silently loses that, and Rollup keeps the call as a side
+     * effect. `renderChunk` minifies the finished chunk regardless, so the output is unchanged.
+     */
+    const transformOptions = Object.fromEntries(
+        Object.entries(esbuildOptions).filter(([key]) => !MINIFY_OPTION_KEYS.has(key)),
+    ) as Omit<typeof esbuildOptions, "minify" | "minifyIdentifiers" | "minifySyntax" | "minifyWhitespace">;
 
     return {
         async buildStart() {
@@ -133,7 +149,7 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
                     // @see https://github.com/evanw/esbuild/issues/1932#issuecomment-1013380565
                     sourcefile: id.replace(SOURCE_FILE_TS_RE, ".ts"),
                     sourcemap: sourceMap,
-                    ...esbuildOptions,
+                    ...transformOptions,
                 });
 
                 await warn(this, result.warnings);
