@@ -156,7 +156,7 @@ Nonce value for CSP (Content Security Policy) compliance.
 
 This library supports the following Node.js versions:
 
-- 22.x (>= 22.23.2)
+- 22.x (>= 22.22.2)
 - 24.x (>= 24.10.0)
 
 ## Contributing

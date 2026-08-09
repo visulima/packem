@@ -82,7 +82,7 @@ with a self-explaining error instead of corrupting a baseline.
 - **ESM-only** by design — do not add CJS entry points; `lint:attw` uses
   `--profile esm-only`.
 - Conventional-commit messages.
-- Node engines: `^22.23.2 || >= 24.10.0`.
+- Node engines: `^22.22.2 || >= 24.10.0`.
 - Match the surrounding code's style; run `lint:types` (stricter than the
   bundler build) when validating a change.
 
