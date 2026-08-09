@@ -264,7 +264,8 @@ export const data = content;`,
 
         expect(mjsContent).toContain("second-version");
         expect(cjsContent).toContain("second-version");
-    });
+        // Two full builds plus a package install run well past the 15s default under CI load.
+    }, 60_000);
 
     it("should update output when source changes without '?raw' (transform path)", async () => {
         expect.assertions(7);
@@ -317,5 +318,6 @@ export const data = content;`,
 
         expect(mjsContent).toContain("beta");
         expect(cjsContent).toContain("beta");
-    });
+        // Two full builds plus a package install run well past the 15s default under CI load.
+    }, 60_000);
 });
