@@ -18,6 +18,19 @@ import { dts } from "../src/index.js";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const fixturesDirectory = path.resolve(dirname, "fixtures");
 
+// #240: JSDoc recovered for a re-export lands on the specifier, so the comment is followed by
+// (whitespace and) the exported name. The optional `type ` covers rolldown's inline type modifier.
+const REEXPORT_JSDOC_PROBES = [
+    /\/\*\* @deprecated Import from `some-other-package` instead\. \*\/\s*legacyHelper\b/u,
+    /\/\*\* @deprecated Use `NewOptions` instead\. \*\/\s*type LegacyOptions\b/u,
+    /\/\*\* @deprecated Re-exported from an external package\. \*\/\s*(?:type )?Plugin\b/u,
+    /\/\*\* @deprecated Also from the same external package\. \*\/\s*(?:type )?RollupOptions\b/u,
+    /\/\*\* @deprecated Written inside the braces\. \*\/\s*renamedHelper as aliasedHelper\b/u,
+    /\/\*\* @deprecated A local binding exported through a specifier\. \*\/\s*localHelper\b/u,
+    /\/\*\* @deprecated The whole namespace is going away\. \*\/\s*\w+ as helpers\b/u,
+    /\/\*\* Doc written on the declaration itself\. \*\/\s*(?:type )?DocumentedOptions\b/u,
+];
+
 // ---------------------------------------------------------------------------
 // Minimal inline helper (mirrors @sxzz/test-utils rolldownBuild but lives
 // here so we don't depend on test-utils for the rolldown import path).
@@ -226,5 +239,20 @@ describe("dts plugin – rolldown compat", () => {
         // ...and the export list must reference those declared names. Before the fix it
         // exported `second$1`, which no declaration introduced.
         expect(code).toContain("second$1 as bSecond");
+    });
+
+    // Regression for #240: leading JSDoc on `export { … } from "…"` was dropped from the emitted
+    // declarations. Recovery happens in the shared fake-JS pass, but rolldown lays the chunk out
+    // differently from rollup (inline `type X` modifiers instead of a hoisted `export type { … }`,
+    // its own renaming), so the by-name re-attachment is pinned here too.
+    it("keeps the JSDoc of re-export statements", async () => {
+        expect.assertions(REEXPORT_JSDOC_PROBES.length);
+
+        const { dtsChunks } = await rolldownBuildHelper(path.resolve(fixturesDirectory, "jsdoc-reexport/index.ts"), { emitDtsOnly: true, oxc: true });
+        const code = dtsChunks.map((c) => c.code).join("\n");
+
+        for (const probe of REEXPORT_JSDOC_PROBES) {
+            expect(code).toMatch(probe);
+        }
     });
 });
