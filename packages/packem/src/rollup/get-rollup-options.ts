@@ -916,6 +916,29 @@ const dedupeResolvePatterns = (merged: (string | RegExp)[]): (string | RegExp)[]
     return deduped;
 };
 
+/**
+ * Drops the packages a `!name` pattern excludes from the merged list.
+ * @remarks
+ * Auto-detection adds every optional peer dependency, on the theory that a
+ * consumer may not have it installed. That is the wrong call for a package
+ * whose own declarations re-export through a private subpath import — inlining
+ * it emits that specifier (`#node-utils`), which resolves nowhere outside the
+ * package that owns it. Without a way to subtract, the only alternative is
+ * `resolve: false`, which also gives up inlining the packages that genuinely
+ * need it.
+ * @param merged Patterns from auto-detection and the user, already deduplicated.
+ * @returns The patterns to inline, minus every excluded package name.
+ */
+const applyResolveExclusions = (merged: (string | RegExp)[]): (string | RegExp)[] => {
+    const excluded = new Set(merged.filter((entry): entry is string => typeof entry === "string" && entry.startsWith("!")).map((entry) => entry.slice(1)));
+
+    if (excluded.size === 0) {
+        return merged;
+    }
+
+    return merged.filter((entry) => typeof entry !== "string" || (!entry.startsWith("!") && !excluded.has(entry)));
+};
+
 // eslint-disable-next-line import/exports-last, sonarjs/function-return-type -- exports-last: consumed by getRolldownDtsOptions in get-rolldown-options.ts. function-return-type: the tri-state return is the deliberate dts-plugin `resolve` contract (false = disable, true = inline all, array = specific patterns).
 export const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean | (string | RegExp)[] => {
     const userResolve = context.options.rollup.dts?.resolve;
@@ -944,8 +967,9 @@ export const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): 
         return false;
     }
 
-    // Merge and deduplicate auto-detected with user-provided patterns
-    return dedupeResolvePatterns([...autoResolve, ...userResolve ?? []]);
+    // Merge and deduplicate auto-detected with user-provided patterns, then honour
+    // any `!name` exclusions the user added.
+    return applyResolveExclusions(dedupeResolvePatterns([...autoResolve, ...userResolve ?? []]));
 };
 
 const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsResolve: boolean | (string | RegExp)[]): Promise<Plugin[]> => {

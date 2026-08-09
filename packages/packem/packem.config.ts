@@ -53,7 +53,14 @@ export default defineConfig({
             // packem-plugins is private and bundled into our JS, so its types have to
             // come along too — otherwise the emitted declarations import a package no
             // consumer can install.
-            resolve: ["@visulima/packem-plugins", /^@visulima\/packem-plugins\//],
+            resolve: [
+                "@visulima/packem-plugins",
+                /^@visulima\/packem-plugins\//,
+                // typedoc's own declarations re-export through `#node-utils`, a subpath
+                // import private to its package. Inlining them emits that specifier,
+                // which resolves nowhere for a consumer.
+                "!typedoc",
+            ],
         },
         license: {
             path: "./LICENSE.md",
