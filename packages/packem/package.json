@@ -192,6 +192,7 @@
     },
     "dependencies": {
         "@antfu/install-pkg": "catalog:node",
+        "@babel/core": "catalog:dev",
         "@clack/prompts": "catalog:node",
         "@rollup/pluginutils": "catalog:build",
         "@visulima/cerebro": "catalog:visulima",
@@ -225,7 +226,6 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
-        "@babel/core": "catalog:dev",
         "@babel/parser": "catalog:dev",
         "@babel/preset-react": "catalog:frontend",
         "@csstools/css-parser-algorithms": "catalog:style",
