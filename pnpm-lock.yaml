@@ -32,7 +32,7 @@ overrides:
   minimatch@<3.1.4: '>=3.1.4'
   ajv@<6.14.0: '>=6.14.0'
   ajv@>=7.0.0-alpha.0 <8.18.0: '>=8.18.0'
-  svgo@=4.0.0: '>=4.0.1'
+  svgo@=4.0.0: '>=4.0.2'
   tar@<=7.5.9: '>=7.5.10'
   tar@<=7.5.10: '>=7.5.11'
   flatted@<3.4.0: '>=3.4.0'
@@ -10057,8 +10057,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  svgo@4.0.1:
-    resolution: {integrity: sha512-XDpWUOPC6FEibaLzjfe0ucaV0YrOjYotGJO1WpF0Zd+n6ZGEQUsSugaoLq9QkEZtAfQIxT42UChcssDVPP3+/w==}
+  svgo@4.0.2:
+    resolution: {integrity: sha512-ekx94z1rRc5LDi6oSUaeRnYhd0UOJxdtQCL2rF8xpWxD3TPAsISWOrxezqGovqS38GRZOdpDfvQe3ts6F7nsng==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -10799,7 +10799,7 @@ packages:
       '@vitest/coverage-istanbul': 4.1.7
       '@vitest/coverage-v8': 4.1.7
       '@vitest/ui': 4.1.7
-      happy-dom: '>=20.8.8'
+      happy-dom: '>=20.8.9'
       jsdom: '*'
     peerDependenciesMeta:
       '@edge-runtime/vm':
@@ -19892,7 +19892,7 @@ snapshots:
     dependencies:
       postcss: 8.5.15
       postcss-value-parser: 4.2.0
-      svgo: 4.0.1
+      svgo: 4.0.2
 
   postcss-unique-selectors@7.0.4(postcss@8.5.15):
     dependencies:
@@ -21243,7 +21243,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svgo@4.0.1:
+  svgo@4.0.2:
     dependencies:
       commander: 11.1.0
       css-select: 5.2.2
