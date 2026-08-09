@@ -13,7 +13,7 @@ import createMigrateCommand from "./commands/migrate";
  * Enables the V8 compile cache for faster startup.
  * @remarks
  * Uses Node.js' native `module.enableCompileCache` (always present given the
- * package's supported engines: Node 22.14+/24.10+). Failures are non-fatal.
+ * package's supported engines: Node 22.23+/24.10+). Failures are non-fatal.
  */
 try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
