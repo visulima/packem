@@ -1982,6 +1982,9 @@ importers:
       oxc-resolver:
         specifier: catalog:node
         version: 11.24.2
+      oxc-transform:
+        specifier: catalog:dev
+        version: 0.140.0
       package-manager-detector:
         specifier: catalog:peer
         version: 1.7.0
@@ -2175,9 +2178,6 @@ importers:
       minireset.css:
         specifier: catalog:style
         version: 0.0.7
-      oxc-transform:
-        specifier: catalog:dev
-        version: 0.140.0
       picomatch:
         specifier: catalog:prod
         version: 4.0.5
