@@ -93,6 +93,10 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
     let declarationIndex = 0;
     const declarationMap = new Map<number /* declaration id */, DeclarationInfo>();
     const commentsMap = new Map<string /* filename */, t.Comment[]>();
+    // Leading JSDoc of specifier-based export statements, which — unlike declarations — are
+    // handed to rollup verbatim and would otherwise be lost to the `comments: false` print
+    // at the end of `transform`. Re-attached by name in `renderChunk`.
+    const exportCommentsMap = new Map<string /* filename */, ExportComments>();
     const moduleExportsMap = new Map<string /* filename */, ModuleExports>();
     const warnedCjsDtsInputs = new Set<string>();
     // Cross-module type-only propagation depends only on `moduleExportsMap`, not on
@@ -250,6 +254,12 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
         if (directives.length > 0) {
             commentsMap.set(id, directives);
+        }
+
+        const exportComments = collectExportComments(program.body);
+
+        if (exportComments.size > 0) {
+            exportCommentsMap.set(id, exportComments);
         }
 
         const appendStmts: t.ProgramStatement[] = [];
@@ -724,6 +734,9 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             program.body.push(b.exportNamedDeclaration(null, []));
         }
 
+        // recover the JSDoc of re-export statements, which never became declarations
+        restoreExportComments(program.body, resolveChunkExportComments(chunk, exportCommentsMap));
+
         // recover comments
         const comments = new Set<t.Comment>();
         const commentsValue = new Set<string>(); // deduplicate
@@ -1126,6 +1139,189 @@ const rebaseReferencePath = (comment: t.Comment, sourceDirectory: string, chunkO
     // Return a fresh comment node so we don't mutate the cached entry shared across renders.
     return { ...comment, value: comment.value.replace(REFERENCE_PATH_RE, `${prefix}${quote}${rebased}${quote}`) };
 };
+
+// #region Re-export JSDoc
+
+/**
+ * Leading JSDoc recovered for a single exported name, keyed by that name.
+ */
+type ExportComments = Map<string /* exported name */, t.AttachedComment[]>;
+
+const isDocumentationComment = (comment: t.AttachedComment): boolean =>
+    comment.position === "before" && comment.type === "Block" && comment.value.startsWith("*") && !REFERENCE_RE.test(comment.value) && !isSourceMapPragma(comment);
+
+/**
+ * The JSDoc block TypeScript associates with a node is the *nearest* preceding one — an
+ * earlier license banner or `@packageDocumentation` block does not document the statement
+ * that happens to follow it. Mirror that rule so only the doc comment a user actually wrote
+ * for the export is carried over.
+ */
+const nearestDocumentationComment = (comments: t.AttachedComment[] | undefined): t.AttachedComment | undefined => comments?.findLast((comment) => isDocumentationComment(comment));
+
+/**
+ * Collect the leading JSDoc of specifier-based export statements (`export { x } from "…"`,
+ * `export type { T } from "…"`, `export { x }`, `export * as ns from "…"`) keyed by the
+ * name each comment documents.
+ *
+ * These statements are the only ones the transform pass hands to rollup verbatim: they are
+ * never rewritten into the sentinel `var [x] = [...]` form, so — unlike declarations, whose
+ * nodes are stashed in `declarationMap` and reprinted with `comments: true` in `renderChunk`
+ * — their comments would be lost to the `comments: false` print at the end of `transform`.
+ * `renderChunk` re-attaches them by name (see `restoreExportComments`).
+ */
+const collectExportComments = (nodes: t.ProgramStatement[]): ExportComments => {
+    const result: ExportComments = new Map();
+
+    const add = (name: string | undefined | null, comment: t.AttachedComment | undefined) => {
+        if (!name || !comment) {
+            return;
+        }
+
+        const existing = result.get(name);
+
+        if (existing) {
+            if (existing.every((previous) => previous.value !== comment.value)) {
+                existing.push(comment);
+            }
+
+            return;
+        }
+
+        result.set(name, [comment]);
+    };
+
+    for (const node of nodes) {
+        // `export * as ns from "…"` documents exactly one name; `export * from "…"` documents
+        // none, so there is nothing a comment could be re-attached to.
+        if (node.type === "ExportAllDeclaration") {
+            add(node.exported && nameOf(node.exported), nearestDocumentationComment(node.comments));
+
+            continue;
+        }
+
+        if (node.type !== "ExportNamedDeclaration" || node.declaration) {
+            continue;
+        }
+
+        const statementComment = nearestDocumentationComment(node.comments);
+
+        for (const specifier of node.specifiers) {
+            if (specifier.type !== "ExportSpecifier") {
+                continue;
+            }
+
+            const name = nameOf(specifier.exported);
+
+            add(name, statementComment);
+            add(name, nearestDocumentationComment(specifier.comments));
+        }
+    }
+
+    return result;
+};
+
+const sameComments = (a: t.AttachedComment[], b: t.AttachedComment[]): boolean => a.length === b.length && a.every((comment, index) => comment.value === b[index].value);
+
+/**
+ * Merge the per-module maps of every module in `chunk` into one lookup keyed by exported name.
+ *
+ * The rendered chunk gives us no export → module attribution, so the exported name is the only
+ * handle left after rollup has merged, inlined and renamed the original statements. The facade
+ * (entry) module owns the chunk's public surface, so its annotations win outright; a name that
+ * two non-facade modules document differently is ambiguous and mapped to `undefined` so that
+ * `restoreExportComments` leaves it alone rather than guessing.
+ */
+const resolveChunkExportComments = (chunk: RenderedChunk, exportCommentsMap: Map<string, ExportComments>): Map<string, t.AttachedComment[] | undefined> => {
+    const resolved = new Map<string, t.AttachedComment[] | undefined>();
+    const { facadeModuleId } = chunk;
+    const moduleIds = facadeModuleId && chunk.moduleIds.includes(facadeModuleId) ? [facadeModuleId, ...chunk.moduleIds.filter((moduleId) => moduleId !== facadeModuleId)] : chunk.moduleIds;
+    const fromFacade = new Set<string>();
+
+    for (const moduleId of moduleIds) {
+        const moduleComments = exportCommentsMap.get(moduleId);
+
+        if (!moduleComments) {
+            continue;
+        }
+
+        for (const [name, comments] of moduleComments) {
+            if (fromFacade.has(name)) {
+                continue;
+            }
+
+            if (moduleId === facadeModuleId) {
+                fromFacade.add(name);
+                resolved.set(name, comments);
+
+                continue;
+            }
+
+            const existing = resolved.get(name);
+
+            if (!resolved.has(name)) {
+                resolved.set(name, comments);
+            } else if (!existing || !sameComments(existing, comments)) {
+                resolved.set(name, undefined);
+            }
+        }
+    }
+
+    return resolved;
+};
+
+/**
+ * Re-attach the JSDoc collected by {@link collectExportComments} to the rendered chunk.
+ *
+ * Comments always land on the *specifier*, never on the statement, even when the original
+ * statement had a single member: TypeScript only honours JSDoc written inside the braces of an
+ * `export { … } from "…"` — a leading block on the statement itself is ignored — and rollup is
+ * free to merge same-source re-exports into one statement, which would smear a statement-level
+ * comment across unrelated members.
+ */
+const restoreExportComments = (nodes: t.ProgramStatement[], commentsByName: Map<string, t.AttachedComment[] | undefined>): void => {
+    if (commentsByName.size === 0) {
+        return;
+    }
+
+    const attach = (target: { comments?: t.AttachedComment[] }, name: string | undefined | null) => {
+        if (!name) {
+            return;
+        }
+
+        const comments = commentsByName.get(name);
+
+        if (!comments) {
+            return;
+        }
+
+        // A comment the chunk already carries came through rollup untouched and wins.
+        if (target.comments?.some((comment) => isDocumentationComment(comment))) {
+            return;
+        }
+
+        target.comments = [...comments, ...target.comments ?? []];
+    };
+
+    for (const node of nodes) {
+        if (node.type === "ExportAllDeclaration") {
+            attach(node, node.exported && nameOf(node.exported));
+
+            continue;
+        }
+
+        if (node.type !== "ExportNamedDeclaration" || node.declaration) {
+            continue;
+        }
+
+        for (const specifier of node.specifiers) {
+            if (specifier.type === "ExportSpecifier") {
+                attach(specifier, nameOf(specifier.exported));
+            }
+        }
+    }
+};
+
+// #endregion
 
 // CommonJS declaration syntax (`export = X`, `import X = require("y")`) cannot be
 // represented in a bundled ESM `.d.ts`. Used to emit a one-time warning per input.
