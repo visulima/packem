@@ -317,13 +317,13 @@
         "vitest": "catalog:test"
     },
     "peerDependencies": {
-        "@arethetypeswrong/core": ">=0.18.3",
+        "@arethetypeswrong/core": ">=0.18.5",
         "@swc/core": ">=1.15.40",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
         "@visulima/packem-rollup": "1.0.0-alpha.85",
-        "cssnano": ">=8.0.1",
-        "esbuild": ">=0.28.0",
+        "cssnano": ">=8.0.4",
+        "esbuild": ">=0.28.1",
         "icss-utils": ">=5.1.0",
         "less": ">=4.6.4",
         "lightningcss": ">=1.32.0",
