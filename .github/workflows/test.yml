@@ -105,10 +105,11 @@ jobs:
               uses: "anolilab/workflows/step/setup@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
               with:
                   node-version: "${{ matrix.node_version }}"
-                  # npm@latest (12.x) requires node ^22.22 || ^24.15 || >=26, so it refuses
-                  # to install on node 25 (EBADENGINE) and fails the whole setup step. npm 11.x
-                  # (engines `>=22.9`) supports node 25, so pin it there; other lanes keep latest.
-                  npm-version: "${{ matrix.node_version == '25' && '11' || 'latest' }}"
+                  # The matrix spans node versions npm@latest (12.x, engines
+                  # `^22.22 || ^24.15 || >=26`) refuses to install on, which fails the whole
+                  # setup step with EBADENGINE. Tests run through pnpm and never touch npm,
+                  # so skip the upgrade instead of pinning a version per lane.
+                  upgrade-npm-version: "false"
                   install-packages: "false"
                   install-node-gyp: "true"
 
