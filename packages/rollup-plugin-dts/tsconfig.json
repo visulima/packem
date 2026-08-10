@@ -6,6 +6,6 @@
         "noUncheckedIndexedAccess": false,
         "skipLibCheck": true
     },
-    "include": ["src", "__tests__", "__bench__"],
+    "include": ["src", "__tests__", "__bench__", "vitest.bench.config.ts"],
     "exclude": ["__tests__/fixtures", "__tests__/__fixtures__"]
 }

@@ -1,0 +1,167 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "CodSpeed"
+
+on: # yamllint disable-line rule:truthy
+    push:
+        branches: ["main", "alpha"]
+    pull_request:
+        types: ["opened", "synchronize", "reopened"]
+        branches: ["main", "alpha", "next", "beta"]
+    workflow_dispatch: # yamllint disable-line rule:empty-values
+
+concurrency:
+    group: "${{ github.workflow }}-${{ github.ref }}"
+    cancel-in-progress: true
+
+permissions:
+    contents: "read" # to fetch code (actions/checkout)
+
+env:
+    NX_BRANCH: "${{ github.event.number || github.ref_name }}"
+    NX_RUN_GROUP: "${{ github.run_id }}"
+
+jobs:
+    # PR-only gate: a docs-only PR skips the whole install/build/bench job. Push
+    # runs are never gated — CodSpeed needs a complete baseline on every branch
+    # head to compare later pull requests against.
+    files-changed:
+        name: "Detect what files changed"
+        if: "github.event_name == 'pull_request'"
+        runs-on: "ubuntu-latest"
+        timeout-minutes: 5
+        outputs:
+            packages: "${{ steps.changes.outputs.packages }}"
+        steps:
+            - name: "Harden Runner"
+              uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
+              with:
+                  egress-policy: "audit"
+
+            - name: "Git checkout"
+              uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+
+            - name: "Check for file changes"
+              uses: "dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706" # v4.0.2
+              id: "changes"
+              with:
+                  token: "${{ github.token }}"
+                  filters: ".github/file-filters.yml"
+
+    # One runner per bench project. Separate runners mean no CPU contention between
+    # projects — something a single sequential job cannot promise — and wall-clock
+    # becomes the slowest project rather than the sum of all of them.
+    discover:
+        name: "Discover bench projects"
+        # `!cancelled()` rather than the implicit success(): files-changed is skipped
+        # on push and workflow_dispatch, which would otherwise skip this job too.
+        if: "!cancelled() && (github.event_name != 'pull_request' || needs.files-changed.outputs.packages == 'true')"
+        needs: "files-changed"
+        runs-on: "ubuntu-latest"
+        timeout-minutes: 10
+        outputs:
+            has-benches: "${{ steps.affected.outputs.has-benches }}"
+            matrix: "${{ steps.affected.outputs.matrix }}"
+        steps:
+            - name: "Harden Runner"
+              uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
+              with:
+                  egress-policy: "audit"
+
+            - name: "Git checkout"
+              uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+              with:
+                  # Full history so `nx affected` can resolve the PR base ref.
+                  fetch-depth: 0
+
+            - name: "Derive appropriate SHAs for base and head for `nx affected` commands"
+              id: "setSHAs"
+              uses: "nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1" # v5.0.1
+
+            - name: "Setup resources and environment"
+              uses: "anolilab/workflows/step/setup@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
+              with:
+                  node-version: "22.x"
+                  cache-prefix: "codspeed-discover"
+
+            # On a pull request only the benches whose project (or an upstream dependency)
+            # changed; on push every bench, so each branch head keeps a complete baseline
+            # for later pull requests to compare against.
+            - name: "Compute bench projects"
+              id: "affected"
+              shell: "bash"
+              env:
+                  EVENT_NAME: "${{ github.event_name }}"
+              run: |
+                  if [ "$EVENT_NAME" = "pull_request" ]; then
+                      projects=$(pnpm exec nx show projects --affected --withTarget=test:bench --json 2>/dev/null | grep -E '^\[' | tail -n 1)
+                  else
+                      projects=$(pnpm exec nx show projects --withTarget=test:bench --json 2>/dev/null | grep -E '^\[' | tail -n 1)
+                  fi
+
+                  # `benchmarks` owns a test:bench target too, but it is the end-to-end
+                  # build comparison: it measures wall-clock, must run sequentially on one
+                  # machine, and has nothing for CodSpeed to instrument.
+                  projects=$(echo "${projects:-[]}" | jq -c '[.[] | select(. != "benchmarks")]')
+
+                  if [ "$projects" = "[]" ]; then
+                      echo "No affected bench projects."
+                      echo "has-benches=false" >> "$GITHUB_OUTPUT"
+                      echo "matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+                      exit 0
+                  fi
+
+                  echo "Bench projects: $projects"
+                  echo "has-benches=true" >> "$GITHUB_OUTPUT"
+                  echo "matrix=$(echo "$projects" | jq -c '{include: [.[] | {project: .}]}')" >> "$GITHUB_OUTPUT"
+
+    benchmark:
+        name: "Bench: ${{ matrix.project }}"
+        needs: "discover"
+        if: "${{ needs.discover.outputs.has-benches == 'true' }}"
+        runs-on: "ubuntu-latest"
+        timeout-minutes: 30
+        strategy:
+            # One project failing should not cancel the rest: a partial set of
+            # measurements is still worth uploading.
+            fail-fast: false
+            matrix: "${{ fromJSON(needs.discover.outputs.matrix) }}"
+        # Scope the CodSpeed OIDC token to an environment so secrets and reviewer
+        # rules (configured in repo settings) can apply to benchmark uploads.
+        environment: "benchmarks"
+        permissions:
+            contents: "read"
+            id-token: "write" # required for OIDC authentication with CodSpeed
+        steps:
+            - name: "Harden Runner"
+              uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
+              with:
+                  egress-policy: "audit"
+
+            - name: "Git checkout"
+              uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+              with:
+                  # Full history so `nx affected` can resolve the PR base ref.
+                  fetch-depth: 0
+
+            - name: "Setup resources and environment"
+              uses: "anolilab/workflows/step/setup@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
+              with:
+                  node-version: "22.x"
+                  cache-prefix: "codspeed"
+                  install-node-gyp: "true"
+
+            # Benches import their package's siblings through the built `dist/`, which is
+            # gitignored, so they cannot resolve until the workspace is built.
+            - name: "Build packages"
+              run: "pnpm run build:prod:packages"
+
+            # `--skip-nx-cache` is deliberate: a cache hit would short-circuit the run
+            # and hand CodSpeed no measurements at all.
+            - name: "Run benchmark"
+              env:
+                  BENCH_PROJECT: "${{ matrix.project }}"
+              uses: "CodSpeedHQ/action@f99becdce5e5d51fd556489ebef684f4ecfd6286" # v4.18.5
+              with:
+                  mode: "simulation"
+                  run: "pnpm exec nx run \"$BENCH_PROJECT\":test:bench --skip-nx-cache"

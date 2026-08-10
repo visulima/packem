@@ -452,6 +452,9 @@ catalogs:
       specifier: 4.3.2
       version: 4.3.2
   test:
+    '@codspeed/vitest-plugin':
+      specifier: ^5.5.0
+      version: 5.5.0
     '@jridgewell/source-map':
       specifier: ^0.3.11
       version: 0.3.11
@@ -660,6 +663,9 @@ importers:
       '@anolilab/textlint-config':
         specifier: catalog:lint
         version: 13.0.4(supports-color@7.2.0)(textlint@15.7.1(supports-color@7.2.0))
+      '@codspeed/vitest-plugin':
+        specifier: catalog:test
+        version: 5.5.0(tinybench@2.9.0)(vitest@4.1.10)
       '@commitlint/cli':
         specifier: catalog:lint
         version: 21.2.1(@types/node@26.1.1)(typescript@6.0.3)
@@ -750,9 +756,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.29.7
         version: 7.29.7(@babel/core@7.29.7(supports-color@7.2.0))
-      '@codspeed/vitest-plugin':
-        specifier: ^5.5.0
-        version: 5.5.0(tinybench@2.9.0)(vite@8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10)
       '@parcel/bundler-default':
         specifier: ^2.16.4
         version: 2.16.4(@parcel/core@2.16.4(@swc/helpers@0.5.23))
@@ -864,6 +867,9 @@ importers:
       prettier:
         specifier: 3.8.3
         version: 3.8.3
+      rolldown:
+        specifier: catalog:build
+        version: 1.2.0
       rollup:
         specifier: ^4.61.0
         version: 4.62.2
@@ -897,6 +903,10 @@ importers:
       webpack:
         specifier: ^5.107.2
         version: 5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
+
+  benchmarks/projects/js-small: {}
+
+  benchmarks/projects/js-synthetic: {}
 
   benchmarks/projects/react-empty:
     dependencies:
@@ -1865,6 +1875,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
+      '@codspeed/vitest-plugin':
+        specifier: catalog:test
+        version: 5.5.0(tinybench@2.9.0)(vitest@4.1.10)
       '@total-typescript/ts-reset':
         specifier: catalog:tsc
         version: 0.6.1
@@ -1883,6 +1896,9 @@ importers:
       eslint:
         specifier: catalog:lint
         version: 10.7.0(jiti@2.7.0)(supports-color@7.2.0)
+      happy-dom:
+        specifier: catalog:prod
+        version: 20.10.6
       prettier:
         specifier: catalog:lint
         version: 3.9.5
@@ -2025,6 +2041,9 @@ importers:
       '@babel/preset-react':
         specifier: catalog:frontend
         version: 8.0.1(@babel/core@8.0.1)
+      '@codspeed/vitest-plugin':
+        specifier: catalog:test
+        version: 5.5.0(tinybench@2.9.0)(vitest@4.1.10)
       '@csstools/css-parser-algorithms':
         specifier: catalog:style
         version: 4.0.0(@csstools/css-tokenizer@4.0.0)
@@ -2380,6 +2399,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
+      '@codspeed/vitest-plugin':
+        specifier: catalog:test
+        version: 5.5.0(tinybench@2.9.0)(vitest@4.1.10)
       '@oxc-parser/binding-linux-x64-gnu':
         specifier: catalog:dev
         version: 0.140.0
@@ -2633,6 +2655,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
+      '@codspeed/vitest-plugin':
+        specifier: catalog:test
+        version: 5.5.0(tinybench@2.9.0)(vitest@4.1.10)
       '@oxc-parser/binding-linux-x64-gnu':
         specifier: catalog:dev
         version: 0.140.0
@@ -2961,6 +2986,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
+      '@codspeed/vitest-plugin':
+        specifier: catalog:test
+        version: 5.5.0(tinybench@2.9.0)(vitest@4.1.10)
       '@csstools/css-parser-algorithms':
         specifier: catalog:style
         version: 4.0.0(@csstools/css-tokenizer@4.0.0)
@@ -3162,6 +3190,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
+      '@codspeed/vitest-plugin':
+        specifier: catalog:test
+        version: 5.5.0(tinybench@2.9.0)(vitest@4.1.10)
       '@jridgewell/source-map':
         specifier: catalog:test
         version: 0.3.11
@@ -18428,12 +18459,11 @@ snapshots:
       - debug
       - supports-color
 
-  '@codspeed/vitest-plugin@5.5.0(tinybench@2.9.0)(vite@8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10)':
+  '@codspeed/vitest-plugin@5.5.0(tinybench@2.9.0)(vitest@4.1.10)':
     dependencies:
       '@codspeed/core': 5.5.0
       tinybench: 2.9.0
-      vite: 8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0)
-      vitest: 4.1.10(@types/node@25.9.1)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(happy-dom@20.10.6)(vite@8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))
+      vitest: 4.1.10(@types/node@26.1.1)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(happy-dom@20.10.6)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))
     transitivePeerDependencies:
       - debug
       - supports-color
@@ -23479,14 +23509,6 @@ snapshots:
       '@vitest/utils': 4.1.10
       chai: 6.2.2
       tinyrainbow: 3.1.0
-
-  '@vitest/mocker@4.1.10(vite@8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))':
-    dependencies:
-      '@vitest/spy': 4.1.10
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      vite: 8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0)
 
   '@vitest/mocker@4.1.10(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))':
     dependencies:
@@ -32970,36 +32992,6 @@ snapshots:
       terser: 5.47.1
       tsx: 4.23.1
       yaml: 2.9.0
-
-  vitest@4.1.10(@types/node@25.9.1)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(happy-dom@20.10.6)(vite@8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0)):
-    dependencies:
-      '@vitest/expect': 4.1.10
-      '@vitest/mocker': 4.1.10(vite@8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))
-      '@vitest/pretty-format': 4.1.10
-      '@vitest/runner': 4.1.10
-      '@vitest/snapshot': 4.1.10
-      '@vitest/spy': 4.1.10
-      '@vitest/utils': 4.1.10
-      es-module-lexer: 2.1.0
-      expect-type: 1.3.0
-      magic-string: 0.30.21
-      obug: 2.1.3
-      pathe: 2.0.3
-      picomatch: 4.0.5
-      std-env: 4.1.0
-      tinybench: 2.9.0
-      tinyexec: 1.2.4
-      tinyglobby: 0.2.17
-      tinyrainbow: 3.1.0
-      vite: 8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@types/node': 25.9.1
-      '@vitest/coverage-v8': 4.1.10(vitest@4.1.10)
-      '@vitest/ui': 4.1.10(vitest@4.1.10)
-      happy-dom: 20.10.6
-    transitivePeerDependencies:
-      - msw
 
   vitest@4.1.10(@types/node@26.1.1)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(happy-dom@20.10.6)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0)):
     dependencies:

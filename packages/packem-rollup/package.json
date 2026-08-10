@@ -93,7 +93,7 @@
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
         "lint:types": "tsc --noEmit",
         "test": "vitest run",
-        "test:bench": "vitest bench --run",
+        "test:bench": "vitest bench --run --config vitest.bench.config.ts",
         "test:coverage": "vitest run --coverage",
         "test:ui": "vitest --ui --coverage.enabled=true",
         "test:watch": "vitest"
@@ -132,6 +132,7 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@codspeed/vitest-plugin": "catalog:test",
         "@oxc-parser/binding-linux-x64-gnu": "catalog:dev",
         "@oxc-project/types": "catalog:dev",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",

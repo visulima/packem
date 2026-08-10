@@ -2,8 +2,18 @@
     "$schema": "https://json.schemastore.org/tsconfig",
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "lib": ["es2023", "dom", "dom.iterable"],
+        "lib": [
+            "es2023",
+            "dom",
+            "dom.iterable"
+        ],
         "moduleResolution": "bundler"
     },
-    "include": ["src/**/*", "*.d.ts", "__tests__/index.test.ts", "__bench__/**/*"]
+    "include": [
+        "src/**/*",
+        "*.d.ts",
+        "__tests__/index.test.ts",
+        "__bench__/**/*",
+        "vitest.bench.config.ts"
+    ]
 }
