@@ -362,7 +362,7 @@
     },
     "dependencies": {
         "@antfu/install-pkg": "1.1.0",
-        "@babel/parser": "7.28.3",
+        "@babel/parser": "7.29.8",
         "@clack/prompts": "0.11.0",
         "@csstools/css-parser-algorithms": "3.0.5",
         "@csstools/css-tokenizer": "3.0.4",
