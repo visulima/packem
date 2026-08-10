@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { versions } from "node:process";
 
 import { cyan } from "@visulima/colorize";
@@ -851,17 +851,24 @@ export const buildPurePlugins = (
  * - `optionalDependencies` — consumers may not install these
  * - Peer dependencies marked as optional in `peerDependenciesMeta` — consumers
  *   only install the ones they need (e.g. multi-framework libraries like unplugin)
- * - `devDependencies` that the JS build actually bundled — the JS build inlines
- *   devDeps by default (`resolveExternals.devDeps: false`), so the emitted .d.ts
- *   must follow suit. Without this, value-and-type re-exports like
+ * - `devDependencies` that are not also a dependency or peerDependency — the JS
+ *   build inlines devDeps by default (`resolveExternals.devDeps: false`), so the
+ *   emitted .d.ts must follow suit. Without this, value-and-type re-exports like
  *   `export { type X, default as y } from "some-devdep"` stay external in the
  *   .d.ts while the .js inlines `y` into the bundle, leaving consumers' builds
- *   to chase transitive specifiers that aren't runtime deps of the package.
+ *   to chase transitive specifiers that aren't runtime deps of the package — and
+ *   a types-only devDep (`import type { … } from "type-fest"`) leaves an import
+ *   no consumer can resolve, since they never install it.
  *
  * The user can extend or override via `rollup.dts.resolve`:
  * - `false` -> disable auto-resolution, keep all deps external in .d.ts
  * - `true`  -> inline ALL node_modules types
  * - `(string | RegExp)[]` -> merged with the auto-detected list
+ * - `"!name"` -> drop `name` from the auto-detected list (e.g. `"!typescript"` to
+ *   keep a heavyweight devDep's types external when consumers are known to have it)
+ *
+ * To keep a devDep out of both the bundled code and the emitted types, name it in the
+ * top-level `externals` option — auto-detection skips anything listed there.
  */
 const collectOptionalPeerDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
     if (!context.pkg.peerDependenciesMeta) {
@@ -876,23 +883,107 @@ const collectOptionalPeerDeps = (context: BuildContext<InternalBuildOptions>, pe
     }
 };
 
-const collectBundledDevDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
-    // Include devDeps the JS build bundled. usedDependencies is populated by the
-    // externals plugin during the JS build (which runs before DTS), so we only
-    // inline devDeps that actually appeared in the bundled JS — skipping the
-    // long tail of build-time-only devDeps (typescript, eslint, type-fest used
-    // purely as local casts, …) that would otherwise bloat the emitted .d.ts.
+/**
+ * A package that ships declarations and no runtime entry — `type-fest`, `@types/*`.
+ *
+ * These are the devDeps the `usedDependencies` gate below structurally cannot see: with
+ * no JS to import, they are only ever imported in type position, so the TS transform
+ * erases them before the JS build constructs a module graph.
+ *
+ * Reading the manifest is the only way to tell before the DTS build runs, but it costs
+ * one `existsSync` + one small read per devDep the JS build did not already reach, and
+ * only for a package that resolved at all.
+ */
+const isTypesOnlyPackage = (rootDirectory: string, name: string): boolean => {
+    const manifestPath = resolve(rootDirectory, "node_modules", name, "package.json");
+
+    if (!existsSync(manifestPath)) {
+        return false;
+    }
+
+    let manifest: { exports?: unknown; main?: unknown; module?: unknown };
+
+    try {
+        manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as typeof manifest;
+    } catch {
+        // A manifest we cannot parse is not one we should silently start inlining.
+        return false;
+    }
+
+    if (manifest.main !== undefined || manifest.module !== undefined) {
+        return false;
+    }
+
+    // `exports` may name a runtime entry through any condition other than `types`.
+    // A string form (`exports: "./index.js"`) is a runtime entry by definition.
+    const hasRuntimeExport = (node: unknown): boolean => {
+        if (typeof node === "string") {
+            return true;
+        }
+
+        if (node === null || typeof node !== "object") {
+            return false;
+        }
+
+        return Object.entries(node as Record<string, unknown>).some(([condition, child]) => condition !== "types" && hasRuntimeExport(child));
+    };
+
+    return manifest.exports !== undefined && !hasRuntimeExport(manifest.exports);
+};
+
+const collectInlinableDevDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
+    // A devDependency is one the consumer never installs, so a devDep left external in
+    // the emitted .d.ts is an import that resolves only where the package manager
+    // happens to hoist it, and fails for everyone else. Two disjoint cases reach the
+    // declarations, and each needs its own detection:
     //
-    // Exclude devDeps that are also declared as peerDependencies: the JS build
-    // externalizes peer deps (consumer provides the runtime), so the emitted
-    // .d.ts must match and keep them external too. Optional peer deps are
-    // still inlined above to cover the multi-framework case.
+    // 1. The JS build bundled it — `usedDependencies`, populated by the externals plugin
+    //    during the JS build (which runs before DTS). Matching it keeps the .d.ts
+    //    consistent with what the .js actually inlined.
+    //
+    // 2. It ships no runtime entry at all. A types-only package is imported purely in
+    //    type position, so the TS transform erases it before rollup builds a module
+    //    graph and it never lands in `usedDependencies` — the one leak the gate above
+    //    structurally cannot see, and always broken for consumers.
+    //
+    // Deliberately NOT "every devDependency": that pulls a package's full declaration
+    // set in whenever it is reachable from an exported type, and build tooling with
+    // large declarations (`typescript` above all) is a devDep of nearly every project.
+    // Measured on this repo's own fixtures, inlining unconditionally cost 2-5x DTS build
+    // time. A devDep with a real runtime entry that a consumer genuinely needs belongs
+    // in `dependencies`/`peerDependencies`, or in `rollup.dts.resolve` explicitly.
+    //
+    // Packages the consumer *does* install stay external: peerDependencies (the
+    // consumer provides them) and dependencies (installed transitively), either of
+    // which a package may also list in devDependencies for local development. Optional
+    // peer deps are still inlined above to cover the multi-framework case.
+    //
+    // `externals` is the user's own opt-out: naming a devDep there is how you keep it
+    // out of both the bundled code and the emitted types. It has to be honoured here
+    // rather than downstream, because the externals plugin folds this list into its
+    // `exclude` set — so auto-detecting a package the user externalized would defeat
+    // the very entry they added to externalize it.
     if (context.options.rollup.resolveExternals?.devDeps) {
         return;
     }
 
+    const deps = context.pkg.dependencies ?? {};
+    const { externals: userExternals, rootDir } = context.options;
+    const isUserExternal = (name: string): boolean =>
+        userExternals.some((pattern) => {
+            if (typeof pattern === "string") {
+                return pattern === name;
+            }
+
+            return pattern.test(name);
+        });
+
     for (const name of Object.keys(context.pkg.devDependencies ?? {})) {
-        if (context.usedDependencies.has(name) && !(name in peerDeps)) {
+        if (name in peerDeps || name in deps || isUserExternal(name)) {
+            continue;
+        }
+
+        if (context.usedDependencies.has(name) || isTypesOnlyPackage(rootDir, name)) {
             autoResolve.push(name);
         }
     }
@@ -961,7 +1052,7 @@ export const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): 
     const peerDeps = context.pkg.peerDependencies ?? {};
 
     collectOptionalPeerDeps(context, peerDeps, autoResolve);
-    collectBundledDevDeps(context, peerDeps, autoResolve);
+    collectInlinableDevDeps(context, peerDeps, autoResolve);
 
     if (autoResolve.length === 0 && !userResolve) {
         return false;

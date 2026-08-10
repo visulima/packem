@@ -250,6 +250,16 @@ Packem automatically inlines types from **optional peer dependencies** and **opt
 Types are automatically inlined for:
 - Packages in `optionalDependencies`
 - Packages in `peerDependencies` that are marked as optional in `peerDependenciesMeta`
+- Packages in `devDependencies` that the JS build bundled
+- Packages in `devDependencies` that ship **no runtime entry** — types-only packages such as `type-fest` and `@types/*`
+
+Packages in `dependencies` and required `peerDependencies` stay external, because consumers install them and can resolve the import themselves. A `devDependency` listed in either is treated as that, not as a devDependency.
+
+A `devDependency` is inlined because a consumer never installs it. Leaving `import type { Simplify } from 'type-fest'` in your published `.d.ts` produces an import that only resolves where the package manager happens to hoist `type-fest`, and fails for everyone else. Types-only packages need their own detection because they never appear in your JS bundle at all — an `import type` is erased at transform time, but the type still reaches your declarations.
+
+<Callout type="info">
+Build tooling with a runtime entry — `typescript`, `eslint`, bundlers — is **not** inlined just for being a devDependency, even when reachable from an exported type. Those carry large declaration sets and inlining them unconditionally can multiply declaration build time several times over. If consumers genuinely need such a package's types, move it to `dependencies`/`peerDependencies`, or name it in `rollup.dts.resolve` explicitly.
+</Callout>
 
 ```json
 {
@@ -289,7 +299,29 @@ export default defineConfig({
 Options:
 - `true` — inline types from all node\_modules
 - `false` — disable auto-resolution, keep all dependencies external in `.d.ts`
-- `(string | RegExp)[]` — merged with auto-detected optional peers/deps
+- `(string | RegExp)[]` — merged with auto-detected optional peers/deps and devDeps
+- `'!name'` — drop `name` from the auto-detected list
+
+Use `'!name'` to keep one auto-detected package's types external:
+
+```typescript
+rollup: {
+  dts: {
+    resolve: ['!some-types-only-devdep']
+  }
+}
+```
+
+### Keeping a Package Out of Both Code and Types
+
+`rollup.dts.resolve` only controls declarations. To keep a package external in **both** the bundled JS and the emitted `.d.ts`, name it in the top-level [`externals`](/docs/options/externals) option — auto-detection skips anything listed there:
+
+```typescript
+export default defineConfig({
+  transformer,
+  externals: ['type-fest']
+})
+```
 
 ## Multiple Entry Points
 
