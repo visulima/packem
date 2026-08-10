@@ -75,6 +75,7 @@
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",
         "eslint": "catalog:lint",
+        "happy-dom": "catalog:prod",
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
         "rimraf": "catalog:node",

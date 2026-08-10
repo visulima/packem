@@ -1896,6 +1896,9 @@ importers:
       eslint:
         specifier: catalog:lint
         version: 10.7.0(jiti@2.7.0)(supports-color@7.2.0)
+      happy-dom:
+        specifier: catalog:prod
+        version: 20.10.6
       prettier:
         specifier: catalog:lint
         version: 3.9.5

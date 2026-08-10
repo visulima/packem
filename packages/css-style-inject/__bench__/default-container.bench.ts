@@ -10,9 +10,10 @@ import { cssStyleInject } from "../src";
 // container path and includes a "before" baseline that resolves the container
 // the old way so the win is directly comparable in the same describe block.
 //
-// Requires the jsdom (or happy-dom) environment. Add the directive so the
-// bench is self-contained regardless of the package default test environment.
-// @vitest-environment jsdom
+// Needs a DOM. happy-dom rather than jsdom: it is already the workspace's
+// catalogued DOM environment, so this adds no new dependency tree for a bench
+// that only touches `document.head`.
+// @vitest-environment happy-dom
 
 const CSS = ".bench-a{color:red}";
 

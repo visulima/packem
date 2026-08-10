@@ -13,6 +13,7 @@ export default createConfig(
             "__docs__",
             "examples",
             "vitest.config.ts",
+            "vitest.bench.config.ts",
             "packem.config.ts",
             ".secretlintrc.cjs",
             ".prettierrc.cjs",

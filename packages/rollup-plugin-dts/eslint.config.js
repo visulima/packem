@@ -19,6 +19,7 @@ export default createConfig(
             "__tests__/__snapshots__/**",
             "__tests__/temp/**",
             "vitest.config.ts",
+            "vitest.bench.config.ts",
             "packem.config.ts",
             ".secretlintrc.cjs",
             ".prettierrc.cjs",

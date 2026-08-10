@@ -48,20 +48,20 @@ jobs:
                   token: "${{ github.token }}"
                   filters: ".github/file-filters.yml"
 
-    benchmark:
-        name: "Benchmarks"
+    # One runner per bench project. Separate runners mean no CPU contention between
+    # projects — something a single sequential job cannot promise — and wall-clock
+    # becomes the slowest project rather than the sum of all of them.
+    discover:
+        name: "Discover bench projects"
         # `!cancelled()` rather than the implicit success(): files-changed is skipped
         # on push and workflow_dispatch, which would otherwise skip this job too.
         if: "!cancelled() && (github.event_name != 'pull_request' || needs.files-changed.outputs.packages == 'true')"
         needs: "files-changed"
         runs-on: "ubuntu-latest"
-        timeout-minutes: 30
-        # Scope the CodSpeed OIDC token to an environment so secrets and reviewer
-        # rules (configured in repo settings) can apply to benchmark uploads.
-        environment: "benchmarks"
-        permissions:
-            contents: "read"
-            id-token: "write" # required for OIDC authentication with CodSpeed
+        timeout-minutes: 10
+        outputs:
+            has-benches: "${{ steps.affected.outputs.has-benches }}"
+            matrix: "${{ steps.affected.outputs.matrix }}"
         steps:
             - name: "Harden Runner"
               uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
@@ -82,6 +82,72 @@ jobs:
               uses: "anolilab/workflows/step/setup@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
               with:
                   node-version: "22.x"
+                  cache-prefix: "codspeed-discover"
+
+            # On a pull request only the benches whose project (or an upstream dependency)
+            # changed; on push every bench, so each branch head keeps a complete baseline
+            # for later pull requests to compare against.
+            - name: "Compute bench projects"
+              id: "affected"
+              shell: "bash"
+              env:
+                  EVENT_NAME: "${{ github.event_name }}"
+              run: |
+                  if [ "$EVENT_NAME" = "pull_request" ]; then
+                      projects=$(pnpm exec nx show projects --affected --withTarget=test:bench --json 2>/dev/null | grep -E '^\[' | tail -n 1)
+                  else
+                      projects=$(pnpm exec nx show projects --withTarget=test:bench --json 2>/dev/null | grep -E '^\[' | tail -n 1)
+                  fi
+
+                  # `benchmarks` owns a test:bench target too, but it is the end-to-end
+                  # build comparison: it measures wall-clock, must run sequentially on one
+                  # machine, and has nothing for CodSpeed to instrument.
+                  projects=$(echo "${projects:-[]}" | jq -c '[.[] | select(. != "benchmarks")]')
+
+                  if [ "$projects" = "[]" ]; then
+                      echo "No affected bench projects."
+                      echo "has-benches=false" >> "$GITHUB_OUTPUT"
+                      echo "matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+                      exit 0
+                  fi
+
+                  echo "Bench projects: $projects"
+                  echo "has-benches=true" >> "$GITHUB_OUTPUT"
+                  echo "matrix=$(echo "$projects" | jq -c '{include: [.[] | {project: .}]}')" >> "$GITHUB_OUTPUT"
+
+    benchmark:
+        name: "Bench: ${{ matrix.project }}"
+        needs: "discover"
+        if: "${{ needs.discover.outputs.has-benches == 'true' }}"
+        runs-on: "ubuntu-latest"
+        timeout-minutes: 30
+        strategy:
+            # One project failing should not cancel the rest: a partial set of
+            # measurements is still worth uploading.
+            fail-fast: false
+            matrix: "${{ fromJSON(needs.discover.outputs.matrix) }}"
+        # Scope the CodSpeed OIDC token to an environment so secrets and reviewer
+        # rules (configured in repo settings) can apply to benchmark uploads.
+        environment: "benchmarks"
+        permissions:
+            contents: "read"
+            id-token: "write" # required for OIDC authentication with CodSpeed
+        steps:
+            - name: "Harden Runner"
+              uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
+              with:
+                  egress-policy: "audit"
+
+            - name: "Git checkout"
+              uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+              with:
+                  # Full history so `nx affected` can resolve the PR base ref.
+                  fetch-depth: 0
+
+            - name: "Setup resources and environment"
+              uses: "anolilab/workflows/step/setup@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
+              with:
+                  node-version: "22.x"
                   cache-prefix: "codspeed"
                   install-node-gyp: "true"
 
@@ -90,26 +156,12 @@ jobs:
             - name: "Build packages"
               run: "pnpm run build:prod:packages"
 
-            # On a pull request only the benches whose project (or an upstream dependency)
-            # changed are run; on push every bench runs so CodSpeed always has a complete,
-            # fresh baseline. `--skip-nx-cache` forces real execution — a cache hit would
-            # short-circuit the run and hand CodSpeed no measurements at all.
-            - name: "Resolve benchmark command"
-              id: "bench-cmd"
-              shell: "bash"
+            # `--skip-nx-cache` is deliberate: a cache hit would short-circuit the run
+            # and hand CodSpeed no measurements at all.
+            - name: "Run benchmark"
               env:
-                  # Bound to env rather than interpolated into the script so untrusted
-                  # context never reaches the shell directly (zizmor template-injection).
-                  EVENT_NAME: "${{ github.event_name }}"
-              run: |
-                  if [ "$EVENT_NAME" = "pull_request" ]; then
-                      echo "run=pnpm exec nx affected --target=test:bench --skip-nx-cache" >> "$GITHUB_OUTPUT"
-                  else
-                      echo "run=pnpm exec nx run-many --target=test:bench --all --skip-nx-cache" >> "$GITHUB_OUTPUT"
-                  fi
-
-            - name: "Run benchmarks"
+                  BENCH_PROJECT: "${{ matrix.project }}"
               uses: "CodSpeedHQ/action@f99becdce5e5d51fd556489ebef684f4ecfd6286" # v4.18.5
               with:
                   mode: "simulation"
-                  run: "${{ steps.bench-cmd.outputs.run }}"
+                  run: "pnpm exec nx run \"$BENCH_PROJECT\":test:bench --skip-nx-cache"
