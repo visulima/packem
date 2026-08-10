@@ -26,7 +26,7 @@
         }
     ],
     "license": "MIT",
-    "author": "三咲智子 Kevin Deng <sxzz@sxzz.moe>",
+    "author": "\u4e09\u54b2\u667a\u5b50 Kevin Deng <sxzz@sxzz.moe>",
     "contributors": [
         {
             "name": "Daniel Bannert",
@@ -68,7 +68,7 @@
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
         "lint:types": "tsc --noEmit",
         "test": "vitest run --cache",
-        "test:bench": "vitest bench --run",
+        "test:bench": "vitest bench --run --config vitest.bench.config.ts",
         "test:coverage": "vitest run --cache --coverage",
         "test:ui": "vitest --cache --ui --coverage.enabled=true",
         "test:watch": "vitest"
@@ -91,6 +91,7 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@codspeed/vitest-plugin": "catalog:test",
         "@jridgewell/source-map": "catalog:test",
         "@sxzz/test-utils": "catalog:test",
         "@types/debug": "catalog:types",

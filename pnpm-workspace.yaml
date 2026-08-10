@@ -220,6 +220,7 @@ catalogs:
     sass-embedded: 1.100.0
     tailwindcss: 4.3.2
   test:
+    "@codspeed/vitest-plugin": ^5.5.0
     "@jridgewell/source-map": ^0.3.11
     "@sxzz/test-utils": 0.5.18
     "@vitest/coverage-v8": 4.1.10
