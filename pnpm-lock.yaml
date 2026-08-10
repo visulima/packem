@@ -639,8 +639,6 @@ overrides:
   ws@>=8.0.0 <8.21.0: '>=8.21.0'
   yaml@>=2.0.0 <2.8.3: '>=2.8.3'
 
-pnpmfileChecksum: sha256-fPJY5NeVZcVx92LoeUexKpcIFjrKsne5JpBRIOMaDwQ=
-
 patchedDependencies:
   oxc-parser: 464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76
 
@@ -905,8 +903,6 @@ importers:
         version: 5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
 
   benchmarks/projects/js-small: {}
-
-  benchmarks/projects/js-synthetic: {}
 
   benchmarks/projects/react-empty:
     dependencies:
@@ -4891,7 +4887,7 @@ packages:
     resolution: {integrity: sha512-eWpQYr67tqJLeaSUl0Q+TquuYfUdTibpOJlUMV2FfUP7+KqCC5TufnwnlXL6mobZBJbGAYRd7ZvEBDCbLInjhg==}
     engines: {node: '>=20'}
     peerDependencies:
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
 
   '@html-eslint/core@0.60.0':
     resolution: {integrity: sha512-P2+ymEBt7EZ8sh1xc4XNA1/zSyDhSA1ppWyBBwPvGfY8VnDfmtd5UKr6AD24htABwzNJ6WcBIV3lAx5crtozfg==}
@@ -8843,7 +8839,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       next: '>=14.0'
       rotating-file-stream: '>=3.2.9'
     peerDependenciesMeta:
@@ -11658,7 +11654,7 @@ packages:
       graphile-config: ^1.0.0
       graphql: ^16.9.0
       h3: ^1.13.0
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       ws: '>=8.21.0'
     peerDependenciesMeta:
       '@envelop/core':

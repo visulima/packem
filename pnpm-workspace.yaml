@@ -96,7 +96,7 @@ catalogs:
     typedoc-plugin-rename-defaults: 0.7.3
   frontend:
     "@babel/preset-react": ^8.0.1
-    "@radix-ui/react-tooltip": ^1.2.12
+    "@radix-ui/react-tooltip": ^1.2.16
     "@vue/language-core": 3.3.7
     babel-plugin-react-compiler: 1.0.0
     preact: 10.29.7
