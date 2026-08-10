@@ -906,8 +906,6 @@ importers:
 
   benchmarks/projects/js-small: {}
 
-  benchmarks/projects/js-synthetic: {}
-
   benchmarks/projects/react-empty:
     dependencies:
       '@emotion/react':
