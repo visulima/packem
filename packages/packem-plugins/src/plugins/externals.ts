@@ -270,6 +270,35 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
             calledImplicitExternals.clear();
         },
 
+        // Rollup records the specifier of every import it left external on each emitted
+        // chunk, so this is the one place the question can be answered from fact rather
+        // than by replaying the resolve decisions: what did we actually ask the consumer
+        // to resolve? A package that only appears in devDependencies is one the consumer
+        // never installs — the import resolves for us and for anyone whose installer
+        // happens to hoist it, and fails for everyone else.
+        generateBundle(_outputOptions, bundle) {
+            for (const chunk of Object.values(bundle)) {
+                if (chunk.type !== "chunk") {
+                    continue;
+                }
+
+                for (const specifier of [...chunk.imports, ...chunk.dynamicImports]) {
+                    // Chunk-to-chunk edges name a file in this bundle, not a package.
+                    if (specifier in bundle) {
+                        continue;
+                    }
+
+                    const specifierPkg = getPackageName(specifier);
+
+                    if (!specifierPkg || isNodeBuiltin(specifierPkg) || !devDeps.has(specifierPkg) || runtimeDependencies.has(specifierPkg)) {
+                        continue;
+                    }
+
+                    context.externalizedDevDependencies.add(specifierPkg);
+                }
+            }
+        },
+
         name: "packem:externals",
 
         // The options hook sets rollup's `external` function — the final arbiter rollup

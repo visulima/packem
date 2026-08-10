@@ -732,6 +732,7 @@ const createContext = async (
         buildEntries: [],
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
+        externalizedDevDependencies: new Set(),
         hoistedDependencies: new Set(),
         // `createHooks` is generic over the hook map; typing it against the
         // shared `BuildHooks` contract makes it structurally match

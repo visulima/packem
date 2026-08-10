@@ -15,6 +15,20 @@ const NODE_JS_VERSION = `${splitNodeJsVersion[0] ?? ""}.${splitNodeJsVersion[1] 
 
 const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
 
+// The client fixture exports one symbol under two names (`Client`, and
+// `Client as UIClient`), and rolldown names the shared chunk after whichever
+// export it reaches first — `Client-<hash>.mjs` on most runs, `UIClient-<hash>.mjs`
+// on some. The hash is identical either way, so the chunk really is the same
+// chunk; only the derived base name moves. Both spellings are correct output, so
+// the assertions accept either and compare against the canonical one.
+const CLIENT_CHUNK_PREFIX_REGEX = /^(?:UI)?Client-/;
+const CLIENT_CHUNK_PATH_REGEX = /packem_shared\/(?:UI)?Client-/g;
+
+const canonicalizeClientChunkName = (content: string): string => content.replaceAll(CLIENT_CHUNK_PATH_REGEX, "packem_shared/Client-");
+
+const findClientChunk = (files: string[], extension: string): string | undefined =>
+    files.find((file) => CLIENT_CHUNK_PREFIX_REGEX.test(file) && file.endsWith(extension));
+
 // Match the assigned string-literal value regardless of quote style: rollup
 // emits double quotes (`= "production"`) while rolldown's codegen emits
 // backtick template literals (`` = `production` ``) for the same value. Both
@@ -1476,12 +1490,12 @@ export function Client() {
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
-        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+        expect(canonicalizeClientChunkName(normalizeBundleOutput(mjsContent))).toMatchSnapshot();
 
         const sharedDirectory = `${temporaryDirectoryPath}/dist/packem_shared`;
         const sharedFiles = readdirSync(sharedDirectory);
-        const mjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".mjs"));
-        const cjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".cjs"));
+        const mjsClientFile = findClientChunk(sharedFiles, ".mjs");
+        const cjsClientFile = findClientChunk(sharedFiles, ".cjs");
 
         expect(mjsClientFile, `expected a Client-*.mjs file in ${sharedDirectory}, found: ${sharedFiles.join(", ")}`).toBeDefined();
         expect(cjsClientFile, `expected a Client-*.cjs file in ${sharedDirectory}, found: ${sharedFiles.join(", ")}`).toBeDefined();
@@ -1489,7 +1503,7 @@ export function Client() {
         const mjsClientContent = readFileSync(`${sharedDirectory}/${String(mjsClientFile)}`);
 
         // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
-        expect(normalizeBundleOutput(mjsClientContent)).toMatchSnapshot();
+        expect(canonicalizeClientChunkName(normalizeBundleOutput(mjsClientContent))).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
@@ -1499,7 +1513,7 @@ export function Client() {
         const cjsClientContent = readFileSync(`${sharedDirectory}/${String(cjsClientFile)}`);
 
         // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
-        expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
+        expect(canonicalizeClientChunkName(normalizeBundleOutput(cjsClientContent))).toMatchSnapshot();
     });
 
     it("should generate proper assets for each exports for server components", async () => {
@@ -1584,14 +1598,14 @@ export const asset = "asset-module";
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
-        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
+        expect(canonicalizeClientChunkName(normalizeBundleOutput(mjsContent))).toMatchSnapshot();
 
         const sharedDirectory = `${temporaryDirectoryPath}/dist/packem_shared`;
         const sharedFiles = readdirSync(sharedDirectory);
         const mjsActionFile = sharedFiles.find((f) => f.startsWith("action-") && f.endsWith(".mjs"));
         const cjsActionFile = sharedFiles.find((f) => f.startsWith("action-") && f.endsWith(".cjs"));
-        const mjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".mjs"));
-        const cjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".cjs"));
+        const mjsClientFile = findClientChunk(sharedFiles, ".mjs");
+        const cjsClientFile = findClientChunk(sharedFiles, ".cjs");
 
         const filesInDirectory = `expected matching shared file in ${sharedDirectory}, found: ${sharedFiles.join(", ")}`;
 
@@ -1608,7 +1622,7 @@ export const asset = "asset-module";
         const mjsClientContent = readFileSync(`${sharedDirectory}/${String(mjsClientFile)}`);
 
         // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
-        expect(normalizeBundleOutput(mjsClientContent)).toMatchSnapshot();
+        expect(canonicalizeClientChunkName(normalizeBundleOutput(mjsClientContent))).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
@@ -1623,7 +1637,7 @@ export const asset = "asset-module";
         const cjsClientContent = readFileSync(`${sharedDirectory}/${String(cjsClientFile)}`);
 
         // eslint-disable-next-line vitest/prefer-snapshot-hint -- adding a hint re-keys the committed snapshot; regenerating snapshots is out of scope here, so a hint would orphan the stored snapshot and fail the test.
-        expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
+        expect(canonicalizeClientChunkName(normalizeBundleOutput(cjsClientContent))).toMatchSnapshot();
     });
 
     it("should find all files in the same directory if globstar is used", async () => {
