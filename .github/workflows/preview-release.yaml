@@ -4,6 +4,11 @@ on: # yamllint disable-line rule:truthy
     # eslint-disable-next-line yml/no-empty-mapping-value
     pull_request: # yamllint disable-line rule:empty-values
 
+# A new push to a pull request supersedes the preview it would have published.
+concurrency:
+    group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+    cancel-in-progress: true
+
 permissions:
     contents: "read" # to fetch code (actions/checkout)
 

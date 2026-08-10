@@ -2,33 +2,30 @@ name: "Lint"
 on: # yamllint disable-line rule:truthy
     pull_request:
         branches: ["main", "alpha"]
+    merge_group: # yamllint disable-line rule:empty-values
+
+concurrency:
+    group: "${{ github.workflow }}-${{ github.ref }}"
+    cancel-in-progress: true
+
 permissions: {}
 jobs:
     lint:
         permissions:
             contents: "read"
             pull-requests: "read"
-        uses: "anolilab/workflows/.github/workflows/lint.yml@045a2d464dad0661a570c8a3c19f4b32bf9efad9" # v15.3.0+
+        uses: "anolilab/workflows/.github/workflows/lint.yml@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
         with:
             lint_eslint: true
             lint_types: true
             lint_attw: true
             lint_package_json: true
-            # Disabled until `lint:text` is fixed. The script passes `--parallel`, which
-            # textlint has no such option for, so the job fails on argument parsing before
-            # linting anything. Dropping the flag is not enough on its own — textlint then
-            # runs and reports 642 pre-existing prose errors (319 auto-fixable) across
-            # .github/ and packages/**. Re-enable once that backlog is cleared.
+            # `lint:text` no longer dies on an invalid `--parallel` flag, but now that it
+            # actually runs it reports 642 pre-existing prose errors (319 auto-fixable)
+            # across .github/ and packages/**. Nothing has ever exercised this job, so the
+            # backlog has to be cleared before it can gate anything. Re-enable then.
             lint_markdown: false
             lint_yaml: true
-            # Disabled because raven-actions/actionlint cannot run against a pnpm catalog
-            # workspace. To fetch its binary it runs
-            # `npm install --no-save @actions/tool-cache` in the repo root, where npm reads
-            # our package.json, hits the `catalog:` protocol and exits EUNSUPPORTEDPROTOCOL.
-            # That step is also what populates the tool cache, so the cache never warms and
-            # every run fails — it only ever surfaces on a PR that touches a workflow file,
-            # which is why nothing caught it sooner. Re-enable once the shared workflow
-            # stops installing that dependency into the consumer's workspace.
-            lint_actionlint: false
+            lint_actionlint: true
             lint_rust: false
             node_version: "22"
