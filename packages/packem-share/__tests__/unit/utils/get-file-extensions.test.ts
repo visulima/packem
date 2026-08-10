@@ -11,6 +11,7 @@ const createOptions = (options: Partial<FileExtensionOptions> = {}): BuildContex
         buildEntries: [],
         dependencyGraphMap: new Map(),
         environment: undefined,
+        externalizedDevDependencies: new Set<string>(),
         hoistedDependencies: new Set(),
         hooks: {} as never,
         implicitDependencies: new Set(),

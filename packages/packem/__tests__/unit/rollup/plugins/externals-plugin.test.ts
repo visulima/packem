@@ -73,7 +73,8 @@ describe("externals-plugin", () => {
         new MockPluginContext(
             externalsPlugin({
                 externals: [],
-                hoistedDependencies: new Set(),
+                externalizedDevDependencies: new Set<string>(),
+        hoistedDependencies: new Set(),
                 implicitDependencies: new Set(),
                 logger,
                 options: {

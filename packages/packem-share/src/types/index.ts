@@ -39,6 +39,8 @@ export type BuildContext<T = unknown> = {
     buildEntries: (BuildContextBuildAssetAndChunk | BuildContextBuildEntry)[];
     dependencyGraphMap: Map<string, Set<[string, string]>>;
     environment: Environment;
+    /** Packages the emitted bundle imports that only appear in `devDependencies` — declared for us, absent for consumers. */
+    externalizedDevDependencies: Set<string>;
     hoistedDependencies: Set<string>;
     hooks: Hookable<BuildHooks<T>>;
     implicitDependencies: Set<string>;

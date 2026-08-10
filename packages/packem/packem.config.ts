@@ -5,7 +5,6 @@ import { defineConfig } from "./src/config";
 export default defineConfig({
     cjsInterop: true,
     externals: [
-        "@babel/parser",
         "@rolldown/node",
         "@rollup/plugin-alias",
         "@rollup/plugin-commonjs",

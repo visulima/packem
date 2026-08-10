@@ -2025,9 +2025,6 @@ importers:
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
-      '@babel/parser':
-        specifier: catalog:dev
-        version: 8.0.4
       '@babel/preset-react':
         specifier: catalog:frontend
         version: 8.0.1(@babel/core@8.0.1)

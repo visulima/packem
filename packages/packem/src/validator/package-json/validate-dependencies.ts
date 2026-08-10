@@ -13,6 +13,15 @@ const validateDependencies = (context: BuildContext<InternalBuildOptions>): void
         warn(context, message);
     }
 
+    if (context.externalizedDevDependencies.size > 0) {
+        const message
+            = `These packages are imported by the build output but only declared in devDependencies: ${joinWarnings(context.externalizedDevDependencies)}`
+                + `\n ↳ a consumer never installs them, so the import resolves only where the package manager happens to hoist it.`
+                + `\n ↳ move them to "dependencies" (or "peerDependencies" when the consumer should choose the version).`;
+
+        warn(context, message);
+    }
+
     let unusedDependencies = Object.keys(context.pkg.dependencies ?? {}).filter((index) => !context.usedDependencies.has(index));
 
     const { validation } = context.options;
