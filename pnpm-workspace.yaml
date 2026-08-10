@@ -19,13 +19,6 @@ allowBuilds:
   nx: true
   rs-module-lexer: true
   unrs-resolver: true
-auditConfig:
-  ignoreGhsas:
-    - GHSA-9vqf-7f2p-gf9v
-    - GHSA-69xw-7hcm-h432
-    - GHSA-23c5-xmqv-rm74
-    - GHSA-7r86-cg39-jmmj
-    - GHSA-v8w9-8mx6-g223
 
 # --- Workspace settings ---
 
