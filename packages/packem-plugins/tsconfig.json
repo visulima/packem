@@ -5,5 +5,11 @@
         "moduleResolution": "bundler",
         "skipLibCheck": true
     },
-    "include": ["src/**/*", "*.d.ts", "__tests__/**/*", "__bench__/**/*"]
+    "include": [
+        "src/**/*",
+        "*.d.ts",
+        "__tests__/**/*",
+        "__bench__/**/*",
+        "vitest.bench.config.ts"
+    ]
 }
