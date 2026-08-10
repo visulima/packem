@@ -21,6 +21,14 @@ jobs:
             # .github/ and packages/**. Re-enable once that backlog is cleared.
             lint_markdown: false
             lint_yaml: true
-            lint_actionlint: true
+            # Disabled because raven-actions/actionlint cannot run against a pnpm catalog
+            # workspace. To fetch its binary it runs
+            # `npm install --no-save @actions/tool-cache` in the repo root, where npm reads
+            # our package.json, hits the `catalog:` protocol and exits EUNSUPPORTEDPROTOCOL.
+            # That step is also what populates the tool cache, so the cache never warms and
+            # every run fails — it only ever surfaces on a PR that touches a workflow file,
+            # which is why nothing caught it sooner. Re-enable once the shared workflow
+            # stops installing that dependency into the consumer's workspace.
+            lint_actionlint: false
             lint_rust: false
             node_version: "22"
