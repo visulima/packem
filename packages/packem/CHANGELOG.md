@@ -1,3 +1,12 @@
+## @visulima/packem [2.0.0-alpha.106](https://github.com/visulima/packem/compare/%40visulima%2Fpackem%402.0.0-alpha.105...%40visulima%2Fpackem%402.0.0-alpha.106) (2026-08-10)
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.59
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.63
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.85
+
 ## @visulima/packem [2.0.0-alpha.105](https://github.com/visulima/packem/compare/%40visulima%2Fpackem%402.0.0-alpha.104...%40visulima%2Fpackem%402.0.0-alpha.105) (2026-08-10)
 
 ## @visulima/packem [2.0.0-alpha.104](https://github.com/visulima/packem/compare/%40visulima%2Fpackem%402.0.0-alpha.103...%40visulima%2Fpackem%402.0.0-alpha.104) (2026-08-09)
