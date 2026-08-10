@@ -65,6 +65,7 @@ export const getLogger = (context: BuildContext<InternalBuildOptions>): Logger =
 };
 
 const CIRCULAR_NODE_MODULES_REGEX = /Circular dependency:[\s\S]*node_modules/;
+const GLOBAL_OR_STICKY_FLAG_REGEX = /[gy]/g;
 const MTS_EXTENSION_REGEX = /\.mts$/;
 
 // Exported for the shared JS-build builder in src/bundler/get-build-options.ts.
@@ -901,7 +902,7 @@ const isTypesOnlyPackage = (rootDirectory: string, name: string): boolean => {
         return false;
     }
 
-    let manifest: { exports?: unknown; main?: unknown; module?: unknown };
+    let manifest: { exports?: unknown; main?: unknown; module?: unknown; types?: unknown; typings?: unknown };
 
     try {
         manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as typeof manifest;
@@ -928,7 +929,15 @@ const isTypesOnlyPackage = (rootDirectory: string, name: string): boolean => {
         return Object.entries(node as Record<string, unknown>).some(([condition, child]) => condition !== "types" && hasRuntimeExport(child));
     };
 
-    return manifest.exports !== undefined && !hasRuntimeExport(manifest.exports);
+    if (manifest.exports !== undefined) {
+        return !hasRuntimeExport(manifest.exports);
+    }
+
+    // No `exports` map at all. Most `@types/*` packages are this shape — a top-level
+    // `types`/`typings` and nothing else — so requiring `exports` would miss the very
+    // packages this check exists for. With no `main`/`module` either, a declared types
+    // entry is the whole package.
+    return manifest.types !== undefined || manifest.typings !== undefined;
 };
 
 const collectInlinableDevDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
@@ -973,6 +982,15 @@ const collectInlinableDevDeps = (context: BuildContext<InternalBuildOptions>, pe
         userExternals.some((pattern) => {
             if (typeof pattern === "string") {
                 return pattern === name;
+            }
+
+            // `test` advances `lastIndex` on a global or sticky regex and resumes from
+            // there on the next call, so a user-supplied /g pattern would match the
+            // first devDep it is tried against and then miss later ones — silently
+            // auto-inlining packages the user externalized. Match against a stateless
+            // copy rather than mutating a regex the caller also passes to rollup.
+            if (pattern.global || pattern.sticky) {
+                return new RegExp(pattern.source, pattern.flags.replaceAll(GLOBAL_OR_STICKY_FLAG_REGEX, "")).test(name);
             }
 
             return pattern.test(name);

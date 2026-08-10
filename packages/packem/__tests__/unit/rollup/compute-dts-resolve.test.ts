@@ -26,9 +26,19 @@ const writeManifest = (name: string, manifest: Record<string, unknown>): void =>
 const writeFixtureManifests = (): void => {
     writeManifest("type-fest", { exports: { ".": { types: "./index.d.ts" } }, types: "./index.d.ts" });
     writeManifest("@scope/tooling", { exports: { ".": { types: "./index.d.ts" } } });
+    // Two of them, so a stateful /g pattern that skips the first can be caught skipping
+    // the second — one alone would pass whether or not `lastIndex` is handled.
+    writeManifest("@scope/a-tooling", { exports: { ".": { types: "./index.d.ts" } } });
+    writeManifest("@scope/b-tooling", { exports: { ".": { types: "./index.d.ts" } } });
     writeManifest("typescript", { exports: { ".": { default: "./lib/typescript.js", types: "./lib/typescript.d.ts" } }, main: "./lib/typescript.js" });
     writeManifest("react", { exports: { ".": { default: "./index.js", types: "./index.d.ts" } }, main: "./index.js" });
     writeManifest("defu", { exports: { ".": { import: "./dist/defu.mjs", types: "./dist/defu.d.ts" } } });
+    // The @types/* shape: a top-level `types` and no `exports` map at all.
+    writeManifest("@types/legacy", { types: "./index.d.ts" });
+    // Same, via the older `typings` alias.
+    writeManifest("legacy-typings", { typings: "./index.d.ts" });
+    // No `exports`, but a `main` — a runtime package that merely ships its own types.
+    writeManifest("legacy-runtime", { main: "./index.js", types: "./index.d.ts" });
 };
 
 interface ContextShape {
@@ -224,6 +234,44 @@ describe(computeDtsResolve, () => {
             createContext({
                 devDependencies: { "@scope/tooling": "1.0.0", "type-fest": "4.0.0" },
                 externals: [SCOPE_REGEX],
+            }),
+        );
+
+        expect(resolved).toStrictEqual(["type-fest"]);
+    });
+
+    // Most @types/* packages predate `exports` and declare only a top-level `types`.
+    // Requiring an `exports` map would have missed the very packages this detection
+    // exists for.
+    it("inlines a types-only devDependency that has no `exports` map", () => {
+        expect.assertions(1);
+
+        const resolved = computeDtsResolve(
+            createContext({
+                devDependencies: { "@types/legacy": "1.0.0", "legacy-typings": "1.0.0" },
+            }),
+        );
+
+        expect(resolved).toStrictEqual(["@types/legacy", "legacy-typings"]);
+    });
+
+    it("keeps a devDependency with `main` and no `exports` external", () => {
+        expect.assertions(1);
+
+        // Shipping its own types does not make a runtime package types-only.
+        expect(computeDtsResolve(createContext({ devDependencies: { "legacy-runtime": "1.0.0" } }))).toBe(false);
+    });
+
+    // `test` advances `lastIndex` on a global regex and resumes from there next call, so
+    // a shared /g pattern would match the first devDep and then miss later ones —
+    // auto-inlining packages the user had externalized.
+    it("applies a global regular expression in `externals` to every devDependency", () => {
+        expect.assertions(1);
+
+        const resolved = computeDtsResolve(
+            createContext({
+                devDependencies: { "@scope/a-tooling": "1.0.0", "@scope/b-tooling": "1.0.0", "type-fest": "4.0.0" },
+                externals: [/^@scope\//g],
             }),
         );
 
