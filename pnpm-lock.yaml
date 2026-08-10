@@ -864,6 +864,9 @@ importers:
       prettier:
         specifier: 3.8.3
         version: 3.8.3
+      rolldown:
+        specifier: catalog:build
+        version: 1.2.0
       rollup:
         specifier: ^4.61.0
         version: 4.62.2
@@ -897,6 +900,10 @@ importers:
       webpack:
         specifier: ^5.107.2
         version: 5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
+
+  benchmarks/projects/js-small: {}
+
+  benchmarks/projects/js-synthetic: {}
 
   benchmarks/projects/react-empty:
     dependencies:

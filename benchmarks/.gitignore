@@ -11,3 +11,6 @@ projects/*/.babelrc
 projects/*/.parcelrc
 projects/*/.terserrc
 projects/*/.env
+
+# Generated benchmark fixtures (see scripts/generate-js-project.ts)
+projects/js-synthetic/

@@ -1,9 +1,11 @@
+import { join } from "node:path";
 import { performance } from "node:perf_hooks";
 import { bunBuilder } from "../builders/bun";
 import { buncheeBuilder } from "../builders/bunchee";
 import { esbuildBuilder } from "../builders/esbuild";
 import { packemBuilder } from "../builders/packem";
 import { parcelBuilder } from "../builders/parcel";
+import { rolldownBuilder } from "../builders/rolldown";
 import { rollupBuilder } from "../builders/rollup";
 import { rspackBuilder } from "../builders/rspack";
 import { tsdownBuilder } from "../builders/tsdown";
@@ -13,6 +15,7 @@ import { webpackBuilder } from "../builders/webpack";
 import { errorToString, getArguments, getFileMetrics, summarizeSamples } from "./utils";
 import { displayBenchmarkResults } from "./utils";
 import type { Builder, BuilderOptions } from "../builders/types";
+import { existsSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 
 interface BuilderResult {
@@ -54,6 +57,7 @@ const getBuilderInstances = (): BuilderWithPreset[] => {
         buncheeBuilder,
         esbuildBuilder,
         parcelBuilder,
+        rolldownBuilder,
         rspackBuilder,
         tsdownBuilder,
         tsupBuilder,
@@ -140,7 +144,20 @@ const runBuilder = async (
 };
 
 const PROJECTS_DIR = "./projects";
-const DEFAULT_ENTRYPOINT = "src/index.tsx";
+const ENTRYPOINT_CANDIDATES = ["src/index.tsx", "src/index.jsx", "src/index.ts", "src/index.js"];
+
+// Projects are not all TSX: the plain-JavaScript fixtures enter through
+// `src/index.js`. Pick the first entry the project actually has instead of
+// assuming one, so a new fixture only has to exist to be benchmarked.
+const resolveEntrypoint = (project: string): string => {
+    const entrypoint = ENTRYPOINT_CANDIDATES.find(candidate => existsSync(join(PROJECTS_DIR, project, candidate)));
+
+    if (!entrypoint) {
+        throw new Error(`No entrypoint found for project "${project}" (looked for ${ENTRYPOINT_CANDIDATES.join(", ")})`);
+    }
+
+    return entrypoint;
+};
 const DEFAULT_OUTDIR = "./builds";
 
 const getProjects = async (): Promise<string[]> => {
@@ -151,12 +168,14 @@ const getProjects = async (): Promise<string[]> => {
 const runBenchmark = async (project: string, runs: number, warmup: number): Promise<void> => {
     console.log(`\n${'='.repeat(80)}`);
     console.log(`Running benchmark for project: ${project}`);
-    console.log(`Entry: ${DEFAULT_ENTRYPOINT}`);
+    const entrypoint = resolveEntrypoint(project);
+
+    console.log(`Entry: ${entrypoint}`);
     console.log(`Samples: ${runs} measured run(s) after ${warmup} warmup run(s) per builder\n`);
 
     const options: BuilderOptions = {
         project,
-        entrypoint: DEFAULT_ENTRYPOINT,
+        entrypoint,
         outDir: DEFAULT_OUTDIR,
     };
 
