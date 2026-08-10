@@ -96,11 +96,11 @@ catalogs:
       specifier: ^8.1.0
       version: 8.1.0
     '@swc/core':
-      specifier: 1.15.43
-      version: 1.15.43
+      specifier: 1.15.47
+      version: 1.15.47
     '@swc/types':
-      specifier: 0.1.27
-      version: 0.1.27
+      specifier: 0.1.28
+      version: 0.1.28
     babel-plugin-transform-hook-names:
       specifier: ^1.0.2
       version: 1.0.2
@@ -639,8 +639,6 @@ overrides:
   ws@>=8.0.0 <8.21.0: '>=8.21.0'
   yaml@>=2.0.0 <2.8.3: '>=2.8.3'
 
-pnpmfileChecksum: sha256-fPJY5NeVZcVx92LoeUexKpcIFjrKsne5JpBRIOMaDwQ=
-
 patchedDependencies:
   oxc-parser: 464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76
 
@@ -677,7 +675,7 @@ importers:
         version: 13.0.2
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.94(6dca178acd9a0d43bfb0f68ee9be13b2)
+        version: 2.0.0-alpha.94(cd8b83ab4926720589017510b7c32a3e)
       audit-ci:
         specifier: catalog:prod
         version: 7.1.0
@@ -704,7 +702,7 @@ importers:
         version: 17.0.8
       nx:
         specifier: catalog:monorepo
-        version: 23.1.0(@swc/core@1.15.43(@swc/helpers@0.5.23))
+        version: 23.1.0(@swc/core@1.15.47(@swc/helpers@0.5.23))
       oxc-parser:
         specifier: catalog:prod
         version: 0.140.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
@@ -845,7 +843,7 @@ importers:
         version: 6.0.2(babel-plugin-react-compiler@1.0.0)(vite@8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))
       babel-loader:
         specifier: ^10.1.1
-        version: 10.1.1(@babel/core@7.29.7(supports-color@7.2.0))(@rspack/core@2.0.5(@swc/helpers@0.5.23))(webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
+        version: 10.1.1(@babel/core@7.29.7(supports-color@7.2.0))(@rspack/core@2.0.5(@swc/helpers@0.5.23))(webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
       bun:
         specifier: ^1.3.14
         version: 1.3.14
@@ -860,7 +858,7 @@ importers:
         version: 0.28.1
       esbuild-loader:
         specifier: ^4.4.3
-        version: 4.4.3(webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
+        version: 4.4.3(webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
       jiti:
         specifier: catalog:script
         version: 2.7.0
@@ -878,22 +876,22 @@ importers:
         version: 6.2.1(esbuild@0.28.1)(rollup@4.62.2)(supports-color@7.2.0)
       rollup-plugin-swc3:
         specifier: ^0.12.1
-        version: 0.12.1(@swc/core@1.15.43(@swc/helpers@0.5.23))(rollup@4.62.2)
+        version: 0.12.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(rollup@4.62.2)
       swc-loader:
         specifier: ^0.2.7
-        version: 0.2.7(@swc/core@1.15.43(@swc/helpers@0.5.23))(webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
+        version: 0.2.7(@swc/core@1.15.47(@swc/helpers@0.5.23))(webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
       table:
         specifier: ^6.9.0
         version: 6.9.0
       terser-webpack-plugin:
         specifier: ^5.6.1
-        version: 5.6.1(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)(webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
+        version: 5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)(webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
       tsdown:
         specifier: ^0.22.1
         version: 0.22.1(@arethetypeswrong/core@0.18.5)(@ts-macro/tsc@0.3.7(rollup@4.62.2))(@typescript/native-preview@7.0.0-dev.20250922.1)(oxc-resolver@11.24.2)(publint@0.3.21)(tsx@4.23.1)(typescript@6.0.3)(vue-tsc@3.3.7(typescript@6.0.3))
       tsup:
         specifier: ^8.5.1
-        version: 8.5.1(@swc/core@1.15.43(@swc/helpers@0.5.23))(jiti@2.7.0)(postcss@8.5.26)(supports-color@7.2.0)(tsx@4.23.1)(typescript@6.0.3)(yaml@2.9.0)
+        version: 8.5.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(jiti@2.7.0)(postcss@8.5.26)(supports-color@7.2.0)(tsx@4.23.1)(typescript@6.0.3)(yaml@2.9.0)
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -902,11 +900,9 @@ importers:
         version: 8.1.4(@types/node@25.9.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0)
       webpack:
         specifier: ^5.107.2
-        version: 5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
+        version: 5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
 
   benchmarks/projects/js-small: {}
-
-  benchmarks/projects/js-synthetic: {}
 
   benchmarks/projects/react-empty:
     dependencies:
@@ -1979,7 +1975,7 @@ importers:
         version: 6.1.1
       html-minifier-next:
         specifier: catalog:prod
-        version: 7.2.0(@swc/core@1.15.43(@swc/helpers@0.5.23))
+        version: 7.2.0(@swc/core@1.15.47(@swc/helpers@0.5.23))
       jiti:
         specifier: catalog:script
         version: 2.7.0
@@ -2085,10 +2081,10 @@ importers:
         version: 8.1.0(typescript@6.0.3)
       '@swc/core':
         specifier: catalog:dev
-        version: 1.15.43(@swc/helpers@0.5.23)
+        version: 1.15.47(@swc/helpers@0.5.23)
       '@swc/types':
         specifier: catalog:dev
-        version: 0.1.27
+        version: 0.1.28
       '@tailwindcss/node':
         specifier: catalog:style
         version: 4.3.2
@@ -2346,7 +2342,7 @@ importers:
         version: 3.0.3
       html-minifier-next:
         specifier: catalog:prod
-        version: 7.2.0(@swc/core@1.15.43(@swc/helpers@0.5.23))
+        version: 7.2.0(@swc/core@1.15.47(@swc/helpers@0.5.23))
       magic-string:
         specifier: catalog:utils
         version: 0.30.21
@@ -2425,7 +2421,7 @@ importers:
         version: 1.0.9
       '@types/html-minifier-next':
         specifier: catalog:types
-        version: 4.1.0(@swc/core@1.15.43(@swc/helpers@0.5.23))
+        version: 4.1.0(@swc/core@1.15.47(@swc/helpers@0.5.23))
       '@types/node':
         specifier: catalog:types
         version: 26.1.1
@@ -2434,7 +2430,7 @@ importers:
         version: 7.7.1
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.94(6dca178acd9a0d43bfb0f68ee9be13b2)
+        version: 2.0.0-alpha.94(cd8b83ab4926720589017510b7c32a3e)
       '@visulima/pail':
         specifier: catalog:visulima
         version: 4.0.0(express@5.2.1)(hono@4.13.1)
@@ -2512,7 +2508,7 @@ importers:
         version: 26.1.1
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.94(6dca178acd9a0d43bfb0f68ee9be13b2)
+        version: 2.0.0-alpha.94(cd8b83ab4926720589017510b7c32a3e)
       '@visulima/packem-plugins':
         specifier: workspace:*
         version: link:../packem-plugins
@@ -2590,7 +2586,7 @@ importers:
         version: 5.4.0(rollup@4.62.2)
       '@swc/types':
         specifier: catalog:dev
-        version: 0.1.27
+        version: 0.1.28
       '@visulima/find-cache-dir':
         specifier: catalog:visulima
         version: 3.0.0
@@ -2614,7 +2610,7 @@ importers:
         version: 5.3.3
       html-minifier-next:
         specifier: catalog:prod
-        version: 7.2.0(@swc/core@1.15.43(@swc/helpers@0.5.23))
+        version: 7.2.0(@swc/core@1.15.47(@swc/helpers@0.5.23))
       magic-string:
         specifier: catalog:utils
         version: 0.30.21
@@ -2669,7 +2665,7 @@ importers:
         version: 13.0.2
       '@swc/core':
         specifier: catalog:dev
-        version: 1.15.43(@swc/helpers@0.5.23)
+        version: 1.15.47(@swc/helpers@0.5.23)
       '@total-typescript/ts-reset':
         specifier: catalog:tsc
         version: 0.6.1
@@ -2684,7 +2680,7 @@ importers:
         version: 1.0.9
       '@types/html-minifier-next':
         specifier: catalog:types
-        version: 4.1.0(@swc/core@1.15.43(@swc/helpers@0.5.23))
+        version: 4.1.0(@swc/core@1.15.47(@swc/helpers@0.5.23))
       '@types/node':
         specifier: catalog:types
         version: 26.1.1
@@ -4891,7 +4887,7 @@ packages:
     resolution: {integrity: sha512-eWpQYr67tqJLeaSUl0Q+TquuYfUdTibpOJlUMV2FfUP7+KqCC5TufnwnlXL6mobZBJbGAYRd7ZvEBDCbLInjhg==}
     engines: {node: '>=20'}
     peerDependencies:
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
 
   '@html-eslint/core@0.60.0':
     resolution: {integrity: sha512-P2+ymEBt7EZ8sh1xc4XNA1/zSyDhSA1ppWyBBwPvGfY8VnDfmtd5UKr6AD24htABwzNJ6WcBIV3lAx5crtozfg==}
@@ -7481,8 +7477,20 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
+  '@swc/core-darwin-arm64@1.15.47':
+    resolution: {integrity: sha512-GsoMtan3ojGGMGFbl31mmRu5ctZ56re8grGE8mO/OHJ8O+JRkzod02fe7X6ZQ8JvamA3imkEkx/h3u+vsOgPgA==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [darwin]
+
   '@swc/core-darwin-x64@1.15.43':
     resolution: {integrity: sha512-lp3d4Lamc8dt5huYdGLSR+9hLxmfr1jb0l+4XXG2zPqZwYWRN9R0U2qYoTrggiU2RWW0oV9VbWM3kBnqIc2kdQ==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@swc/core-darwin-x64@1.15.47':
+    resolution: {integrity: sha512-leTi7Rx3KF4zcC637iqWgk9SoV8VXAD8ppQYXsep63px5A/UftOcxLN1pmr8Z1si/YvX90ompP/rHgpYkgwXWg==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [darwin]
@@ -7493,8 +7501,21 @@ packages:
     cpu: [arm]
     os: [linux]
 
+  '@swc/core-linux-arm-gnueabihf@1.15.47':
+    resolution: {integrity: sha512-hBqHuoWKKIsKmDBn9qVeWqj5GWZhtlcczVaqQmNRXsDfq+voR5CxKRfamA367QjJXtceYuliLFfEL8QsskRM2g==}
+    engines: {node: '>=10'}
+    cpu: [arm]
+    os: [linux]
+
   '@swc/core-linux-arm64-gnu@1.15.43':
     resolution: {integrity: sha512-B4otJRdPWIsmiSBf0uG7Z/+vMWmkufjz5MmYxubwKuZazDW14Zd3symga1N62QR4RT+kEFeHEgsXfZGyn/w0hw==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@swc/core-linux-arm64-gnu@1.15.47':
+    resolution: {integrity: sha512-TBxvRz+B4K205TWHHZxWVxkC2RFNP/Mz3PNcECBos5PsKwxjg3QSJzdoebr0VCf0Bfh8HOPldKxAP/8XkFe9gA==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux]
@@ -7507,8 +7528,22 @@ packages:
     os: [linux]
     libc: [musl]
 
+  '@swc/core-linux-arm64-musl@1.15.47':
+    resolution: {integrity: sha512-3Yu3Uq/VgytqsPjTMbkPU1ExADytbdWbruJYhA584E9jrpE2Ki+R6VVPoZCeAVk1Cb7QxcRTgblw6bSa6a/R+w==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
   '@swc/core-linux-ppc64-gnu@1.15.43':
     resolution: {integrity: sha512-coxE1ZWdB3uSDVNoEtYNrRi/1epvckZx9cTJ8ICUxTMTxGk+yvQ/Twacp3ruZSaMPGCriUjP86C37VhaT6nyRg==}
+    engines: {node: '>=10'}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [glibc]
+
+  '@swc/core-linux-ppc64-gnu@1.15.47':
+    resolution: {integrity: sha512-wfdMi5IaOaNtmh2/6geRoxIdNfqylUZFdtzTKS655y1axWfIWyx7As74vv0wVdjeCIZ3WmCI9odDd4rUttXOSQ==}
     engines: {node: '>=10'}
     cpu: [ppc64]
     os: [linux]
@@ -7521,8 +7556,22 @@ packages:
     os: [linux]
     libc: [glibc]
 
+  '@swc/core-linux-s390x-gnu@1.15.47':
+    resolution: {integrity: sha512-3hHYBY0yx8Ez7GMRrkhXHQzMdR5IZA6Wq5Ee4svlgwvSECLpnAJ9+0AimEGUFDvuLwE7nV/2+PYe8+Nm4rvNcQ==}
+    engines: {node: '>=10'}
+    cpu: [s390x]
+    os: [linux]
+    libc: [glibc]
+
   '@swc/core-linux-x64-gnu@1.15.43':
     resolution: {integrity: sha512-07XnKwTmKy8TGOZG3D9fRnLWGynxPjwQnZLVmBFbo6F+7vHYzBIOuwXEhemrChBWb6yDNZsVCcMWCPX6FDD2xg==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@swc/core-linux-x64-gnu@1.15.47':
+    resolution: {integrity: sha512-TjfhjgP/jGCfFHYC3JQPhJA1HwErbIJ9JfREDc1KNkvY6P0LodCgKVIlQ5deeTbkG7ih3bF5PHJLuLpaZjdRyQ==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
@@ -7535,8 +7584,21 @@ packages:
     os: [linux]
     libc: [musl]
 
+  '@swc/core-linux-x64-musl@1.15.47':
+    resolution: {integrity: sha512-CQpS8Ge/avfjZd0UEwG/sds83Uu32deQXcV1Jo3jD0mmvQQqtYAjpsDZXugmheeAwmt+YIuoVtVHro8LMYHqsQ==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
   '@swc/core-win32-arm64-msvc@1.15.43':
     resolution: {integrity: sha512-jfd7s2/bUQYkOHLs+LWQNKZdmDa8+sufKLllhpWAhVQ2GDCwsHe3vR/j+OSiItZNtkzFuaawa3+SAKz9y5gYfw==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@swc/core-win32-arm64-msvc@1.15.47':
+    resolution: {integrity: sha512-0W8IKHsUTYiT7G2RqtOoVWk+89yzZikIiDUb/sCK6BmQDBhN91hQSfyUtW12jhEWLzYgcfmisfsZrmZE+84U1A==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [win32]
@@ -7547,14 +7609,35 @@ packages:
     cpu: [ia32]
     os: [win32]
 
+  '@swc/core-win32-ia32-msvc@1.15.47':
+    resolution: {integrity: sha512-ZIp49d2Z4/ka2jO9otOg4hDvTdPmp86kVOgS2M5FCPI7eKKZ1W0boxWn+8XeZrfERtFGW0AlMRm4JhlJa7l3NA==}
+    engines: {node: '>=10'}
+    cpu: [ia32]
+    os: [win32]
+
   '@swc/core-win32-x64-msvc@1.15.43':
     resolution: {integrity: sha512-h8MLDHZcfIukwQWj03rIJZx1I0E81AYj2X7J/nGErG4nz+QAv6G1Z+peotvinL3lqpbo32tLYSMFo32/ySzxKg==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [win32]
 
+  '@swc/core-win32-x64-msvc@1.15.47':
+    resolution: {integrity: sha512-2h8Iek95vnixkBRCo+H8p09+Q5ll2NgSMFrWTy0iKt7+/t+8/T5mBpiT6c0ZxSS7wcWjwZ9sGZkK70tTSYHdDw==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [win32]
+
   '@swc/core@1.15.43':
     resolution: {integrity: sha512-1CuKjFkPxIgGdeHVuNbkxmBxkcbdc08u0aiI43pFq6yY1tTVKmXT9hFEooyyKs/sJ3xf1GPHyEwTtk9Xl8dvQw==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      '@swc/helpers': '>=0.5.17'
+    peerDependenciesMeta:
+      '@swc/helpers':
+        optional: true
+
+  '@swc/core@1.15.47':
+    resolution: {integrity: sha512-FbsO5JcfOjfH38W/rohBRBweJeERsAuIP4f377lmkmxTcq9exjtx4SkRuZY5CdfhR2CBVwDIJegBpJDffwNsOg==}
     engines: {node: '>=10'}
     peerDependencies:
       '@swc/helpers': '>=0.5.17'
@@ -7573,6 +7656,9 @@ packages:
 
   '@swc/types@0.1.27':
     resolution: {integrity: sha512-K6h3iUlqeM946U4sXFYeahefR1YBbXJvko+hv8WS8/0BNJ4OHiHRywMnQUJCqkR7Y9+hqQ1TvEpiKqUhz7NEFg==}
+
+  '@swc/types@0.1.28':
+    resolution: {integrity: sha512-V6Mnml8v09QALx6K0elJ7o9K/MkVDtW3t6L+7Ou/JcWtb3xwId2AH4FeOceySd2JaO87IMw4+6vSZxLm34LPbw==}
 
   '@sxzz/test-utils@0.5.18':
     resolution: {integrity: sha512-Od2KZMSzibfnNhcpniDVvPqyHOdx/UG1Wz9ZrJnH9zJx94deSZnIKaOF32Wzw3VaQMupQhrAEg1+B0uNYcA33Q==}
@@ -8843,7 +8929,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       next: '>=14.0'
       rotating-file-stream: '>=3.2.9'
     peerDependenciesMeta:
@@ -11658,7 +11744,7 @@ packages:
       graphile-config: ^1.0.0
       graphql: ^16.9.0
       h3: ^1.13.0
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       ws: '>=8.21.0'
     peerDependenciesMeta:
       '@envelop/core':
@@ -21849,37 +21935,73 @@ snapshots:
   '@swc/core-darwin-arm64@1.15.43':
     optional: true
 
+  '@swc/core-darwin-arm64@1.15.47':
+    optional: true
+
   '@swc/core-darwin-x64@1.15.43':
+    optional: true
+
+  '@swc/core-darwin-x64@1.15.47':
     optional: true
 
   '@swc/core-linux-arm-gnueabihf@1.15.43':
     optional: true
 
+  '@swc/core-linux-arm-gnueabihf@1.15.47':
+    optional: true
+
   '@swc/core-linux-arm64-gnu@1.15.43':
+    optional: true
+
+  '@swc/core-linux-arm64-gnu@1.15.47':
     optional: true
 
   '@swc/core-linux-arm64-musl@1.15.43':
     optional: true
 
+  '@swc/core-linux-arm64-musl@1.15.47':
+    optional: true
+
   '@swc/core-linux-ppc64-gnu@1.15.43':
+    optional: true
+
+  '@swc/core-linux-ppc64-gnu@1.15.47':
     optional: true
 
   '@swc/core-linux-s390x-gnu@1.15.43':
     optional: true
 
+  '@swc/core-linux-s390x-gnu@1.15.47':
+    optional: true
+
   '@swc/core-linux-x64-gnu@1.15.43':
+    optional: true
+
+  '@swc/core-linux-x64-gnu@1.15.47':
     optional: true
 
   '@swc/core-linux-x64-musl@1.15.43':
     optional: true
 
+  '@swc/core-linux-x64-musl@1.15.47':
+    optional: true
+
   '@swc/core-win32-arm64-msvc@1.15.43':
+    optional: true
+
+  '@swc/core-win32-arm64-msvc@1.15.47':
     optional: true
 
   '@swc/core-win32-ia32-msvc@1.15.43':
     optional: true
 
+  '@swc/core-win32-ia32-msvc@1.15.47':
+    optional: true
+
   '@swc/core-win32-x64-msvc@1.15.43':
+    optional: true
+
+  '@swc/core-win32-x64-msvc@1.15.47':
     optional: true
 
   '@swc/core@1.15.43(@swc/helpers@0.5.23)':
@@ -21901,6 +22023,25 @@ snapshots:
       '@swc/core-win32-x64-msvc': 1.15.43
       '@swc/helpers': 0.5.23
 
+  '@swc/core@1.15.47(@swc/helpers@0.5.23)':
+    dependencies:
+      '@swc/counter': 0.1.3
+      '@swc/types': 0.1.27
+    optionalDependencies:
+      '@swc/core-darwin-arm64': 1.15.47
+      '@swc/core-darwin-x64': 1.15.47
+      '@swc/core-linux-arm-gnueabihf': 1.15.47
+      '@swc/core-linux-arm64-gnu': 1.15.47
+      '@swc/core-linux-arm64-musl': 1.15.47
+      '@swc/core-linux-ppc64-gnu': 1.15.47
+      '@swc/core-linux-s390x-gnu': 1.15.47
+      '@swc/core-linux-x64-gnu': 1.15.47
+      '@swc/core-linux-x64-musl': 1.15.47
+      '@swc/core-win32-arm64-msvc': 1.15.47
+      '@swc/core-win32-ia32-msvc': 1.15.47
+      '@swc/core-win32-x64-msvc': 1.15.47
+      '@swc/helpers': 0.5.23
+
   '@swc/counter@0.1.3': {}
 
   '@swc/helpers@0.2.14': {}
@@ -21910,6 +22051,10 @@ snapshots:
       tslib: 2.8.1
 
   '@swc/types@0.1.27':
+    dependencies:
+      '@swc/counter': 0.1.3
+
+  '@swc/types@0.1.28':
     dependencies:
       '@swc/counter': 0.1.3
 
@@ -22573,9 +22718,9 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
-  '@types/html-minifier-next@4.1.0(@swc/core@1.15.43(@swc/helpers@0.5.23))':
+  '@types/html-minifier-next@4.1.0(@swc/core@1.15.47(@swc/helpers@0.5.23))':
     dependencies:
-      html-minifier-next: 7.2.0(@swc/core@1.15.43(@swc/helpers@0.5.23))
+      html-minifier-next: 7.2.0(@swc/core@1.15.47(@swc/helpers@0.5.23))
     transitivePeerDependencies:
       - '@swc/core'
 
@@ -23199,7 +23344,7 @@ snapshots:
       - jsonc-parser
       - smol-toml
 
-  '@visulima/packem-rollup@1.0.0-alpha.76(@swc/core@1.15.43(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.62.2))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.1)(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(rolldown@1.2.0)(rollup@4.62.2)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))(vue-tsc@3.3.7(typescript@6.0.3))(yaml@2.9.0)':
+  '@visulima/packem-rollup@1.0.0-alpha.76(@swc/core@1.15.47(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.62.2))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.1)(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(rolldown@1.2.0)(rollup@4.62.2)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))(vue-tsc@3.3.7(typescript@6.0.3))(yaml@2.9.0)':
     dependencies:
       '@babel/core': 8.0.1
       '@rollup/plugin-alias': 6.0.0(rollup@4.62.2)
@@ -23218,7 +23363,7 @@ snapshots:
       '@visulima/path': 3.0.0
       '@visulima/rollup-plugin-dts': 1.0.0-alpha.36(@ts-macro/tsc@0.3.7(rollup@4.62.2))(@typescript/native-preview@7.0.0-dev.20250922.1)(ini@7.0.0)(json5@2.2.3)(rolldown@1.2.0)(rollup@4.62.2)(smol-toml@1.6.1)(typescript@6.0.3)(vue-tsc@3.3.7(typescript@6.0.3))(yaml@2.9.0)
       clean-css: 5.3.3
-      html-minifier-next: 7.2.0(@swc/core@1.15.43(@swc/helpers@0.5.23))
+      html-minifier-next: 7.2.0(@swc/core@1.15.47(@swc/helpers@0.5.23))
       magic-string: 0.30.21
       oxc-resolver: 11.24.2
       oxc-transform: 0.140.0
@@ -23229,7 +23374,7 @@ snapshots:
       rollup-plugin-visualizer: 7.0.1(rolldown@1.2.0)(rollup@4.62.2)
       rs-module-lexer: 2.8.0
     optionalDependencies:
-      '@swc/core': 1.15.43(@swc/helpers@0.5.23)
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       esbuild: 0.28.1
       sucrase: 3.35.1
     transitivePeerDependencies:
@@ -23260,13 +23405,13 @@ snapshots:
       - smol-toml
       - yaml
 
-  '@visulima/packem@2.0.0-alpha.94(6dca178acd9a0d43bfb0f68ee9be13b2)':
+  '@visulima/packem@2.0.0-alpha.94(cd8b83ab4926720589017510b7c32a3e)':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 1.7.0
       '@rollup/pluginutils': 5.4.0(rollup@4.62.2)
       '@visulima/cerebro': 3.0.0(@visulima/find-cache-dir@3.0.0)(@visulima/pail@4.0.0(express@5.2.1)(hono@4.13.1))(github-slugger@2.0.0)
-      '@visulima/packem-rollup': 1.0.0-alpha.76(@swc/core@1.15.43(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.62.2))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.1)(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(rolldown@1.2.0)(rollup@4.62.2)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))(vue-tsc@3.3.7(typescript@6.0.3))(yaml@2.9.0)
+      '@visulima/packem-rollup': 1.0.0-alpha.76(@swc/core@1.15.47(@swc/helpers@0.5.23))(@ts-macro/tsc@0.3.7(rollup@4.62.2))(@typescript/native-preview@7.0.0-dev.20250922.1)(esbuild@0.28.1)(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(rolldown@1.2.0)(rollup@4.62.2)(smol-toml@1.6.1)(sucrase@3.35.1)(typescript@6.0.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.1)(yaml@2.9.0))(vue-tsc@3.3.7(typescript@6.0.3))(yaml@2.9.0)
       '@visulima/packem-share': 1.0.0-alpha.51(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(rollup@4.62.2)(smol-toml@1.6.1)(yaml@2.9.0)
       '@visulima/rollup-plugin-css': 1.0.0-alpha.55(@csstools/css-parser-algorithms@4.0.0(@csstools/css-tokenizer@4.0.0))(@csstools/css-tokenizer@4.0.0)(@csstools/postcss-slow-plugins@3.0.0(postcss@8.5.26))(@tailwindcss/node@4.3.2)(@tailwindcss/oxide@4.3.2)(@visulima/css-style-inject@1.0.0-alpha.19)(cssnano@8.0.2(postcss@8.5.26))(icss-utils@5.1.0(postcss@8.5.26))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(less@4.6.7)(lightningcss@1.32.0)(postcss-load-config@6.0.1(jiti@2.7.0)(postcss@8.5.26)(tsx@4.23.1)(yaml@2.9.0))(postcss-modules-extract-imports@3.1.0(postcss@8.5.26))(postcss-modules-local-by-default@4.2.0(postcss@8.5.26))(postcss-modules-scope@3.2.1(postcss@8.5.26))(postcss-modules-values@4.0.0(postcss@8.5.26))(postcss-value-parser@4.2.0)(postcss@8.5.26)(rollup@4.62.2)(sass-embedded@1.100.0)(sass@1.101.0)(smol-toml@1.6.1)(stylus@0.64.0)(yaml@2.9.0)
       '@visulima/rollup-plugin-dts': 1.0.0-alpha.36(@ts-macro/tsc@0.3.7(rollup@4.62.2))(@typescript/native-preview@7.0.0-dev.20250922.1)(ini@7.0.0)(json5@2.2.3)(rolldown@1.2.0)(rollup@4.62.2)(smol-toml@1.6.1)(typescript@6.0.3)(vue-tsc@3.3.7(typescript@6.0.3))(yaml@2.9.0)
@@ -23278,7 +23423,7 @@ snapshots:
       estree-walker: 3.0.3
       fastest-levenshtein: 1.0.16
       hookable: 6.1.1
-      html-minifier-next: 7.2.0(@swc/core@1.15.43(@swc/helpers@0.5.23))
+      html-minifier-next: 7.2.0(@swc/core@1.15.47(@swc/helpers@0.5.23))
       jiti: 2.7.0
       magic-string: 0.30.21
       mime: 4.1.0
@@ -23294,7 +23439,7 @@ snapshots:
     optionalDependencies:
       '@arethetypeswrong/core': 0.18.5
       '@babel/core': 8.0.1
-      '@swc/core': 1.15.43(@swc/helpers@0.5.23)
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       '@tailwindcss/node': 4.3.2
       '@tailwindcss/oxide': 4.3.2
       cssnano: 8.0.2(postcss@8.5.26)
@@ -24065,13 +24210,13 @@ snapshots:
 
   axobject-query@4.1.0: {}
 
-  babel-loader@10.1.1(@babel/core@7.29.7(supports-color@7.2.0))(@rspack/core@2.0.5(@swc/helpers@0.5.23))(webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)):
+  babel-loader@10.1.1(@babel/core@7.29.7(supports-color@7.2.0))(@rspack/core@2.0.5(@swc/helpers@0.5.23))(webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)):
     dependencies:
       '@babel/core': 7.29.7(supports-color@7.2.0)
       find-up: 5.0.0
     optionalDependencies:
       '@rspack/core': 2.0.5(@swc/helpers@0.5.23)
-      webpack: 5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
+      webpack: 5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
 
   babel-plugin-jsx-dom-expressions@0.40.7(@babel/core@8.0.1):
     dependencies:
@@ -25457,12 +25602,12 @@ snapshots:
 
   es-toolkit@1.46.1: {}
 
-  esbuild-loader@4.4.3(webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)):
+  esbuild-loader@4.4.3(webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)):
     dependencies:
       esbuild: 0.28.1
       get-tsconfig: 4.14.0
       loader-utils: 2.0.4
-      webpack: 5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
+      webpack: 5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
       webpack-sources: 3.5.0
 
   esbuild@0.28.1:
@@ -27080,7 +27225,7 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
-  html-minifier-next@7.2.0(@swc/core@1.15.43(@swc/helpers@0.5.23)):
+  html-minifier-next@7.2.0(@swc/core@1.15.47(@swc/helpers@0.5.23)):
     dependencies:
       commander: 15.0.0
       entities: 8.0.0
@@ -27088,7 +27233,7 @@ snapshots:
       svgo: 4.0.2
       terser: 5.47.1
     optionalDependencies:
-      '@swc/core': 1.15.43(@swc/helpers@0.5.23)
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
 
   html-standard@0.0.13:
     dependencies:
@@ -29298,7 +29443,7 @@ snapshots:
 
   nullthrows@1.1.1: {}
 
-  nx@23.1.0(@swc/core@1.15.43(@swc/helpers@0.5.23)):
+  nx@23.1.0(@swc/core@1.15.47(@swc/helpers@0.5.23)):
     dependencies:
       '@emnapi/core': 1.4.5
       '@emnapi/runtime': 1.4.5
@@ -29426,7 +29571,7 @@ snapshots:
       '@nx/nx-linux-x64-musl': 23.1.0
       '@nx/nx-win32-arm64-msvc': 23.1.0
       '@nx/nx-win32-x64-msvc': 23.1.0
-      '@swc/core': 1.15.43(@swc/helpers@0.5.23)
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
 
   object-assign@4.1.1: {}
 
@@ -31024,12 +31169,12 @@ snapshots:
       rollup: 4.62.2
       rollup-preserve-directives: 1.1.3(rollup@4.62.2)
 
-  rollup-plugin-swc3@0.12.1(@swc/core@1.15.43(@swc/helpers@0.5.23))(rollup@4.62.2):
+  rollup-plugin-swc3@0.12.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(rollup@4.62.2):
     dependencies:
       '@dual-bundle/import-meta-resolve': 4.2.1
       '@fastify/deepmerge': 2.0.2
       '@rollup/pluginutils': 5.4.0(rollup@4.62.2)
-      '@swc/core': 1.15.43(@swc/helpers@0.5.23)
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       get-tsconfig: 4.14.0
       rollup: 4.62.2
       rollup-preserve-directives: 1.1.3(rollup@4.62.2)
@@ -31922,11 +32067,11 @@ snapshots:
       picocolors: 1.1.1
       sax: 1.6.0
 
-  swc-loader@0.2.7(@swc/core@1.15.43(@swc/helpers@0.5.23))(webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)):
+  swc-loader@0.2.7(@swc/core@1.15.47(@swc/helpers@0.5.23))(webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)):
     dependencies:
-      '@swc/core': 1.15.43(@swc/helpers@0.5.23)
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       '@swc/counter': 0.1.3
-      webpack: 5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
+      webpack: 5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
 
   sync-child-process@1.0.2:
     dependencies:
@@ -31992,15 +32137,15 @@ snapshots:
       ansi-escapes: 7.3.0
       supports-hyperlinks: 4.4.0
 
-  terser-webpack-plugin@5.6.1(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)(webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)):
+  terser-webpack-plugin@5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)(webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       terser: 5.47.1
-      webpack: 5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
+      webpack: 5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)
     optionalDependencies:
-      '@swc/core': 1.15.43(@swc/helpers@0.5.23)
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       cssnano: 8.0.2(postcss@8.5.26)
       esbuild: 0.28.1
       lightningcss: 1.32.0
@@ -32304,7 +32449,7 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tsup@8.5.1(@swc/core@1.15.43(@swc/helpers@0.5.23))(jiti@2.7.0)(postcss@8.5.26)(supports-color@7.2.0)(tsx@4.23.1)(typescript@6.0.3)(yaml@2.9.0):
+  tsup@8.5.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(jiti@2.7.0)(postcss@8.5.26)(supports-color@7.2.0)(tsx@4.23.1)(typescript@6.0.3)(yaml@2.9.0):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.28.1)
       cac: 6.7.14
@@ -32324,7 +32469,7 @@ snapshots:
       tinyglobby: 0.2.17
       tree-kill: 1.2.2
     optionalDependencies:
-      '@swc/core': 1.15.43(@swc/helpers@0.5.23)
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       postcss: 8.5.26
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -33085,7 +33230,7 @@ snapshots:
 
   webpack-virtual-modules@0.6.2: {}
 
-  webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26):
+  webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26):
     dependencies:
       '@types/estree': 1.0.9
       '@types/json-schema': 7.0.15
@@ -33107,7 +33252,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.3
-      terser-webpack-plugin: 5.6.1(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)(webpack@5.107.2(@swc/core@1.15.43(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
+      terser-webpack-plugin: 5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26)(webpack@5.107.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(cssnano@8.0.2(postcss@8.5.26))(esbuild@0.28.1)(lightningcss@1.32.0)(postcss@8.5.26))
       watchpack: 2.5.1
       webpack-sources: 3.5.0
     transitivePeerDependencies:
