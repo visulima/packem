@@ -1,0 +1,54 @@
+"package: css-style-inject":
+    - changed-files:
+          - any-glob-to-any-file: "packages/css-style-inject/**/*"
+"package: packem":
+    - changed-files:
+          - any-glob-to-any-file: "packages/packem/**/*"
+"package: packem-plugins":
+    - changed-files:
+          - any-glob-to-any-file: "packages/packem-plugins/**/*"
+"package: packem-rolldown":
+    - changed-files:
+          - any-glob-to-any-file: "packages/packem-rolldown/**/*"
+"package: packem-rollup":
+    - changed-files:
+          - any-glob-to-any-file: "packages/packem-rollup/**/*"
+"package: packem-share":
+    - changed-files:
+          - any-glob-to-any-file: "packages/packem-share/**/*"
+"package: rollup-plugin-css":
+    - changed-files:
+          - any-glob-to-any-file: "packages/rollup-plugin-css/**/*"
+"package: rollup-plugin-dts":
+    - changed-files:
+          - any-glob-to-any-file: "packages/rollup-plugin-dts/**/*"
+"area: ci":
+    - changed-files:
+          - any-glob-to-any-file:
+                - ".github/**/*"
+"area: docs":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "docs/**/*"
+                - "**/*.md"
+                - "**/*.mdx"
+"area: benchmarks":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "benchmarks/**/*"
+"area: examples":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "examples/**/*"
+"area: tooling":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "tools/**/*"
+                - "scripts/**/*"
+                - "plop/**/*"
+"area: dependencies":
+    - changed-files:
+          - any-glob-to-any-file:
+                - "pnpm-lock.yaml"
+                - "pnpm-workspace.yaml"
+                - "**/package.json"

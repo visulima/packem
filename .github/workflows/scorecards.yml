@@ -7,6 +7,12 @@ on: # yamllint disable-line rule:truthy
         - cron: "37 14 * * 6"
     push:
         branches: ["main"]
+# Only the newest main scan is meaningful — it is what gets published — so a burst
+# of merges collapses to one run instead of queueing one per commit.
+concurrency:
+    group: "${{ github.workflow }}-${{ github.ref }}"
+    cancel-in-progress: true
+
 permissions: {}
 jobs:
     scorecards:
@@ -15,7 +21,7 @@ jobs:
             id-token: "write"
             actions: "read"
             contents: "read"
-        uses: "anolilab/workflows/.github/workflows/scorecards.yml@045a2d464dad0661a570c8a3c19f4b32bf9efad9" # v15.3.0+
+        uses: "anolilab/workflows/.github/workflows/scorecards.yml@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
         with:
             branch: "main"
             publish_results: true

@@ -6,6 +6,12 @@ on: # yamllint disable-line rule:truthy
         branches: ["main", "alpha"]
     schedule:
         - cron: "0 0 * * 1"
+# Push and schedule runs feed the code-scanning dashboard, so only collapse
+# superseded pull request runs.
+concurrency:
+    group: "${{ github.workflow }}-${{ github.ref }}"
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions: {}
 jobs:
     codeql:
@@ -13,7 +19,7 @@ jobs:
             security-events: "write"
             actions: "read"
             contents: "read"
-        uses: "anolilab/workflows/.github/workflows/codeql.yml@045a2d464dad0661a570c8a3c19f4b32bf9efad9" # v15.3.0+
+        uses: "anolilab/workflows/.github/workflows/codeql.yml@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
         with:
             languages: "[\"javascript-typescript\"]"
             branches: "[\"main\", \"alpha\"]"
