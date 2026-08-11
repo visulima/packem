@@ -33,6 +33,7 @@ const FROM_FAKE_PEER_DEVDEP_REGEX = /from ["']fake-peer-devdep["']/;
 const PARSE_WORD_REGEX = /\bparse\b/;
 const DECLARE_NAMESPACE_PARSE_REGEX = /declare namespace parse/;
 const FROM_FAKE_TYPES_ONLY_REGEX = /from ["']fake-types-only["']/;
+const LITERAL_UNION_REGEX = /\bLiteralUnion\b/;
 const COLOR_WORD_REGEX = /\bColor\b/;
 const FROM_FAKE_DUAL_DEP_REGEX = /from ["']fake-dual-dep["']/;
 const FROM_FAKE_EXPORTS_STRING_REGEX = /from ["']fake-exports-string["']/;
@@ -3042,14 +3043,18 @@ throw new Error('line 9');
         expect(dMtsContent).not.toMatch(DECLARE_NAMESPACE_PARSE_REGEX);
     });
 
-    it("should externalize a types-only devDep (no JS entry in exports) in .d.ts build", async () => {
-        expect.assertions(4);
+    it("should inline a types-only devDep (no JS entry in exports) in .d.ts build", async () => {
+        expect.assertions(5);
 
         // Repro for type-fest in @visulima/inspector: devDep that ships only `.d.ts` files
-        // (no JS entry in its `exports` field). Pre-fix, the externals plugin tried to
-        // node-resolve its JS entry in DTS mode and blew up because no JS entry exists.
-        // The DTS resolver is meant to handle types-only packages by externalizing them —
-        // the consumer installs the package from npm, TypeScript finds the .d.ts there.
+        // (no JS entry in its `exports` field). The externals plugin must not node-resolve
+        // its JS entry in DTS mode — there isn't one, and it blew up trying.
+        //
+        // It must also not be left external. The package is a devDependency, so a consumer
+        // never installs it, and a preserved `from "fake-types-only"` resolves only where
+        // the package manager happens to hoist it. Handing off to the DTS resolver inlines
+        // the types instead, which both avoids the non-existent JS entry and emits
+        // declarations a consumer can actually resolve.
         const typesOnlyRoot = `${temporaryDirectoryPath}/node_modules/fake-types-only`;
 
         await writeFile(
@@ -3114,9 +3119,79 @@ throw new Error('line 9');
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        // Externalized — specifier preserved in the emitted .d.ts.
-        expect(dMtsContent).toMatch(FROM_FAKE_TYPES_ONLY_REGEX);
+        // Inlined — no specifier a consumer would have to resolve.
+        expect(dMtsContent).not.toMatch(FROM_FAKE_TYPES_ONLY_REGEX);
+        // The helper type came along rather than being dropped to `any`.
+        expect(dMtsContent).toMatch(LITERAL_UNION_REGEX);
         // Used type chain survives.
+        expect(dMtsContent).toMatch(COLOR_WORD_REGEX);
+    });
+
+    it("should keep a types-only devDep external in .d.ts when the user lists it in `externals`", async () => {
+        expect.assertions(3);
+
+        // `externals` is the opt-out from the auto-inlining above: it moves a package out
+        // of both the bundled code and the emitted types. It has to win over auto-detection
+        // — the externals plugin folds the DTS resolve list into its `exclude` set, so an
+        // auto-detected devDep would otherwise override the entry added to externalize it.
+        const typesOnlyRoot = `${temporaryDirectoryPath}/node_modules/fake-types-only`;
+
+        await writeFile(
+            `${typesOnlyRoot}/package.json`,
+            JSON.stringify({
+                exports: { ".": { types: "./index.d.ts" } },
+                name: "fake-types-only",
+                types: "./index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(
+            `${typesOnlyRoot}/index.d.ts`,
+            "export type LiteralUnion<T extends string, U extends string = string> = T | (U & Record<never, never>);\n",
+        );
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            [
+                "import type { LiteralUnion } from \"fake-types-only\";",
+                "",
+                "export type Color = LiteralUnion<\"red\" | \"green\" | \"blue\">;",
+                "",
+                "export function render(color: Color): string {",
+                "    return String(color);",
+                "}",
+                "",
+            ].join("\n"),
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-types-only": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath, { config: { externals: ["fake-types-only"] } });
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // Externalized on the user's instruction — specifier preserved, types not inlined.
+        expect(dMtsContent).toMatch(FROM_FAKE_TYPES_ONLY_REGEX);
         expect(dMtsContent).toMatch(COLOR_WORD_REGEX);
     });
 

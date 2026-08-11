@@ -34,7 +34,7 @@
         "lint:prettier:root:fix": "prettier --config=.prettierrc.cjs --write '*.{json,yml,yaml,js,mjs,cjs,ts}' && prettier --config=.prettierrc.cjs --write 'examples/**/*.{json,yml,yaml,js,mjs,cjs,ts}' && prettier --config=.prettierrc.cjs --write 'scripts/**/*.{json,yml,yaml,js,mjs,cjs,ts}'",
         "lint:secrets": "secretlint **/*",
         "lint:staged": "lint-staged --verbose --concurrent false --debug",
-        "lint:text": "textlint ./.github/ ./packages/** ./README.md ./UPGRADE.md --parallel --experimental --cache --dry-run",
+        "lint:text": "textlint ./.github/ ./packages/** ./README.md ./UPGRADE.md --experimental --cache --dry-run",
         "lint:text:fix": "textlint ./.github/ ./packages/** ./README.md ./UPGRADE.md --parallel --experimental --fix",
         "lint:types": "nx run-many --target=lint:types --all --parallel",
         "nx": "nx",
