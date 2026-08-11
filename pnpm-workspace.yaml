@@ -134,7 +134,7 @@ catalogs:
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.12.0
   monorepo:
-    nx: 23.1.0
+    nx: 23.1.1
   network:
     browserslist: 4.28.6
     browserslist-config-anolilab: 9.0.0
