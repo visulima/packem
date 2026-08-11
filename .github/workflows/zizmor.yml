@@ -4,12 +4,18 @@ on: # yamllint disable-line rule:truthy
         branches: ["main", "alpha"]
     pull_request:
         branches: ["main", "alpha"]
+# Push runs feed the code-scanning dashboard, so only collapse superseded
+# pull request runs.
+concurrency:
+    group: "${{ github.workflow }}-${{ github.ref }}"
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions: {}
 jobs:
     zizmor:
         permissions:
             security-events: "write"
             contents: "read"
-        uses: "anolilab/workflows/.github/workflows/zizmor.yml@045a2d464dad0661a570c8a3c19f4b32bf9efad9" # v15.3.0+
+        uses: "anolilab/workflows/.github/workflows/zizmor.yml@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
         with:
             min_severity: "medium"

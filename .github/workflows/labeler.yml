@@ -1,0 +1,47 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Labeler"
+
+on: # yamllint disable-line rule:truthy
+    - "pull_request_target"
+
+permissions:
+    contents: "read"
+
+concurrency:
+    group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+    cancel-in-progress: true
+
+jobs:
+    triage:
+        runs-on: "ubuntu-latest"
+        timeout-minutes: 30
+        permissions:
+            contents: "read"
+            pull-requests: "write"
+        steps:
+            - name: "Harden Runner"
+              uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
+              with:
+                  egress-policy: "audit"
+
+            # `secrets.GITHUB_TOKEN` returns transient HTTP 401 mid-call;
+            # wrap with a two-shot retry.
+            - id: "labeler"
+              continue-on-error: true
+              uses: "actions/labeler@b8dd2d9be0f68b860e7dae5dae7d772984eacd6d" # v6.2.0
+              with:
+                  repo-token: "${{ secrets.GITHUB_TOKEN }}"
+                  configuration-path: "labeler-config.yml"
+
+            - name: "Wait before retrying labeler"
+              if: "steps.labeler.outcome == 'failure'"
+              shell: "bash"
+              run: "sleep 15"
+
+            - name: "Labeler (retry)"
+              if: "steps.labeler.outcome == 'failure'"
+              uses: "actions/labeler@b8dd2d9be0f68b860e7dae5dae7d772984eacd6d" # v6.2.0
+              with:
+                  repo-token: "${{ secrets.GITHUB_TOKEN }}"
+                  configuration-path: "labeler-config.yml"

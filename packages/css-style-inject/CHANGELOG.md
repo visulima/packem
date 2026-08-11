@@ -1,3 +1,5 @@
+## @visulima/css-style-inject 1.0.0 (2026-08-10)
+
 ## @visulima/css-style-inject [1.0.0-alpha.20](https://github.com/visulima/packem/compare/%40visulima%2Fcss-style-inject%401.0.0-alpha.19...%40visulima%2Fcss-style-inject%401.0.0-alpha.20) (2026-08-09)
 
 ## @visulima/css-style-inject [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.18...@visulima/css-style-inject@1.0.0-alpha.19) (2026-06-16)

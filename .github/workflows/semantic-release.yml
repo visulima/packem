@@ -13,6 +13,19 @@ on: # yamllint disable-line rule:truthy
             - "beta"
     workflow_dispatch: # yamllint disable-line rule:empty-values
 
+# Two pushes to a release branch in quick succession start two runs that both check
+# out, both run multi-semantic-release, and then both push. The second loses with
+# `! [rejected] main -> main (non-fast-forward)`, which is how the lock file refresh
+# below has been failing: the release itself publishes, then the commit that keeps
+# pnpm-lock.yaml in step with the bumped manifests never lands.
+#
+# `cancel-in-progress` is deliberately false, unlike the other workflows here. This
+# job publishes to npm and pushes tags, so cancelling a run midway can leave some
+# packages released and others not. Queue the second run behind the first instead.
+concurrency:
+    group: "${{ github.workflow }}-${{ github.ref }}"
+    cancel-in-progress: false
+
 permissions:
     id-token: "write" # Required for OIDC
     contents: "read" # for checkout
