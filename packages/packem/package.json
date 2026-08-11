@@ -318,7 +318,7 @@
     },
     "peerDependencies": {
         "@arethetypeswrong/core": ">=0.18.3",
-        "@swc/core": ">=1.15.40",
+        "@swc/core": ">=1.15.47",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
         "@visulima/packem-rollup": "1.0.0",

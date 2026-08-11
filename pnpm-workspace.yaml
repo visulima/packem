@@ -69,9 +69,9 @@ catalogs:
     "@oxc-parser/binding-linux-x64-gnu": 0.140.0
     "@oxc-project/types": 0.140.0
     "@svgr/core": ^8.1.0
-    "@swc/core": 1.15.43
+    "@swc/core": 1.15.47
     "@swc/helpers": 0.5.23
-    "@swc/types": 0.1.27
+    "@swc/types": 0.1.28
     babel-plugin-transform-hook-names: ^1.0.2
     babel-preset-solid: 1.9.12
     conventional-changelog-conventionalcommits: 10.2.1
