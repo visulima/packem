@@ -656,13 +656,13 @@ importers:
         version: 11.0.12(eslint@10.7.0(jiti@2.7.0))(husky@9.1.7)(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(lint-staged@17.0.8)(prettier@3.9.5)(secretlint@13.0.2(supports-color@7.2.0))(vitest@4.1.10)(yaml@2.9.0)
       '@anolilab/multi-semantic-release':
         specifier: catalog:cli
-        version: 4.4.6(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(supports-color@7.2.0)(typescript@6.0.3))(typescript@6.0.3)
+        version: 4.4.6(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(supports-color@7.2.0)(typescript@6.0.3))(supports-color@7.2.0)(typescript@6.0.3)
       '@anolilab/prettier-config':
         specifier: catalog:lint
         version: 10.0.2(prettier@3.9.5)
       '@anolilab/textlint-config':
         specifier: catalog:lint
-        version: 13.0.5(textlint@15.7.1(supports-color@7.2.0))
+        version: 13.0.5(supports-color@7.2.0)(textlint@15.7.1(supports-color@7.2.0))
       '@codspeed/vitest-plugin':
         specifier: catalog:test
         version: 5.5.0(tinybench@2.9.0)(vitest@4.1.10)
@@ -817,7 +817,7 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0(rollup@4.62.2)
       '@rspack/core':
-        specifier: ^2.0.8
+        specifier: ^2.1.8
         version: 2.1.8(@swc/helpers@0.5.23)
       '@types/bun':
         specifier: ^1.3.14
@@ -1860,16 +1860,16 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
+        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
       '@anolilab/prettier-config':
         specifier: catalog:lint
         version: 10.0.2(prettier@3.9.5)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
-        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
+        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)
       '@anolilab/semantic-release-preset':
         specifier: catalog:cli
-        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(yaml@2.9.0)
+        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)(yaml@2.9.0)
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
@@ -2026,13 +2026,13 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
+        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
-        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
+        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)
       '@anolilab/semantic-release-preset':
         specifier: catalog:cli
-        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(yaml@2.9.0)
+        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)(yaml@2.9.0)
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
@@ -2218,7 +2218,7 @@ importers:
         version: 4.2.0
       postgraphile:
         specifier: catalog:dev
-        version: 5.1.4(440ff0ceecf127c63cbcd61605aac923)
+        version: 5.1.4(b80f9a03a33ec4f6d3c822e8613627b7)
       preact:
         specifier: catalog:frontend
         version: 10.29.8
@@ -2384,16 +2384,16 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
+        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
       '@anolilab/prettier-config':
         specifier: catalog:lint
         version: 10.0.2(prettier@3.9.5)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
-        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
+        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)
       '@anolilab/semantic-release-preset':
         specifier: catalog:cli
-        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(yaml@2.9.0)
+        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)(yaml@2.9.0)
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
@@ -2486,16 +2486,16 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
+        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
       '@anolilab/prettier-config':
         specifier: catalog:lint
         version: 10.0.2(prettier@3.9.5)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
-        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
+        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)
       '@anolilab/semantic-release-preset':
         specifier: catalog:cli
-        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(yaml@2.9.0)
+        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)(yaml@2.9.0)
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
@@ -2640,16 +2640,16 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
+        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
       '@anolilab/prettier-config':
         specifier: catalog:lint
         version: 10.0.2(prettier@3.9.5)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
-        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
+        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)
       '@anolilab/semantic-release-preset':
         specifier: catalog:cli
-        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(yaml@2.9.0)
+        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)(yaml@2.9.0)
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
@@ -2779,16 +2779,16 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
+        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
       '@anolilab/prettier-config':
         specifier: catalog:lint
         version: 10.0.2(prettier@3.9.5)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
-        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
+        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)
       '@anolilab/semantic-release-preset':
         specifier: catalog:cli
-        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(yaml@2.9.0)
+        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)(yaml@2.9.0)
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
@@ -2974,13 +2974,13 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
+        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
-        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
+        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)
       '@anolilab/semantic-release-preset':
         specifier: catalog:cli
-        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(yaml@2.9.0)
+        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)(yaml@2.9.0)
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
@@ -3175,16 +3175,16 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
+        version: 28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)
       '@anolilab/prettier-config':
         specifier: catalog:lint
         version: 10.0.2(prettier@3.9.5)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
-        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
+        version: 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)
       '@anolilab/semantic-release-preset':
         specifier: catalog:cli
-        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(yaml@2.9.0)
+        version: 13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)(yaml@2.9.0)
       '@arethetypeswrong/cli':
         specifier: catalog:dev
         version: 0.18.5
@@ -9338,11 +9338,6 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
-  '@yuku-codegen/binding-darwin-arm64@0.6.4':
-    resolution: {integrity: sha512-oTXKokdxrIc/rK+FOZ3GXsafSVLe9u92pIb7Zt/oiHtRj4unQbHl4badFXs0VIeRrqILshK1IXTdvE0PlA4QGg==}
-    cpu: [arm64]
-    os: [darwin]
-
   '@yuku-codegen/binding-darwin-arm64@0.8.4':
     resolution: {integrity: sha512-tNLKzPF3FYmEcHSYvWp/LEpjHHAtDR13hwo6/gdCkYMi9x59CWn2obczKzWNe7kDor4/1AMZuJDEVRpFkTSefw==}
     cpu: [arm64]
@@ -9350,11 +9345,6 @@ packages:
 
   '@yuku-codegen/binding-darwin-x64@0.6.12':
     resolution: {integrity: sha512-YV2jLF2hJtkRjw50szArmyl19DI2s50Y0v+UTb6vADaDTts0kCP/ZJ5bvTX8XuX/5RW7kTERZx/PI+w/9lnAKw==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@yuku-codegen/binding-darwin-x64@0.6.4':
-    resolution: {integrity: sha512-gKmy9V5VSnk6ZcoZrxKxWypmm+hercCh8gh/HNP5jvzWGKSobJAlYJJ9wQ0aHc3QI4h4gWBtDD7aizOrh1OEhQ==}
     cpu: [x64]
     os: [darwin]
 
@@ -9368,11 +9358,6 @@ packages:
     cpu: [x64]
     os: [freebsd]
 
-  '@yuku-codegen/binding-freebsd-x64@0.6.4':
-    resolution: {integrity: sha512-yts1prQuuttrQlxIj546k6lYnktUCK4afcwAg/bu+h9mE+CpzhgDdonAGjJbayBRWvRtpGCmz4SDU0AgFgeWXw==}
-    cpu: [x64]
-    os: [freebsd]
-
   '@yuku-codegen/binding-freebsd-x64@0.8.4':
     resolution: {integrity: sha512-5MUV4d7g2p5Hd8GiXW6ynTRgYjm4Dw4eM2gaWRZ4crkGetzNx+HlPxcEfGtVNPqH5Qaa4Z2REtzdsdgvaE6/Ng==}
     cpu: [x64]
@@ -9380,12 +9365,6 @@ packages:
 
   '@yuku-codegen/binding-linux-arm-gnu@0.6.12':
     resolution: {integrity: sha512-ClOiLpyofntNGZzQ3BxbwkNe92J911t9C2R3s6HwQ2yH0lRLS88DUey7+xQNu4az96T1PEc+pR9ZIP/GzOCHNg==}
-    cpu: [arm]
-    os: [linux]
-    libc: [glibc]
-
-  '@yuku-codegen/binding-linux-arm-gnu@0.6.4':
-    resolution: {integrity: sha512-w4buuxYQMeb/hmFlVClDcTfLzbX6ASsZfpAFKi+99DtJKn6vxFFoYgl36EotpLwBkvYDG7nP+Q4sy/GYBpQ3Xg==}
     cpu: [arm]
     os: [linux]
     libc: [glibc]
@@ -9402,12 +9381,6 @@ packages:
     os: [linux]
     libc: [musl]
 
-  '@yuku-codegen/binding-linux-arm-musl@0.6.4':
-    resolution: {integrity: sha512-Ia176bKbP/eV0bB5lKh4m0MYf5KwEURm6NqxrW0iu5vaOTfiaV4WdD+pixskzon89G91yOe5uF9cUM5LJs9wLQ==}
-    cpu: [arm]
-    os: [linux]
-    libc: [musl]
-
   '@yuku-codegen/binding-linux-arm-musl@0.8.4':
     resolution: {integrity: sha512-7XAPHrROPEFuJWXEGZeLZQN4xR8ENQ65+HSCtCHjSzCwGgnX53GUjM9ExVcHopV0a5g4vu57v2wwtyWIM5iNOQ==}
     cpu: [arm]
@@ -9416,12 +9389,6 @@ packages:
 
   '@yuku-codegen/binding-linux-arm64-gnu@0.6.12':
     resolution: {integrity: sha512-GdETEflvfkPtdEpzT6QBAucsMAt7wiLYMk4+w1qA34J02OAo11BsTJrxUkPaQ4z/S6KkX3IfK5Ud9rCAyelnCg==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@yuku-codegen/binding-linux-arm64-gnu@0.6.4':
-    resolution: {integrity: sha512-4HpkS5jgqVW5DOQnhIB5ObXwGWDdzz3TKNbBObRcXS3xmPBxDO7CEdXu7SznL9zzaVBWyjGUN+gdxf5eNu6Ggw==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
@@ -9438,12 +9405,6 @@ packages:
     os: [linux]
     libc: [musl]
 
-  '@yuku-codegen/binding-linux-arm64-musl@0.6.4':
-    resolution: {integrity: sha512-VxjgM1a6O9ykOWB7jdaFn9VnMZVdcQXyy4+OGUd34P+WOJYey0xtWqRUNMFi8LkSky+89lWXpC5fT3txj8hT9w==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
   '@yuku-codegen/binding-linux-arm64-musl@0.8.4':
     resolution: {integrity: sha512-6vTw4ZHO9nm4SUkw36uG+UE6/qifZ0E8HIef7Mx/U/c2Zxu3JLBfXtU7U/NN2GMkDmcJkgwjXfpQoYw4Ch5Y1w==}
     cpu: [arm64]
@@ -9452,12 +9413,6 @@ packages:
 
   '@yuku-codegen/binding-linux-x64-gnu@0.6.12':
     resolution: {integrity: sha512-aDZEat8bARks9upxd8Joi7LGatX2B/TwlnXIdbMCGlONK3WAEroihY1SUyGlf02niU1OyBidhlN7l3l+LByMxw==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@yuku-codegen/binding-linux-x64-gnu@0.6.4':
-    resolution: {integrity: sha512-sRnYHQ/NBIBh+klW1vzGyHAs2YovD926HsqGyioRJcPIhI3e7xxhjGnoKyfKROVd7VihHHKjsaIqEGPdx7Nn+A==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
@@ -9474,12 +9429,6 @@ packages:
     os: [linux]
     libc: [musl]
 
-  '@yuku-codegen/binding-linux-x64-musl@0.6.4':
-    resolution: {integrity: sha512-1JKVnPbAsl3SqTdnB6hWgRL3LqJnUiPVP/s4hyAGscNbl0orBUZu/hlwF6+AfluWVgrT4fxaS46rszZ7iP0lqw==}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
   '@yuku-codegen/binding-linux-x64-musl@0.8.4':
     resolution: {integrity: sha512-QH60PE4eZecmgNGa1/T1cKPhrfxt6ANtu4lrQ1FZ50F9b0GS9WjGmIjrfdSUeQa+f2Iqk3oEFSJdgVHBg1KPNg==}
     cpu: [x64]
@@ -9491,11 +9440,6 @@ packages:
     cpu: [arm64]
     os: [win32]
 
-  '@yuku-codegen/binding-win32-arm64@0.6.4':
-    resolution: {integrity: sha512-5BAvS1UIZ0/tG4VlMpOxd8OVZuVDRnZF++BDgPWLTn+HUrF73GHKZD0AYpjZHIG167S5Nfqo5PQgvIavrOfQ9A==}
-    cpu: [arm64]
-    os: [win32]
-
   '@yuku-codegen/binding-win32-arm64@0.8.4':
     resolution: {integrity: sha512-6r68c0nKZPIBRXZIBiD7zjlEukBR+xRxpTOVj4n1Fsjcdh4YbbJfjFfmIzdbo9jXR1xL+dPueDVdsRGOUH5MoQ==}
     cpu: [arm64]
@@ -9503,11 +9447,6 @@ packages:
 
   '@yuku-codegen/binding-win32-x64@0.6.12':
     resolution: {integrity: sha512-ZItYULslPqB9S7b53v23IeUcPCd5NeW+5+BoMyCY5/AEsMADKdznZXd4ELO1TZxv+0oA55g3iAOC9GWgigCsZA==}
-    cpu: [x64]
-    os: [win32]
-
-  '@yuku-codegen/binding-win32-x64@0.6.4':
-    resolution: {integrity: sha512-1RXR6uh2qzMn61DyRmhQgPJW/oFdpUdUp6iKnpC+dAhdF2xVOobNE8ZifKBYhteZQsHOn7p4+f/YJBBZfXdFDg==}
     cpu: [x64]
     os: [win32]
 
@@ -9526,11 +9465,6 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
-  '@yuku-parser/binding-darwin-arm64@0.6.4':
-    resolution: {integrity: sha512-QsZxEeAt5r52mBl3kxu7bmW9Tk82Jtvc12O73IAXE89wBMIDxiBJhErYI+ct/nJ8Rw5oNa/+1cK+M1eMUsGSiA==}
-    cpu: [arm64]
-    os: [darwin]
-
   '@yuku-parser/binding-darwin-arm64@0.8.4':
     resolution: {integrity: sha512-Elf/B/2m3OsyvxoQnBk8Dtu+9csHkzBNs5Yv9GbHjT3x0kVKNWjFusyZgm41VwxcPDqdpRi8tWxNX7OqXkmf/A==}
     cpu: [arm64]
@@ -9538,11 +9472,6 @@ packages:
 
   '@yuku-parser/binding-darwin-x64@0.6.12':
     resolution: {integrity: sha512-URbCSLE/B0jWnB94RpOxak2TM0GvRLUmArtfb/UmxtQfNOLed4LKK0jUv68IMAL9lOmJlvOBH9UwOyeuLEfuvA==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@yuku-parser/binding-darwin-x64@0.6.4':
-    resolution: {integrity: sha512-EnbVvqHmMI45oQXQsH1jJWq54a2oJ+L2JN1hFzTvKbhnMMn8BeUtUNMXQwPffHR2TngoCn+vDujqbXxXmF37EA==}
     cpu: [x64]
     os: [darwin]
 
@@ -9556,11 +9485,6 @@ packages:
     cpu: [x64]
     os: [freebsd]
 
-  '@yuku-parser/binding-freebsd-x64@0.6.4':
-    resolution: {integrity: sha512-fLNeBSLR5nxTt5a/sUpbN/WcXGhzzPjhJOoV4f9SCNV5hPiprandAE9FvdaFLUHodSq8EioLlQe7ntEDsF4vSg==}
-    cpu: [x64]
-    os: [freebsd]
-
   '@yuku-parser/binding-freebsd-x64@0.8.4':
     resolution: {integrity: sha512-ibLKORdz71iI4Vs+fyFgvwQ51P5XcxJIyQLa8cSEWqwptRdo+BTcZHIQEcZnFDPUuvmJ19RRH9CoiJdfhr7pZw==}
     cpu: [x64]
@@ -9568,12 +9492,6 @@ packages:
 
   '@yuku-parser/binding-linux-arm-gnu@0.6.12':
     resolution: {integrity: sha512-q9WcllopGo8W9qzMz4Aahew3z/rLxiZFpmVoZQaLjwaO9EDW3sULue2zJ9agvVMf1NzRXircauTUrPZ4EZ74cQ==}
-    cpu: [arm]
-    os: [linux]
-    libc: [glibc]
-
-  '@yuku-parser/binding-linux-arm-gnu@0.6.4':
-    resolution: {integrity: sha512-DKZndPj19B//6klRKE35+MbiY2b6yv3kGSzzxikReHm+wUgEOc84Cv9Q6/006NLmzNVM/apOFfT3gLD4DWprdg==}
     cpu: [arm]
     os: [linux]
     libc: [glibc]
@@ -9590,12 +9508,6 @@ packages:
     os: [linux]
     libc: [musl]
 
-  '@yuku-parser/binding-linux-arm-musl@0.6.4':
-    resolution: {integrity: sha512-IpQLxD32qIWMujAAGwW1zwgcPyeBDdBjDbUzik8D+esgpW7Gf2z5r7exsvzXPGlEr3V3dolnv4hJ0QggAgGwVg==}
-    cpu: [arm]
-    os: [linux]
-    libc: [musl]
-
   '@yuku-parser/binding-linux-arm-musl@0.8.4':
     resolution: {integrity: sha512-BEB31vUEgXPWf7WkoMPSzzJhpC/wWCBXyysRCCPsw47BJ/OtbQsvJbxX9fFDuSRLy3kbyIV/WbdUTgbQ9COxiw==}
     cpu: [arm]
@@ -9604,12 +9516,6 @@ packages:
 
   '@yuku-parser/binding-linux-arm64-gnu@0.6.12':
     resolution: {integrity: sha512-zUFJar5Y9On9eIAw6kLxCmuAirGUjC3pyLdxrHC1dYueIMzZDrBa0hyzHRC7Nybr6R7COQ2U0oVZuZcl46RboA==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@yuku-parser/binding-linux-arm64-gnu@0.6.4':
-    resolution: {integrity: sha512-HXCiigA/akjVgDbXi9VnwXvQFBi50PdQ6pF80uh7M2scFLLpn7I3dqSan7ooHpopqZgofniBOXCt3MorZgSlFA==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
@@ -9626,12 +9532,6 @@ packages:
     os: [linux]
     libc: [musl]
 
-  '@yuku-parser/binding-linux-arm64-musl@0.6.4':
-    resolution: {integrity: sha512-jEBbF8dXlvnmMtDJU+J126H8oWsfi61vUBpSf56IDMm6JsbcEDRJLV0HHuSu88GIT+AMwYqO9NbMW5yqidSjdQ==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
   '@yuku-parser/binding-linux-arm64-musl@0.8.4':
     resolution: {integrity: sha512-3kNRi8NJT2q6FQRVCUFHIQ99+kXdi8cVJEEUi6+xtFqpMgNrZNnbgAj28ILsDC7zmclaU+v47eUCeJoKLSCbww==}
     cpu: [arm64]
@@ -9640,12 +9540,6 @@ packages:
 
   '@yuku-parser/binding-linux-x64-gnu@0.6.12':
     resolution: {integrity: sha512-XucJKw1k2nyfQoiBJiQJm1q3n6K8rCDvhQpF4XRoIzTQNhAV2sldEayJvCAsTS4orCHcsDqrDrBVRMRg8ExXPw==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@yuku-parser/binding-linux-x64-gnu@0.6.4':
-    resolution: {integrity: sha512-SgHXzC6eN/rdRp7kLjCY76vKguKdIrX3GRMpr/MMz4+c0uZs8DpQ8XK/6TsgnJ+VPYjoTZm5e7wwyZZGhUJOuw==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
@@ -9662,12 +9556,6 @@ packages:
     os: [linux]
     libc: [musl]
 
-  '@yuku-parser/binding-linux-x64-musl@0.6.4':
-    resolution: {integrity: sha512-bq6PsBS1VYpc6cPLSnTxMHxYKjlQSSnqrDlI7WF8fI8PCCZ2rKUgSVspNlnAXB8bbyqnG2Djt+LWu0SvRToBYA==}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
   '@yuku-parser/binding-linux-x64-musl@0.8.4':
     resolution: {integrity: sha512-9RsEw2xYHqU/pjSRBTOupWN3sF8uz9stjJdARfz6o0llvF+yfrj5QHmTiocGGBeAI80fvKmDtr2RIQClUzAPcA==}
     cpu: [x64]
@@ -9679,11 +9567,6 @@ packages:
     cpu: [arm64]
     os: [win32]
 
-  '@yuku-parser/binding-win32-arm64@0.6.4':
-    resolution: {integrity: sha512-dzzSSFEP/ecfLE/VPOdnqUP3gWbHvQrKmZgWTgNjKj/z7zyjTNt7OPHwwt7oXfY0d1fZXpOUu0ZTLaTVt1wFyQ==}
-    cpu: [arm64]
-    os: [win32]
-
   '@yuku-parser/binding-win32-arm64@0.8.4':
     resolution: {integrity: sha512-VEZHo9rEGOBKR20sA3vCO00aQvwWND5aLu7YxeX+YupMZJh9hd1f17AbClJN37Q2iL1PCHht+wDTOKX6tZYqXg==}
     cpu: [arm64]
@@ -9691,11 +9574,6 @@ packages:
 
   '@yuku-parser/binding-win32-x64@0.6.12':
     resolution: {integrity: sha512-Qv4Lwg3pvLJrLg+JlB71Xuz3kIxEg/S402jpoLSlchvUkQKTzO+dii0+97FZfQsN67pqqssenhezg5iLNrdw1w==}
-    cpu: [x64]
-    os: [win32]
-
-  '@yuku-parser/binding-win32-x64@0.6.4':
-    resolution: {integrity: sha512-KBBaoGTqDpN7LUiR4fFPvZzNDTpQIbPOqTOjxEhFCCp+eq3liQzSgneyBsXf11teWqNcIPiue6jUtk2ckEF42Q==}
     cpu: [x64]
     os: [win32]
 
@@ -17564,18 +17442,6 @@ packages:
     engines: {node: '>=6', npm: '>=5'}
     hasBin: true
 
-  ws@8.21.0:
-    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   ws@8.21.3:
     resolution: {integrity: sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw==}
     engines: {node: '>=10.0.0'}
@@ -17683,17 +17549,11 @@ packages:
   yuku-codegen@0.6.12:
     resolution: {integrity: sha512-5cAJedx9MdKf/ngFpMYH9B1DKaB3FVJOPncl80M+8nNS2rEvrta17N59ryEVIewuHYS81o4XDb4Hg5/5hBdF7A==}
 
-  yuku-codegen@0.6.4:
-    resolution: {integrity: sha512-Y0nBr04uOalpLjoZ7sNhTV5olBBmLySg+obVXl+bcaFTo4cLk5fluvqpG4jNzDbPLOZTNP1Q/MOigf5hMl0WIA==}
-
   yuku-codegen@0.8.4:
     resolution: {integrity: sha512-1Rw+NYcmB1xkHAWlsIpbwIv/Fr50idtEbLf7OjDA+90dny6PM4Krz7Fs0TT+w2PBdjaldZpN4ye5wR4Dhlm8vA==}
 
   yuku-parser@0.6.12:
     resolution: {integrity: sha512-A1+KVTvdm1pQmrl/cS5JlqFvUclKpM8I5MvAOoQnYSGmmJBVDKN24HNXiZmxE8Ndsl4g3qBliZBAxq8/J4pKxA==}
-
-  yuku-parser@0.6.4:
-    resolution: {integrity: sha512-8RSyH8NK0BcvCiZohjh24EI/1dQqXmC8P+gCDJ4OC+WLTNavkMI27IRhkLM3DbMxw9fyd7Xfztq5Wn7Io5NRhQ==}
 
   yuku-parser@0.8.4:
     resolution: {integrity: sha512-sw41wouvT5rUmLIp87hmvm5vtF+MRSI3x6yjq6xqpYmtkQj+Ht6N7xRQ8lMhLv8N7JAzughGj0Rfi0jQRSu9HQ==}
@@ -17776,13 +17636,13 @@ snapshots:
       - conventional-commits-parser
       - typescript
 
-  '@anolilab/eslint-config@28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)':
+  '@anolilab/eslint-config@28.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(tailwind-csstree@0.3.3(@eslint/css@1.4.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)(vitest@4.1.10)(yaml@2.9.0)':
     dependencies:
       '@e18e/eslint-plugin': 0.5.1(eslint@10.7.0(jiti@2.7.0))
       '@eslint-community/eslint-plugin-eslint-comments': 4.7.2(eslint@10.7.0(jiti@2.7.0))
       '@eslint/compat': 2.1.0(eslint@10.7.0(jiti@2.7.0))
       '@eslint/js': 10.0.1(eslint@10.7.0(jiti@2.7.0))
-      '@eslint/markdown': 8.0.3
+      '@eslint/markdown': 8.0.3(supports-color@7.2.0)
       '@html-eslint/eslint-plugin': 0.64.0(eslint@10.7.0(jiti@2.7.0))
       '@html-eslint/parser': 0.64.0
       '@stylistic/eslint-plugin': 5.10.0(eslint@10.7.0(jiti@2.7.0))
@@ -17798,15 +17658,15 @@ snapshots:
       eslint-config-flat-gitignore: 2.3.0(eslint@10.7.0(jiti@2.7.0))
       eslint-flat-config-utils: 3.2.0
       eslint-import-resolver-node: 0.4.0
-      eslint-import-resolver-typescript: 4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0)))(eslint@10.7.0(jiti@2.7.0))
+      eslint-import-resolver-typescript: 4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0))(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0)
       eslint-merge-processors: 2.0.0(eslint@10.7.0(jiti@2.7.0))
       eslint-plugin-antfu: 3.2.3(eslint@10.7.0(jiti@2.7.0))
       eslint-plugin-compat: 7.0.2(eslint@10.7.0(jiti@2.7.0))
       eslint-plugin-erasable-syntax-only: 0.4.2(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3)
       eslint-plugin-es-x: 10.0.0(eslint@10.7.0(jiti@2.7.0))
       eslint-plugin-html: 8.1.4
-      eslint-plugin-import-x: 4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0))
-      eslint-plugin-jsdoc: 63.1.0(eslint@10.7.0(jiti@2.7.0))
+      eslint-plugin-import-x: 4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0)
+      eslint-plugin-jsdoc: 63.1.0(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0)
       eslint-plugin-jsonc: 3.3.0(eslint@10.7.0(jiti@2.7.0))
       eslint-plugin-n: 18.2.2(eslint@10.7.0(jiti@2.7.0))(ts-declaration-location@1.0.7(typescript@6.0.3))(typescript@6.0.3)
       eslint-plugin-no-for-of-array: 0.1.0(eslint@10.7.0(jiti@2.7.0))(typescript-eslint@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(typescript@6.0.3)
@@ -17820,7 +17680,7 @@ snapshots:
       eslint-plugin-security: 4.0.1
       eslint-plugin-simple-import-sort: 14.0.0(eslint@10.7.0(jiti@2.7.0))
       eslint-plugin-sonarjs: 4.2.0(eslint@10.7.0(jiti@2.7.0))
-      eslint-plugin-toml: 1.4.0(eslint@10.7.0(jiti@2.7.0))
+      eslint-plugin-toml: 1.4.0(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0)
       eslint-plugin-unicorn: 72.0.0(eslint@10.7.0(jiti@2.7.0))
       eslint-plugin-unused-imports: 4.4.1(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))
       eslint-plugin-yml: 3.6.0(eslint@10.7.0(jiti@2.7.0))
@@ -17872,7 +17732,7 @@ snapshots:
       - smol-toml
       - yaml
 
-  '@anolilab/multi-semantic-release@4.4.6(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(supports-color@7.2.0)(typescript@6.0.3))(typescript@6.0.3)':
+  '@anolilab/multi-semantic-release@4.4.6(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(supports-color@7.2.0)(typescript@6.0.3))(supports-color@7.2.0)(typescript@6.0.3)':
     dependencies:
       '@semrel-extra/topo': 1.14.1
       '@visulima/fs': 5.0.5(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
@@ -17921,7 +17781,7 @@ snapshots:
       - smol-toml
       - yaml
 
-  '@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)':
+  '@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)':
     dependencies:
       '@actions/core': 3.0.1
       '@anolilab/rc': 4.0.5
@@ -17944,19 +17804,19 @@ snapshots:
       - supports-color
       - yaml
 
-  '@anolilab/semantic-release-preset@13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(yaml@2.9.0)':
+  '@anolilab/semantic-release-preset@13.4.18(@anolilab/semantic-release-pnpm@8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0))(@semantic-release/npm@13.1.5(semantic-release@25.0.9(typescript@6.0.3)))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)(yaml@2.9.0)':
     dependencies:
       '@anolilab/semantic-release-clean-package-json': 5.5.15(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
       '@semantic-release/changelog': 7.0.0(semantic-release@25.0.9(typescript@6.0.3))
       '@semantic-release/commit-analyzer': 13.0.1(semantic-release@25.0.9(typescript@6.0.3))
-      '@semantic-release/exec': 7.1.0(semantic-release@25.0.9(typescript@6.0.3))
-      '@semantic-release/git': 11.0.1(semantic-release@25.0.9(typescript@6.0.3))
-      '@semantic-release/github': 12.0.9(semantic-release@25.0.9(typescript@6.0.3))
+      '@semantic-release/exec': 7.1.0(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)
+      '@semantic-release/git': 11.0.1(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)
+      '@semantic-release/github': 12.0.9(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)
       '@semantic-release/release-notes-generator': 14.1.1(semantic-release@25.0.9(typescript@6.0.3))
       conventional-changelog-conventionalcommits: 10.2.1
       semantic-release: 25.0.9(typescript@6.0.3)
     optionalDependencies:
-      '@anolilab/semantic-release-pnpm': 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(yaml@2.9.0)
+      '@anolilab/semantic-release-pnpm': 8.1.17(json5@2.2.3)(jsonc-parser@3.3.1)(supports-color@7.2.0)(yaml@2.9.0)
       '@semantic-release/npm': 13.1.5(semantic-release@25.0.9(typescript@6.0.3))
     transitivePeerDependencies:
       - ini
@@ -17966,7 +17826,7 @@ snapshots:
       - supports-color
       - yaml
 
-  '@anolilab/textlint-config@13.0.5(textlint@15.7.1(supports-color@7.2.0))':
+  '@anolilab/textlint-config@13.0.5(supports-color@7.2.0)(textlint@15.7.1(supports-color@7.2.0))':
     dependencies:
       '@textlint-rule/textlint-rule-no-invalid-control-character': 3.0.0
       '@textlint-rule/textlint-rule-no-unmatched-pair': 2.0.4
@@ -17976,10 +17836,10 @@ snapshots:
       textlint: 15.7.1(supports-color@7.2.0)
       textlint-filter-rule-comments: 1.3.0
       textlint-rule-abbr-within-parentheses: 1.0.2
-      textlint-rule-alex: 5.0.0
+      textlint-rule-alex: 5.0.0(supports-color@7.2.0)
       textlint-rule-apostrophe: 3.0.0
       textlint-rule-common-misspellings: 1.0.1
-      textlint-rule-date-weekday-mismatch: 1.1.1
+      textlint-rule-date-weekday-mismatch: 1.1.1(supports-color@7.2.0)
       textlint-rule-diacritics: 2.1.4(textlint@15.7.1(supports-color@7.2.0))
       textlint-rule-en-capitalization: 2.0.3
       textlint-rule-footnote-order: 1.0.3
@@ -19454,7 +19314,7 @@ snapshots:
     dependencies:
       '@eslint/object-schema': 3.0.5
       debug: 4.4.3(supports-color@7.2.0)
-      minimatch: 10.2.5
+      minimatch: 10.2.6
     transitivePeerDependencies:
       - supports-color
 
@@ -19489,12 +19349,12 @@ snapshots:
     optionalDependencies:
       eslint: 10.7.0(jiti@2.7.0)
 
-  '@eslint/markdown@8.0.3':
+  '@eslint/markdown@8.0.3(supports-color@7.2.0)':
     dependencies:
       '@eslint/core': 1.2.1
       '@eslint/plugin-kit': 0.7.2
       github-slugger: 2.0.0
-      mdast-util-from-markdown: 2.0.3
+      mdast-util-from-markdown: 2.0.3(supports-color@7.2.0)
       mdast-util-frontmatter: 2.0.1
       mdast-util-gfm: 3.1.0
       mdast-util-math: 3.0.0
@@ -21964,7 +21824,7 @@ snapshots:
 
   '@semantic-release/error@4.0.0': {}
 
-  '@semantic-release/exec@7.1.0(semantic-release@25.0.9(typescript@6.0.3))':
+  '@semantic-release/exec@7.1.0(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)':
     dependencies:
       '@semantic-release/error': 4.0.0
       aggregate-error: 3.1.0
@@ -21976,7 +21836,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@semantic-release/git@11.0.1(semantic-release@25.0.9(typescript@6.0.3))':
+  '@semantic-release/git@11.0.1(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)':
     dependencies:
       '@semantic-release/error': 4.0.0
       aggregate-error: 5.0.0
@@ -22036,7 +21896,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@semantic-release/github@12.0.9(semantic-release@25.0.9(typescript@6.0.3))':
+  '@semantic-release/github@12.0.9(semantic-release@25.0.9(typescript@6.0.3))(supports-color@7.2.0)':
     dependencies:
       '@octokit/core': 7.0.6
       '@octokit/plugin-paginate-rest': 14.0.0(@octokit/core@7.0.6)
@@ -22623,7 +22483,7 @@ snapshots:
 
   '@textlint/ast-node-types@4.4.3': {}
 
-  '@textlint/ast-tester@12.6.1':
+  '@textlint/ast-tester@12.6.1(supports-color@7.2.0)':
     dependencies:
       '@textlint/ast-node-types': 12.6.1
       debug: 4.4.3(supports-color@7.2.0)
@@ -22675,13 +22535,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@textlint/kernel@12.6.1':
+  '@textlint/kernel@12.6.1(supports-color@7.2.0)':
     dependencies:
       '@textlint/ast-node-types': 12.6.1
-      '@textlint/ast-tester': 12.6.1
+      '@textlint/ast-tester': 12.6.1(supports-color@7.2.0)
       '@textlint/ast-traverse': 12.6.1
       '@textlint/feature-flag': 12.6.1
-      '@textlint/source-code-fixer': 12.6.1
+      '@textlint/source-code-fixer': 12.6.1(supports-color@7.2.0)
       '@textlint/types': 12.6.1
       '@textlint/utils': 12.6.1
       debug: 4.4.3(supports-color@7.2.0)
@@ -22724,7 +22584,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@textlint/markdown-to-ast@12.6.1':
+  '@textlint/markdown-to-ast@12.6.1(supports-color@7.2.0)':
     dependencies:
       '@textlint/ast-node-types': 12.6.1
       debug: 4.4.3(supports-color@7.2.0)
@@ -22766,7 +22626,7 @@ snapshots:
 
   '@textlint/resolver@15.7.1': {}
 
-  '@textlint/source-code-fixer@12.6.1':
+  '@textlint/source-code-fixer@12.6.1(supports-color@7.2.0)':
     dependencies:
       '@textlint/types': 12.6.1
       debug: 4.4.3(supports-color@7.2.0)
@@ -22788,9 +22648,9 @@ snapshots:
     dependencies:
       '@textlint/ast-node-types': 15.7.1
 
-  '@textlint/textlint-plugin-markdown@12.6.1':
+  '@textlint/textlint-plugin-markdown@12.6.1(supports-color@7.2.0)':
     dependencies:
-      '@textlint/markdown-to-ast': 12.6.1
+      '@textlint/markdown-to-ast': 12.6.1(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -23235,8 +23095,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.64.0(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.64.0(typescript@6.0.3)
-      '@typescript-eslint/types': 8.64.0
+      '@typescript-eslint/tsconfig-utils': 8.66.0(typescript@6.0.3)
+      '@typescript-eslint/types': 8.66.0
       debug: 4.4.3(supports-color@7.2.0)
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -23848,8 +23708,8 @@ snapshots:
       oxc-resolver: 11.24.2
       oxc-transform: 0.140.0
       yuku-ast: 0.1.7
-      yuku-codegen: 0.6.4
-      yuku-parser: 0.6.4
+      yuku-codegen: 0.6.12
+      yuku-parser: 0.6.12
     optionalDependencies:
       '@typescript/native-preview': 7.0.0-dev.20260707.2
       rolldown: 1.2.3
@@ -23908,7 +23768,7 @@ snapshots:
       istanbul-lib-report: 3.0.1
       istanbul-reports: 3.2.0
       magicast: 0.5.3
-      obug: 2.1.3
+      obug: 2.1.4
       std-env: 4.1.0
       tinyrainbow: 3.1.0
       vitest: 4.1.10(@types/node@26.1.1)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(happy-dom@20.10.6)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.11)(yaml@2.9.0))
@@ -23964,7 +23824,7 @@ snapshots:
     dependencies:
       '@vitest/utils': 4.1.10
       fflate: 0.8.3
-      flatted: 3.4.2
+      flatted: 3.4.4
       pathe: 2.0.3
       sirv: 3.0.2
       tinyglobby: 0.2.17
@@ -24172,16 +24032,10 @@ snapshots:
   '@yuku-codegen/binding-darwin-arm64@0.6.12':
     optional: true
 
-  '@yuku-codegen/binding-darwin-arm64@0.6.4':
-    optional: true
-
   '@yuku-codegen/binding-darwin-arm64@0.8.4':
     optional: true
 
   '@yuku-codegen/binding-darwin-x64@0.6.12':
-    optional: true
-
-  '@yuku-codegen/binding-darwin-x64@0.6.4':
     optional: true
 
   '@yuku-codegen/binding-darwin-x64@0.8.4':
@@ -24190,16 +24044,10 @@ snapshots:
   '@yuku-codegen/binding-freebsd-x64@0.6.12':
     optional: true
 
-  '@yuku-codegen/binding-freebsd-x64@0.6.4':
-    optional: true
-
   '@yuku-codegen/binding-freebsd-x64@0.8.4':
     optional: true
 
   '@yuku-codegen/binding-linux-arm-gnu@0.6.12':
-    optional: true
-
-  '@yuku-codegen/binding-linux-arm-gnu@0.6.4':
     optional: true
 
   '@yuku-codegen/binding-linux-arm-gnu@0.8.4':
@@ -24208,16 +24056,10 @@ snapshots:
   '@yuku-codegen/binding-linux-arm-musl@0.6.12':
     optional: true
 
-  '@yuku-codegen/binding-linux-arm-musl@0.6.4':
-    optional: true
-
   '@yuku-codegen/binding-linux-arm-musl@0.8.4':
     optional: true
 
   '@yuku-codegen/binding-linux-arm64-gnu@0.6.12':
-    optional: true
-
-  '@yuku-codegen/binding-linux-arm64-gnu@0.6.4':
     optional: true
 
   '@yuku-codegen/binding-linux-arm64-gnu@0.8.4':
@@ -24226,16 +24068,10 @@ snapshots:
   '@yuku-codegen/binding-linux-arm64-musl@0.6.12':
     optional: true
 
-  '@yuku-codegen/binding-linux-arm64-musl@0.6.4':
-    optional: true
-
   '@yuku-codegen/binding-linux-arm64-musl@0.8.4':
     optional: true
 
   '@yuku-codegen/binding-linux-x64-gnu@0.6.12':
-    optional: true
-
-  '@yuku-codegen/binding-linux-x64-gnu@0.6.4':
     optional: true
 
   '@yuku-codegen/binding-linux-x64-gnu@0.8.4':
@@ -24244,25 +24080,16 @@ snapshots:
   '@yuku-codegen/binding-linux-x64-musl@0.6.12':
     optional: true
 
-  '@yuku-codegen/binding-linux-x64-musl@0.6.4':
-    optional: true
-
   '@yuku-codegen/binding-linux-x64-musl@0.8.4':
     optional: true
 
   '@yuku-codegen/binding-win32-arm64@0.6.12':
     optional: true
 
-  '@yuku-codegen/binding-win32-arm64@0.6.4':
-    optional: true
-
   '@yuku-codegen/binding-win32-arm64@0.8.4':
     optional: true
 
   '@yuku-codegen/binding-win32-x64@0.6.12':
-    optional: true
-
-  '@yuku-codegen/binding-win32-x64@0.6.4':
     optional: true
 
   '@yuku-codegen/binding-win32-x64@0.8.4':
@@ -24274,16 +24101,10 @@ snapshots:
   '@yuku-parser/binding-darwin-arm64@0.6.12':
     optional: true
 
-  '@yuku-parser/binding-darwin-arm64@0.6.4':
-    optional: true
-
   '@yuku-parser/binding-darwin-arm64@0.8.4':
     optional: true
 
   '@yuku-parser/binding-darwin-x64@0.6.12':
-    optional: true
-
-  '@yuku-parser/binding-darwin-x64@0.6.4':
     optional: true
 
   '@yuku-parser/binding-darwin-x64@0.8.4':
@@ -24292,16 +24113,10 @@ snapshots:
   '@yuku-parser/binding-freebsd-x64@0.6.12':
     optional: true
 
-  '@yuku-parser/binding-freebsd-x64@0.6.4':
-    optional: true
-
   '@yuku-parser/binding-freebsd-x64@0.8.4':
     optional: true
 
   '@yuku-parser/binding-linux-arm-gnu@0.6.12':
-    optional: true
-
-  '@yuku-parser/binding-linux-arm-gnu@0.6.4':
     optional: true
 
   '@yuku-parser/binding-linux-arm-gnu@0.8.4':
@@ -24310,16 +24125,10 @@ snapshots:
   '@yuku-parser/binding-linux-arm-musl@0.6.12':
     optional: true
 
-  '@yuku-parser/binding-linux-arm-musl@0.6.4':
-    optional: true
-
   '@yuku-parser/binding-linux-arm-musl@0.8.4':
     optional: true
 
   '@yuku-parser/binding-linux-arm64-gnu@0.6.12':
-    optional: true
-
-  '@yuku-parser/binding-linux-arm64-gnu@0.6.4':
     optional: true
 
   '@yuku-parser/binding-linux-arm64-gnu@0.8.4':
@@ -24328,16 +24137,10 @@ snapshots:
   '@yuku-parser/binding-linux-arm64-musl@0.6.12':
     optional: true
 
-  '@yuku-parser/binding-linux-arm64-musl@0.6.4':
-    optional: true
-
   '@yuku-parser/binding-linux-arm64-musl@0.8.4':
     optional: true
 
   '@yuku-parser/binding-linux-x64-gnu@0.6.12':
-    optional: true
-
-  '@yuku-parser/binding-linux-x64-gnu@0.6.4':
     optional: true
 
   '@yuku-parser/binding-linux-x64-gnu@0.8.4':
@@ -24346,25 +24149,16 @@ snapshots:
   '@yuku-parser/binding-linux-x64-musl@0.6.12':
     optional: true
 
-  '@yuku-parser/binding-linux-x64-musl@0.6.4':
-    optional: true
-
   '@yuku-parser/binding-linux-x64-musl@0.8.4':
     optional: true
 
   '@yuku-parser/binding-win32-arm64@0.6.12':
     optional: true
 
-  '@yuku-parser/binding-win32-arm64@0.6.4':
-    optional: true
-
   '@yuku-parser/binding-win32-arm64@0.8.4':
     optional: true
 
   '@yuku-parser/binding-win32-x64@0.6.12':
-    optional: true
-
-  '@yuku-parser/binding-win32-x64@0.6.4':
     optional: true
 
   '@yuku-parser/binding-win32-x64@0.8.4':
@@ -24446,7 +24240,7 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  alex@11.0.1:
+  alex@11.0.1(supports-color@7.2.0):
     dependencies:
       '@types/mdast': 3.0.15
       '@types/nlcst': 1.0.4
@@ -24463,8 +24257,8 @@ snapshots:
       retext-equality: 6.6.0
       retext-profanities: 7.2.2
       unified: 10.1.2
-      unified-diff: 4.0.1
-      unified-engine: 10.1.0
+      unified-diff: 4.0.1(supports-color@7.2.0)
+      unified-engine: 10.1.0(supports-color@7.2.0)
       update-notifier: 6.0.2
       vfile: 5.3.7
       vfile-reporter: 7.0.5
@@ -24944,8 +24738,8 @@ snapshots:
 
   caniuse-api@4.0.0:
     dependencies:
-      browserslist: 4.28.6
-      caniuse-lite: 1.0.30001805
+      browserslist: 4.28.8
+      caniuse-lite: 1.0.30001809
 
   caniuse-lite@1.0.30001805: {}
 
@@ -26162,7 +25956,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0)))(eslint@10.7.0(jiti@2.7.0)):
+  eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0))(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0):
     dependencies:
       debug: 4.4.3(supports-color@7.2.0)
       eslint: 10.7.0(jiti@2.7.0)
@@ -26173,7 +25967,7 @@ snapshots:
       tinyglobby: 0.2.17
       unrs-resolver: 1.12.0
     optionalDependencies:
-      eslint-plugin-import-x: 4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0))
+      eslint-plugin-import-x: 4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -26230,7 +26024,7 @@ snapshots:
     dependencies:
       htmlparser2: 10.1.0
 
-  eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0)):
+  eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.66.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.4.0)(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0):
     dependencies:
       '@typescript-eslint/types': 8.59.4
       comment-parser: 1.4.6
@@ -26248,7 +26042,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-jsdoc@63.1.0(eslint@10.7.0(jiti@2.7.0)):
+  eslint-plugin-jsdoc@63.1.0(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0):
     dependencies:
       '@es-joy/jsdoccomment': 0.88.0
       '@es-joy/resolve.exports': 1.2.0
@@ -26378,7 +26172,7 @@ snapshots:
       typescript: 6.0.3
       yaml: 2.9.0
 
-  eslint-plugin-toml@1.4.0(eslint@10.7.0(jiti@2.7.0)):
+  eslint-plugin-toml@1.4.0(eslint@10.7.0(jiti@2.7.0))(supports-color@7.2.0):
     dependencies:
       '@eslint/core': 1.2.1
       '@eslint/plugin-kit': 0.7.2
@@ -26482,7 +26276,7 @@ snapshots:
       imurmurhash: 0.1.4
       is-glob: 4.0.3
       json-stable-stringify-without-jsonify: 1.0.1
-      minimatch: 10.2.5
+      minimatch: 10.2.6
       natural-compare: 1.4.0
       optionator: 0.9.4
     optionalDependencies:
@@ -26967,9 +26761,9 @@ snapshots:
     dependencies:
       isobject: 3.0.1
 
-  git-diff-tree@1.1.0:
+  git-diff-tree@1.1.0(supports-color@7.2.0):
     dependencies:
-      git-spawned-stream: 1.0.1
+      git-spawned-stream: 1.0.1(supports-color@7.2.0)
       pump-chain: 1.0.0
       split-transform-stream: 0.1.1
       through2: 2.0.0
@@ -26987,7 +26781,7 @@ snapshots:
       through2: 2.0.5
       traverse: 0.6.8
 
-  git-spawned-stream@1.0.1:
+  git-spawned-stream@1.0.1(supports-color@7.2.0):
     dependencies:
       debug: 4.4.3(supports-color@7.2.0)
       spawn-to-readstream: 0.1.3
@@ -27176,7 +26970,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  graphile-utils@5.0.3(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.14.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.14.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(tamedevil@0.1.1):
+  graphile-utils@5.0.3(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.14.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.14.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(supports-color@7.2.0)(tamedevil@0.1.1):
     dependencies:
       '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0)
       debug: 4.4.3(supports-color@7.2.0)
@@ -27242,7 +27036,7 @@ snapshots:
       buffer-image-size: 0.6.4
       entities: 7.0.1
       whatwg-mimetype: 3.0.0
-      ws: 8.21.0
+      ws: 8.21.3
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -28447,14 +28241,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  mdast-util-from-markdown@2.0.3:
+  mdast-util-from-markdown@2.0.3(supports-color@7.2.0):
     dependencies:
       '@types/mdast': 4.0.4
       '@types/unist': 3.0.3
       decode-named-character-reference: 1.3.0
       devlop: 1.1.0
       mdast-util-to-string: 4.0.0
-      micromark: 4.0.2
+      micromark: 4.0.2(supports-color@7.2.0)
       micromark-util-decode-numeric-character-reference: 2.0.2
       micromark-util-decode-string: 2.0.1
       micromark-util-normalize-identifier: 2.0.1
@@ -28479,7 +28273,7 @@ snapshots:
       '@types/mdast': 4.0.4
       devlop: 1.1.0
       escape-string-regexp: 5.0.0
-      mdast-util-from-markdown: 2.0.3
+      mdast-util-from-markdown: 2.0.3(supports-color@7.2.0)
       mdast-util-to-markdown: 2.1.2
       micromark-extension-frontmatter: 2.0.0
     transitivePeerDependencies:
@@ -28518,7 +28312,7 @@ snapshots:
     dependencies:
       '@types/mdast': 4.0.4
       devlop: 1.1.0
-      mdast-util-from-markdown: 2.0.3
+      mdast-util-from-markdown: 2.0.3(supports-color@7.2.0)
       mdast-util-to-markdown: 2.1.2
       micromark-util-normalize-identifier: 2.0.1
     transitivePeerDependencies:
@@ -28536,7 +28330,7 @@ snapshots:
   mdast-util-gfm-strikethrough@2.0.0:
     dependencies:
       '@types/mdast': 4.0.4
-      mdast-util-from-markdown: 2.0.3
+      mdast-util-from-markdown: 2.0.3(supports-color@7.2.0)
       mdast-util-to-markdown: 2.1.2
     transitivePeerDependencies:
       - supports-color
@@ -28560,7 +28354,7 @@ snapshots:
       '@types/mdast': 4.0.4
       devlop: 1.1.0
       markdown-table: 3.0.4
-      mdast-util-from-markdown: 2.0.3
+      mdast-util-from-markdown: 2.0.3(supports-color@7.2.0)
       mdast-util-to-markdown: 2.1.2
     transitivePeerDependencies:
       - supports-color
@@ -28578,7 +28372,7 @@ snapshots:
     dependencies:
       '@types/mdast': 4.0.4
       devlop: 1.1.0
-      mdast-util-from-markdown: 2.0.3
+      mdast-util-from-markdown: 2.0.3(supports-color@7.2.0)
       mdast-util-to-markdown: 2.1.2
     transitivePeerDependencies:
       - supports-color
@@ -28607,7 +28401,7 @@ snapshots:
 
   mdast-util-gfm@3.1.0:
     dependencies:
-      mdast-util-from-markdown: 2.0.3
+      mdast-util-from-markdown: 2.0.3(supports-color@7.2.0)
       mdast-util-gfm-autolink-literal: 2.0.1
       mdast-util-gfm-footnote: 2.1.0
       mdast-util-gfm-strikethrough: 2.0.0
@@ -28623,7 +28417,7 @@ snapshots:
       '@types/mdast': 4.0.4
       devlop: 1.1.0
       longest-streak: 3.1.0
-      mdast-util-from-markdown: 2.0.3
+      mdast-util-from-markdown: 2.0.3(supports-color@7.2.0)
       mdast-util-to-markdown: 2.1.2
       unist-util-remove-position: 5.0.0
     transitivePeerDependencies:
@@ -29290,7 +29084,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  micromark@4.0.2:
+  micromark@4.0.2(supports-color@7.2.0):
     dependencies:
       '@types/debug': 4.1.13
       debug: 4.4.3(supports-color@7.2.0)
@@ -30270,7 +30064,7 @@ snapshots:
   postcss-calc@10.1.1(postcss@8.5.26):
     dependencies:
       postcss: 8.5.26
-      postcss-selector-parser: 7.1.4
+      postcss-selector-parser: 7.1.5
       postcss-value-parser: 4.2.0
 
   postcss-colormin@7.0.10(postcss@8.5.26):
@@ -30515,13 +30309,13 @@ snapshots:
     dependencies:
       icss-utils: 5.1.0(postcss@8.5.26)
       postcss: 8.5.26
-      postcss-selector-parser: 7.1.4
+      postcss-selector-parser: 7.1.5
       postcss-value-parser: 4.2.0
 
   postcss-modules-scope@3.2.1(postcss@8.5.26):
     dependencies:
       postcss: 8.5.26
-      postcss-selector-parser: 7.1.4
+      postcss-selector-parser: 7.1.5
 
   postcss-modules-values@4.0.0(postcss@8.5.26):
     dependencies:
@@ -30782,7 +30576,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postgraphile@5.1.4(440ff0ceecf127c63cbcd61605aac923):
+  postgraphile@5.1.4(b80f9a03a33ec4f6d3c822e8613627b7):
     dependencies:
       '@dataplan/json': 1.0.0(grafast@1.0.2(graphql@16.14.0))
       '@dataplan/pg': 1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0)
@@ -30795,7 +30589,7 @@ snapshots:
       graphile-build: 5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)
       graphile-build-pg: 5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.14.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config: 1.0.1
-      graphile-utils: 5.0.3(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.14.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.14.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(tamedevil@0.1.1)
+      graphile-utils: 5.0.3(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.14.0))(graphile-build-pg@5.0.2(@dataplan/pg@1.0.3(@dataplan/json@1.0.0(grafast@1.0.2(graphql@16.14.0)))(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.0.2(graphql@16.14.0))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.0.2(grafast@1.0.2(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0))(graphile-config@1.0.1)(graphql@16.14.0)(supports-color@7.2.0)(tamedevil@0.1.1)
       graphql: 16.14.0
       iterall: 1.3.0
       jsonwebtoken: 9.0.3
@@ -32532,9 +32326,9 @@ snapshots:
     dependencies:
       match-index: 1.0.3
 
-  textlint-rule-alex@5.0.0:
+  textlint-rule-alex@5.0.0(supports-color@7.2.0):
     dependencies:
-      alex: 11.0.1
+      alex: 11.0.1(supports-color@7.2.0)
       textlint-rule-helper: 2.5.0
     transitivePeerDependencies:
       - supports-color
@@ -32546,11 +32340,11 @@ snapshots:
       misspellings: 1.1.0
       textlint-rule-helper: 1.2.0
 
-  textlint-rule-date-weekday-mismatch@1.1.1:
+  textlint-rule-date-weekday-mismatch@1.1.1(supports-color@7.2.0):
     dependencies:
       chrono-node: 2.9.1
       moment: 2.30.1
-      textlint-tester: 12.6.1
+      textlint-tester: 12.6.1(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -32611,11 +32405,11 @@ snapshots:
       textlint-rule-helper: 2.5.0
       write-good: 1.0.8
 
-  textlint-tester@12.6.1:
+  textlint-tester@12.6.1(supports-color@7.2.0):
     dependencies:
       '@textlint/feature-flag': 12.6.1
-      '@textlint/kernel': 12.6.1
-      '@textlint/textlint-plugin-markdown': 12.6.1
+      '@textlint/kernel': 12.6.1(supports-color@7.2.0)
+      '@textlint/textlint-plugin-markdown': 12.6.1(supports-color@7.2.0)
       '@textlint/textlint-plugin-text': 12.6.1
     transitivePeerDependencies:
       - supports-color
@@ -32949,7 +32743,7 @@ snapshots:
       '@gerrit0/mini-shiki': 3.23.0
       lunr: 2.3.9
       markdown-it: 14.3.0
-      minimatch: 10.2.5
+      minimatch: 10.2.6
       typescript: 6.0.3
       yaml: 2.9.0
 
@@ -33043,14 +32837,14 @@ snapshots:
 
   unicorn-magic@0.4.0: {}
 
-  unified-diff@4.0.1:
+  unified-diff@4.0.1(supports-color@7.2.0):
     dependencies:
-      git-diff-tree: 1.1.0
+      git-diff-tree: 1.1.0(supports-color@7.2.0)
       vfile-find-up: 6.1.0
     transitivePeerDependencies:
       - supports-color
 
-  unified-engine@10.1.0:
+  unified-engine@10.1.0(supports-color@7.2.0):
     dependencies:
       '@types/concat-stream': 2.0.3
       '@types/debug': 4.1.13
@@ -33251,7 +33045,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
       '@vue/reactivity': 3.5.40
-      obug: 2.1.3
+      obug: 2.1.4
       unplugin: 3.0.0
       vite: 8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.11)(yaml@2.9.0)
       vue: 3.5.40(typescript@6.0.3)
@@ -33274,7 +33068,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
       '@vue/reactivity': 3.5.40
-      obug: 2.1.3
+      obug: 2.1.4
       unplugin: 3.0.0
       vite: 8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass-embedded@1.100.0)(sass@1.101.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.47.1)(tsx@4.23.11)(yaml@2.9.0)
       vue: 3.5.40(typescript@7.0.2)
@@ -33768,8 +33562,6 @@ snapshots:
       too-wordy: 0.3.6
       weasel-words: 0.1.1
 
-  ws@8.21.0: {}
-
   ws@8.21.3: {}
 
   wsl-utils@0.3.1:
@@ -33876,22 +33668,6 @@ snapshots:
       '@yuku-codegen/binding-win32-arm64': 0.6.12
       '@yuku-codegen/binding-win32-x64': 0.6.12
 
-  yuku-codegen@0.6.4:
-    dependencies:
-      '@yuku-toolchain/types': 0.5.43
-    optionalDependencies:
-      '@yuku-codegen/binding-darwin-arm64': 0.6.4
-      '@yuku-codegen/binding-darwin-x64': 0.6.4
-      '@yuku-codegen/binding-freebsd-x64': 0.6.4
-      '@yuku-codegen/binding-linux-arm-gnu': 0.6.4
-      '@yuku-codegen/binding-linux-arm-musl': 0.6.4
-      '@yuku-codegen/binding-linux-arm64-gnu': 0.6.4
-      '@yuku-codegen/binding-linux-arm64-musl': 0.6.4
-      '@yuku-codegen/binding-linux-x64-gnu': 0.6.4
-      '@yuku-codegen/binding-linux-x64-musl': 0.6.4
-      '@yuku-codegen/binding-win32-arm64': 0.6.4
-      '@yuku-codegen/binding-win32-x64': 0.6.4
-
   yuku-codegen@0.8.4:
     dependencies:
       '@yuku-toolchain/types': 0.8.4
@@ -33925,22 +33701,6 @@ snapshots:
       '@yuku-parser/binding-linux-x64-musl': 0.6.12
       '@yuku-parser/binding-win32-arm64': 0.6.12
       '@yuku-parser/binding-win32-x64': 0.6.12
-
-  yuku-parser@0.6.4:
-    dependencies:
-      '@yuku-toolchain/types': 0.5.43
-    optionalDependencies:
-      '@yuku-parser/binding-darwin-arm64': 0.6.4
-      '@yuku-parser/binding-darwin-x64': 0.6.4
-      '@yuku-parser/binding-freebsd-x64': 0.6.4
-      '@yuku-parser/binding-linux-arm-gnu': 0.6.4
-      '@yuku-parser/binding-linux-arm-musl': 0.6.4
-      '@yuku-parser/binding-linux-arm64-gnu': 0.6.4
-      '@yuku-parser/binding-linux-arm64-musl': 0.6.4
-      '@yuku-parser/binding-linux-x64-gnu': 0.6.4
-      '@yuku-parser/binding-linux-x64-musl': 0.6.4
-      '@yuku-parser/binding-win32-arm64': 0.6.4
-      '@yuku-parser/binding-win32-x64': 0.6.4
 
   yuku-parser@0.8.4:
     dependencies:
