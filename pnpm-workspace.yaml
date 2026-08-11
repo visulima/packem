@@ -43,7 +43,7 @@ catalogs:
     "@visulima/packem-rollup": 1.0.0-alpha.65
     "@visulima/rollup-plugin-css": 1.0.0-alpha.45
     esbuild: 0.28.1
-    rolldown: 1.2.0
+    rolldown: 1.2.3
     rollup: 4.62.2
     rollup-plugin-dts: 6.4.1
     rollup-plugin-import-trace: 1.0.1
@@ -56,9 +56,9 @@ catalogs:
     unplugin-vue: 7.2.0
     vite: 8.1.4
   cli:
-    "@anolilab/multi-semantic-release": 4.4.5
-    "@anolilab/semantic-release-pnpm": 8.1.16
-    "@anolilab/semantic-release-preset": 13.4.17
+    "@anolilab/multi-semantic-release": 4.4.6
+    "@anolilab/semantic-release-pnpm": 8.1.17
+    "@anolilab/semantic-release-preset": 13.4.18
     commitizen: ^4.3.2
     semantic-release: 25.0.9
   dev:
@@ -85,10 +85,10 @@ catalogs:
     nodehun: ^3.0.2
     oxc-parser: 0.140.0
     oxc-transform: 0.140.0
-    p-queue: 9.3.1
+    p-queue: 9.3.3
     package-manager-detector: ^1.7.0
     picocolors: ^1.1.1
-    postgraphile: 5.1.0
+    postgraphile: 5.1.4
     rs-module-lexer: 2.8.0
     safe-stable-stringify: ^2.5.0
     sort-package-json: 4.0.0
@@ -104,19 +104,19 @@ catalogs:
     "@radix-ui/react-tooltip": ^1.2.16
     "@vue/language-core": 3.3.7
     babel-plugin-react-compiler: 1.0.0
-    preact: 10.29.7
+    preact: 10.29.8
     react: 19.2.7
     react-dom: 19.2.7
-    svelte: 5.56.5
+    svelte: 5.56.8
     vue: 3.5.40
   icons:
     lucide-static: 1.24.0
   lint:
-    "@anolilab/commitlint-config": 10.0.1
-    "@anolilab/eslint-config": 28.0.1
-    "@anolilab/lint-staged-config": 11.0.11
-    "@anolilab/prettier-config": 10.0.1
-    "@anolilab/textlint-config": 13.0.4
+    "@anolilab/commitlint-config": 10.0.2
+    "@anolilab/eslint-config": 28.0.2
+    "@anolilab/lint-staged-config": 11.0.12
+    "@anolilab/prettier-config": 10.0.2
+    "@anolilab/textlint-config": 13.0.5
     "@commitlint/cli": 21.2.1
     "@commitlint/config-conventional": 21.2.0
     "@eslint/css": 1.4.0
@@ -125,7 +125,7 @@ catalogs:
     husky: ^9.1.7
     lint-staged: 17.0.8
     prettier: 3.9.5
-    publint: 0.3.21
+    publint: 0.3.23
     secretlint: 13.0.2
     tailwind-csstree: 0.3.3
     textlint: 15.7.1
@@ -136,8 +136,8 @@ catalogs:
   monorepo:
     nx: 23.1.1
   network:
-    browserslist: 4.28.6
-    browserslist-config-anolilab: 9.0.0
+    browserslist: 4.28.7
+    browserslist-config-anolilab: 9.0.1
   node:
     "@antfu/install-pkg": 1.1.0
     "@babel/preset-env": 8.0.2
@@ -148,7 +148,7 @@ catalogs:
     execa: ^9.6.1
     glob-parent: 6.0.2
     oxc-resolver: 11.24.2
-    pkg-pr-new: 0.0.78
+    pkg-pr-new: 0.0.87
     rimraf: 6.1.3
     tinyexec: 1.2.4
     tinyglobby: 0.2.17
@@ -162,7 +162,7 @@ catalogs:
     cjs-module-lexer: 2.2.0
     clsx: ^2.1.1
     fastest-levenshtein: 1.0.16
-    get-tsconfig: 4.14.0
+    get-tsconfig: 4.14.1
     gpt-tokenizer: ^3.4.0
     happy-dom: 20.10.6
     hookable: 6.1.1
@@ -170,9 +170,9 @@ catalogs:
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.2
-    obug: 2.1.3
+    obug: 2.1.4
     oxc-parser: 0.140.0
-    p-queue: 9.3.1
+    p-queue: 9.3.3
     picomatch: 4.0.5
     plop: 4.0.5
     preline: 4.2.0
@@ -184,11 +184,11 @@ catalogs:
     tailwind-merge: 3.6.0
     workerpool: 10.0.3
     yuku-ast: ^0.1.7
-    yuku-codegen: ^0.6.4
-    yuku-parser: ^0.6.4
+    yuku-codegen: ^0.6.12
+    yuku-parser: ^0.6.12
   script:
     jiti: 2.7.0
-    tsx: 4.23.1
+    tsx: 4.23.11
   style:
     "@csstools/css-parser-algorithms": 4.0.0
     "@csstools/css-tokenizer": 4.0.0
@@ -200,7 +200,7 @@ catalogs:
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.0-alpha.15
     clean-css: ^5.3.3
-    cssnano: 8.0.2
+    cssnano: 8.0.4
     icss-utils: ^5.1.0
     less: 4.6.7
     lightningcss: 1.32.0
@@ -259,7 +259,7 @@ catalogs:
     "@types/stylus": ^0.48.43
     "@types/turndown": ^5.0.6
     "@types/uglifycss": ^0.0.11
-    "@typescript/native-preview": 7.0.0-dev.20250922.1
+    "@typescript/native-preview": 7.0.0-dev.20260707.2
   utils:
     cheerio: 1.2.0
     defu: 6.1.7
@@ -364,49 +364,49 @@ onlyBuiltDependencies:
   - rs-module-lexer
   - unrs-resolver
 overrides:
-  '@hono/node-server@<2.0.10': ">=2.0.10"
+  '@hono/node-server@<2.0.10': ">=2.0.12"
   ajv@>=7.0.0 <8.18.0: ">=8.18.0"
-  axios@>=1.0.0 <1.18.0: ">=1.18.0"
+  axios@>=1.0.0 <1.18.0: ">=1.18.1"
   body-parser@>=2.0.0 <2.3.0: ">=2.3.0"
   brace-expansion@<5.0.9: ">=5.0.9 <6"
-  chrono-node@<2.2.4: ">=2.2.4"
-  defu@<6.1.5: ">=6.1.5"
-  devalue@>=5.0.0 <5.8.1: ">=5.8.1"
+  chrono-node@<2.2.4: ">=2.2.7"
+  defu@<6.1.5: ">=6.1.7"
+  devalue@>=5.0.0 <5.8.1: ">=5.8.2"
   diff@>=5.0.0 <5.2.2: ">=5.2.2"
   esbuild@>=0.0.0 <0.28.1: ">=0.28.1"
   eslint-plugin-sonarjs@<4.2.0: ">=4.2.0"
   fast-uri@<3.1.5: ">=3.1.5 <4"
-  flatted@<3.4.2: ">=3.4.2"
+  flatted@<3.4.2: ">=3.4.4"
   follow-redirects@<1.16.0: ">=1.16.0"
   form-data@>=4.0.0 <4.0.6: ">=4.0.6"
   glob@>=10.0.0 <10.5.0: ">=10.5.0"
   handlebars@>=4.0.0 <4.7.9: ">=4.7.9"
   happy-dom@>=15.0.0 <20.8.8: ">=20.8.9"
   hono@<4.12.34: ">=4.12.34 <5"
-  immutable@>=5.0.0 <5.1.8: ">=5.1.8"
+  immutable@>=5.0.0 <5.1.8: ">=5.1.9"
   ip-address@<10.3.1: ">=10.3.1 <11"
   js-yaml@>=4.0.0 <4.3.1: ">=4.3.1 <5"
   lodash@<4.18.0: ">=4.18.0"
   lodash-es@<4.18.0: ">=4.18.0"
   markdown-it@<14.2.0: ">=14.2.0"
-  minimatch@<3.1.4: ">=3.1.4"
-  minimatch@>=5.0.0 <5.1.8: ">=5.1.8"
-  minimatch@>=9.0.0 <9.0.7: ">=9.0.7"
-  minimatch@>=10.0.0 <10.2.3: ">=10.2.3"
+  minimatch@<3.1.4: ">=3.1.5"
+  minimatch@>=5.0.0 <5.1.8: ">=5.1.9"
+  minimatch@>=9.0.0 <9.0.7: ">=9.0.9"
+  minimatch@>=10.0.0 <10.2.3: ">=10.2.6"
   # exact pin, not a floor: see the cooldown note above 3.3.17 in minimumReleaseAgeExclude
-  nanoid@>=3.0.0 <4: "3.3.17"
-  path-to-regexp@>=8.0.0 <8.4.0: ">=8.4.0"
+  nanoid@>=3.0.0 <4: "3.3.18"
+  path-to-regexp@>=8.0.0 <8.4.0: ">=8.4.2"
   picomatch@<2.3.2: ">=2.3.2"
-  picomatch@>=4.0.0 <4.0.4: ">=4.0.4"
+  picomatch@>=4.0.0 <4.0.4: ">=4.0.5"
   postcss@<8.5.23: ">=8.5.23 <9"
   shell-quote@<1.8.5: ">=1.8.5"
-  svelte@<5.55.7: ">=5.55.7"
+  svelte@<5.55.7: ">=5.55.10"
   svgo@>=4.0.0 <4.0.2: ">=4.0.2"
   tmp@<0.2.7: ">=0.2.7"
   undici@<8.9.0: ">=8.9.0 <9"
   vite@>=8.0.0 <8.0.5: ">=8.0.5"
-  ws@>=8.0.0 <8.21.0: ">=8.21.0"
-  yaml@>=2.0.0 <2.8.3: ">=2.8.3"
+  ws@>=8.0.0 <8.21.0: ">=8.21.3"
+  yaml@>=2.0.0 <2.8.3: ">=2.8.4"
 
 patchedDependencies:
   oxc-parser: patches/oxc-parser.patch

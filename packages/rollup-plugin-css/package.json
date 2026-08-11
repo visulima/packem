@@ -183,7 +183,7 @@
         "@tailwindcss/node": ">=4.3.0",
         "@tailwindcss/oxide": ">=4.3.0",
         "@visulima/css-style-inject": "1.0.0",
-        "cssnano": ">=8.0.1",
+        "cssnano": ">=8.0.4",
         "icss-utils": ">=5.1.0",
         "less": ">=4.6.4",
         "lightningcss": ">=1.32.0",
