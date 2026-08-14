@@ -44,7 +44,7 @@ catalogs:
     "@visulima/rollup-plugin-css": 1.0.0-alpha.45
     esbuild: 0.28.1
     rolldown: 1.2.3
-    rollup: 4.62.2
+    rollup: 4.62.4
     rollup-plugin-dts: 6.4.1
     rollup-plugin-import-trace: 1.0.1
     rollup-plugin-license: 3.7.1
