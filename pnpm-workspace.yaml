@@ -74,7 +74,7 @@ catalogs:
     "@swc/types": 0.1.28
     babel-plugin-transform-hook-names: ^1.0.2
     babel-preset-solid: 1.9.12
-    conventional-changelog-conventionalcommits: 10.2.1
+    conventional-changelog-conventionalcommits: 9.3.1
     deeks: ^3.2.1
     detect-indent: ^7.0.2
     diff: 9.0.0
