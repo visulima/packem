@@ -102,27 +102,33 @@ const COMMON_SCRIPT_PATTERNS: { from: string; rewrite: (script: string) => strin
  */
 const migrateScript = (key: string, value: string, logger: CommandLogger): string | undefined => {
     let next = value;
-    let changed = false;
+    let isChanged = false;
 
     // Replace bundler commands
-    for (const oldCmd of Object.keys(DEP_MIGRATIONS)) {
-        if (next.includes(oldCmd)) {
-            logger.info(`Migrating \`${key}\` script from ${oldCmd} to packem`);
-            changed = true;
-            next = next.replaceAll(new RegExp(String.raw`\b${oldCmd}\b`, "g"), "packem").replaceAll(new RegExp(String.raw`\b${oldCmd}-node\b`, "g"), "packem");
+    for (const oldCommand of Object.keys(DEP_MIGRATIONS)) {
+        if (!next.includes(oldCommand)) {
+            continue;
         }
+
+        logger.info(`Migrating \`${key}\` script from ${oldCommand} to packem`);
+        isChanged = true;
+        next = next
+            .replaceAll(new RegExp(String.raw`\b${oldCommand}\b`, "g"), "packem")
+            .replaceAll(new RegExp(String.raw`\b${oldCommand}-node\b`, "g"), "packem");
     }
 
     // Handle common script patterns
     for (const { from, rewrite } of COMMON_SCRIPT_PATTERNS) {
-        if (next.includes(from)) {
-            logger.info(`Migrating \`${key}\` script from ${from} to packem`);
-            changed = true;
-            next = rewrite(next);
+        if (!next.includes(from)) {
+            continue;
         }
+
+        logger.info(`Migrating \`${key}\` script from ${from} to packem`);
+        isChanged = true;
+        next = rewrite(next);
     }
 
-    return changed ? next : undefined;
+    return isChanged ? next : undefined;
 };
 
 /**
@@ -133,18 +139,18 @@ const migrateScript = (key: string, value: string, logger: CommandLogger): strin
  */
 const migrateScripts = (scripts: Record<string, string>, logger: CommandLogger): { found: boolean; scripts: Record<string, string> } => {
     const result: Record<string, string> = { ...scripts };
-    let found = false;
+    let isFound = false;
 
     for (const key of Object.keys(result)) {
         const migrated = migrateScript(key, result[key], logger);
 
         if (migrated !== undefined) {
             result[key] = migrated;
-            found = true;
+            isFound = true;
         }
     }
 
-    return { found, scripts: result };
+    return { found: isFound, scripts: result };
 };
 
 /**
@@ -156,22 +162,24 @@ const migrateScripts = (scripts: Record<string, string>, logger: CommandLogger):
  */
 const migrateDependencies = (parsedPkg: MigratablePackageJson, logger: CommandLogger): { found: boolean; pkg: MigratablePackageJson } => {
     const result: MigratablePackageJson = { ...parsedPkg };
-    let found = false;
+    let isFound = false;
 
     for (const [field, semver] of Object.entries(DEP_FIELDS)) {
         let fieldValue = result[field] as Record<string, string> | undefined;
 
-        for (const [oldDep, newDep] of Object.entries(DEP_MIGRATIONS)) {
-            if (fieldValue?.[oldDep]) {
-                logger.info(`Migrating \`${field}\` from ${oldDep} to ${newDep}.`);
-                found = true;
-                fieldValue = renameKey(fieldValue, oldDep, newDep, semver);
-                result[field] = fieldValue;
+        for (const [oldDependency, newDependency] of Object.entries(DEP_MIGRATIONS)) {
+            if (!fieldValue?.[oldDependency]) {
+                continue;
             }
+
+            logger.info(`Migrating \`${field}\` from ${oldDependency} to ${newDependency}.`);
+            isFound = true;
+            fieldValue = renameKey(fieldValue, oldDependency, newDependency, semver);
+            result[field] = fieldValue;
         }
     }
 
-    return { found, pkg: result };
+    return { found: isFound, pkg: result };
 };
 
 /**
@@ -206,8 +214,8 @@ const migratePackageJson = async (dryRun: boolean | undefined, logger: CommandLo
     const pkgRaw = await readFile("package.json", "utf8");
     const initialPkg = JSON.parse(pkgRaw) as MigratablePackageJson;
 
-    const { found: depsFound, pkg: parsedPkg } = migrateDependencies(initialPkg, logger);
-    let found = depsFound;
+    const { found: dependenciesFound, pkg: parsedPkg } = migrateDependencies(initialPkg, logger);
+    let isFound = dependenciesFound;
 
     // Migrate scripts
     if (parsedPkg.scripts) {
@@ -215,13 +223,13 @@ const migratePackageJson = async (dryRun: boolean | undefined, logger: CommandLo
 
         if (scriptsFound) {
             parsedPkg.scripts = migratedScripts;
-            found = true;
+            isFound = true;
         }
     }
 
     warnInlineConfigFields(parsedPkg, logger);
 
-    if (!found) {
+    if (!isFound) {
         logger.info("No migratable bundler dependencies found in package.json");
 
         return false;
@@ -281,7 +289,7 @@ const CONFIG_FILES = [
  * @returns Whether any migration was performed
  */
 const migrateConfigFiles = (logger: CommandLogger): boolean => {
-    let found = false;
+    let isFound = false;
 
     for (const file of CONFIG_FILES) {
         if (!existsSync(file)) {
@@ -293,14 +301,14 @@ const migrateConfigFiles = (logger: CommandLogger): boolean => {
 
         // For now, we just warn about config files but don't auto-migrate them
         // as config migration is complex and requires understanding the specific bundler config
-        found = true;
+        isFound = true;
     }
 
-    if (!found) {
+    if (!isFound) {
         logger.info("No bundler config files found");
     }
 
-    return found;
+    return isFound;
 };
 
 /**
@@ -337,9 +345,9 @@ const migrate = async ({ cwd, dryRun, logger }: { cwd?: string; dryRun?: boolean
 
         rl.close();
 
-        const confirm = input.toLowerCase() === "y" || input === "";
+        const isConfirm = input.toLowerCase() === "y" || input === "";
 
-        if (!confirm) {
+        if (!isConfirm) {
             logger.error("Migration cancelled.");
             process.exitCode = 1;
 
@@ -351,19 +359,19 @@ const migrate = async ({ cwd, dryRun, logger }: { cwd?: string; dryRun?: boolean
         process.chdir(cwd);
     }
 
-    let migrated = false;
+    let isMigrated = false;
 
     // Migrate package.json
     if (await migratePackageJson(dryRun, logger)) {
-        migrated = true;
+        isMigrated = true;
     }
 
     // Migrate config files
     if (migrateConfigFiles(logger)) {
-        migrated = true;
+        isMigrated = true;
     }
 
-    if (migrated) {
+    if (isMigrated) {
         logger.success("Migration completed. Remember to run install command with your package manager.");
     } else {
         logger.error("No migration performed.");
@@ -399,7 +407,7 @@ const createMigrateCommand = (cli: Cli<Pail>): void => {
             await migrate({
                 cwd: options.cwd,
                 dryRun: options.dryRun,
-                logger: logger as unknown as CommandLogger,
+                logger,
             });
         },
         name: "migrate",

@@ -397,13 +397,13 @@ export type ValidationOptions = {
     };
     /** Dependency validation options */
     dependencies:
+        | false
         | {
               /** Hoisted dependency validation with exclusions */
-              hoisted: { exclude: string[] } | false;
+              hoisted: false | { exclude: string[] };
               /** Unused dependency validation with exclusions */
-              unused: { exclude: string[] } | false;
-          }
-        | false;
+              unused: false | { exclude: string[] };
+          };
     /** Package.json validation options */
     packageJson?: {
         /** Allowed file extensions in exports field */

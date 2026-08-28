@@ -937,7 +937,7 @@ describe(validatePackageFields, () => {
                 pkg: {
                     exports: {
                         ".": "./dist/index.js",
-                        // eslint-disable-next-line unicorn/no-null
+
                         "./internal": null,
                     },
                     sideEffects: false,

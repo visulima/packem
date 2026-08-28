@@ -113,9 +113,9 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             : undefined;
 
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean OR is intended: a falsy `unbundle` must still fall through to the preserveModules check
-    const usePreserveModules = Boolean(context.options.unbundle || context.options.rollup.output?.preserveModules);
+    const isUsePreserveModules = Boolean(context.options.unbundle || context.options.rollup.output?.preserveModules);
 
-    const chunking = usePreserveModules
+    const chunking = isUsePreserveModules
         ? {
               preserveModules: true,
               preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
@@ -161,10 +161,10 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                     // options for url handler accordingly.
                     assetFileNames: "[name]-[hash][extname]",
                     banner: jsBanner,
-                    chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "cjs"), usePreserveModules),
+                    chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "cjs"), isUsePreserveModules),
                     compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
-                    entryFileNames: createEntryFileNames((_chunk) => getOutputExtension(context, "cjs"), usePreserveModules),
+                    entryFileNames: createEntryFileNames((_chunk) => getOutputExtension(context, "cjs"), isUsePreserveModules),
                     esModule: useEsModuleMark ?? "if-default-prop",
                     exports: "auto",
                     extend: true,
@@ -198,10 +198,10 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                     // options for url handler accordingly.
                     assetFileNames: "[name]-[hash][extname]",
                     banner: jsBanner,
-                    chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "esm"), usePreserveModules),
+                    chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "esm"), isUsePreserveModules),
                     compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
-                    entryFileNames: createEntryFileNames((chunk) => resolveEsmEntryExtension(context, chunk, usePreserveModules), usePreserveModules),
+                    entryFileNames: createEntryFileNames((chunk) => resolveEsmEntryExtension(context, chunk, isUsePreserveModules), isUsePreserveModules),
                     esModule: useEsModuleMark ?? "if-default-prop",
                     exports: "auto",
                     extend: true,
@@ -467,7 +467,7 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
                     const instance = jsxRemoveAttributes({
                         attributes: context.options.rollup.jsxRemoveAttributes.attributes,
                         logger: getLogger(context),
-                        ...(isRolldown ? { mode: "renderChunk" as const } : {}),
+                        ...(isRolldown && { mode: "renderChunk" as const }),
                     });
 
                     // Only the rollup transform path is cacheable; the rolldown path

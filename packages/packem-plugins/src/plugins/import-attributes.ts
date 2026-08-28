@@ -121,7 +121,7 @@ export const importAttributesPlugin = (): Plugin => {
 
         transform(code, id) {
             // Skip our own virtual modules and non-source files.
-            const baseId = id.split("?")[0] ?? id;
+            const baseId = id.split("?", 1)[0] ?? id;
 
             if (baseId.startsWith(VIRTUAL_PREFIX) || !SOURCE_FILE.test(baseId)) {
                 // eslint-disable-next-line unicorn/no-null

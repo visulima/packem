@@ -35,7 +35,7 @@ export const invalidateContextFile = (context: TscContext, file: string): void =
 
     debug(`invalidating context file: ${normalizedFile}`);
     context.files.delete(normalizedFile);
-    context.programs = context.programs.filter((program) => !program.getSourceFiles().some((sourceFile) => sourceFile.fileName === normalizedFile));
+    context.programs = context.programs.filter((program) => program.getSourceFiles().every((sourceFile) => sourceFile.fileName !== normalizedFile));
     context.projects.clear();
 };
 

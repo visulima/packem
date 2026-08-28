@@ -14,7 +14,7 @@ import type { Plugin } from "rollup";
 // bivariance, which `any` (but not `unknown`) provides. Typing the slot as
 // the rollup-side union would also create a dependency cycle
 // (packem-plugins → packem-rollup → packem-plugins).
-// eslint-disable-next-line unicorn/prevent-abbreviations, @typescript-eslint/no-explicit-any -- `TransformerFn` is public API (renaming is breaking); default `any` (not `unknown`) keeps concrete transformer configs assignable to the bare slot via parameter bivariance.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- `TransformerFn` is public API (renaming is breaking); default `any` (not `unknown`) keeps concrete transformer configs assignable to the bare slot via parameter bivariance.
 export type TransformerFn<C = any> = ((config: C) => Plugin) & {
     NAME?: TransformerName;
 };

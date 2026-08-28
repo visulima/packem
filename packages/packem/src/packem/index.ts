@@ -880,7 +880,7 @@ const packem = async (
         cwd: rootDirectory,
     });
 
-    let logged = false;
+    let isLogged = false;
     let onSuccessProcess: ExecChild | undefined;
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type,@typescript-eslint/no-explicit-any
     let onSuccessCleanup: (() => any) | undefined | void;
@@ -955,7 +955,7 @@ const packem = async (
                 const getBuilderDuration = () => duration(Math.floor(Date.now() - builderStart));
 
                 // eslint-disable-next-line no-await-in-loop -- builders must run sequentially (shared mutable context/cache)
-                await builder(context, cachePath, fileCache, logged);
+                await builder(context, cachePath, fileCache, isLogged);
 
                 // eslint-disable-next-line no-await-in-loop -- builders must run sequentially (shared mutable context/cache)
                 await context.hooks.callHook("builder:done", name, context);
@@ -1042,10 +1042,10 @@ const packem = async (
 
             await context.hooks.callHook("build:done", context);
         } else {
-            logged = await build(context, fileCache);
+            isLogged = await build(context, fileCache);
 
             if (context.options.emitCJS && context.options.declaration === "compatible") {
-                if (logged) {
+                if (isLogged) {
                     logger.raw("\n");
                 }
 
@@ -1070,18 +1070,18 @@ const packem = async (
                 }
 
                 if (context.options.validation.attw) {
-                    await attw(context, logged);
+                    await attw(context, isLogged);
                 }
 
                 if (context.options.validation.bundleLimit) {
                     // validateBundleSize is synchronous, run immediately
-                    validateBundleSize(context, logged);
+                    validateBundleSize(context, isLogged);
                 }
             }
 
             await context.hooks.callHook("validate:done", context);
 
-            logBuildErrors(context, logged);
+            logBuildErrors(context, isLogged);
         }
 
         logger.raw(`\n⚡️ Build run in ${getDuration()}\n`);
@@ -1123,7 +1123,7 @@ const packem = async (
         // Restore all wrapped console methods
         logger.restoreAll();
 
-        await removeOldCacheFolders(cachePath, logger, logged);
+        await removeOldCacheFolders(cachePath, logger, isLogged);
     }
 };
 

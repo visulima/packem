@@ -10,7 +10,9 @@ const errorFactory = (error: Error & { formatted?: string; span?: { start: { col
 
     const newError = new Error(message, { cause: error }) as SassError;
 
+    // eslint-disable-next-line unicorn/no-error-property-assignment -- the point of this factory is to present sass's own name and to drop our stack
     newError.name = error.name;
+    // eslint-disable-next-line unicorn/no-error-property-assignment -- sass reports the source location itself; our stack is noise in the terminal
     newError.stack = undefined;
     newError.id = file;
 

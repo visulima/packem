@@ -153,8 +153,8 @@ export const cjsInteropPlugin = ({
             }
 
             const transformed = new MagicString(code);
-            let changed = false;
-            let sawDefault = false;
+            let isChanged = false;
+            let isSawDefault = false;
 
             // Only top-level statements are rewritten — assignments inside string
             // literals or comments never reach the AST, and nested assignments
@@ -162,11 +162,11 @@ export const cjsInteropPlugin = ({
             for (const statement of (ast as unknown as { body: Node[] }).body) {
                 const outcome = rewriteExportAssignment(transformed, statement);
 
-                changed = changed || outcome.changed;
-                sawDefault = sawDefault || outcome.sawDefault;
+                isChanged ||= outcome.changed;
+                isSawDefault ||= outcome.sawDefault;
             }
 
-            if (!sawDefault) {
+            if (!isSawDefault) {
                 // Nothing to collapse to a default export → leave the chunk as-is,
                 // matching the previous behaviour of bailing without a default.
                 return undefined;
@@ -178,10 +178,10 @@ export const cjsInteropPlugin = ({
                 // literal RHS `module.exports` rather than re-evaluating the original
                 // assignment's RHS, which could be a non-identifier expression.
                 transformed.append("\nmodule.exports.default = module.exports;");
-                changed = true;
+                isChanged = true;
             }
 
-            if (!changed) {
+            if (!isChanged) {
                 return undefined;
             }
 

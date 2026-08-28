@@ -1,4 +1,3 @@
-/* eslint-disable vitest/require-mock-type-parameters */
 import { describe, expect, it, vi } from "vitest";
 
 import { memoizeByKey } from "../../../src/utils/memoize";

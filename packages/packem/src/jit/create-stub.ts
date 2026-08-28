@@ -9,7 +9,7 @@ import { fileURLToPath, pathToFileURL, resolveModuleExportNames, resolvePath } f
 
 import type { InternalBuildOptions } from "../types";
 
-const IDENTIFIER_REGEX = /^[_$a-z\u00A0-\uFFFF][\w$\u00A0-\uFFFF]*$/iu;
+const IDENTIFIER_REGEX = /^[_$a-z\u{A0}-\u{FFFF}][\w$\u{A0}-\u{FFFF}]*$/iu;
 
 /**
  * A babel plugin entry is either a bare module specifier or a tuple of the

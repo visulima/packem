@@ -20,7 +20,7 @@ export type UrlResolve = (inputUrl: string, baseDirectories: string[]) => Promis
 export const urlResolve: UrlResolve = (inputUrl: string, baseDirectories: string[]): Promise<UrlFile> => {
     const urlObject = new URL(inputUrl, "file://");
     const fragmentIdentifier = urlObject.hash ? urlObject.hash.slice(1) : "";
-    const url = inputUrl.split("?")[0] ?? "";
+    const url = inputUrl.split("?", 1)[0] ?? "";
 
     const paths = [url];
 

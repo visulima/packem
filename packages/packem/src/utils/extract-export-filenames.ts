@@ -118,11 +118,9 @@ export const extractExportFilenames: (
                             exportKey: key.replace("./", ""),
                             file: entryExport,
                             key: "exports",
-                            ...(runtimeExportConventions.has(condition)
-                                ? {
-                                      subKey: condition,
-                                  }
-                                : {}),
+                            ...(runtimeExportConventions.has(condition) && {
+                                subKey: condition,
+                            }),
                             type: inferExportType(condition, conditions, packageType, entryExport),
                             ...(isIgnored && { ignored: true }),
                         });

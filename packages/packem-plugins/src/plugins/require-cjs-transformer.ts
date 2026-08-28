@@ -59,7 +59,7 @@ const DEFAULT_EXCLUDE = [/node_modules/, /\.d\.[cm]?ts$/];
 const DEFAULT_INCLUDE = [/\.[cm]?[jt]sx?$/];
 
 // Global state
-let cjsLexerInitialized = false;
+let isCjsLexerInitialized = false;
 
 // Helper functions
 const isBuiltinModule = (source: string, builtinNodeModules: boolean): boolean =>
@@ -230,9 +230,9 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
             // serving a stale decision from a previous build in this process.
             clearPureCjsCache();
 
-            if (!cjsLexerInitialized) {
+            if (!isCjsLexerInitialized) {
                 await init();
-                cjsLexerInitialized = true;
+                isCjsLexerInitialized = true;
             }
         },
 
@@ -252,16 +252,16 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                 });
 
                 const s = new MagicString(code);
-                let needsRequire = false;
-                let needsProcess = false;
-                let needsBuiltin = false;
+                let isNeedsRequire = false;
+                let isNeedsProcess = false;
+                let isNeedsBuiltin = false;
 
-                for (const stmt of parsed.program.body) {
-                    if (stmt.type !== "ImportDeclaration" || stmt.importKind === "type") {
+                for (const statement of parsed.program.body) {
+                    if (statement.type !== "ImportDeclaration" || statement.importKind === "type") {
                         continue;
                     }
 
-                    const source = stmt.source.value;
+                    const source = statement.source.value;
                     const isBuiltin = isBuiltinModule(source, builtinNodeModules);
                     const resolveId = this.resolve;
 
@@ -277,16 +277,16 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                         needsRequire: needsRequest,
                     } = generateRequireCode(source, isBuiltin);
 
-                    needsRequire ||= needsRequest;
-                    needsProcess ||= needsProc;
-                    needsBuiltin ||= needsBuilt;
+                    isNeedsRequire ||= needsRequest;
+                    isNeedsProcess ||= needsProc;
+                    isNeedsBuiltin ||= needsBuilt;
 
-                    if (stmt.specifiers.length === 0) {
+                    if (statement.specifiers.length === 0) {
                         // import 'module'
                         if (isBuiltin) {
-                            s.remove(stmt.start, stmt.end);
+                            s.remove(statement.start, statement.end);
                         } else {
-                            s.overwrite(stmt.start, stmt.end, `${requireCode};`);
+                            s.overwrite(statement.start, statement.end, `${requireCode};`);
                         }
 
                         continue;
@@ -297,7 +297,7 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                     let namespaceId: string | undefined;
                     let defaultId: string | undefined;
 
-                    for (const specifier of stmt.specifiers) {
+                    for (const specifier of statement.specifiers) {
                         if (specifier.type === "ImportNamespaceSpecifier") {
                             namespaceId = specifier.local.name;
                         } else if (specifier.type === "ImportSpecifier" && specifier.importKind !== "type") {
@@ -329,22 +329,22 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                         codes.push(destructuring);
                     }
 
-                    s.overwrite(stmt.start, stmt.end, codes.join("\n"));
+                    s.overwrite(statement.start, statement.end, codes.join("\n"));
                 }
 
                 // Add helpers if needed
-                if (needsRequire || needsProcess || needsBuiltin) {
+                if (isNeedsRequire || isNeedsProcess || isNeedsBuiltin) {
                     const preambleParts: string[] = [];
 
-                    if (needsRequire) {
+                    if (isNeedsRequire) {
                         preambleParts.push(CREATE_REQUIRE_IMPORT, REQUIRE_DECLARATION);
                     }
 
-                    if (needsProcess) {
+                    if (isNeedsProcess) {
                         preambleParts.push(GET_PROCESS_DECLARATION);
                     }
 
-                    if (needsBuiltin) {
+                    if (isNeedsBuiltin) {
                         preambleParts.push(GET_BUILTIN_MODULE_DECLARATION);
                     }
 

@@ -141,10 +141,10 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
     // stacked `/* @internal */` markers all collapse into a single removal.
     const skipPastCommentsAndWhitespace = (from: number): number => {
         let pos = from;
-        let advanced = true;
+        let isAdvanced = true;
 
-        while (advanced) {
-            advanced = false;
+        while (isAdvanced) {
+            isAdvanced = false;
 
             while (pos < code.length && WHITESPACE_RE.test(code[pos] as string)) {
                 pos += 1;
@@ -153,7 +153,7 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
             for (const c of parsed.comments) {
                 if (c.start === pos) {
                     pos = c.end;
-                    advanced = true;
+                    isAdvanced = true;
                     break;
                 }
             }

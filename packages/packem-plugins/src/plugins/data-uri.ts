@@ -2,6 +2,7 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { readFile } from "@visulima/fs";
 import { svgToCssDataUri, svgToTinyDataUri } from "@visulima/packem-share";
+// eslint-disable-next-line e18e/ban-dependencies -- mime's lookup table covers extensions mrmime does not; the swap is tracked separately
 import mime from "mime";
 import type { Plugin, PluginContext } from "rollup";
 
@@ -58,8 +59,8 @@ export const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
                 return `export default ${JSON.stringify(uri)}`;
             }
 
-            const buf = await readFile(cleanId, { buffer: true });
-            const base64 = Buffer.from(buf).toString("base64");
+            const buffer = await readFile(cleanId, { buffer: true });
+            const base64 = Buffer.from(buffer).toString("base64");
             const prefix = type.startsWith("text/") ? `data:${type};charset=utf-8;base64,` : `data:${type};base64,`;
             const uri = `${prefix}${base64}`;
 

@@ -71,7 +71,7 @@ export const stripSvgComments = (input: string): string => {
  * @returns Optimized SVG data URI with charset specification
  */
 export const svgToTinyDataUri = (svgString: string): string => {
-    const withoutBom = svgString.startsWith("\uFEFF") ? svgString.slice(1) : svgString;
+    const withoutBom = svgString.startsWith("\u{FEFF}") ? svgString.slice(1) : svgString;
     const noComments = stripSvgComments(withoutBom);
     const body = collapseWhitespace(noComments).replaceAll(REGEX.quotes, "'");
 

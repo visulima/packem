@@ -132,6 +132,6 @@ describe("stylus loader", () => {
 
         const { context } = await run(join(FIXTURE_ROOT, "style.styl"), '.style\n  @import "foo.styl"\n');
 
-        expect([...context.deps].some((dep) => dep.endsWith("foo.styl"))).toBe(true);
+        expect([...context.deps].some((dependency) => dependency.endsWith("foo.styl"))).toBe(true);
     });
 });

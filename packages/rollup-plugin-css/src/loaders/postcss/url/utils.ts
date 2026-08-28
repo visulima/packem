@@ -4,9 +4,9 @@ import valueParser from "postcss-value-parser";
 
 const urlFunctionRe = /^url$/i;
 const imageSetFunctionRe = /^(?:-webkit-)?image-set$/i;
-const declUrlRe = /(?:url|(?:-webkit-)?image-set)\(/i;
+const declarationUrlRe = /(?:url|(?:-webkit-)?image-set)\(/i;
 
-export const isDeclWithUrl = (decl: Declaration): boolean => declUrlRe.test(decl.value);
+export const isDeclWithUrl = (declaration: Declaration): boolean => declarationUrlRe.test(declaration.value);
 
 export const walkUrls = (parsed: ParsedValue, callback: (url: string, node?: Node) => void): void => {
     // eslint-disable-next-line sonarjs/cognitive-complexity

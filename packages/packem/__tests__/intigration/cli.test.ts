@@ -323,7 +323,7 @@ export const version = process.env.PACKEM_VERSION;`,
     // On Node.js v20+, --env-file is a Node.js CLI option that fails with exit 9
     // when the file doesn't exist, before the script even runs.
     // On Node.js < 20, packem handles missing env files gracefully (exit 0).
-    const NODE_MAJOR_VERSION = Number(process.versions.node.split(".")[0]);
+    const NODE_MAJOR_VERSION = Number(process.versions.node.split(".", 1)[0]);
 
     const setupMissingEnvFileFixture = async (): Promise<void> => {
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -667,6 +667,7 @@ export function barFunction() {
         // and rollup reports it as unresolved-but-externalized — both expected for this fixture.
         // Assert no OTHER warnings reached stderr.
         expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [UNDECLARED_DEPENDENCY_WARNING_REGEX]);
+
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).toContain("Preparing build for");

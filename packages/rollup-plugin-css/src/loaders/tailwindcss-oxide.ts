@@ -48,7 +48,7 @@ class TailwindRoot {
      * Generate CSS for the root file
      */
     // eslint-disable-next-line sonarjs/cognitive-complexity
-    public async generate(content: string, addWatchFile: (file: string) => void): Promise<{ code: string; map: string | undefined } | false> {
+    public async generate(content: string, addWatchFile: (file: string) => void): Promise<false | { code: string; map: string | undefined }> {
         const inputPath = pathResolve(this.id.replace(QUERY_SUFFIX_REGEXP, ""));
 
         const addWatchFileWrapper = (file: string) => {

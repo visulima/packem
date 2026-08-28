@@ -18,10 +18,10 @@ describe(svgToTinyDataUri, () => {
     it("should remove BOM characters", () => {
         expect.assertions(1);
 
-        const svgWithBom = "\uFEFF<svg><path d='M0 0'/></svg>";
+        const svgWithBom = "\u{FEFF}<svg><path d='M0 0'/></svg>";
         const result = svgToTinyDataUri(svgWithBom);
 
-        expect(result).not.toContain("\uFEFF");
+        expect(result).not.toContain("\u{FEFF}");
     });
 
     it("should remove SVG comments", () => {
@@ -230,12 +230,12 @@ describe("sVG data URI functions comparison", () => {
     it("should handle BOM differently", () => {
         expect.assertions(2);
 
-        const svgWithBom = "\uFEFF<svg><path d='M0 0'/></svg>";
+        const svgWithBom = "\u{FEFF}<svg><path d='M0 0'/></svg>";
         const tinyResult = svgToTinyDataUri(svgWithBom);
         const cssResult = svgToCssDataUri(svgWithBom);
 
         // Both should remove BOM
-        expect(tinyResult).not.toContain("\uFEFF");
-        expect(cssResult).not.toContain("\uFEFF");
+        expect(tinyResult).not.toContain("\u{FEFF}");
+        expect(cssResult).not.toContain("\u{FEFF}");
     });
 });

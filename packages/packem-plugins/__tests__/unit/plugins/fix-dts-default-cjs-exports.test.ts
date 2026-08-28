@@ -487,15 +487,15 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
         it("should warn if defaultLocalExport is not found (L327-330)", () => {
             expect.assertions(1);
 
-            const codeWithMissingDeclAndType = `declare interface AnotherType {}; export { MissingVar as default, type AnotherType };`;
-            const chunkInfoWithMissingDeclAndType: Partial<RenderedChunk> = {
+            const codeWithMissingDeclarationAndType = `declare interface AnotherType {}; export { MissingVar as default, type AnotherType };`;
+            const chunkInfoWithMissingDeclarationAndType: Partial<RenderedChunk> = {
                 exports: ["default", "AnotherType"],
                 fileName: "test.d.ts",
                 isEntry: true,
                 type: "chunk",
             };
 
-            renderChunk(codeWithMissingDeclAndType, chunkInfoWithMissingDeclAndType, {} as NormalizedOutputOptions, { chunks: {} });
+            renderChunk(codeWithMissingDeclarationAndType, chunkInfoWithMissingDeclarationAndType, {} as NormalizedOutputOptions, { chunks: {} });
 
             expect(mockWarn).toHaveBeenCalledExactlyOnceWith(
                 expect.stringContaining("Cannot infer default export from the file: test.d.ts. Declaration for 'MissingVar' not found."),

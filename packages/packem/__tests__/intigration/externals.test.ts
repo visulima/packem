@@ -269,6 +269,7 @@ export const transform = svgrTransform;
         // That advisory is expected here (the test asserts type *inlining*, not identifier names);
         // assert no OTHER warnings reached stderr.
         expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [/contains confusing identifier names/]);
+
         expect(binProcess.exitCode).toBe(0);
 
         // JS output should still have the external import

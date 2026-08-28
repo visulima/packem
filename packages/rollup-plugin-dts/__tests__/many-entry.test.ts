@@ -6,8 +6,8 @@ import { rollup } from "rollup";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { dts } from "../src/index.js";
-import { MAX_RETAINED_PROGRAMS } from "../src/tsc/emit-compiler.js";
 import { globalContext } from "../src/tsc/context.js";
+import { MAX_RETAINED_PROGRAMS } from "../src/tsc/emit-compiler.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const temporaryDirectory = path.join(dirname, "temp/many-entry");

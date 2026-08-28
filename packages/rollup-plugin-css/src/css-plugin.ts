@@ -606,8 +606,8 @@ const cssPlugin = (
                 plugin: "css",
             });
 
-            for (const dep of context.deps) {
-                this.addWatchFile(dep);
+            for (const dependency of context.deps) {
+                this.addWatchFile(dependency);
             }
 
             for (const [fileName, source] of context.assets) {

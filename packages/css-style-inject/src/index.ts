@@ -46,6 +46,7 @@ export const cssStyleInject = (
     }
 
     if (typeof document === "undefined") {
+        // eslint-disable-next-line unicorn/no-global-object-property-assignment -- the SSR collector is a global by design: the renderer reads it back after the bundle ran
         globalThis[SSR_INJECT_ID] ??= [];
 
         const store = globalThis[SSR_INJECT_ID];
@@ -64,7 +65,7 @@ export const cssStyleInject = (
         return;
     }
 
-    const singleTag = options.singleTag === true;
+    const isSingleTag = options.singleTag === true;
     const insertAt = options.insertAt ?? "last";
 
     const container =
@@ -72,7 +73,7 @@ export const cssStyleInject = (
             ? document.querySelector<HTMLElement>(options.container)
             : // Prefer the native `document.head` (fast path in real browsers); fall back to
               // a `head` lookup for environments/test doubles where `document.head` is absent.
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- lib.dom types `document.head` as non-null, but it is genuinely absent in SSR/test-double environments; the fallback is load-bearing.
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, unicorn/no-incorrect-query-selector -- lib.dom types `document.head` as non-null, but it is genuinely absent in SSR/test-double environments, and the fallback deliberately uses querySelectorAll: the doubles that need it implement nothing else.
               ((document.head ?? document.querySelectorAll("head")[0]) as HTMLElement | undefined);
 
     if (!container) {
@@ -143,7 +144,7 @@ export const cssStyleInject = (
 
     let styleTag: HTMLStyleElement;
 
-    if (singleTag) {
+    if (isSingleTag) {
         let tagsForContainer = singleTagCache.get(container);
 
         if (!tagsForContainer) {

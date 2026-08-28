@@ -257,9 +257,9 @@ export const createReexportSpecifierRewriter = (tsconfig?: string): ReexportSpec
                 // the same name (or it re-exports everything). An inline reference
                 // with no captured name (a plain top-level import) only needs the
                 // origin link to exist.
-                const forwardsAll = reexports.all || [...referencedNames].every((name) => reexports.names.has(name));
+                const isForwardsAll = reexports.all || [...referencedNames].every((name) => reexports.names.has(name));
 
-                if (forwardsAll) {
+                if (isForwardsAll) {
                     candidates.push(dependency);
                 }
             }

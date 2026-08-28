@@ -87,11 +87,11 @@ const resolveNodeVersion = async (nodeVersion: string): Promise<string> => {
         }
 
         const releases = (await response.json()) as NodeRelease[];
-        const wantLatest = resolved === "latest";
+        const isWantLatest = resolved === "latest";
         let selectedVersion = "";
 
         for (const candidate of releases) {
-            if (wantLatest || candidate.lts !== false) {
+            if (isWantLatest || candidate.lts !== false) {
                 selectedVersion = candidate.version;
                 break;
             }

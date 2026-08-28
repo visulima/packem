@@ -134,13 +134,13 @@ const patchCompilerOptions = (
         tsconfigPath: string;
     } | null,
 ): ts.CompilerOptions => {
-    const noEmit: boolean = options.noEmit ?? false;
-    const declaration: boolean = options.declaration ?? !!options.composite;
-    const declarationMap: boolean = options.declarationMap ?? false;
+    const isNoEmit: boolean = options.noEmit ?? false;
+    const isDeclaration: boolean = options.declaration ?? !!options.composite;
+    const isDeclarationMap: boolean = options.declarationMap ?? false;
 
     const shouldPrintWarning = extraOptions?.tsconfigPath && !extraOptions.force;
 
-    if (noEmit) {
+    if (isNoEmit) {
         options = { ...options, noEmit: false };
 
         if (shouldPrintWarning) {
@@ -148,7 +148,7 @@ const patchCompilerOptions = (
         }
     }
 
-    if (!declaration) {
+    if (!isDeclaration) {
         options = { ...options, declaration: true };
 
         if (shouldPrintWarning) {
@@ -158,7 +158,7 @@ const patchCompilerOptions = (
         }
     }
 
-    if (!declarationMap && extraOptions?.sourcemap) {
+    if (!isDeclarationMap && extraOptions?.sourcemap) {
         options = { ...options, declarationMap: true };
 
         if (shouldPrintWarning) {
@@ -222,8 +222,8 @@ const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
 
     debug(`loaded project ${project.tsconfigPath} for ${id}`);
 
-    const ignoreCase = !fsSystem.useCaseSensitiveFileNames;
-    const outputFiles = ts.getOutputFileNames(project.parsedConfig, resolvedId, ignoreCase);
+    const isIgnoreCase = !fsSystem.useCaseSensitiveFileNames;
+    const outputFiles = ts.getOutputFileNames(project.parsedConfig, resolvedId, isIgnoreCase);
 
     let code: string | undefined;
     let map: ExistingRawSourceMap | undefined;

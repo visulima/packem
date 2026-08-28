@@ -14,7 +14,7 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
     return <Plugin>{
         async load(id) {
             if (id.includes("?raw")) {
-                const cleanId = id.split("?")[0] as string;
+                const cleanId = id.split("?", 1)[0] as string;
 
                 try {
                     const content = await readFile(cleanId);
@@ -34,7 +34,7 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
         transform(code, id) {
             // Check if the file has ?raw query parameter
             const isRawQuery = id.includes("?raw");
-            const cleanId = isRawQuery ? id.split("?")[0] : id;
+            const cleanId = isRawQuery ? id.split("?", 1)[0] : id;
 
             if (filter(cleanId) || isRawQuery) {
                 // Normalize line endings only on Windows for .txt and .data files

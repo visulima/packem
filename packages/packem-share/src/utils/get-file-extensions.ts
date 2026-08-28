@@ -53,7 +53,7 @@ export interface FileExtensionOptions {
     /** Whether to emit ESM format */
     emitESM?: boolean;
     /** Node.js 10 compatibility options */
-    node10Compatibility?: { typeScriptVersion?: string; writeToPackageJson?: boolean } | false;
+    node10Compatibility?: false | { typeScriptVersion?: string; writeToPackageJson?: boolean };
     /** Map of format to file extension */
     outputExtensionMap?: Record<Format, string>;
 }

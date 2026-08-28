@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle, @typescript-eslint/naming-convention */
+/* eslint-disable no-underscore-dangle */
 import type { NormalizedPackageJson } from "@visulima/package";
 import { describe, expect, it } from "vitest";
 

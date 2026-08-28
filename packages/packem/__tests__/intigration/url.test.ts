@@ -360,6 +360,7 @@ export default svg;`,
         // packem advises it will bundle the undeclared dep. That advisory is expected here;
         // assert no OTHER warnings reached stderr.
         expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [/but not declared in package\.json/]);
+
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));

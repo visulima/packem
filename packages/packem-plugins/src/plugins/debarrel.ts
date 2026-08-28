@@ -503,7 +503,7 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
     // Allow user to scope by include patterns if needed
     const includeFilter: ((id: string) => boolean) | undefined = options.include ? createFilter(options.include, []) : undefined;
 
-    let sourceMap = true;
+    let isSourceMap = true;
 
     return {
         buildEnd: purgeCaches,
@@ -523,7 +523,7 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
 
         // align sourcemap behavior with Rollup options
         options(inputOptions) {
-            const { output } = inputOptions as { output?: { sourcemap?: boolean } | { sourcemap?: boolean }[] };
+            const { output } = inputOptions as { output?: { sourcemap?: boolean }[] | { sourcemap?: boolean } };
             let sm: boolean | undefined;
 
             if (Array.isArray(output)) {
@@ -533,7 +533,7 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
             }
 
             if (sm === false) {
-                sourceMap = false;
+                isSourceMap = false;
             }
 
             return undefined;
@@ -565,7 +565,7 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
 
             const modifications = await getDebarrelModifications(context, id, code, options, logger);
 
-            return applyModifications(id, code, modifications, sourceMap);
+            return applyModifications(id, code, modifications, isSourceMap);
         },
 
         watchChange(id) {

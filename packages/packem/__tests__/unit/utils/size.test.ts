@@ -7,17 +7,17 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import brotliSize from "../../../src/packem/utils/brotli-size";
 import gzipSize from "../../../src/packem/utils/gzip-size";
 
-let tempFile: string;
+let temporaryFile: string;
 
 beforeEach(async () => {
-    tempFile = join(tmpdir(), `packem-size-test-${process.pid}.txt`);
-    await writeFile(tempFile, "hello packem size helper test content");
+    temporaryFile = join(tmpdir(), `packem-size-test-${process.pid}.txt`);
+    await writeFile(temporaryFile, "hello packem size helper test content");
 });
 
 afterEach(async () => {
     const { unlink } = await import("node:fs/promises");
 
-    await unlink(tempFile).catch(() => {
+    await unlink(temporaryFile).catch(() => {
         /* already removed */
     });
 });
@@ -26,7 +26,7 @@ describe("gzipSize", () => {
     it("resolves to a positive number for a real file", async () => {
         expect.assertions(1);
 
-        const size = await gzipSize(tempFile);
+        const size = await gzipSize(temporaryFile);
 
         expect(size).toBeGreaterThan(0);
     });
@@ -44,7 +44,7 @@ describe("brotliSize", () => {
     it("resolves to a positive number for a real file", async () => {
         expect.assertions(1);
 
-        const size = await brotliSize(tempFile);
+        const size = await brotliSize(temporaryFile);
 
         expect(size).toBeGreaterThan(0);
     });

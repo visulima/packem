@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { JsonPlugin } from "../../../src/plugins/json";
 
-type TransformHandler = (this: unknown, code: string, id: string) => { code?: string } | string | null | undefined;
+type TransformHandler = (this: unknown, code: string, id: string) => string | { code?: string } | null | undefined;
 
 const MODULE_EXPORTS_REGEX = /^module\.exports = /;
 

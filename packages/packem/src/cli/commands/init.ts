@@ -383,13 +383,13 @@ const createInitCommand = (cli: Cli<Pail>): void => {
 
             const cssMinifier: CssMinifier = options.cssMinifier ? await selectCssMinifier(cssLoaders, packagesToInstall) : undefined;
 
-            const cssEnabled = options.css ?? false;
-            const cssMinifierEnabled = options.cssMinifier ?? false;
-            const useEsm = hasTypescript || packageJson.type === "module";
+            const isCssEnabled = options.css ?? false;
+            const isCssMinifierEnabled = options.cssMinifier ?? false;
+            const isUseEsm = hasTypescript || packageJson.type === "module";
 
-            const packemConfig = buildCssConfigBlock(cssEnabled, cssMinifier, cssMinifierEnabled, cssLoaders);
-            const imports = buildCssImports(cssEnabled, cssLoaders, cssMinifier, cssMinifierEnabled, useEsm);
-            const template = buildConfigTemplate(useEsm, options.transformer ?? "", options.runtime ?? "", imports, packemConfig);
+            const packemConfig = buildCssConfigBlock(isCssEnabled, cssMinifier, isCssMinifierEnabled, cssLoaders);
+            const imports = buildCssImports(isCssEnabled, cssLoaders, cssMinifier, isCssMinifierEnabled, isUseEsm);
+            const template = buildConfigTemplate(isUseEsm, options.transformer ?? "", options.runtime ?? "", imports, packemConfig);
 
             const s = spinner();
 

@@ -7,11 +7,11 @@
  */
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
-import MagicString from "magic-string";
 // rollup 4.63 types its own `SourceMap.sourcesContent` as `(string | null)[]` while
 // `SourceMapInput` still demands `string[]`, so rollup's map type no longer satisfies
 // the hooks that return it. magic-string's map is what we actually produce here.
 import type { SourceMap } from "magic-string";
+import MagicString from "magic-string";
 import type { Plugin } from "rollup";
 
 type PreserveDirectivesPluginOptions = {
@@ -32,9 +32,9 @@ interface ScannedDirective {
 
 // Spelled with explicit escapes (not raw characters) so the set is reviewable
 // by eye: space, tab, form-feed, vertical-tab, no-break space, BOM.
-const WHITESPACE = new Set([" ", "\t", "\f", "\v", "\u00A0", "\uFEFF"]);
+const WHITESPACE = new Set([" ", "\t", "\f", "\v", "\u{A0}", "\u{FEFF}"]);
 // Line feed, carriage return, line separator (U+2028), paragraph separator (U+2029).
-const LINE_TERMINATORS = new Set(["\n", "\r", "\u2028", "\u2029"]);
+const LINE_TERMINATORS = new Set(["\n", "\r", "\u{2028}", "\u{2029}"]);
 
 // Extracts the first quoted token from a rollup MODULE_LEVEL_DIRECTIVE warning
 // message (the offending directive, e.g. `"use client"`). Module-scoped to avoid
@@ -119,7 +119,7 @@ const scanLeadingDirectives = (code: string): ScannedDirective[] => {
 
         index += 1;
 
-        let closed = false;
+        let isClosed = false;
 
         while (index < length) {
             const char = code[index] as string;
@@ -131,7 +131,7 @@ const scanLeadingDirectives = (code: string): ScannedDirective[] => {
 
             if (char === quote) {
                 index += 1;
-                closed = true;
+                isClosed = true;
                 break;
             }
 
@@ -142,7 +142,7 @@ const scanLeadingDirectives = (code: string): ScannedDirective[] => {
             index += 1;
         }
 
-        if (!closed) {
+        if (!isClosed) {
             break;
         }
 

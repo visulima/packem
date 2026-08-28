@@ -67,7 +67,7 @@ const typesPrefix = "@types/";
 
 const getAtTypesPackageName = (packageName: string): string => {
     if (packageName.startsWith("@")) {
-        const [scope, name] = packageName.split("/");
+        const [scope, name] = packageName.split("/", 2);
 
         return `${scope ?? ""}/types/${name ?? ""}`;
     }
@@ -123,10 +123,10 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     const runtimeDependencies = new Set<string>();
 
     for (const property of dependencyTypes) {
-        const deps = pkg[property];
+        const dependencies = pkg[property];
 
-        if (deps) {
-            for (const packageName of Object.keys(deps)) {
+        if (dependencies) {
+            for (const packageName of Object.keys(dependencies)) {
                 if (packageName.startsWith(typesPrefix)) {
                     runtimeDependencies.add(getOriginalPackageName(packageName));
                 } else {
@@ -136,7 +136,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
         }
     }
 
-    const devDeps = new Set<string>(Object.keys(pkg.devDependencies ?? {}));
+    const devDependencies = new Set<string>(Object.keys(pkg.devDependencies ?? {}));
 
     // Precompute the declared-dependency name sets once. These maps are static for
     // the build, so the per-import-edge `declared` check in `options.external` can do
@@ -191,13 +191,13 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
         });
     };
 
-    const classifiedDeps: Record<string, string | undefined> = {
-        ...(resolvedExternalsOptions.deps ? (pkg.dependencies ?? {}) : undefined),
-        ...(resolvedExternalsOptions.devDeps ? (pkg.devDependencies ?? {}) : undefined),
-        ...(resolvedExternalsOptions.peerDeps ? (pkg.peerDependencies ?? {}) : undefined),
-        ...(resolvedExternalsOptions.optDeps ? (pkg.optionalDependencies ?? {}) : undefined),
+    const classifiedDependencies: Record<string, string | undefined> = {
+        ...(resolvedExternalsOptions.deps && (pkg.dependencies ?? {})),
+        ...(resolvedExternalsOptions.devDeps && (pkg.devDependencies ?? {})),
+        ...(resolvedExternalsOptions.peerDeps && (pkg.peerDependencies ?? {})),
+        ...(resolvedExternalsOptions.optDeps && (pkg.optionalDependencies ?? {})),
     };
-    const classifiedNames = Object.keys(classifiedDeps);
+    const classifiedNames = Object.keys(classifiedDependencies);
 
     if (classifiedNames.length > 0) {
         // Escape each package name so regex metacharacters in names (e.g. the `.` in
@@ -229,7 +229,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     let tsconfigPathPatterns: RegExp[] = [];
 
     if (context.tsconfig) {
-        tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) => {
+        tsconfigPathPatterns = Object.keys(context.tsconfig.config.compilerOptions?.paths ?? {}).map((key) => {
             if (key.endsWith("*")) {
                 return new RegExp(`^${key.replace("*", "(.*)")}$`);
             }
@@ -251,7 +251,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
         || tsconfigPathPatterns.some((pattern) => pattern.test(id));
 
     const sourceDirectoryPattern = context.options.sourceDir
-        ? new RegExp(String.raw`(?:^|/)${context.options.sourceDir.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}/`)
+        ? new RegExp(`(?:^|/)${context.options.sourceDir.replaceAll(REGEX_ESCAPE_RE, String.raw`\$&`)}/`)
         : undefined;
 
     const warnedAtTypes = new Set<string>();
@@ -290,7 +290,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
 
                     const specifierPkg = getPackageName(specifier);
 
-                    if (!specifierPkg || isNodeBuiltin(specifierPkg) || !devDeps.has(specifierPkg) || runtimeDependencies.has(specifierPkg)) {
+                    if (!specifierPkg || isNodeBuiltin(specifierPkg) || !devDependencies.has(specifierPkg) || runtimeDependencies.has(specifierPkg)) {
                         continue;
                     }
 
@@ -349,12 +349,12 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                 if (packageName && !isNodeBuiltin(packageName)) {
                     context.usedDependencies.add(packageName);
 
-                    const importerFromSource = !importer || !isFromNodeModules(importer, context.options.rootDir);
-                    const declared = declaredDependencies.has(packageName);
+                    const isImporterFromSource = !importer || !isFromNodeModules(importer, context.options.rootDir);
+                    const isDeclared = declaredDependencies.has(packageName);
 
                     if (
-                        importerFromSource
-                        && !declared
+                        isImporterFromSource
+                        && !isDeclared
                         && context.options.validation
                         && context.options.validation.dependencies
                         && context.options.validation.dependencies.hoisted !== false
@@ -512,7 +512,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
 
                 // devDependency — if user externals included it, options.external handles that.
                 // Otherwise resolve and bundle; fail fast on unresolvable declared deps.
-                if (devDeps.has(specifierPkg) && !runtimeDependencies.has(specifierPkg)) {
+                if (devDependencies.has(specifierPkg) && !runtimeDependencies.has(specifierPkg)) {
                     if (isIncluded(id) && !isExcluded(id)) {
                         // Let options.external mark it external — no need to resolve.
                         return undefined;
@@ -565,7 +565,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                     if (options?.forTypes) {
                         const atTypesName = getAtTypesPackageName(specifierPkg);
 
-                        if (devDeps.has(atTypesName) && !warnedAtTypes.has(atTypesName)) {
+                        if (devDependencies.has(atTypesName) && !warnedAtTypes.has(atTypesName)) {
                             warnedAtTypes.add(atTypesName);
                             context.logger.warn(
                                 `Recommendation: "${atTypesName}" is bundled (devDependencies) but "${specifierPkg}" is externalized. Place "${atTypesName}" in dependencies/peerDependencies as well so users don't have missing types.`,
@@ -577,7 +577,7 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
                 }
 
                 if (
-                    !devDeps.has(specifierPkg)
+                    !devDependencies.has(specifierPkg)
                     && importer
                     && !isFromNodeModules(importer, cwd)
                     && !options?.skipUnlistedWarnings

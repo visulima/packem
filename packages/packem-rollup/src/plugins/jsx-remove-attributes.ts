@@ -105,39 +105,41 @@ const removeProperty = (magicString: MagicString, code: string, start: number, e
  */
 const stripAttributes = (ast: Node, code: string, attributes: string[], trailingComma: boolean, logger: Console): MagicString | undefined => {
     const magicString = new MagicString(code);
-    let changed = false;
+    let isChanged = false;
 
     walk(ast, {
         enter(node) {
-            if (node.type === "CallExpression" && node.callee.type === "Identifier" && AUTOMATIC_RUNTIME_CALLEES.has(node.callee.name)) {
-                const filteredArguments = node.arguments.filter(
-                    (argument): argument is ObjectExpression => argument.type === "ObjectExpression" && Array.isArray(argument.properties),
-                );
+            if (!(node.type === "CallExpression" && node.callee.type === "Identifier" && AUTOMATIC_RUNTIME_CALLEES.has(node.callee.name))) {
+                return;
+            }
 
-                for (const object of filteredArguments) {
-                    for (const property of object.properties) {
-                        if (property.type !== "Property" || property.key.type !== "Literal" || !attributes.includes(property.key.value as string)) {
-                            continue;
-                        }
+            const filteredArguments = node.arguments.filter(
+                (argument): argument is ObjectExpression => argument.type === "ObjectExpression" && Array.isArray(argument.properties),
+            );
 
-                        if (property.value.type !== "Literal") {
-                            // Only statically-literal values are stripped (a dynamic
-                            // value may have side effects / be needed at runtime).
-                            // Surface the skip so it's diagnosable.
-                            logger.debug({
-                                message: `skipping attribute "${String(property.key.value)}": value is "${property.value.type}", not a literal.`,
-                                prefix: "plugin:jsx-remove-attributes",
-                            });
-
-                            continue;
-                        }
-
-                        const { end, start } = property as PropertyLiteralValue;
-
-                        removeProperty(magicString, code, start, end, trailingComma);
-
-                        changed = true;
+            for (const object of filteredArguments) {
+                for (const property of object.properties) {
+                    if (property.type !== "Property" || property.key.type !== "Literal" || !attributes.includes(property.key.value as string)) {
+                        continue;
                     }
+
+                    if (property.value.type !== "Literal") {
+                        // Only statically-literal values are stripped (a dynamic
+                        // value may have side effects / be needed at runtime).
+                        // Surface the skip so it's diagnosable.
+                        logger.debug({
+                            message: `skipping attribute "${String(property.key.value)}": value is "${property.value.type}", not a literal.`,
+                            prefix: "plugin:jsx-remove-attributes",
+                        });
+
+                        continue;
+                    }
+
+                    const { end, start } = property as PropertyLiteralValue;
+
+                    removeProperty(magicString, code, start, end, trailingComma);
+
+                    isChanged = true;
                 }
             }
         },
@@ -148,7 +150,7 @@ const stripAttributes = (ast: Node, code: string, attributes: string[], trailing
     // `changed` back to its initial `false` here and the rule misreads the ternary
     // as always-falsy — a known closure-mutation false positive. Runtime is correct.
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    return changed ? magicString : undefined;
+    return isChanged ? magicString : undefined;
 };
 
 /**
@@ -184,7 +186,7 @@ export const jsxRemoveAttributes = ({
                     // (expensive) full parse otherwise.
                     if (
                         !(code.includes("jsx(") || code.includes("jsxs(") || code.includes("jsxDEV("))
-                        || !attributes.some((attribute) => code.includes(attribute))
+                        || attributes.every((attribute) => !code.includes(attribute))
                     ) {
                         return undefined;
                     }

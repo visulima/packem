@@ -23,7 +23,6 @@ describe(arrayify, () => {
     it("should return an empty array if the input is null", () => {
         expect.assertions(1);
 
-        // eslint-disable-next-line unicorn/no-null
         const result = arrayify(null);
 
         expect(result).toStrictEqual([]);
@@ -85,7 +84,7 @@ describe(arrayify, () => {
     it("should handle input that is a function", () => {
         expect.assertions(1);
 
-        // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
+        // eslint-disable-next-line no-underscore-dangle
         const function_ = () => {};
         const result = arrayify(function_);
 

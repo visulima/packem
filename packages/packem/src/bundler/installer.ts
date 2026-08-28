@@ -22,15 +22,15 @@ export const buildInstallHint = async (packages: string | string[], rootDirector
     const list = Array.isArray(packages) ? packages : [packages];
     const agent = await detectPackageManager(rootDirectory).catch(() => undefined);
 
-    let cmd: string;
+    let command: string;
 
     if (agent === "yarn" || agent === "bun") {
-        cmd = `${agent} add -D`;
+        command = `${agent} add -D`;
     } else if (agent === "pnpm") {
-        cmd = "pnpm add -D";
+        command = "pnpm add -D";
     } else {
-        cmd = "npm install -D";
+        command = "npm install -D";
     }
 
-    return `${cmd} ${list.join(" ")}`;
+    return `${command} ${list.join(" ")}`;
 };

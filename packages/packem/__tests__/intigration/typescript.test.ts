@@ -430,6 +430,7 @@ console.log(fromBoth, fromTs);
             // packem advises it will bundle those undeclared deps. That advisory is expected
             // here; assert no OTHER warnings reached stderr.
             expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [/but not declared in package\.json/]);
+
             expect(binProcess.exitCode).toBe(0);
 
             const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
@@ -1103,9 +1104,9 @@ export { _default as default };
 export default fn({ value: 1 });`,
         );
 
-        const depAIndexDtsPath = `${temporaryDirectoryPath}/store/dep-a/index.d.ts`;
+        const dependencyAIndexDtsPath = `${temporaryDirectoryPath}/store/dep-a/index.d.ts`;
 
-        await writeFile(depAIndexDtsPath, `export * from 'dep-b';`);
+        await writeFile(dependencyAIndexDtsPath, `export * from 'dep-b';`);
         await writeFile(
             `${temporaryDirectoryPath}/store/dep-a/node_modules/dep-b/index.d.ts`,
             `type data = {
@@ -1119,7 +1120,7 @@ export declare function fn(a: data): data;
         await writeJson(join(temporaryDirectoryPath, "node_modules", "dep-a", "package.json"), { main: "index.js", name: "dep-a" });
         await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-a", "index.js"), "console.log('dep-a');");
 
-        symlinkSync(depAIndexDtsPath, join(temporaryDirectoryPath, "node_modules", "dep-a", "index.d.ts"));
+        symlinkSync(dependencyAIndexDtsPath, join(temporaryDirectoryPath, "node_modules", "dep-a", "index.d.ts"));
 
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
@@ -2845,10 +2846,10 @@ throw new Error('line 9');
         // "some-devdep". Consumers then pull the transitive specifier into their own build
         // and get "Inlined implicit external" / "shamefully hoisted" warnings for packages
         // that are not runtime deps of the package they imported from.
-        const devDepRoot = `${temporaryDirectoryPath}/node_modules/fake-bundled-devdep`;
+        const devDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-bundled-devdep`;
 
         await writeFile(
-            `${devDepRoot}/package.json`,
+            `${devDependencyRoot}/package.json`,
             // `types` must be listed before `default` — Node.js exports resolution picks the
             // first matching condition in object order, so if default comes first we'd get
             // `./index.js` back even when asking for the types condition.
@@ -2860,9 +2861,9 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${devDepRoot}/index.js`, "export default function work(value) { return value; }\n");
+        await writeFile(`${devDependencyRoot}/index.js`, "export default function work(value) { return value; }\n");
         await writeFile(
-            `${devDepRoot}/index.d.ts`,
+            `${devDependencyRoot}/index.d.ts`,
             "export interface WorkOptions { verbose?: boolean }\ndeclare function work(value: string): string;\nexport default work;\n",
         );
 
@@ -2910,10 +2911,10 @@ throw new Error('line 9');
         // casts would leak into every emitted .d.ts. We only inline devDeps that
         // show up in `context.usedDependencies` — i.e. the JS build actually reached
         // them — to match the JS build's bundling decisions.
-        const usedDepRoot = `${temporaryDirectoryPath}/node_modules/fake-used-devdep`;
+        const usedDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-used-devdep`;
 
         await writeFile(
-            `${usedDepRoot}/package.json`,
+            `${usedDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -2922,18 +2923,18 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${usedDepRoot}/index.js`, "export default function used(value) { return value; }\n");
+        await writeFile(`${usedDependencyRoot}/index.js`, "export default function used(value) { return value; }\n");
         await writeFile(
-            `${usedDepRoot}/index.d.ts`,
+            `${usedDependencyRoot}/index.d.ts`,
             "export interface UsedOptions { verbose?: boolean }\ndeclare function used(value: string): string;\nexport default used;\n",
         );
 
         // Declared but never imported anywhere — simulates the "long tail" of
         // build-time-only devDeps (typescript, eslint, type-fest used only for casts …).
-        const unusedDepRoot = `${temporaryDirectoryPath}/node_modules/fake-unused-devdep`;
+        const unusedDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-unused-devdep`;
 
         await writeFile(
-            `${unusedDepRoot}/package.json`,
+            `${unusedDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -2942,9 +2943,9 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${unusedDepRoot}/index.js`, "export default function unused(value) { return value; }\n");
+        await writeFile(`${unusedDependencyRoot}/index.js`, "export default function unused(value) { return value; }\n");
         await writeFile(
-            `${unusedDepRoot}/index.d.ts`,
+            `${unusedDependencyRoot}/index.d.ts`,
             "export interface UnusedOptions { verbose?: boolean }\ndeclare function unused(value: string): string;\nexport default unused;\n",
         );
 
@@ -2994,10 +2995,10 @@ throw new Error('line 9');
         // .d.ts must externalize it too — otherwise we bundle the dep's .d.ts, which can
         // hit TS declaration-merging patterns (e.g. `export interface X` + `export const X`)
         // that produce duplicate ES-module exports rollup rejects.
-        const peerDepRoot = `${temporaryDirectoryPath}/node_modules/fake-peer-devdep`;
+        const peerDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-peer-devdep`;
 
         await writeFile(
-            `${peerDepRoot}/package.json`,
+            `${peerDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -3006,9 +3007,9 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${peerDepRoot}/index.js`, "export function parse(value) { return value; }\n");
+        await writeFile(`${peerDependencyRoot}/index.js`, "export function parse(value) { return value; }\n");
         await writeFile(
-            `${peerDepRoot}/index.d.ts`,
+            `${peerDependencyRoot}/index.d.ts`,
             "export declare function parse(value: string): string;\nexport declare namespace parse { const FLAG: unique symbol; }\n",
         );
 
@@ -3215,10 +3216,10 @@ throw new Error('line 9');
         //
         // Emitting dual CJS+ESM is enough to trip the original cache (two DTS
         // outputs, same tsconfig) — the fix hashes `dtsResolve` into the key.
-        const devDepRoot = `${temporaryDirectoryPath}/node_modules/fake-dual-dep`;
+        const devDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-dual-dep`;
 
         await writeFile(
-            `${devDepRoot}/package.json`,
+            `${devDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -3227,9 +3228,9 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${devDepRoot}/index.js`, "export function sign(v) { return v; }\n");
+        await writeFile(`${devDependencyRoot}/index.js`, "export function sign(v) { return v; }\n");
         await writeFile(
-            `${devDepRoot}/index.d.ts`,
+            `${devDependencyRoot}/index.d.ts`,
             "export interface DualOptions { verbose?: boolean }\nexport declare function sign(value: string): string;\n",
         );
 
@@ -3281,10 +3282,10 @@ throw new Error('line 9');
         // string doesn't go through conditional resolution — leaving the
         // emitted .d.ts to import the bare specifier, which then triggers
         // "shamefully hoisted" warnings at downstream consumers.
-        const devDepRoot = `${temporaryDirectoryPath}/node_modules/fake-exports-string`;
+        const devDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-exports-string`;
 
         await writeFile(
-            `${devDepRoot}/package.json`,
+            `${devDependencyRoot}/package.json`,
             // Exact shape of the sindresorhus packages: string exports, no types
             // condition, sibling `index.d.ts` by convention.
             JSON.stringify({
@@ -3295,9 +3296,9 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${devDepRoot}/index.js`, "export default function work(value) { return value; }\n");
+        await writeFile(`${devDependencyRoot}/index.js`, "export default function work(value) { return value; }\n");
         await writeFile(
-            `${devDepRoot}/index.d.ts`,
+            `${devDependencyRoot}/index.d.ts`,
             "export interface WorkOptions { verbose?: boolean }\ndeclare function work(value: string): string;\nexport default work;\n",
         );
 
@@ -3545,10 +3546,10 @@ throw new Error('line 9');
         // + `const ZodError`). The plugin must fold the companion into the primary so
         // fake-JS emits exactly one `export { X }` while still rendering both declaration
         // bodies in the final .d.ts.
-        const mergedDepRoot = `${temporaryDirectoryPath}/node_modules/fake-merged-devdep`;
+        const mergedDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-merged-devdep`;
 
         await writeFile(
-            `${mergedDepRoot}/package.json`,
+            `${mergedDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -3558,11 +3559,11 @@ throw new Error('line 9');
             }),
         );
         await writeFile(
-            `${mergedDepRoot}/index.js`,
+            `${mergedDependencyRoot}/index.js`,
             "export function visit(node, visitor) { visitor(node); }\nvisit.BREAK = Symbol('BREAK');\nexport const ZodError = class { constructor(issues) { this.issues = issues; } };\n",
         );
         await writeFile(
-            `${mergedDepRoot}/index.d.ts`,
+            `${mergedDependencyRoot}/index.d.ts`,
             [
                 "export declare function visit(node: unknown, visitor: (n: unknown) => void): void;",
                 "export declare namespace visit {",

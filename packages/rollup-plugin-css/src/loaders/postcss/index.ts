@@ -72,7 +72,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
         const plugins: AcceptedPlugin[] = [];
 
         // Determine CSS modules support from various sources
-        const supportModules = detectCssModules(this.options.modules, this.autoModules, this.id);
+        const isSupportModules = detectCssModules(this.options.modules, this.autoModules, this.id);
 
         /** CSS modules exports mapping class names to hashed names */
         const modulesExports: Record<string, string> = {};
@@ -124,7 +124,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
         plugins.push(...config.plugins);
 
         // Add CSS modules plugins if enabled
-        if (supportModules) {
+        if (isSupportModules) {
             const modulesOptions = typeof this.options.modules === "object" ? this.options.modules : {};
 
             plugins.push(
@@ -221,7 +221,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             map,
             modulesExports,
             namedExports: this.namedExports,
-            supportModules,
+            supportModules: isSupportModules,
         });
 
         // Handle CSS extraction for separate CSS files

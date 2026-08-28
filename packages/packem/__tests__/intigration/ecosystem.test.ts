@@ -55,6 +55,7 @@ describe("packem ecosystem", () => {
         // overridden by packem's `onlyRemoveTypeImports`. Both advisories are expected here; assert
         // no OTHER warnings reached stderr.
         expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [UNDECLARED_DEPENDENCY_WARNING_REGEX, /CONFIGURATION_FIELD_CONFLICT/]);
+
         expect(binProcess.exitCode).toBe(0);
 
         const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {

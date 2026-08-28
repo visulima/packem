@@ -13,7 +13,7 @@ import { build as esbuildBuild } from "esbuild";
 // eslint-disable-next-line import/no-namespace
 import * as rsModuleLexer from "rs-module-lexer";
 
-import type { Optimized, OptimizeDepsOptions, OptimizeDepsResult } from "../types";
+import type { Optimized, OptimizeDepsOptions as OptimizeDependenciesOptions, OptimizeDepsResult as OptimizeDependenciesResult } from "../types";
 
 const slash = (p: string) => p.replaceAll("\\", "/");
 
@@ -30,8 +30,7 @@ interface LoadPluginData {
     resolveDir: string;
 }
 
-const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsResult> => {
-    // eslint-disable-next-line unicorn/prevent-abbreviations
+const optimizeDependencies = async (options: OptimizeDependenciesOptions): Promise<OptimizeDependenciesResult> => {
     const cacheDir = findCacheDirSync("@visulima/packem/optimize-deps", {
         create: true,
         cwd: options.cwd,
@@ -128,4 +127,4 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
     };
 };
 
-export default optimizeDeps;
+export default optimizeDependencies;

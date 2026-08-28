@@ -123,7 +123,7 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
 
             // Support query params in id (e.g., ?raw). Keep the query as part of the cache key,
             // but compute file fingerprint using the clean path (without query) when possible.
-            const cleanId = id.includes("?") ? (id.split("?")[0] as string) : id;
+            const cleanId = id.includes("?") ? (id.split("?", 1)[0] as string) : id;
 
             let contentHash = "";
 

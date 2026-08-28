@@ -145,7 +145,7 @@ describe(svgEncoder, () => {
         expect.assertions(1);
 
         // This test handles properly escaped quotes in HTML attributes - quite rare but valid
-        const svgInput = String.raw`<svg class="my&quot;class&quot;"><path class='my&apos;class&apos;' d='M0 0'/></svg>`;
+        const svgInput = "<svg class=\"my&quot;class&quot;\"><path class='my&apos;class&apos;' d='M0 0'/></svg>";
         const cleanedSvg = "<svg><path d='M0 0'/></svg>";
         const expectedOutput = Buffer.from(cleanedSvg).toString("base64");
 

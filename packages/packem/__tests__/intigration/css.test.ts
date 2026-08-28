@@ -162,6 +162,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         }
 
         expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [CSS_BENIGN_STDERR_WARNING_REGEX]);
+
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).toSatisfy((content: string) => {
@@ -188,7 +189,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 match = regex.exec(content);
             }
 
-            return matches.filter(Boolean).length === 0;
+            return !matches.some(Boolean);
         });
 
         const distributionPath = join(temporaryDirectoryPath, "dist");

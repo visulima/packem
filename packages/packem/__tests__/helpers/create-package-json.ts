@@ -19,7 +19,7 @@ const createPackageJson = async (
             ? {
                   ".": {
                       import: data.module.startsWith("./") ? data.module : `./${data.module}`,
-                      ...(data.types ? { types: data.types.startsWith("./") ? data.types : `./${data.types}` } : {}),
+                      ...(data.types && { types: data.types.startsWith("./") ? data.types : `./${data.types}` }),
                   },
               }
             : undefined);

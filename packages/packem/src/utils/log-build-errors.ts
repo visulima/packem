@@ -17,18 +17,20 @@ interface Logger {
 }
 
 const logBuildErrors = (context: BuildContext<InternalBuildOptions>, hasOtherLogs: boolean): void => {
-    if (context.warnings.size > 0) {
-        const logger = context.logger as unknown as Logger;
+    if (context.warnings.size === 0) {
+        return;
+    }
 
-        if (hasOtherLogs) {
-            logger.raw("\n");
-        }
+    const logger = context.logger as unknown as Logger;
 
-        logger.warn(`Build is done with some warnings:\n\n${Array.from(context.warnings, (message) => `- ${message}`).join("\n")}`);
+    if (hasOtherLogs) {
+        logger.raw("\n");
+    }
 
-        if (context.options.failOnWarn) {
-            throw new Error("Exiting with code (1). You can change this behavior by setting `failOnWarn: false`.");
-        }
+    logger.warn(`Build is done with some warnings:\n\n${Array.from(context.warnings, (message) => `- ${message}`).join("\n")}`);
+
+    if (context.options.failOnWarn) {
+        throw new Error("Exiting with code (1). You can change this behavior by setting `failOnWarn: false`.");
     }
 };
 

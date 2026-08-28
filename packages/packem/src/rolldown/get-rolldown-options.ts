@@ -223,10 +223,10 @@ export const stripRolldownRegionCommentsPlugin = (): Plugin => {
                 }
 
                 if (line.trim() === "") {
-                    const previousIsMarker = index > 0 && REGION_MARKER_RE.test(lines[index - 1]);
-                    const nextIsMarker = index < lines.length - 1 && REGION_MARKER_RE.test(lines[index + 1]);
+                    const isPreviousIsMarker = index > 0 && REGION_MARKER_RE.test(lines[index - 1]);
+                    const isNextIsMarker = index < lines.length - 1 && REGION_MARKER_RE.test(lines[index + 1]);
 
-                    if (previousIsMarker || nextIsMarker) {
+                    if (isPreviousIsMarker || isNextIsMarker) {
                         continue;
                     }
                 }

@@ -39,22 +39,22 @@ const isProcessableURL = (uri: string): boolean => {
 
 const loadImportContent = async (
     result: Result,
-    stmt: ImportStatement,
+    statement: ImportStatement,
     filename: string,
     options: ImportOptions & { root: string },
     state: State,
     postcss: Postcss,
 ): Promise<Stylesheet> => {
-    const { conditions, from, node } = stmt;
+    const { conditions, from, node } = statement;
 
-    const stmtDuplicateCheckKey = conditions
+    const statementDuplicateCheckKey = conditions
         .map((condition) => formatImportPrelude(condition.layer, condition.media, condition.supports, condition.scope))
         .join(":");
 
     if (options.skipDuplicates) {
         // skip files already imported at the same scope
 
-        if (state.importedFiles[filename]?.[stmtDuplicateCheckKey]) {
+        if (state.importedFiles[filename]?.[statementDuplicateCheckKey]) {
             return { statements: [] };
         }
 
@@ -64,7 +64,7 @@ const loadImportContent = async (
         state.importedFiles[filename] ??= {};
 
         // eslint-disable-next-line no-param-reassign
-        state.importedFiles[filename][stmtDuplicateCheckKey] = true;
+        state.importedFiles[filename][statementDuplicateCheckKey] = true;
     }
 
     if (from.includes(filename)) {
@@ -81,7 +81,7 @@ const loadImportContent = async (
 
     // skip previous imported files not containing @import rules
 
-    if (options.skipDuplicates && state.hashFiles[content]?.[stmtDuplicateCheckKey]) {
+    if (options.skipDuplicates && state.hashFiles[content]?.[statementDuplicateCheckKey]) {
         return { statements: [] };
     }
 
@@ -105,7 +105,7 @@ const loadImportContent = async (
             state.hashFiles[content] ??= {};
 
             // eslint-disable-next-line no-param-reassign
-            state.hashFiles[content][stmtDuplicateCheckKey] = true;
+            state.hashFiles[content][statementDuplicateCheckKey] = true;
         }
     }
 
@@ -114,28 +114,28 @@ const loadImportContent = async (
     return await parseStyles(options, result, styles, state, node, conditions, [...from, filename], postcss);
 };
 
-const resolveImportId = async (options: ImportOptions & { root: string }, result: Result, stmt: ImportStatement, state: State, postcss: Postcss) => {
-    if (isValidDataURL(stmt.uri)) {
+const resolveImportId = async (options: ImportOptions & { root: string }, result: Result, statement: ImportStatement, state: State, postcss: Postcss) => {
+    if (isValidDataURL(statement.uri)) {
         // eslint-disable-next-line no-param-reassign
-        stmt.stylesheet = await loadImportContent(result, stmt, stmt.uri, options, state, postcss);
+        statement.stylesheet = await loadImportContent(result, statement, statement.uri, options, state, postcss);
 
         return;
     }
 
-    if (isValidDataURL(stmt.from.at(-1))) {
+    if (isValidDataURL(statement.from.at(-1))) {
         // Data urls can't be used as a base url to resolve imports.
         // Skip inlining and warn.
         // eslint-disable-next-line no-param-reassign
-        stmt.stylesheet = { statements: [] };
+        statement.stylesheet = { statements: [] };
 
-        result.warn(`Unable to import '${stmt.uri}' from a stylesheet that is embedded in a data url`, {
-            node: stmt.node,
+        result.warn(`Unable to import '${statement.uri}' from a stylesheet that is embedded in a data url`, {
+            node: statement.node,
         });
 
         return;
     }
 
-    const atRule = stmt.node;
+    const atRule = statement.node;
 
     let sourceFile: string | undefined;
 
@@ -147,22 +147,22 @@ const resolveImportId = async (options: ImportOptions & { root: string }, result
 
     // Resolve aliases
     for (const [from, to] of Object.entries(options.alias)) {
-        if (stmt.uri !== from && !stmt.uri.startsWith(`${from}/`)) {
+        if (statement.uri !== from && !statement.uri.startsWith(`${from}/`)) {
             continue;
         }
 
         // eslint-disable-next-line no-param-reassign
-        stmt.uri = normalize(to) + stmt.uri.slice(from.length);
+        statement.uri = normalize(to) + statement.uri.slice(from.length);
     }
 
     let resolved;
 
     try {
-        resolved = await options.resolve(stmt.uri, base, options.extensions, atRule);
+        resolved = await options.resolve(statement.uri, base, options.extensions, atRule);
     } catch (error: unknown) {
         const reason = error instanceof Error ? `: ${error.message}` : "";
 
-        stmt.node.warn(result, `Unable to resolve "${stmt.uri}" from "${base}"${reason}`);
+        statement.node.warn(result, `Unable to resolve "${statement.uri}" from "${base}"${reason}`);
 
         return;
     }
@@ -176,7 +176,7 @@ const resolveImportId = async (options: ImportOptions & { root: string }, result
     });
 
     // eslint-disable-next-line no-param-reassign
-    stmt.stylesheet = await loadImportContent(result, stmt, resolved, options, state, postcss);
+    statement.stylesheet = await loadImportContent(result, statement, resolved, options, state, postcss);
 };
 
 const parseStyles = async (
@@ -197,19 +197,18 @@ const parseStyles = async (
         // Lazy because the current stylesheet might not contain any further @import statements
         const jobs: Promise<void>[] = [];
 
-        for (const stmt of statements) {
-            if (!isImportStatement(stmt) || !isProcessableURL(stmt.uri)) {
+        for (const statement of statements) {
+            if (!isImportStatement(statement) || !isProcessableURL(statement.uri)) {
                 continue;
             }
 
-            // eslint-disable-next-line unicorn/no-array-callback-reference
-            if (options.filter && !options.filter(stmt.uri)) {
+            if (options.filter && !options.filter(statement.uri)) {
                 // rejected by filter
 
                 continue;
             }
 
-            jobs.push(resolveImportId(options, result, stmt, state, postcss));
+            jobs.push(resolveImportId(options, result, statement, state, postcss));
         }
 
         if (jobs.length > 0) {
@@ -219,20 +218,22 @@ const parseStyles = async (
 
     // eslint-disable-next-line no-plusplus
     for (let index = 0; index < statements.length; index++) {
-        const stmt = statements[index] as Statement;
+        const statement = statements[index] as Statement;
 
-        if (isImportStatement(stmt) && stmt.stylesheet) {
-            if (charset && stmt.stylesheet.charset && charset.params.toLowerCase() !== stmt.stylesheet.charset.params.toLowerCase()) {
-                throw stmt.stylesheet.charset.error(
+        if (isImportStatement(statement) && statement.stylesheet) {
+            if (charset && statement.stylesheet.charset && charset.params.toLowerCase() !== statement.stylesheet.charset.params.toLowerCase()) {
+                throw statement.stylesheet.charset.error(
                     "Incompatible @charset statements:\n"
-                        + `  ${stmt.stylesheet.charset.params} specified in ${stmt.stylesheet.charset.source?.input.file ?? "<unknown>"}\n`
+                        + `  ${statement.stylesheet.charset.params} specified in ${statement.stylesheet.charset.source?.input.file ?? "<unknown>"}\n`
                         + `  ${charset.params} specified in ${charset.source?.input.file ?? "<unknown>"}`,
                 );
-            } else if (!charset && stmt.stylesheet.charset) {
-                charset = stmt.stylesheet.charset;
             }
 
-            statements.splice(index, 1, ...stmt.stylesheet.statements);
+            if (!charset && statement.stylesheet.charset) {
+                charset = statement.stylesheet.charset;
+            }
+
+            statements.splice(index, 1, ...statement.stylesheet.statements);
 
             index -= 1;
         }

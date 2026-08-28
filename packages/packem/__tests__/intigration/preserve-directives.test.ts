@@ -346,7 +346,7 @@ console.log("Hello, cli!");
         // The second directive of the multi-directive module is preserved too.
         expect(USE_SUKKA_DIRECTIVE_RE.test(mjsContent)).toBe(true);
         // The implementation survives (sanity check that we did not corrupt the module).
-        expect(mjsContent.includes("widget")).toBe(true);
+        expect(mjsContent).toContain("widget");
     });
 
     // Rolldown chunks differ from rollup: it emits `import { foo } from './X';`

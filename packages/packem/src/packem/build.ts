@@ -261,7 +261,7 @@ const buildEntryLine = (entry: SizeEntry, context: BuildContext<InternalBuildOpt
 const showSizeInformation = (logger: Logger, context: BuildContext<InternalBuildOptions>): boolean => {
     const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
 
-    let loggedEntries = false;
+    let isLoggedEntries = false;
 
     const foundDtsEntries: string[] = [];
     const entries = context.buildEntries.filter((bEntry) => bEntry.type === "entry");
@@ -272,7 +272,7 @@ const showSizeInformation = (logger: Logger, context: BuildContext<InternalBuild
         for (const entry of entries) {
             const line = buildEntryLine(entry, context, rPath, foundDtsEntries);
 
-            loggedEntries = true;
+            isLoggedEntries = true;
 
             logger.raw(line);
         }
@@ -296,7 +296,7 @@ const showSizeInformation = (logger: Logger, context: BuildContext<InternalBuild
         logger.raw(line);
     }
 
-    if (loggedEntries) {
+    if (isLoggedEntries) {
         logger.raw(
             "Σ Total dist size (byte size):",
             cyan(
@@ -311,7 +311,7 @@ const showSizeInformation = (logger: Logger, context: BuildContext<InternalBuild
         );
     }
 
-    return loggedEntries;
+    return isLoggedEntries;
 };
 
 /**
@@ -601,12 +601,12 @@ const prepareRollupConfig = async (
                 // Note: fileAlias is handled separately in prepareEntries, not in subDirectory
 
                 // Determine minify setting based on environment and explicit config
-                let minify = environmentRuntimeContext.options.minify ?? false;
+                let isMinify = environmentRuntimeContext.options.minify ?? false;
 
                 if (environment === "development") {
-                    minify = false;
+                    isMinify = false;
                 } else if (environment === "production") {
-                    minify = true;
+                    isMinify = true;
                 }
 
                 const buildEntries: BuildEntry[] = (entries as EntryWithType[]).map((entry) => {
@@ -652,7 +652,7 @@ const prepareRollupConfig = async (
                         true,
                         true,
                         filterDtsEntries(esmAndCjsEntries),
-                        minify,
+                        isMinify,
                         replaceValues,
                     );
 
@@ -689,7 +689,7 @@ const prepareRollupConfig = async (
                         false,
                         true,
                         filterDtsEntries(esmEntries),
-                        minify,
+                        isMinify,
                         replaceValues,
                     );
 
@@ -727,7 +727,7 @@ const prepareRollupConfig = async (
                         true,
                         false,
                         filterDtsEntries(cjsEntries),
-                        minify,
+                        isMinify,
                         replaceValues,
                     );
 
@@ -761,17 +761,17 @@ const prepareRollupConfig = async (
 
                 if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
                     // Check per-entry declaration format requirements (set by declaration-only exports)
-                    const needsCjsDecl = dtsEntries.some((entry) => entry.declarationCjs);
-                    const needsEsmDecl = dtsEntries.some((entry) => entry.declarationEsm);
+                    const isNeedsCjsDeclaration = dtsEntries.some((entry) => entry.declarationCjs);
+                    const isNeedsEsmDeclaration = dtsEntries.some((entry) => entry.declarationEsm);
                     // Entries with only plain `declaration` (no format-specific flags) need .d.ts output.
                     // Setting emitCJS=true in single-format mode causes getDtsExtension to return "d.ts".
-                    const needsPlainDts = dtsEntries.some((entry) => entry.declaration && !entry.declarationCjs && !entry.declarationEsm);
+                    const isNeedsPlainDts = dtsEntries.some((entry) => entry.declaration && !entry.declarationCjs && !entry.declarationEsm);
                     const adjustedDtsContext = createAdjustedContext(
                         environmentRuntimeContext,
-                        needsCjsDecl || needsPlainDts,
-                        needsEsmDecl,
+                        isNeedsCjsDeclaration || isNeedsPlainDts,
+                        isNeedsEsmDeclaration,
                         dtsEntries,
-                        minify,
+                        isMinify,
                         replaceValues,
                     );
 

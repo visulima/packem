@@ -11,7 +11,7 @@ const getPackageSideEffect = (cwd: string, packageJson: PackageJson): ((id: stri
     if (typeof sideEffects === "boolean") {
         hasSideEffects = () => sideEffects;
     } else if (Array.isArray(sideEffects)) {
-        if (sideEffects.length <= 0) {
+        if (sideEffects.length === 0) {
             // createFilter always returns true if `includes` is an empty array
             // but here we want it to always return false
             hasSideEffects = () => false;

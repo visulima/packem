@@ -603,7 +603,7 @@ describe("externals-plugin", () => {
         const windowsAbsolutePaths = [
             String.raw`D:\a\visulima\visulima\packages\filesystem\path\src\index.ts`,
             String.raw`D:\a\visulima\visulima\packages\filesystem\path\src\utils.ts`,
-            String.raw`D:`,
+            "D:",
             String.raw`C:\Users\runner\work\proj\src\file.ts`,
             String.raw`\\server\share\src\file.ts`,
         ];

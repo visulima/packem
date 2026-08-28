@@ -331,11 +331,11 @@ export type OptionsResolved = Overwrite<
         oxc: IsolatedDeclarationsOptions | false;
         tsconfig?: string;
         tsconfigRaw: TsConfigJson;
-        tsgo: { path?: string } | false;
+        tsgo: false | { path?: string };
     }
 >;
 
-let warnedTsgo = false;
+let isWarnedTsgo = false;
 
 type RawTsconfig = {
     [key: string]: unknown;
@@ -539,8 +539,8 @@ const validateGenerator = (generator: Generator, logger: Logger): void => {
         return;
     }
 
-    if (generator === "tsgo" && !warnedTsgo) {
-        warnedTsgo = true;
+    if (generator === "tsgo" && !isWarnedTsgo) {
+        isWarnedTsgo = true;
         logger.warn(
             "[@visulima/rollup-plugin-dts] The `tsgo` generator is experimental: TypeScript 7.0 does not yet have a stable API, and some options (such as `isolatedDeclarations`) are unavailable.",
         );
@@ -703,14 +703,14 @@ export const resolveOptions = ({
     // TypeScript's parser and `@visulima/tsconfig` auto-add `incremental: true`
     // whenever `composite: true` is set, which would otherwise force every
     // composite project into disk mode and leave `.tsbuildinfo` files behind.
-    const incremental =
+    const isIncremental =
         incrementalOption
         || pluginCompilerOptions.incremental === true
         || typeof pluginCompilerOptions.tsBuildInfoFile === "string"
         || (typeof tsconfig === "string" && hasExplicitIncrementalInTsconfig(tsconfig));
-    const sourcemap = sourcemapOption ?? Boolean(compilerOptions.declarationMap);
+    const isSourcemap = sourcemapOption ?? Boolean(compilerOptions.declarationMap);
 
-    compilerOptions.declarationMap = sourcemap;
+    compilerOptions.declarationMap = isSourcemap;
 
     let resolvedEntry: string[] | undefined;
 
@@ -754,7 +754,7 @@ export const resolveOptions = ({
     // extra work") must not veto `allowJs: true`, which still requires `.js`
     // declarations to be emitted.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- `||` is intentional: this is boolean OR semantics (either flag enables JS emit), not a null/undefined fallback; `??` would let an explicit `checkJs: false` veto `allowJs: true`.
-    const emitJs = emitJsOption ?? Boolean(compilerOptions.checkJs || compilerOptions.allowJs);
+    const isEmitJs = emitJsOption ?? Boolean(compilerOptions.checkJs || compilerOptions.allowJs);
 
     return {
         banner,
@@ -765,13 +765,13 @@ export const resolveOptions = ({
         dtsInput,
         eager,
         emitDtsOnly,
-        emitJs,
+        emitJs: isEmitJs,
         entry: resolvedEntry,
         exclude,
         footer,
         generator,
         include,
-        incremental,
+        incremental: isIncremental,
         logger,
         newContext,
         oxc: oxcResolved,
@@ -780,7 +780,7 @@ export const resolveOptions = ({
         resolve,
         resolver,
         sideEffects,
-        sourcemap,
+        sourcemap: isSourcemap,
         tsconfig,
         tsconfigRaw,
         tsgo,

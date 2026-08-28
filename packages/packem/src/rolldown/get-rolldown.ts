@@ -49,8 +49,8 @@ const NOT_INSTALLED_MESSAGE = "Rolldown is not installed. Please install '@rolld
 export const getRolldownBuild = async (): Promise<RolldownBuild> => {
     // Literal-string imports keep packem's own bundler (rollup-plugin-dynamic-import-vars)
     // happy when self-building.
-    // @ts-ignore optional peer dependency
     const fromNode = await tryImport(
+        // @ts-ignore optional peer dependency
         () => import("@rolldown/node"),
         (m) => pickFunction(m.rolldown),
     );
@@ -59,8 +59,8 @@ export const getRolldownBuild = async (): Promise<RolldownBuild> => {
         return fromNode;
     }
 
-    // @ts-ignore optional peer dependency
     const fromCore = await tryImport(
+        // @ts-ignore optional peer dependency
         () => import("rolldown"),
         (m) => pickFunction(m.rolldown),
     );
@@ -78,8 +78,8 @@ export const getRolldownBuild = async (): Promise<RolldownBuild> => {
  * / `.close()` shape as Rollup's, so packem's watch handler is reused as-is.
  */
 export const getRolldownWatch = async (): Promise<RolldownWatch> => {
-    // @ts-ignore optional peer dependency
     const fromNode = await tryImport(
+        // @ts-ignore optional peer dependency
         () => import("@rolldown/node"),
         (m) => pickFunction(m.watch),
     );
@@ -88,8 +88,8 @@ export const getRolldownWatch = async (): Promise<RolldownWatch> => {
         return fromNode;
     }
 
-    // @ts-ignore optional peer dependency
     const fromCore = await tryImport(
+        // @ts-ignore optional peer dependency
         () => import("rolldown"),
         (m) => pickFunction(m.watch),
     );

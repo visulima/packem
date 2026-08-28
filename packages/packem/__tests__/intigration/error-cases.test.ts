@@ -95,7 +95,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        const NODE_JS_VERSION = Number(process.versions.node.split(".")[0]);
+        const NODE_JS_VERSION = Number(process.versions.node.split(".", 1)[0]);
         // Node.js changed the error message for invalid package.json across versions:
         // < 20: "Unexpected end of JSON input in"
         // 20-21: "Expected property name or"

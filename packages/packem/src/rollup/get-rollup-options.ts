@@ -90,11 +90,7 @@ export const computeDtsResolveKey = (dtsResolve: boolean | (string | RegExp)[]):
         return String(dtsResolve);
     }
 
-    const sources: string[] = [];
-
-    for (const pattern of dtsResolve) {
-        sources.push(regExpOrStringToString(pattern));
-    }
+    const sources: string[] = Array.from(dtsResolve, (pattern) => regExpOrStringToString(pattern));
 
     return sources.toSorted((a, b) => a.localeCompare(b)).join(",");
 };
@@ -166,7 +162,7 @@ export const createEntryFileNames = (
 // of the rollup transformer adapter.
 // eslint-disable-next-line import/exports-last -- shared helper for the rolldown options builder; defined where it's wired into the rollup pipeline below
 export const resolveNodeTarget = (context: BuildContext<InternalBuildOptions>): string => {
-    const defaultTarget = `node${versions.node.split(".")[0]}`;
+    const defaultTarget = `node${versions.node.split(".", 1)[0]}`;
 
     if (!context.pkg.engines?.node) {
         return defaultTarget;
@@ -867,14 +863,18 @@ export const buildPurePlugins = (
  * To keep a devDep out of both the bundled code and the emitted types, name it in the
  * top-level `externals` option — auto-detection skips anything listed there.
  */
-const collectOptionalPeerDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
+const collectOptionalPeerDependencies = (
+    context: BuildContext<InternalBuildOptions>,
+    peerDependencies: Partial<Record<string, string>>,
+    autoResolve: string[],
+): void => {
     if (!context.pkg.peerDependenciesMeta) {
         return;
     }
 
     for (const [name, meta] of Object.entries(context.pkg.peerDependenciesMeta)) {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- runtime guard for malformed package.json: peerDependenciesMeta values come from untyped parsed JSON
-        if (meta && typeof meta === "object" && "optional" in meta && meta.optional && name in peerDeps) {
+        if (meta && typeof meta === "object" && "optional" in meta && meta.optional && name in peerDependencies) {
             autoResolve.push(name);
         }
     }
@@ -936,7 +936,11 @@ const isTypesOnlyPackage = (rootDirectory: string, name: string): boolean => {
     return manifest.types !== undefined || manifest.typings !== undefined;
 };
 
-const collectInlinableDevDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
+const collectInlinableDevDependencies = (
+    context: BuildContext<InternalBuildOptions>,
+    peerDependencies: Partial<Record<string, string>>,
+    autoResolve: string[],
+): void => {
     // A devDependency is one the consumer never installs, so a devDep left external in
     // the emitted .d.ts is an import that resolves only where the package manager
     // happens to hoist it, and fails for everyone else. Two disjoint cases reach the
@@ -972,7 +976,7 @@ const collectInlinableDevDeps = (context: BuildContext<InternalBuildOptions>, pe
         return;
     }
 
-    const deps = context.pkg.dependencies ?? {};
+    const dependencies = context.pkg.dependencies ?? {};
     const { externals: userExternals, rootDir } = context.options;
     const isUserExternal = (name: string): boolean =>
         userExternals.some((pattern) => {
@@ -993,7 +997,7 @@ const collectInlinableDevDeps = (context: BuildContext<InternalBuildOptions>, pe
         });
 
     for (const name of Object.keys(context.pkg.devDependencies ?? {})) {
-        if (name in peerDeps || name in deps || isUserExternal(name)) {
+        if (name in peerDependencies || name in dependencies || isUserExternal(name)) {
             continue;
         }
 
@@ -1063,10 +1067,10 @@ export const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): 
 
     // Include peer deps that are marked as optional in peerDependenciesMeta
     // (only if they're actually listed in peerDependencies)
-    const peerDeps = context.pkg.peerDependencies ?? {};
+    const peerDependencies = context.pkg.peerDependencies ?? {};
 
-    collectOptionalPeerDeps(context, peerDeps, autoResolve);
-    collectInlinableDevDeps(context, peerDeps, autoResolve);
+    collectOptionalPeerDependencies(context, peerDependencies, autoResolve);
+    collectInlinableDevDependencies(context, peerDependencies, autoResolve);
 
     if (autoResolve.length === 0 && !userResolve) {
         return false;

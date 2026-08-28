@@ -33,10 +33,12 @@ const collectReachableChunks = (bundle: OutputBundle): Set<string> | undefined =
     const stack: string[] = [];
 
     for (const [fileName, output] of Object.entries(bundle)) {
-        if (output.type === "chunk" && output.isEntry) {
-            reachable.add(fileName);
-            stack.push(fileName);
+        if (!(output.type === "chunk" && output.isEntry)) {
+            continue;
         }
+
+        reachable.add(fileName);
+        stack.push(fileName);
     }
 
     if (stack.length === 0) {
@@ -55,10 +57,12 @@ const collectReachableChunks = (bundle: OutputBundle): Set<string> | undefined =
             // `bundle[imported]` is absent for external / non-bundled imports, so gate
             // on `Object.hasOwn` (rollup's `OutputBundle` index type can't express the
             // missing-key case).
-            if (Object.hasOwn(bundle, imported) && bundle[imported].type === "chunk" && !reachable.has(imported)) {
-                reachable.add(imported);
-                stack.push(imported);
+            if (!(Object.hasOwn(bundle, imported) && bundle[imported].type === "chunk") || reachable.has(imported)) {
+                continue;
             }
+
+            reachable.add(imported);
+            stack.push(imported);
         }
     }
 

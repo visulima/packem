@@ -14,7 +14,7 @@ import type { KillSignal } from "../types";
  * command exits with code 128 because the target process is already gone.
  * @see https://github.com/egoist/tsup/issues/976
  */
-const isTaskKillCmdProcessNotFoundError = (error: Error) =>
+const isTaskKillCommandProcessNotFoundError = (error: Error) =>
     process.platform === "win32"
     && "cmd" in error
     && "code" in error
@@ -39,7 +39,7 @@ const killProcess = async ({ pid, signal }: { pid: number; signal: KillSignal })
         }
 
         kill(pid, signal, (error) => {
-            if (error && !isTaskKillCmdProcessNotFoundError(error)) {
+            if (error && !isTaskKillCommandProcessNotFoundError(error)) {
                 reject(error);
 
                 return;
