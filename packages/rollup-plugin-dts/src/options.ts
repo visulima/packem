@@ -588,7 +588,11 @@ const applyOxcDefaults = (
 ): IsolatedDeclarationsOptions => {
     const oxcResolved: IsolatedDeclarationsOptions = typeof oxcOption === "object" ? oxcOption : {};
 
-    oxcResolved.stripInternal ??= compilerOptions.stripInternal ?? false;
+    // `stripInternal` is a real tsconfig compiler option, but TsConfigJson.CompilerOptions
+    // does not model it (TypeScript marks it internal), so widen to read it.
+    const { stripInternal } = compilerOptions as TsConfigJson.CompilerOptions & { stripInternal?: boolean };
+
+    oxcResolved.stripInternal ??= stripInternal ?? false;
     oxcResolved.sourcemap = compilerOptions.declarationMap ?? false;
 
     return oxcResolved;

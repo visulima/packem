@@ -186,13 +186,9 @@ catalogs:
     source-map-js: ^1.2.1
     tailwind-merge: 3.6.0
     workerpool: 10.0.3
-    # yuku 0.9 replaced the camelCase positional builders (b.numericLiteral(1)) with
-    # PascalCase field-object constructors (b.NumericLiteral({ value: 1 })) and dropped
-    # the yuku-ast/identifier and yuku-ast/utils subpaths. Porting rollup-plugin-dts's
-    # fake-js transform to that API is its own change; hold the old line until then.
-    yuku-ast: ^0.1.7
-    yuku-codegen: ^0.6.12
-    yuku-parser: ^0.6.12
+    yuku-ast: ^0.9.3
+    yuku-codegen: ^0.9.3
+    yuku-parser: ^0.9.3
   script:
     jiti: 2.7.0
     tsx: 4.23.12

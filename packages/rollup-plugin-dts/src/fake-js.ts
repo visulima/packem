@@ -2,9 +2,7 @@
 import path from "node:path";
 
 import type { ExistingRawSourceMap, NormalizedOutputOptions, Plugin, RenderedChunk, SourceMapInput, TransformPluginContext, TransformResult } from "rollup";
-import { b, is } from "yuku-ast";
-import { isIdentifierName } from "yuku-ast/identifier";
-import { nameOf } from "yuku-ast/utils";
+import { b, is, isIdentifierName, nameOf } from "yuku-ast";
 import { print } from "yuku-codegen";
 // eslint-disable-next-line import/no-namespace -- the ESTree/TS-ESTree node types are a large flat namespace; importing them one by one would add ~40 named type imports
 import type * as t from "yuku-parser";
@@ -27,6 +25,22 @@ import type { OptionsResolved } from "./options";
 type Dep = t.Expression & { replace?: (newNode: t.Node) => void };
 
 const CROSS_CHUNK_PLACEHOLDER = "__rollup_dts_resolve__:";
+
+/**
+ * `b.Literal` is typed for every literal shape at once, so it returns the whole
+ * union. These two build the only literals this transform needs, already narrowed.
+ */
+const stringLiteral = (value: string): t.StringLiteral => {
+    return { end: 0, raw: JSON.stringify(value), start: 0, type: "Literal", value };
+};
+
+const numericLiteral = (value: number): t.NumericLiteral => {
+    return { end: 0, raw: String(value), start: 0, type: "Literal", value };
+};
+
+/** `export { ... }` with no declaration and no source, which is all this transform emits. */
+const exportNamedDeclaration = (specifiers: t.ExportSpecifier[]): t.ExportNamedDeclaration =>
+    b.ExportNamedDeclaration({ attributes: [], declaration: null, source: null, specifiers });
 
 /**
  * A collection of type parameters grouped by parameter name
@@ -279,9 +293,14 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         // so they flow through the normal declaration machinery below.
         for (const [i, stmt] of program.body.entries()) {
             if (stmt.type === "TSImportEqualsDeclaration" && stmt.moduleReference.type !== "TSExternalModuleReference") {
-                program.body[i] = b.tsTypeAliasDeclaration(stmt.id, b.tsTypeReference(stmt.moduleReference));
+                program.body[i] = b.TSTypeAliasDeclaration({
+                    declare: false,
+                    id: stmt.id,
+                    typeAnnotation: b.TSTypeReference({ typeArguments: null, typeName: stmt.moduleReference }),
+                    typeParameters: null,
+                });
             } else if (stmt.type === "TSExportAssignment" && stmt.expression.type !== "Identifier") {
-                program.body[i] = b.exportDefaultDeclaration(stmt.expression);
+                program.body[i] = b.ExportDefaultDeclaration({ declaration: stmt.expression });
             }
         }
 
@@ -361,7 +380,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 // and `declare module Foo { }` already have valid Identifier ids and
                 // must keep their names so renderChunk emits the correct keyword.
                 if (sideEffect && binding.type !== "Identifier") {
-                    binding = b.identifier(`_${getIdentifierIndex(identifierMap, "")}`);
+                    binding = b.Identifier({ name: `_${getIdentifierIndex(identifierMap, "")}` });
                 }
 
                 if (binding.type !== "Identifier") {
@@ -370,7 +389,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                 bindings.push(binding);
             } else {
-                const binding = b.identifier("export_default");
+                const binding = b.Identifier({ name: "export_default" });
 
                 bindings.push(binding);
                 (decl as { id?: t.Identifier }).id = binding;
@@ -438,22 +457,27 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 bindingToDeclarationId.set(bindings[0].name, declarationId);
             }
 
-            const declarationIdNode = b.numericLiteral(declarationId);
-            const depsNode = b.arrowFunctionExpression(
-                params.map(({ name }) => b.identifier(name)),
-                b.arrayExpression(deps),
-            );
-            const childrenNode = b.arrayExpression(
-                children.map((node) => {
-                    const placeholder = b.stringLiteral("");
+            const declarationIdNode = numericLiteral(declarationId);
+            const depsNode = b.ArrowFunctionExpression({
+                async: false,
+                body: b.ArrayExpression({ elements: deps }),
+                expression: true,
+                generator: false,
+                id: null,
+                params: params.map(({ name }) => b.Identifier({ name })),
+            });
+            const childrenNode = b.ArrayExpression({
+                elements: children.map((node) => {
+                    const placeholder = stringLiteral("");
 
                     placeholder.start = node.start;
                     placeholder.end = node.end;
 
                     return placeholder;
                 }),
-            );
-            const sideEffectNode = sideEffect && b.callExpression(b.identifier("sideEffect"), [bindings[0]]);
+            });
+            const sideEffectNode
+                = sideEffect && b.CallExpression({ arguments: [bindings[0]], callee: b.Identifier({ name: "sideEffect" }), optional: false });
             const runtimeArrayNode = runtimeBindingArrayExpression(
                 sideEffectNode ? [declarationIdNode, depsNode, childrenNode, sideEffectNode] : [declarationIdNode, depsNode, childrenNode],
             );
@@ -468,13 +492,19 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             // form a colliding 2nd+ binding kept its original name while the export referenced the
             // renamed one — emitting a `.d.ts` that both declares a duplicate and points at an
             // identifier that was never declared. See sxzz/rolldown-plugin-dts@30104ca.
-            const runtimeAssignment = b.variableDeclaration("var", [
-                b.variableDeclarator(b.arrayPattern(bindings.map((binding) => { return { ...binding, typeAnnotation: null }; })), runtimeArrayNode),
-            ]) as RuntimeBindingVariableDeclration;
+            const runtimeAssignment = b.VariableDeclaration({
+                declarations: [
+                    b.VariableDeclarator({
+                        id: b.ArrayPattern({ elements: bindings.map((binding) => { return { ...binding, typeAnnotation: null }; }) }),
+                        init: runtimeArrayNode,
+                    }),
+                ],
+                kind: "var",
+            }) as RuntimeBindingVariableDeclration;
 
             if (isDefaultExport) {
                 // export { ${binding} as default }
-                appendStmts.push(b.exportNamedDeclaration(null, [b.exportSpecifier(bindings[0], b.identifier("default"))]));
+                appendStmts.push(exportNamedDeclaration([b.ExportSpecifier({ exported: b.Identifier({ name: "default" }), local: bindings[0] })]));
                 // replace the whole statement
                 setStmt(runtimeAssignment);
             } else {
@@ -485,7 +515,11 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
         if (sideEffects) {
             // module side effect marker
-            appendStmts.push(b.expressionStatement(b.callExpression(b.identifier("sideEffect"), [])));
+            appendStmts.push(
+                b.ExpressionStatement({
+                    expression: b.CallExpression({ arguments: [], callee: b.Identifier({ name: "sideEffect" }), optional: false }),
+                }),
+            );
         }
 
         program.body = [
@@ -624,7 +658,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                         continue;
 
                     if (transformedDep.type === "UnaryExpression" && transformedDep.operator === "void") {
-                        const undefinedDep = b.identifier("undefined");
+                        const undefinedDep = b.Identifier({ name: "undefined" });
 
                         undefinedDep.start = transformedDep.start;
                         undefinedDep.end = transformedDep.end;
@@ -642,7 +676,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                 // Rewrite local `declare module` specifier → placeholder for generateBundle
                 if (declaration.decl.type === "TSModuleDeclaration" && declaration.resolvedModuleId) {
-                    declaration.decl.id = b.stringLiteral(CROSS_CHUNK_PLACEHOLDER + declaration.resolvedModuleId);
+                    declaration.decl.id = stringLiteral(CROSS_CHUNK_PLACEHOLDER + declaration.resolvedModuleId);
                 }
 
                 // Restore overloaded declarations before the primary declaration
@@ -694,7 +728,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                                 continue;
 
                             if (transformedDep.type === "UnaryExpression" && transformedDep.operator === "void") {
-                                const undefinedDep = b.identifier("undefined");
+                                const undefinedDep = b.Identifier({ name: "undefined" });
 
                                 undefinedDep.start = transformedDep.start;
                                 undefinedDep.end = transformedDep.end;
@@ -731,7 +765,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         const hasModuleAugmentation = program.body.some((node) => node.type === "TSModuleDeclaration" && is.StringLiteral(node.id));
 
         if (!hasExport && hasModuleAugmentation) {
-            program.body.push(b.exportNamedDeclaration(null, []));
+            program.body.push(exportNamedDeclaration([]));
         }
 
         // recover the JSDoc of re-export statements, which never became declarations
@@ -1042,7 +1076,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
         const sourceText = source.value.replaceAll(/\W/g, "_");
         const localName = `_$${isIdentifierName(source.value) ? source.value : `${sourceText}${getIdentifierIndex(identifierMap, sourceText)}`}`;
-        let local: t.Identifier | t.TSQualifiedName = b.identifier(localName);
+        let local: t.Identifier | t.TSQualifiedName = b.Identifier({ name: localName });
 
         if (namespaceStmts.has(source.value)) {
             local = namespaceStmts.get(source.value)!.local;
@@ -1050,7 +1084,12 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             // prepend: import * as ${local} from ${source}
             namespaceStmts.set(source.value, {
                 local,
-                stmt: b.importDeclaration([b.importNamespaceSpecifier(local)], source),
+                stmt: b.ImportDeclaration({
+                    attributes: [],
+                    phase: null,
+                    source,
+                    specifiers: [b.ImportNamespaceSpecifier({ local })],
+                }),
             });
         }
 
@@ -1061,14 +1100,14 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 throw new Error("Cannot import `this` from module.");
             }
 
-            overwriteNode(importedLeft, b.tsQualifiedName(local, { ...importedLeft }));
+            overwriteNode(importedLeft, b.TSQualifiedName({ left: local, right: { ...importedLeft } }));
             local = imported;
         }
 
         let replacement: t.Node = node;
 
         if (node.typeArguments) {
-            overwriteNode(node, b.tsTypeReference(local, node.typeArguments));
+            overwriteNode(node, b.TSTypeReference({ typeArguments: node.typeArguments, typeName: local }));
             replacement = local;
         } else {
             overwriteNode(node, local);
@@ -1712,7 +1751,7 @@ const isRuntimeBindingArrayExpression = (node: t.Node | null | undefined): node 
     node?.type === "ArrayExpression" && isRuntimeBindingArrayElements(node.elements);
 
 const runtimeBindingArrayExpression = (elements: RuntimeBindingArrayElements): RuntimeBindingArrayExpression =>
-    b.arrayExpression([...elements]) as RuntimeBindingArrayExpression;
+    b.ArrayExpression({ elements: [...elements] }) as RuntimeBindingArrayExpression;
 
 type RuntimeBindingArrayElementsBase = [declarationId: t.NumericLiteral, deps: t.ArrowFunctionExpression, children: t.ArrayExpression];
 
@@ -1844,7 +1883,7 @@ const patchImportExport = (node: t.ProgramStatement, exportInfo: ChunkExportInfo
         ) {
             const defaultExport = node.specifiers[0];
 
-            return b.tsExportAssignment(defaultExport.local);
+            return b.TSExportAssignment({ expression: defaultExport.local });
         }
     }
 
@@ -1868,19 +1907,24 @@ const patchTsNamespace = (nodes: t.ProgramStatement[]) => {
         if (exports.properties.length === 0)
             continue;
 
-        const namespaceExport = b.exportNamedDeclaration(
-            null,
+        const namespaceExport = exportNamedDeclaration(
             exports.properties
                 .filter((property) => property.type === "Property")
                 .map((property) => {
                     const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
                     const exported = property.key as t.Identifier;
 
-                    return b.exportSpecifier(local, exported);
+                    return b.ExportSpecifier({ exported, local });
                 }),
         );
 
-        nodes[i] = b.tsModuleDeclaration(binding, b.tsModuleBlock([namespaceExport]), { declare: true, kind: "namespace" });
+        nodes[i] = b.TSModuleDeclaration({
+            body: b.TSModuleBlock({ body: [namespaceExport] }),
+            declare: true,
+            global: false,
+            id: binding,
+            kind: "namespace",
+        });
     }
 
     return nodes.filter((node) => !removed.has(node));
@@ -1945,15 +1989,18 @@ const patchReExport = (nodes: t.ProgramStatement[]) => {
             // type B = [mapping].A
             // TODO how to support value import? currently only type import is supported
 
-            nodes[i] = b.tsTypeAliasDeclaration(
-                b.identifier((node.declarations[0].id as t.Identifier).name),
-                b.tsTypeReference(
-                    b.tsQualifiedName(
-                        b.identifier(exportsNames.get(node.declarations[0].init.object.name)!),
-                        b.identifier((node.declarations[0].init.property as t.Identifier).name),
-                    ),
-                ),
-            );
+            nodes[i] = b.TSTypeAliasDeclaration({
+                declare: false,
+                id: b.Identifier({ name: (node.declarations[0].id as t.Identifier).name }),
+                typeAnnotation: b.TSTypeReference({
+                    typeArguments: null,
+                    typeName: b.TSQualifiedName({
+                        left: b.Identifier({ name: exportsNames.get(node.declarations[0].init.object.name)! }),
+                        right: b.Identifier({ name: (node.declarations[0].init.property as t.Identifier).name }),
+                    }),
+                }),
+                typeParameters: null,
+            });
         } else if (
             node.type === "ExportNamedDeclaration"
             && node.specifiers.length === 1
@@ -2010,7 +2057,14 @@ const rewriteImportExport = (
 
     if (node.type === "TSImportEqualsDeclaration") {
         if (node.moduleReference.type === "TSExternalModuleReference") {
-            set(b.importDeclaration([b.importDefaultSpecifier(node.id)], node.moduleReference.expression));
+            set(
+                b.ImportDeclaration({
+                    attributes: [],
+                    phase: null,
+                    source: node.moduleReference.expression,
+                    specifiers: [b.ImportDefaultSpecifier({ local: node.id })],
+                }),
+            );
 
             return true;
         }
@@ -2022,13 +2076,13 @@ const rewriteImportExport = (
     }
 
     if (node.type === "TSExportAssignment" && node.expression.type === "Identifier") {
-        set(b.exportNamedDeclaration(null, [b.exportSpecifier(node.expression, b.identifier("default"))]));
+        set(exportNamedDeclaration([b.ExportSpecifier({ exported: b.Identifier({ name: "default" }), local: node.expression })]));
 
         return true;
     }
 
     if (node.type === "ExportDefaultDeclaration" && node.declaration.type === "Identifier") {
-        set(b.exportNamedDeclaration(null, [b.exportSpecifier(node.declaration, b.identifier("default"))]));
+        set(exportNamedDeclaration([b.ExportSpecifier({ exported: b.Identifier({ name: "default" }), local: node.declaration })]));
 
         return true;
     }
