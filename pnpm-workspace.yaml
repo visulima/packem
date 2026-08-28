@@ -120,13 +120,13 @@ catalogs:
     "@commitlint/cli": 21.2.1
     "@commitlint/config-conventional": 21.2.0
     "@eslint/css": 1.4.0
-    "@secretlint/secretlint-rule-preset-recommend": 13.0.2
+    "@secretlint/secretlint-rule-preset-recommend": 13.0.4
     eslint: 10.7.0
     husky: ^9.1.7
     lint-staged: 17.0.8
     prettier: 3.9.5
     publint: 0.3.23
-    secretlint: 13.0.2
+    secretlint: 13.0.4
     tailwind-csstree: 0.3.3
     textlint: 15.7.1
   markdown:
