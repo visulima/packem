@@ -40,8 +40,8 @@ catalogs:
       specifier: 4.63.1
       version: 4.63.1
     rollup-plugin-dts:
-      specifier: 6.5.1
-      version: 6.5.1
+      specifier: 6.4.1
+      version: 6.4.1
     rollup-plugin-import-trace:
       specifier: 1.0.1
       version: 1.0.1
@@ -2238,7 +2238,7 @@ importers:
         version: 1.2.6
       rollup-plugin-dts:
         specifier: catalog:build
-        version: 6.5.1(rollup@4.62.2)(typescript@6.0.3)
+        version: 6.4.1(rollup@4.62.2)(typescript@6.0.3)
       rollup-plugin-lit-css:
         specifier: catalog:build
         version: 6.0.1(postcss@8.5.26)(rollup@4.62.2)
@@ -3240,7 +3240,7 @@ importers:
         version: 4.63.1
       rollup-plugin-dts:
         specifier: catalog:build
-        version: 6.5.1(rollup@4.63.1)(typescript@6.0.3)
+        version: 6.4.1(rollup@4.63.1)(typescript@6.0.3)
       tsx:
         specifier: catalog:script
         version: 4.23.12
@@ -16362,17 +16362,6 @@ packages:
     peerDependencies:
       rollup: ^3.29.4 || ^4
       typescript: ^4.5 || ^5.0 || ^6.0
-
-  rollup-plugin-dts@6.5.1:
-    resolution: {integrity: sha512-jODTXp3H7MK/Ur/ErtsrQ0G1GvaCmc3du+y5pNrdBMf6d7HlL2Nd/N6TkEr+f75CkUj01zEoEd7y2elH0eHi1Q==}
-    engines: {node: '>=20'}
-    peerDependencies:
-      '@typescript/typescript6': ^6
-      rollup: ^3 || ^4
-      typescript: ^4.5 || ^5 || ^6 || ^7
-    peerDependenciesMeta:
-      '@typescript/typescript6':
-        optional: true
 
   rollup-plugin-esbuild@6.2.1:
     resolution: {integrity: sha512-jTNOMGoMRhs0JuueJrJqbW8tOwxumaWYq+V5i+PD+8ecSCVkuX27tGW7BXqDgoULQ55rO7IdNxPcnsWtshz3AA==}
@@ -33180,18 +33169,7 @@ snapshots:
     optionalDependencies:
       '@babel/code-frame': 7.29.7
 
-  rollup-plugin-dts@6.5.1(rollup@4.62.2)(typescript@6.0.3):
-    dependencies:
-      '@jridgewell/remapping': 2.3.5
-      '@jridgewell/sourcemap-codec': 1.5.5
-      convert-source-map: 2.0.0
-      magic-string: 0.30.21
-      rollup: 4.62.2
-      typescript: 6.0.3
-    optionalDependencies:
-      '@babel/code-frame': 8.0.0
-
-  rollup-plugin-dts@6.5.1(rollup@4.63.1)(typescript@6.0.3):
+  rollup-plugin-dts@6.4.1(rollup@4.63.1)(typescript@6.0.3):
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -33200,7 +33178,7 @@ snapshots:
       rollup: 4.63.1
       typescript: 6.0.3
     optionalDependencies:
-      '@babel/code-frame': 8.0.0
+      '@babel/code-frame': 7.29.7
 
   rollup-plugin-esbuild@6.2.1(esbuild@0.28.2)(rollup@4.63.1)(supports-color@7.2.0):
     dependencies:

@@ -10,6 +10,8 @@ on: # yamllint disable-line rule:truthy
 # superseded pull request runs.
 concurrency:
     group: "${{ github.workflow }}-${{ github.ref }}"
+    # Quoting the expression would hand GitHub the literal string instead of the boolean.
+    # yamllint disable-line rule:quoted-strings
     cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions: {}
