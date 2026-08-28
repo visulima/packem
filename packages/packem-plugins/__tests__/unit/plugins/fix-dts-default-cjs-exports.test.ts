@@ -62,10 +62,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
 
             renderChunk = (code, chunk, options, meta) =>
                 directRenderChunk.call(rollupContext, code, chunk as RenderedChunk, options, meta) as
-                | string
-                | { code: string; map?: unknown }
-                | null
-                | undefined;
+                    string | { code: string; map?: unknown } | null | undefined;
         });
 
         afterEach(() => {
@@ -125,7 +122,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             // undefined, which used to crash extractExports' default-candidate `.find`
             // ("Cannot read properties of undefined (reading 'includes')"). Reported for
             // a CJS-main package whose entries are index/types/drizzle.
-            const code = "export * from \"./types\";\nexport * from \"./drizzle\";\ndeclare const x: number;\nexport { x };\n";
+            const code = 'export * from "./types";\nexport * from "./drizzle";\ndeclare const x: number;\nexport { x };\n';
             const chunkInfo: Partial<RenderedChunk> = {
                 exports: ["x"],
                 fileName: "index.d.cts",
@@ -383,8 +380,8 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const plugin = fixDtsDefaultCjsExportsPlugin();
             const mockContext = { warn: vi.fn<() => void>() } as unknown as PluginContext;
 
-            const result
-                = typeof plugin.renderChunk === "function"
+            const result =
+                typeof plugin.renderChunk === "function"
                     ? plugin.renderChunk.call(mockContext, code, chunkInfo as RenderedChunk, {} as NormalizedOutputOptions, { chunks: {} })
                     : undefined;
 
@@ -405,8 +402,8 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const plugin = fixDtsDefaultCjsExportsPlugin();
             const mockContext = { warn: vi.fn<() => void>() } as unknown as PluginContext;
 
-            const result
-                = typeof plugin.renderChunk === "function"
+            const result =
+                typeof plugin.renderChunk === "function"
                     ? plugin.renderChunk.call(mockContext, code, chunkInfo as RenderedChunk, {} as NormalizedOutputOptions, { chunks: {} })
                     : undefined;
 

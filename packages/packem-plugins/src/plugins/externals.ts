@@ -152,8 +152,8 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
 
     // User-configured externals (from `externals` option + classified deps) form
     // the include set; `resolveExternals.exclude` + DTS `resolve` form the exclude set.
-    const include = new Set(getRegExps([...context.options.externals ?? []], "include", context.logger));
-    const exclude = new Set(getRegExps([...resolvedExternalsOptions.exclude ?? []], "exclude", context.logger));
+    const include = new Set(getRegExps([...(context.options.externals ?? [])], "include", context.logger));
+    const exclude = new Set(getRegExps([...(resolvedExternalsOptions.exclude ?? [])], "exclude", context.logger));
 
     // dtsResolve adds to `exclude` so classified-dep externalization doesn't re-externalize
     // packages whose types the DTS plugin wants to inline.
@@ -192,10 +192,10 @@ export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildC
     };
 
     const classifiedDeps: Record<string, string | undefined> = {
-        ...resolvedExternalsOptions.deps ? pkg.dependencies ?? {} : undefined,
-        ...resolvedExternalsOptions.devDeps ? pkg.devDependencies ?? {} : undefined,
-        ...resolvedExternalsOptions.peerDeps ? pkg.peerDependencies ?? {} : undefined,
-        ...resolvedExternalsOptions.optDeps ? pkg.optionalDependencies ?? {} : undefined,
+        ...(resolvedExternalsOptions.deps ? (pkg.dependencies ?? {}) : undefined),
+        ...(resolvedExternalsOptions.devDeps ? (pkg.devDependencies ?? {}) : undefined),
+        ...(resolvedExternalsOptions.peerDeps ? (pkg.peerDependencies ?? {}) : undefined),
+        ...(resolvedExternalsOptions.optDeps ? (pkg.optionalDependencies ?? {}) : undefined),
     };
     const classifiedNames = Object.keys(classifiedDeps);
 

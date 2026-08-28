@@ -287,7 +287,7 @@ const selectCssLoaders = async (packagesToInstall: string[]): Promise<string[]> 
     cssLoaders.push(...resolvedExtraLoaders);
 
     const shouldInstall = await confirm({
-        message: `Do you want to install "${cssLoaders.join("\", \"")}"?`,
+        message: `Do you want to install "${cssLoaders.join('", "')}"?`,
     });
 
     if (shouldInstall) {

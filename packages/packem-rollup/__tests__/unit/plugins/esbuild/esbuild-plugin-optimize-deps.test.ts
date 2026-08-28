@@ -149,7 +149,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
             handler: (this: PluginContext, code: string, id: string) => Promise<{ code: string } | undefined>;
         };
 
-        const result = await transform.handler.call({ warn: vi.fn() } as unknown as PluginContext, "{ \"hello\": 1 }", "/data.json");
+        const result = await transform.handler.call({ warn: vi.fn() } as unknown as PluginContext, '{ "hello": 1 }', "/data.json");
 
         expect(result?.code).toMatch(AS_DEFAULT_REGEX);
         expect(result?.code).toContain("export {");

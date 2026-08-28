@@ -74,7 +74,7 @@ describe("externals-plugin", () => {
             externalsPlugin({
                 externals: [],
                 externalizedDevDependencies: new Set<string>(),
-        hoistedDependencies: new Set(),
+                hoistedDependencies: new Set(),
                 implicitDependencies: new Set(),
                 logger,
                 options: {

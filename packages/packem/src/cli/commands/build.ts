@@ -231,21 +231,21 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                             path: options.license,
                         },
                         metafile: options.metafile,
-                        ...Object.keys(environments).length > 0 || Object.keys(cliEnvVariables).length > 0
+                        ...(Object.keys(environments).length > 0 || Object.keys(cliEnvVariables).length > 0
                             ? {
-                                replace: {
-                                    values: environments,
-                                },
-                            }
-                            : {},
+                                  replace: {
+                                      values: environments,
+                                  },
+                              }
+                            : {}),
                         resolveExternals: options.noExternal
                             ? {
-                                builtins: false,
-                                deps: false,
-                                devDeps: false,
-                                optDeps: false,
-                                peerDeps: false,
-                            }
+                                  builtins: false,
+                                  deps: false,
+                                  devDeps: false,
+                                  optDeps: false,
+                                  peerDeps: false,
+                              }
                             : {},
                     },
                     runtime: options.runtime,
@@ -254,14 +254,14 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                     unbundle: options.unbundle,
                     // validation will take the default values
                     validation: options.validation === false ? false : {},
-                    ...options.exe ? { exe: true } : {},
-                    ...options.typedoc
+                    ...(options.exe ? { exe: true } : {}),
+                    ...(options.typedoc
                         ? {
-                            typedoc: {
-                                format: "html",
-                            },
-                        }
-                        : {},
+                              typedoc: {
+                                  format: "html",
+                              },
+                          }
+                        : {}),
                 });
 
                 // --no-validation must override preset validation settings but not user-configured validation
@@ -444,7 +444,7 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                 type: String,
             },
             {
-                description: "Signal to kill child process, \"SIGTERM\" or \"SIGKILL\"",
+                description: 'Signal to kill child process, "SIGTERM" or "SIGKILL"',
                 name: "killSignal",
                 type: (input: string) => {
                     if (input === "SIGTERM" || input === "SIGKILL") {

@@ -121,12 +121,7 @@ describe("hot-path micro patterns", () => {
     const devDeps = makeDeps("dev", 120);
     const peerDeps = makeDeps("peer", 40);
     const optDeps = makeDeps("opt", 20);
-    const declaredSet = new Set<string>([
-        ...Object.keys(deps),
-        ...Object.keys(devDeps),
-        ...Object.keys(peerDeps),
-        ...Object.keys(optDeps),
-    ]);
+    const declaredSet = new Set<string>([...Object.keys(deps), ...Object.keys(devDeps), ...Object.keys(peerDeps), ...Object.keys(optDeps)]);
     const name = "peer-pkg-39";
 
     bench("declared BEFORE: 4x Object.keys().includes", () => {

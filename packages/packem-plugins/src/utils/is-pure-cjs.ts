@@ -40,8 +40,7 @@ export const isPureCJS = async (
     }
 
     // ignore Node.js built-in modules, as their performance is comparable
-    if (id.startsWith("node:"))
-        return false;
+    if (id.startsWith("node:")) return false;
 
     // Check if it's a .cjs file
     if (id.endsWith(".cjs")) {

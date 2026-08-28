@@ -174,13 +174,13 @@ interface Export {
 }
 
 /** Oxc AST declaration node types that the plugin handles. */
-type Declaration
-    = | import("oxc-parser").Class
-        | import("oxc-parser").Function
-        | import("oxc-parser").TSEnumDeclaration
-        | import("oxc-parser").TSInterfaceDeclaration
-        | import("oxc-parser").TSTypeAliasDeclaration
-        | import("oxc-parser").VariableDeclaration;
+type Declaration =
+    | import("oxc-parser").Class
+    | import("oxc-parser").Function
+    | import("oxc-parser").TSEnumDeclaration
+    | import("oxc-parser").TSInterfaceDeclaration
+    | import("oxc-parser").TSTypeAliasDeclaration
+    | import("oxc-parser").VariableDeclaration;
 
 /**
  * Prepares a declaration node by extracting its name and span, and adds it to the declarations map.
@@ -391,8 +391,8 @@ const handleDefaultCJSExportAsDefault = (code: string, parsedExportsInfo: Parsed
 
     if (defaultImport) {
         // Logic for when defaultImport IS present
-        const replacementCode
-            = exportList.length === 0
+        const replacementCode =
+            exportList.length === 0
                 ? `export = ${defaultImport.defaultImport ?? ""};`
                 : `// @ts-ignore\nexport = ${defaultImport.defaultImport ?? ""};\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier ?? ""}'`;
 
@@ -491,7 +491,7 @@ const handleDefaultNamedCJSExport = (
     const importStatement = `import { ${defaultAlias} } from '${defaultExport.specifier ?? ""}';\n`;
     let modifiedCode = code;
 
-    const lastExistingImportEnd = originalStaticImports.length > 0 ? originalStaticImports.at(-1)?.end ?? 0 : 0;
+    const lastExistingImportEnd = originalStaticImports.length > 0 ? (originalStaticImports.at(-1)?.end ?? 0) : 0;
 
     const ms = new MagicString(modifiedCode);
 
@@ -682,11 +682,11 @@ const fixDtsDefaultCJSExports = (
                 // eslint-disable-next-line no-secrets/no-secrets
                 // If handleDefaultNamedCJSExport warned and returned undefined because the specific named import was missing,
                 // we should honor that and not proceed to the general noSpecifier fallback.
-                const wasSpecificNamedExportWarning
-                    = defaultImport // An import for the module existed
-                        && parsedExports.defaultExport.specifier // It was a re-export
-                        && defaultAlias !== "default" // It was a named alias to default
-                        && defaultImport.namedImports?.[defaultAlias] !== defaultAlias; // And the specific alias wasn't found in the import
+                const wasSpecificNamedExportWarning =
+                    defaultImport // An import for the module existed
+                    && parsedExports.defaultExport.specifier // It was a re-export
+                    && defaultAlias !== "default" // It was a named alias to default
+                    && defaultImport.namedImports?.[defaultAlias] !== defaultAlias; // And the specific alias wasn't found in the import
 
                 if (resultString === undefined && wasSpecificNamedExportWarning) {
                     // Do nothing here. resultString is already undefined, and we want to propagate that.

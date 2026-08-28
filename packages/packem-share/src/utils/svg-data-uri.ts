@@ -84,9 +84,7 @@ export const svgToTinyDataUri = (svgString: string): string => {
  * @returns CSS-optimized SVG data URI with charset specification
  */
 export const svgToCssDataUri = (svgString: string): string => {
-    const cleanSvg = stripSvgComments(svgString)
-        .replaceAll(/\s+/g, " ")
-        .trim();
+    const cleanSvg = stripSvgComments(svgString).replaceAll(/\s+/g, " ").trim();
 
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(cleanSvg)}`;
 };

@@ -50,14 +50,20 @@ export const getRolldownBuild = async (): Promise<RolldownBuild> => {
     // Literal-string imports keep packem's own bundler (rollup-plugin-dynamic-import-vars)
     // happy when self-building.
     // @ts-ignore optional peer dependency
-    const fromNode = await tryImport(() => import("@rolldown/node"), (m) => pickFunction(m.rolldown));
+    const fromNode = await tryImport(
+        () => import("@rolldown/node"),
+        (m) => pickFunction(m.rolldown),
+    );
 
     if (fromNode) {
         return fromNode;
     }
 
     // @ts-ignore optional peer dependency
-    const fromCore = await tryImport(() => import("rolldown"), (m) => pickFunction(m.rolldown));
+    const fromCore = await tryImport(
+        () => import("rolldown"),
+        (m) => pickFunction(m.rolldown),
+    );
 
     if (fromCore) {
         return fromCore;
@@ -73,14 +79,20 @@ export const getRolldownBuild = async (): Promise<RolldownBuild> => {
  */
 export const getRolldownWatch = async (): Promise<RolldownWatch> => {
     // @ts-ignore optional peer dependency
-    const fromNode = await tryImport(() => import("@rolldown/node"), (m) => pickFunction(m.watch));
+    const fromNode = await tryImport(
+        () => import("@rolldown/node"),
+        (m) => pickFunction(m.watch),
+    );
 
     if (fromNode) {
         return fromNode;
     }
 
     // @ts-ignore optional peer dependency
-    const fromCore = await tryImport(() => import("rolldown"), (m) => pickFunction(m.watch));
+    const fromCore = await tryImport(
+        () => import("rolldown"),
+        (m) => pickFunction(m.watch),
+    );
 
     if (fromCore) {
         return fromCore;

@@ -190,40 +190,40 @@ const createSplitChunks = (
         // skip the whole-graph walk and per-submodule `getModuleInfo` scan — by far
         // the bulk of the remaining cost — for layerless entries (the common case).
         if (isEntry && moduleLayer) {
-            const subModuleIds: Iterable<string>
+            const subModuleIds: Iterable<string> =
                 // Rollup exposes `getModuleIds()` returning every module in the build.
                 // Rolldown's `manualChunks` context only exposes `getModuleInfo`, so we
                 // fall back to a graph walk from the entry via `importedIds`.
-                = typeof (context as { getModuleIds?: () => Iterable<string> }).getModuleIds === "function"
+                typeof (context as { getModuleIds?: () => Iterable<string> }).getModuleIds === "function"
                     ? (context as { getModuleIds: () => Iterable<string> }).getModuleIds()
                     : (() => {
-                        const visited = new Set<string>();
-                        const stack: string[] = [id];
+                          const visited = new Set<string>();
+                          const stack: string[] = [id];
 
-                        while (stack.length > 0) {
-                            const current = stack.pop() as string;
+                          while (stack.length > 0) {
+                              const current = stack.pop() as string;
 
-                            if (visited.has(current)) {
-                                continue;
-                            }
+                              if (visited.has(current)) {
+                                  continue;
+                              }
 
-                            visited.add(current);
+                              visited.add(current);
 
-                            const info = context.getModuleInfo(current);
+                              const info = context.getModuleInfo(current);
 
-                            if (!info) {
-                                continue;
-                            }
+                              if (!info) {
+                                  continue;
+                              }
 
-                            for (const next of info.importedIds) {
-                                if (!visited.has(next)) {
-                                    stack.push(next);
-                                }
-                            }
-                        }
+                              for (const next of info.importedIds) {
+                                  if (!visited.has(next)) {
+                                      stack.push(next);
+                                  }
+                              }
+                          }
 
-                        return visited;
-                    })();
+                          return visited;
+                      })();
 
             for (const subId of subModuleIds) {
                 const subModuleInfo = context.getModuleInfo(subId);
@@ -274,7 +274,7 @@ const createSplitChunks = (
         // If current module has a layer, and it's not an entry
         if (
             moduleLayer
-            && !isEntry // If the module is imported by the entry:
+            && !isEntry  // If the module is imported by the entry:
             // when the module layer is same as entry layer, keep it as part of entry and don't split it;
             // when the module layer is different from entry layer, split the module into a separate chunk as a separate boundary.
             && dependencyGraphMap.has(id)

@@ -12,3 +12,6 @@ node_modules
 **/jsconfig.json
 
 pnpm-lock.yaml
+# pnpm rewrites this file itself (catalog bumps, `pnpm update`), with its own
+# two-space list indentation. Formatting it here only makes the next install drift.
+pnpm-workspace.yaml

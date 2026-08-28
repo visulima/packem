@@ -48,7 +48,12 @@ const getImportedModule = async function (context: PluginContext, source: string
     return importedModule;
 };
 
-const gatherBarrelReExports = async function* (context: PluginContext, reexported: BarrelReExport, module_: ModuleInfo, state: GatherState): AsyncGenerator<ExportInfo> {
+const gatherBarrelReExports = async function* (
+    context: PluginContext,
+    reexported: BarrelReExport,
+    module_: ModuleInfo,
+    state: GatherState,
+): AsyncGenerator<ExportInfo> {
     const importedModule = await getImportedModule(context, reexported.source, module_);
 
     if (!importedModule) {
@@ -59,7 +64,12 @@ const gatherBarrelReExports = async function* (context: PluginContext, reexporte
     yield* gatherExportsWithState(context, importedModule, state);
 };
 
-const gatherNamedReExports = async function* (context: PluginContext, reexported: NamedReExport, module_: ModuleInfo, state: GatherState): AsyncGenerator<ExportInfo> {
+const gatherNamedReExports = async function* (
+    context: PluginContext,
+    reexported: NamedReExport,
+    module_: ModuleInfo,
+    state: GatherState,
+): AsyncGenerator<ExportInfo> {
     const importedModule = await getImportedModule(context, reexported.source, module_);
 
     if (!importedModule) {

@@ -78,18 +78,15 @@ const collectProjectGraph = (rootTsconfigPath: string, fsSystem: ts.System, forc
     while (true) {
         const tsconfigPath = stack.pop();
 
-        if (!tsconfigPath)
-            break;
+        if (!tsconfigPath) break;
 
-        if (seen.has(tsconfigPath))
-            continue;
+        if (seen.has(tsconfigPath)) continue;
 
         seen.add(tsconfigPath);
 
         const parsedConfig = parseTsconfig(tsconfigPath, fsSystem);
 
-        if (!parsedConfig)
-            continue;
+        if (!parsedConfig) continue;
 
         parsedConfig.options = patchCompilerOptions(parsedConfig.options, {
             force,
@@ -181,9 +178,14 @@ const patchCompilerOptions = (
 // flag, otherwise tsc emits `.d.ts` but not `.d.ts.map` and the final sourcemap
 // chains back to the intermediate `.d.ts` instead of the original `.ts`
 // (sxzz/rolldown-plugin-dts#255).
-const createProgramFactory = (sourcemap: boolean): ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram> =>
+const createProgramFactory =
+    (sourcemap: boolean): ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram> =>
     (rootNames, options, ...arguments_) =>
-        ts.createEmitAndSemanticDiagnosticsBuilderProgram(rootNames, patchCompilerOptions(options ?? {}, { force: true, sourcemap, tsconfigPath: "" }), ...arguments_);
+        ts.createEmitAndSemanticDiagnosticsBuilderProgram(
+            rootNames,
+            patchCompilerOptions(options ?? {}, { force: true, sourcemap, tsconfigPath: "" }),
+            ...arguments_,
+        );
 
 // Emit file using `tsc --build` mode.
 const tscEmitBuild = (tscOptions: TscOptions): TscResult => {

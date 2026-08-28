@@ -56,9 +56,8 @@ const buildWithRollup = async (
     subDirectory: string,
     rollupOptions: RollupOptions,
 ): Promise<void> => {
-    const hasCachedDependencies
-        = dependencyValidationEnabled(context)
-            && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
+    const hasCachedDependencies =
+        dependencyValidationEnabled(context) && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
 
     const loadCache = !dependencyValidationEnabled(context) || hasCachedDependencies;
 
@@ -114,9 +113,8 @@ const buildWithRolldown = async (
     // BUNDLE_CACHE_KEY the way the rollup path does. The dependencies cache,
     // however, is populated by our own plugins and feeds dependency
     // validation — so it must stay in sync regardless of bundler.
-    const hasCachedDependencies
-        = dependencyValidationEnabled(context)
-            && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
+    const hasCachedDependencies =
+        dependencyValidationEnabled(context) && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
 
     if (hasCachedDependencies) {
         loadDependenciesCache(context, fileCache, subDirectory);

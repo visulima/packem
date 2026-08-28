@@ -56,7 +56,7 @@ const createTsProgramFromParsedConfig = ({
         // entry that no `.ts` file imports. Only relevant when a language plugin
         // (Vue/ts-macro) registers such extensions; module resolution already handles the
         // imported-file case. See sxzz/rolldown-plugin-dts#272.
-        ...vue || tsMacro ? { allowNonTsExtensions: true } : undefined,
+        ...(vue || tsMacro ? { allowNonTsExtensions: true } : undefined),
     };
 
     // Root the program at only this module. TypeScript still pulls in everything `id`

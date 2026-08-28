@@ -187,7 +187,9 @@ const __cjs_getBuiltinModule = (module) => {
             ["const __cjs_getProcess", /const\s+__cjs_getProcess\s*=/g],
             ["const __cjs_getBuiltinModule", /const\s+__cjs_getBuiltinModule\s*=/g],
             ["createRequire import", /import\s*\{\s*createRequire/g],
-        ].filter(([, pattern]) => [...result.code.matchAll(pattern as RegExp)].length > 1).map(([name]) => name);
+        ]
+            .filter(([, pattern]) => [...result.code.matchAll(pattern as RegExp)].length > 1)
+            .map(([name]) => name);
 
         expect(duplicated).toStrictEqual([]);
     });

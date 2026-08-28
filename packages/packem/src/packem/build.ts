@@ -82,23 +82,23 @@ const buildSizeSummary = (entry: SizeEntry, totalBytes: number, chunkBytes: numb
             }),
         )}`,
         entry.size?.brotli
-        && `brotli size: ${cyan(
-            formatBytes(entry.size.brotli, {
-                decimals: 2,
-            }),
-        )}`,
+            && `brotli size: ${cyan(
+                formatBytes(entry.size.brotli, {
+                    decimals: 2,
+                }),
+            )}`,
         entry.size?.gzip
-        && `gzip size: ${cyan(
-            formatBytes(entry.size.gzip, {
-                decimals: 2,
-            }),
-        )}`,
+            && `gzip size: ${cyan(
+                formatBytes(entry.size.gzip, {
+                    decimals: 2,
+                }),
+            )}`,
         chunkBytes !== 0
-        && `chunk size: ${cyan(
-            formatBytes(chunkBytes, {
-                decimals: 2,
-            }),
-        )}`,
+            && `chunk size: ${cyan(
+                formatBytes(chunkBytes, {
+                    decimals: 2,
+                }),
+            )}`,
     ]
         .filter(Boolean)
         .join(", ");
@@ -215,8 +215,8 @@ const buildEntryLine = (entry: SizeEntry, context: BuildContext<InternalBuildOpt
                     `  └─ ${rPath(p)}${bold(
                         matchedChunkBytes
                             ? ` (${formatBytes(matchedChunkBytes, {
-                                decimals: 2,
-                            })})`
+                                  decimals: 2,
+                              })})`
                             : "",
                     )}`,
                 );
@@ -238,8 +238,8 @@ const buildEntryLine = (entry: SizeEntry, context: BuildContext<InternalBuildOpt
                     `  📦 ${rPath(m.id)}${bold(
                         m.bytes
                             ? ` (${formatBytes(m.bytes, {
-                                decimals: 2,
-                            })})`
+                                  decimals: 2,
+                              })})`
                             : "",
                     )}`,
                 ),
@@ -523,9 +523,9 @@ const prepareRollupConfig = async (
                             ...context.options.rollup,
                             replace: context.options.rollup.replace
                                 ? {
-                                    ...context.options.rollup.replace,
-                                    values: {},
-                                }
+                                      ...context.options.rollup.replace,
+                                      values: {},
+                                  }
                                 : context.options.rollup.replace,
                         },
                     },
@@ -595,7 +595,7 @@ const prepareRollupConfig = async (
                 // but packem only ever produces string substitutions here
                 // (`createReplaceValues` returns `Record<string, string>` and the
                 // documented replace usage is string-only), so narrow accordingly.
-                const replaceValues = (replaceOptions ? replaceOptions.values ?? defaultReplaceValues : defaultReplaceValues) as Record<string, string>;
+                const replaceValues = (replaceOptions ? (replaceOptions.values ?? defaultReplaceValues) : defaultReplaceValues) as Record<string, string>;
 
                 const subDirectory = createSubDirectory(environment, runtime);
                 // Note: fileAlias is handled separately in prepareEntries, not in subDirectory
@@ -822,7 +822,8 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     if (builders.size > 0) {
         await Promise.all(
             Array.from(builders, async ({ context: bContext, fileCache: cache, subDirectory }) =>
-                bundlerBuild(bContext, cache, subDirectory, resolveBundlerName(bContext.options.bundler))),
+                bundlerBuild(bContext, cache, subDirectory, resolveBundlerName(bContext.options.bundler)),
+            ),
         );
     }
 

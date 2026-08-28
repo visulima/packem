@@ -78,9 +78,10 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
      * call pure so consumers can drop it silently loses that, and Rollup keeps the call as a side
      * effect. `renderChunk` minifies the finished chunk regardless, so the output is unchanged.
      */
-    const transformOptions = Object.fromEntries(
-        Object.entries(esbuildOptions).filter(([key]) => !MINIFY_OPTION_KEYS.has(key)),
-    ) as Omit<typeof esbuildOptions, "minify" | "minifyIdentifiers" | "minifySyntax" | "minifyWhitespace">;
+    const transformOptions = Object.fromEntries(Object.entries(esbuildOptions).filter(([key]) => !MINIFY_OPTION_KEYS.has(key))) as Omit<
+        typeof esbuildOptions,
+        "minify" | "minifyIdentifiers" | "minifySyntax" | "minifyWhitespace"
+    >;
 
     return {
         async buildStart() {

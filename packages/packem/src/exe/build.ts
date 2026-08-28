@@ -164,8 +164,8 @@ const buildSingleExe = async (
                 throwOnError: true,
             });
         } catch {
-            const signHint
-                = processPlatform === "darwin"
+            const signHint =
+                processPlatform === "darwin"
                     ? `You can sign it manually using:\n  codesign --sign - "${outputPath}"`
                     : `Automatic code signing is not supported on ${processPlatform}.`;
 

@@ -208,8 +208,8 @@ const buildMergedWatchOptions = (context: BuildContext<InternalBuildOptions>, cu
 const configureWatchOptions = (context: BuildContext<InternalBuildOptions>, currentWatch: WatchOptions): WatchOptions => {
     const userWatch: WatchOptions = context.options.rollup.watch;
 
-    const result: WatchOptions
-        = !userWatch || typeof currentWatch !== "object" || currentWatch.include !== undefined
+    const result: WatchOptions =
+        !userWatch || typeof currentWatch !== "object" || currentWatch.include !== undefined
             ? currentWatch
             : buildMergedWatchOptions(context, currentWatch, userWatch);
 
@@ -236,7 +236,7 @@ const configureRolldownWatchOptions = (context: BuildContext<InternalBuildOption
         }
 
         if (userWatch.exclude !== undefined) {
-            exclude.push(...Array.isArray(userWatch.exclude) ? userWatch.exclude : [userWatch.exclude]);
+            exclude.push(...(Array.isArray(userWatch.exclude) ? userWatch.exclude : [userWatch.exclude]));
         }
     }
 

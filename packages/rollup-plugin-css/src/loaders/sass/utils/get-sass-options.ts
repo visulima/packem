@@ -110,7 +110,7 @@ const getSassOptions = async (
         ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map((includePath) =>
             normalizeIncludePath(includePath),
         ),
-        ...process.env.SASS_PATH ? process.env.SASS_PATH.split(separator) : [],
+        ...(process.env.SASS_PATH ? process.env.SASS_PATH.split(separator) : []),
     ];
 
     if ((sassOptions as StringOptions<"async">).importers) {

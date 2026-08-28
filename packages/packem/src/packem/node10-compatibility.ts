@@ -83,7 +83,7 @@ export const node10Compatibility = async (
         for (const exportKey of entry.exportKey) {
             typesVersions[exportKey] = exportKey.includes("/*")
                 ? [`./${join(outDirectory, dirname(name), "*.d.ts")}`]
-                : [...typesVersions[exportKey] ?? [], `./${join(outDirectory, `${name}.d.ts`)}`];
+                : [...(typesVersions[exportKey] ?? []), `./${join(outDirectory, `${name}.d.ts`)}`];
         }
     }
 

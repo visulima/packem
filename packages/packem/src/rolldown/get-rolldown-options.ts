@@ -352,23 +352,23 @@ export const getRolldownDtsOptions = async (context: BuildContext<InternalBuildO
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, getLogger(context), context.tsconfig), fileCache),
             context.tsconfig
-            && context.options.rollup.tsconfigPaths
-            && cachingPlugin(
-                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, getLogger(context), context.options.rollup.tsconfigPaths),
-                fileCache,
-            ),
+                && context.options.rollup.tsconfigPaths
+                && cachingPlugin(
+                    resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, getLogger(context), context.options.rollup.tsconfigPaths),
+                    fileCache,
+                ),
 
             resolveImplicitExternalsPlugin(context),
 
             context.options.rollup.replace
-            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap }) as RollupReplaceOptions),
+                && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap }) as RollupReplaceOptions),
 
             context.options.rollup.alias
-            && aliasPlugin({
-                customResolver: nodeResolver as AliasResolverObject,
-                ...context.options.rollup.alias,
-                entries: resolvedAliases,
-            }),
+                && aliasPlugin({
+                    customResolver: nodeResolver as AliasResolverObject,
+                    ...context.options.rollup.alias,
+                    entries: resolvedAliases,
+                }),
 
             ...prePlugins,
 
@@ -376,16 +376,16 @@ export const getRolldownDtsOptions = async (context: BuildContext<InternalBuildO
 
             ...normalPlugins,
 
-            ...await memoizeDtsPluginByKey(uniqueProcessId)(context, dtsResolve),
+            ...(await memoizeDtsPluginByKey(uniqueProcessId)(context, dtsResolve)),
 
             context.options.emitCJS && fixDtsDefaultCjsExportsPlugin(),
 
             context.options.cjsInterop
-            && context.options.emitCJS
-            && cjsInteropPlugin({
-                ...context.options.rollup.cjsInterop,
-                logger: getLogger(context),
-            }),
+                && context.options.emitCJS
+                && cjsInteropPlugin({
+                    ...context.options.rollup.cjsInterop,
+                    logger: getLogger(context),
+                }),
 
             context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, getLogger(context)), fileCache),
 
@@ -394,16 +394,16 @@ export const getRolldownDtsOptions = async (context: BuildContext<InternalBuildO
             ...postPlugins,
 
             context.options.rollup.license !== false
-            && context.options.rollup.license?.path
-            && typeof context.options.rollup.license.dtsTemplate === "function"
-            && licensePlugin({
-                licenseFilePath: context.options.rollup.license.path,
-                licenseTemplate: context.options.rollup.license.dtsTemplate,
-                logger: getLogger(context),
-                marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
-                mode: "types",
-                packageName: context.pkg.name,
-            }),
+                && context.options.rollup.license?.path
+                && typeof context.options.rollup.license.dtsTemplate === "function"
+                && licensePlugin({
+                    licenseFilePath: context.options.rollup.license.path,
+                    licenseTemplate: context.options.rollup.license.dtsTemplate,
+                    logger: getLogger(context),
+                    marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
+                    mode: "types",
+                    packageName: context.pkg.name,
+                }),
 
             // Rolldown-CJS-compat: rolldown infers `.cjs`/`.mjs` module types by extension
             // and fails with PARSE_ERROR when the DTS plugin's transform emits `export {}`

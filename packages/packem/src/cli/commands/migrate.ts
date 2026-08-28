@@ -330,8 +330,8 @@ const migrate = async ({ cwd, dryRun, logger }: { cwd?: string; dryRun?: boolean
 
         logger.warn(
             `\n\n`
-            + `Before proceeding, review the migration guide at https://www.visulima.com/docs/package/packem, as this process will modify your files.\n`
-            + `Uncommitted changes will be lost. Use the --dry-run flag to preview changes without applying them.`,
+                + `Before proceeding, review the migration guide at https://www.visulima.com/docs/package/packem, as this process will modify your files.\n`
+                + `Uncommitted changes will be lost. Use the --dry-run flag to preview changes without applying them.`,
         );
         const input = await rl.question(`Continue? (Y/n) `);
 

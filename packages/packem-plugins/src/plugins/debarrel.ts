@@ -183,11 +183,7 @@ const getImportNames = (specifiers: string): ImportName[] => {
     return names;
 };
 
-const findMatchingImport = (
-    exp: ExportSpecifier,
-    imports: ImportSpecifier[],
-    code: string,
-): { imp: ImportSpecifier | undefined; localExportName?: string } => {
+const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], code: string): { imp: ImportSpecifier | undefined; localExportName?: string } => {
     let localExportName = exp.ln;
 
     let imp = imports.find((index: ImportSpecifier) => index.ss < exp.s && index.se > exp.e && index.d === -1);

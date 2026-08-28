@@ -68,7 +68,7 @@ class TailwindRoot {
         const requiresBuildPromise = this.requiresBuild();
         const inputBase = dirname(pathResolve(inputPath));
 
-        if (!this.compiler || !this.scanner || await requiresBuildPromise) {
+        if (!this.compiler || !this.scanner || (await requiresBuildPromise)) {
             clearRequireCache([...this.buildDependencies.keys()]);
 
             this.buildDependencies.clear();

@@ -26,7 +26,6 @@ export type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | u
 export type Generator = "oxc" | "tsc" | "tsgo";
 
 export interface Logger {
-
     error: (...args: any[]) => void;
 
     info: (...args: any[]) => void;
@@ -390,7 +389,7 @@ const readTsconfigFile = (p: string): string | undefined => {
             // The classic compiler's `ts.sys.readFile` strips a leading UTF-8 BOM before
             // handing the text to `ts.readConfigFile`; `readFileSync` does not. Strip it here
             // so a BOM-prefixed tsconfig parses identically under both compilers.
-            return content.codePointAt(0) === 0xFE_FF ? content.slice(1) : content;
+            return content.codePointAt(0) === 0xfe_ff ? content.slice(1) : content;
         } catch {
             return undefined;
         }
@@ -570,7 +569,10 @@ const normalizeTsgo = (tsgoOption: boolean | TsgoOptions): false | { path?: stri
  * Whether the user asked for oxc, either explicitly or implicitly via `isolatedDeclarations`.
  * This is about *intent* — the generator that actually runs is decided by {@link resolveGenerator}.
  */
-const isOxcRequested = (oxcOption: boolean | Omit<IsolatedDeclarationsOptions, "sourcemap"> | undefined, compilerOptions: TsConfigJson.CompilerOptions): boolean => {
+const isOxcRequested = (
+    oxcOption: boolean | Omit<IsolatedDeclarationsOptions, "sourcemap"> | undefined,
+    compilerOptions: TsConfigJson.CompilerOptions,
+): boolean => {
     if (oxcOption === false) {
         return false;
     }
@@ -701,11 +703,11 @@ export const resolveOptions = ({
     // TypeScript's parser and `@visulima/tsconfig` auto-add `incremental: true`
     // whenever `composite: true` is set, which would otherwise force every
     // composite project into disk mode and leave `.tsbuildinfo` files behind.
-    const incremental
-        = incrementalOption
-            || pluginCompilerOptions.incremental === true
-            || typeof pluginCompilerOptions.tsBuildInfoFile === "string"
-            || (typeof tsconfig === "string" && hasExplicitIncrementalInTsconfig(tsconfig));
+    const incremental =
+        incrementalOption
+        || pluginCompilerOptions.incremental === true
+        || typeof pluginCompilerOptions.tsBuildInfoFile === "string"
+        || (typeof tsconfig === "string" && hasExplicitIncrementalInTsconfig(tsconfig));
     const sourcemap = sourcemapOption ?? Boolean(compilerOptions.declarationMap);
 
     compilerOptions.declarationMap = sourcemap;

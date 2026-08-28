@@ -55,7 +55,7 @@ describe("babel transform-code", () => {
         expect(result?.code).toContain("const x");
     });
 
-    it("drops the react-compiler plugin in annotation mode when the file has no \"use memo\"", async () => {
+    it('drops the react-compiler plugin in annotation mode when the file has no "use memo"', async () => {
         expect.assertions(1);
 
         // babel-plugin-react-compiler is not installed; referencing it by name forces

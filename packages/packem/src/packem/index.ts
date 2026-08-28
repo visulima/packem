@@ -272,14 +272,14 @@ const generateOptions = (
                     jsxRuntime === "preserve"
                         ? "preserve"
                         : {
-                            development: environment !== "production",
-                            pragma: tsconfig?.config.compilerOptions?.jsxFactory,
-                            pragmaFrag: extras(tsconfig?.config.compilerOptions).jsxFragmentFactory,
-                            pure: true,
-                            runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
-                            useBuiltIns: true,
-                            useSpread: true,
-                        },
+                              development: environment !== "production",
+                              pragma: tsconfig?.config.compilerOptions?.jsxFactory,
+                              pragmaFrag: extras(tsconfig?.config.compilerOptions).jsxFragmentFactory,
+                              pure: true,
+                              runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
+                              useBuiltIns: true,
+                              useSpread: true,
+                          },
             },
             patchTypes: {},
             polyfillNode: {},
@@ -339,13 +339,7 @@ const generateOptions = (
                 // their Node/SSR builds, diverging from the established behavior and
                 // bloating output. Node builtins are handled by the externals plugin
                 // (`builtinModules: false`), not by a `"node"` condition.
-                conditionNames: [
-                    environment ?? "production",
-                    "module-sync",
-                    "import",
-                    "require",
-                    "default",
-                ],
+                conditionNames: [environment ?? "production", "module-sync", "import", "require", "default"],
                 // NO `extensionAlias` here. The `.js`→`.ts`/`.tsx` (and `.mjs`→`.mts`,
                 // `.cjs`→`.cts`) rewriting is handled by the dedicated
                 // `resolveTypescriptMjsCts` plugin, which is context-aware: it tries TS
@@ -393,17 +387,17 @@ const generateOptions = (
                 production: environment === PRODUCTION_ENV,
                 // Sucrase feeds rollup, which requires ESM input. The "imports" transform
                 // rewrites ESM to CJS require() and breaks rollup's static module graph.
-                ...tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx as string)
+                ...(tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx as string)
                     ? {
-                        jsxFragmentPragma: extras(tsconfig.config.compilerOptions).jsxFragmentFactory,
-                        jsxImportSource: extras(tsconfig.config.compilerOptions).jsxImportSource,
-                        jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
-                        jsxRuntime,
-                        transforms: ["typescript", "jsx"],
-                    }
+                          jsxFragmentPragma: extras(tsconfig.config.compilerOptions).jsxFragmentFactory,
+                          jsxImportSource: extras(tsconfig.config.compilerOptions).jsxImportSource,
+                          jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
+                          jsxRuntime,
+                          transforms: ["typescript", "jsx"],
+                      }
                     : {
-                        transforms: ["typescript"],
-                    },
+                          transforms: ["typescript"],
+                      }),
             },
             swc: {
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
@@ -570,8 +564,8 @@ const generateOptions = (
     // than silently ignoring the option.
     if (isRolldown && buildConfig.transformer !== undefined) {
         throw new Error(
-            "The `transformer` option is not supported when `bundler: \"rolldown\"`. "
-            + "Rolldown uses its own oxc-based transform — remove `transformer` from your packem config.",
+            'The `transformer` option is not supported when `bundler: "rolldown"`. '
+                + "Rolldown uses its own oxc-based transform — remove `transformer` from your packem config.",
         );
     }
 
@@ -892,8 +886,8 @@ const packem = async (
     let onSuccessCleanup: (() => any) | undefined | void;
     let signalHandler: (() => void) | undefined;
 
-    const cacheKey
-        = getCacheHash(
+    const cacheKey =
+        getCacheHash(
             JSON.stringify({
                 packemVersion,
                 version: packageJson.version,
@@ -1007,13 +1001,13 @@ const packem = async (
 
                 // Capture the spawned process locally to avoid race conditions with cleanup
                 // eslint-disable-next-line no-multi-assign
-                const executedProcess = onSuccessProcess = exec(context.options.onSuccess, [], {
+                const executedProcess = (onSuccessProcess = exec(context.options.onSuccess, [], {
                     nodeOptions: {
                         shell: true,
                         stdio: "inherit",
                         timeout,
                     },
-                });
+                }));
 
                 await executedProcess;
 

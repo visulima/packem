@@ -128,9 +128,9 @@ export const cjsInteropPlugin = ({
             options: NormalizedOutputOptions,
         ):
             | {
-                code: string;
-                map: SourceMapInput;
-            }
+                  code: string;
+                  map: SourceMapInput;
+              }
             | undefined {
             if (!chunk.isEntry) {
                 return undefined;

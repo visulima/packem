@@ -33,7 +33,7 @@ describe("packem exe (SEA)", () => {
 
         skip(SEA_SUPPORTED, "Skipping negative test on a SEA-supported runtime");
 
-        writeFileSync(`${temporaryDirectoryPath}/src/cli.ts`, "console.log(\"hello from packem exe\");\n");
+        writeFileSync(`${temporaryDirectoryPath}/src/cli.ts`, 'console.log("hello from packem exe");\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -57,7 +57,7 @@ describe("packem exe (SEA)", () => {
         async () => {
             expect.assertions(3);
 
-            writeFileSync(`${temporaryDirectoryPath}/src/cli.ts`, "console.log(\"hello from packem exe\");\n");
+            writeFileSync(`${temporaryDirectoryPath}/src/cli.ts`, 'console.log("hello from packem exe");\n');
 
             await installPackage(temporaryDirectoryPath, "typescript");
 

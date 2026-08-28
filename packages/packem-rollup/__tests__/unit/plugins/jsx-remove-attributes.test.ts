@@ -27,11 +27,7 @@ type RenderChunkContext = {
     warn: (warning: { code: string; message: string }) => void;
 };
 
-const callRenderChunk = (
-    plugin: ReturnType<typeof jsxRemoveAttributes>,
-    code: string,
-    context_?: Partial<RenderChunkContext>,
-) => {
+const callRenderChunk = (plugin: ReturnType<typeof jsxRemoveAttributes>, code: string, context_?: Partial<RenderChunkContext>) => {
     const { renderChunk } = plugin;
     const handler = (typeof renderChunk === "function" ? renderChunk : renderChunk?.handler) as
         | ((this: RenderChunkContext, code: string, chunk: { fileName: string }, options: { sourcemap: boolean }) => { code: string; map: unknown } | undefined)
@@ -69,7 +65,7 @@ describe("jsxRemoveAttributes", () => {
         const result = callTransform(plugin, code, "/path/file.tsx");
 
         expect(result?.code).not.toContain("data-test");
-        expect(result?.code).toContain("\"id\": \"real\"");
+        expect(result?.code).toContain('"id": "real"');
     });
 
     it("should remove multiple matched attributes", () => {

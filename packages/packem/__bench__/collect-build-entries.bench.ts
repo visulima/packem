@@ -35,8 +35,7 @@ const makeOutput = (entryCount: number, importsPerEntry: number): BuildOutputIte
     return output;
 };
 
-const makeContext = (): BuildContext<InternalBuildOptions> =>
-    ({ buildEntries: [] } as unknown as BuildContext<InternalBuildOptions>);
+const makeContext = (): BuildContext<InternalBuildOptions> => ({ buildEntries: [] }) as unknown as BuildContext<InternalBuildOptions>;
 
 // Baseline: the previous O(imports x chunks) `.some()` implementation.
 const collectBuildEntriesBaseline = (

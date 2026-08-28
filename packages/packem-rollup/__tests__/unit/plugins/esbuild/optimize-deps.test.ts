@@ -273,7 +273,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
         expect(result).toBeUndefined();
     });
 
-    it("should emit `export * from \"<absolute>\"` contents for a module that has named exports", async () => {
+    it('should emit `export * from "<absolute>"` contents for a module that has named exports', async () => {
         expect.assertions(1);
 
         const { onLoad } = await captureInnerPluginHandlers({
@@ -290,10 +290,10 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: "/abs/react.js", resolveDir: "/virtual/src" },
         });
 
-        expect(result).toStrictEqual({ contents: "export * from \"/abs/react.js\"", resolveDir: "/virtual/src" });
+        expect(result).toStrictEqual({ contents: 'export * from "/abs/react.js"', resolveDir: "/virtual/src" });
     });
 
-    it("should emit `module.exports = require(\"<absolute>\")` for a module with no named exports", async () => {
+    it('should emit `module.exports = require("<absolute>")` for a module with no named exports', async () => {
         expect.assertions(1);
 
         const { onLoad } = await captureInnerPluginHandlers({
@@ -310,7 +310,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: "/abs/react.js", resolveDir: "/virtual/src" },
         });
 
-        expect(result).toStrictEqual({ contents: "module.exports = require(\"/abs/react.js\")", resolveDir: "/virtual/src" });
+        expect(result).toStrictEqual({ contents: 'module.exports = require("/abs/react.js")', resolveDir: "/virtual/src" });
     });
 
     it("should normalize Windows-style backslashes in the absolute path to forward slashes", async () => {
@@ -332,6 +332,6 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: String.raw`C:\abs\react.js`, resolveDir: String.raw`C:\tmp\src` },
         });
 
-        expect(result?.contents).toBe("export * from \"C:/abs/react.js\"");
+        expect(result?.contents).toBe('export * from "C:/abs/react.js"');
     });
 });

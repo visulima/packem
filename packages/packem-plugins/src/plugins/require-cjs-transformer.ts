@@ -78,7 +78,7 @@ const shouldTransformImport = async (
 
     const transformResult = await shouldTransform?.(source, cwd, resolveId);
 
-    return transformResult ?? await isPureCJS(source, cwd, resolveId);
+    return transformResult ?? (await isPureCJS(source, cwd, resolveId));
 };
 
 const generateRequireCode = (source: string, isBuiltin: boolean): { code: string; needsBuiltin: boolean; needsProcess: boolean; needsRequire: boolean } => {
@@ -266,7 +266,7 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                     const resolveId = this.resolve;
 
                     // eslint-disable-next-line no-await-in-loop -- sequential per-import classification is required; results feed subsequent state updates
-                    if (!await shouldTransformImport(source, isBuiltin, shouldTransform, cwd, resolveId)) {
+                    if (!(await shouldTransformImport(source, isBuiltin, shouldTransform, cwd, resolveId))) {
                         continue;
                     }
 

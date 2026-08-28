@@ -15,7 +15,19 @@ import { is } from "yuku-ast";
 import type { TSPropertySignature } from "yuku-parser";
 import { parse } from "yuku-parser";
 
-import { dtsEntryFileName, filenameToDts, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE, replaceTemplateName, resolveTemplateFunction } from "./filename";
+import {
+    dtsEntryFileName,
+    filenameToDts,
+    RE_DTS,
+    RE_DTS_MAP,
+    RE_JS,
+    RE_JSON,
+    RE_NODE_MODULES,
+    RE_TS,
+    RE_VUE,
+    replaceTemplateName,
+    resolveTemplateFunction,
+} from "./filename";
 import type { OptionsResolved } from "./options";
 import { createReexportSpecifierRewriter } from "./reexport-specifier";
 import type { TscContext } from "./tsc/context";
@@ -108,11 +120,11 @@ export const createGeneratePlugin = ({
     const entryIgnores = entry?.filter((p) => p[0] === "!").map((p) => p.slice(1));
     const entryMatcher = entry
         ? (file: string): boolean => {
-            const normalized = file.split(path.sep).join("/");
+              const normalized = file.split(path.sep).join("/");
 
-            // eslint-disable-next-line n/no-unsupported-features/node-builtins -- path.posix.matchesGlob is available on all supported Node versions (>=22.22)
-            return entryIncludes!.some((p) => path.posix.matchesGlob(normalized, p)) && !entryIgnores!.some((p) => path.posix.matchesGlob(normalized, p));
-        }
+              // eslint-disable-next-line n/no-unsupported-features/node-builtins -- path.posix.matchesGlob is available on all supported Node versions (>=22.22)
+              return entryIncludes!.some((p) => path.posix.matchesGlob(normalized, p)) && !entryIgnores!.some((p) => path.posix.matchesGlob(normalized, p));
+          }
         : undefined;
     const dtsMap: DtsMap = new Map<string, TsModule>();
 
@@ -261,8 +273,7 @@ export const createGeneratePlugin = ({
             for (const fileName of Object.keys(bundle)) {
                 const chunk = bundle[fileName];
 
-                if (!chunk)
-                    continue;
+                if (!chunk) continue;
 
                 // Strip names and sourcesContent from DTS sourcemap assets (works for both generate() and write())
                 if (chunk.type === "asset" && RE_DTS_MAP.test(fileName) && typeof chunk.source === "string") {
@@ -287,8 +298,7 @@ export const createGeneratePlugin = ({
                 },
             },
             async handler(dtsId) {
-                if (!dtsMap.has(dtsId))
-                    return;
+                if (!dtsMap.has(dtsId)) return;
 
                 const { code, id, jsFile } = dtsMap.get(dtsId)!;
                 let dtsCode: string | undefined;
@@ -309,8 +319,7 @@ export const createGeneratePlugin = ({
                 }
 
                 if (tsgo) {
-                    if (RE_VUE.test(id))
-                        throw new Error("tsgo does not support Vue files.");
+                    if (RE_VUE.test(id)) throw new Error("tsgo does not support Vue files.");
 
                     const dtsPath = path.resolve(tsgoDist!, path.relative(rootDir, filenameToDts(id)));
 
@@ -533,8 +542,7 @@ export { __json_default_export as default }`;
                 for (const extension of [".ts", ".tsx", ".mts", ".cts"]) {
                     const resolved = await this.resolve(id + extension, importer, { skipSelf: true });
 
-                    if (resolved)
-                        return resolved;
+                    if (resolved) return resolved;
                 }
             }
 
@@ -561,14 +569,11 @@ export { __json_default_export as default }`;
                 // \0rolldown/runtime.js, rollup convention \0...) must pass
                 // through untouched: emitDtsOnly's "export { }" replacement
                 // would strip their runtime exports and break linking.
-                if (id.startsWith("\0"))
-                    return;
+                if (id.startsWith("\0")) return;
 
-                if (RE_DTS.test(id) || RE_NODE_MODULES.test(id))
-                    return;
+                if (RE_DTS.test(id) || RE_NODE_MODULES.test(id)) return;
 
-                if (filter && !filter(id))
-                    return;
+                if (filter && !filter(id)) return;
 
                 const jsFile = RE_JS.test(id);
                 const shouldEmit = !jsFile || emitJs;
@@ -600,8 +605,7 @@ export { __json_default_export as default }`;
                 }
 
                 if (emitDtsOnly) {
-                    if (RE_JSON.test(id))
-                        return "{}";
+                    if (RE_JSON.test(id)) return "{}";
 
                     return "export { }";
                 }
@@ -672,8 +676,8 @@ const collectJsonExports = (code: string) => {
     const [firstStatement] = program.body;
     const declarator = firstStatement?.type === "VariableDeclaration" ? firstStatement.declarations[0] : undefined;
     const typeAnnotation = declarator?.id.type === "Identifier" ? declarator.id.typeAnnotation : undefined;
-    const typeLiteral
-        = typeAnnotation?.type === "TSTypeAnnotation" && typeAnnotation.typeAnnotation.type === "TSTypeLiteral" ? typeAnnotation.typeAnnotation : undefined;
+    const typeLiteral =
+        typeAnnotation?.type === "TSTypeAnnotation" && typeAnnotation.typeAnnotation.type === "TSTypeLiteral" ? typeAnnotation.typeAnnotation : undefined;
     const members = typeLiteral?.members as TSPropertySignature[] | undefined;
 
     if (!Array.isArray(members)) {

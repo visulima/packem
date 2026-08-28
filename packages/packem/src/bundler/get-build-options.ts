@@ -107,8 +107,8 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
     // is still gated by the same `css.loaders.length > 0` checks, so when those
     // terms are reached `cssPluginModule` is guaranteed defined (the `?.` only
     // exists to satisfy the type — it can never short-circuit on a reached term).
-    const cssPluginModule
-        = context.options.rollup.css && context.options.rollup.css.loaders && context.options.rollup.css.loaders.length > 0
+    const cssPluginModule =
+        context.options.rollup.css && context.options.rollup.css.loaders && context.options.rollup.css.loaders.length > 0
             ? await import("@visulima/rollup-plugin-css")
             : undefined;
 
@@ -117,24 +117,24 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
 
     const chunking = usePreserveModules
         ? {
-            preserveModules: true,
-            preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
-        }
+              preserveModules: true,
+              preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
+          }
         : {
-            // The chunk-per-export entry promotion (chunkSplitter) now runs under
-            // both backends, but the directive-based layer walk here is still
-            // gated to rollup: it keys off `getModuleLayer` meta that the
-            // preserve-directives transform only populates on the rollup module
-            // graph. Under rolldown that meta is absent, so `getModuleLayer`
-            // would find nothing to split on and the per-module importer-layer
-            // graph walk would be pure waste.
-            manualChunks: createSplitChunks(
-                context.dependencyGraphMap,
-                context.buildEntries,
-                !isRolldown && Boolean(context.options.rollup.preserveDirectives),
-            ),
-            preserveModules: false,
-        };
+              // The chunk-per-export entry promotion (chunkSplitter) now runs under
+              // both backends, but the directive-based layer walk here is still
+              // gated to rollup: it keys off `getModuleLayer` meta that the
+              // preserve-directives transform only populates on the rollup module
+              // graph. Under rolldown that meta is absent, so `getModuleLayer`
+              // would find nothing to split on and the per-module importer-layer
+              // graph walk would be pure waste.
+              manualChunks: createSplitChunks(
+                  context.dependencyGraphMap,
+                  context.buildEntries,
+                  !isRolldown && Boolean(context.options.rollup.preserveDirectives),
+              ),
+              preserveModules: false,
+          };
 
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "build");
 
@@ -154,78 +154,78 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
 
         output: [
             context.options.emitCJS
-            && <OutputOptions>{
-                // Governs names of CSS files (for assets from CSS use `hash` option for url handler).
-                // Note: using value below will put `.css` files near js,
-                // but make sure to adjust `hash`, `assetDir` and `publicPath`
-                // options for url handler accordingly.
-                assetFileNames: "[name]-[hash][extname]",
-                banner: jsBanner,
-                chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "cjs"), usePreserveModules),
-                compact: context.options.minify,
-                dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: createEntryFileNames((_chunk) => getOutputExtension(context, "cjs"), usePreserveModules),
-                esModule: useEsModuleMark ?? "if-default-prop",
-                exports: "auto",
-                extend: true,
-                // turn off live bindings support (exports.* getters for re-exports)
-                externalLiveBindings: false,
-                footer: jsFooter,
-                format: "cjs",
-                freeze: false,
-                generatedCode: {
-                    arrowFunctions: true,
-                    constBindings: true,
-                    objectShorthand: true,
-                    preset: context.tsconfig?.config.compilerOptions?.target === "es5" ? "es5" : "es2015",
-                    reservedNamesAsProps: true,
-                    symbols: true,
+                && <OutputOptions>{
+                    // Governs names of CSS files (for assets from CSS use `hash` option for url handler).
+                    // Note: using value below will put `.css` files near js,
+                    // but make sure to adjust `hash`, `assetDir` and `publicPath`
+                    // options for url handler accordingly.
+                    assetFileNames: "[name]-[hash][extname]",
+                    banner: jsBanner,
+                    chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "cjs"), usePreserveModules),
+                    compact: context.options.minify,
+                    dir: resolve(context.options.rootDir, context.options.outDir),
+                    entryFileNames: createEntryFileNames((_chunk) => getOutputExtension(context, "cjs"), usePreserveModules),
+                    esModule: useEsModuleMark ?? "if-default-prop",
+                    exports: "auto",
+                    extend: true,
+                    // turn off live bindings support (exports.* getters for re-exports)
+                    externalLiveBindings: false,
+                    footer: jsFooter,
+                    format: "cjs",
+                    freeze: false,
+                    generatedCode: {
+                        arrowFunctions: true,
+                        constBindings: true,
+                        objectShorthand: true,
+                        preset: context.tsconfig?.config.compilerOptions?.target === "es5" ? "es5" : "es2015",
+                        reservedNamesAsProps: true,
+                        symbols: true,
+                    },
+                    // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
+                    hoistTransitiveImports: false,
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    interop: "compat",
+                    sourcemap: context.options.sourcemap,
+                    validate: true,
+                    ...context.options.rollup.output,
+                    ...chunking,
                 },
-                // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
-                hoistTransitiveImports: false,
-                // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
-                interop: "compat",
-                sourcemap: context.options.sourcemap,
-                validate: true,
-                ...context.options.rollup.output,
-                ...chunking,
-            },
             context.options.emitESM
-            && <OutputOptions>{
-                // Governs names of CSS files (for assets from CSS use `hash` option for url handler).
-                // Note: using value below will put `.css` files near js,
-                // but make sure to adjust `hash`, `assetDir` and `publicPath`
-                // options for url handler accordingly.
-                assetFileNames: "[name]-[hash][extname]",
-                banner: jsBanner,
-                chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "esm"), usePreserveModules),
-                compact: context.options.minify,
-                dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: createEntryFileNames((chunk) => resolveEsmEntryExtension(context, chunk, usePreserveModules), usePreserveModules),
-                esModule: useEsModuleMark ?? "if-default-prop",
-                exports: "auto",
-                extend: true,
-                // turn off live bindings support (exports.* getters for re-exports)
-                externalLiveBindings: false,
-                footer: jsFooter,
-                format: "esm",
-                freeze: false,
-                generatedCode: {
-                    arrowFunctions: true,
-                    constBindings: true,
-                    objectShorthand: true,
-                    preset: context.tsconfig?.config.compilerOptions?.target === "es5" ? "es5" : "es2015",
-                    reservedNamesAsProps: true,
-                    symbols: true,
+                && <OutputOptions>{
+                    // Governs names of CSS files (for assets from CSS use `hash` option for url handler).
+                    // Note: using value below will put `.css` files near js,
+                    // but make sure to adjust `hash`, `assetDir` and `publicPath`
+                    // options for url handler accordingly.
+                    assetFileNames: "[name]-[hash][extname]",
+                    banner: jsBanner,
+                    chunkFileNames: createChunkFileNames(() => getOutputExtension(context, "esm"), usePreserveModules),
+                    compact: context.options.minify,
+                    dir: resolve(context.options.rootDir, context.options.outDir),
+                    entryFileNames: createEntryFileNames((chunk) => resolveEsmEntryExtension(context, chunk, usePreserveModules), usePreserveModules),
+                    esModule: useEsModuleMark ?? "if-default-prop",
+                    exports: "auto",
+                    extend: true,
+                    // turn off live bindings support (exports.* getters for re-exports)
+                    externalLiveBindings: false,
+                    footer: jsFooter,
+                    format: "esm",
+                    freeze: false,
+                    generatedCode: {
+                        arrowFunctions: true,
+                        constBindings: true,
+                        objectShorthand: true,
+                        preset: context.tsconfig?.config.compilerOptions?.target === "es5" ? "es5" : "es2015",
+                        reservedNamesAsProps: true,
+                        symbols: true,
+                    },
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
+                    hoistTransitiveImports: false,
+                    sourcemap: context.options.sourcemap,
+                    validate: true,
+                    ...context.options.rollup.output,
+                    ...chunking,
                 },
-                // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
-                // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
-                hoistTransitiveImports: false,
-                sourcemap: context.options.sourcemap,
-                validate: true,
-                ...context.options.rollup.output,
-                ...chunking,
-            },
         ].filter(Boolean),
 
         plugins: [
@@ -248,19 +248,19 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, getLogger(context), context.tsconfig), fileCache),
             context.tsconfig
-            && context.options.rollup.tsconfigPaths
-            && cachingPlugin(
-                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, getLogger(context), context.options.rollup.tsconfigPaths),
-                fileCache,
-            ),
+                && context.options.rollup.tsconfigPaths
+                && cachingPlugin(
+                    resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, getLogger(context), context.options.rollup.tsconfigPaths),
+                    fileCache,
+                ),
 
             resolveImplicitExternalsPlugin(context),
 
             context.options.rollup.replace
-            // cloneReplaceOptions returns `any` by design (its RollupReplaceOptions index
-            // signature can't be safely spread without a cast — see the helper's doc); the
-            // produced object is structurally RollupReplaceOptions, so type it back here.
-            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap }) as RollupReplaceOptions),
+                // cloneReplaceOptions returns `any` by design (its RollupReplaceOptions index
+                // signature can't be safely spread without a cast — see the helper's doc); the
+                // produced object is structurally RollupReplaceOptions, so type it back here.
+                && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap }) as RollupReplaceOptions),
 
             context.options.rollup.alias && buildAliasPlugin(context, resolvedAliases, isRolldown, nodeResolver),
 
@@ -271,21 +271,21 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             context.options.rollup.nativeModules && nativeModulesPlugin(context.options.rollup.nativeModules),
 
             context.options.rollup.dataUri
-            && dataUriPlugin({
-                ...context.options.rollup.dataUri,
-            }),
+                && dataUriPlugin({
+                    ...context.options.rollup.dataUri,
+                }),
 
             context.options.rollup.polyfillNode
-            && polyfillPlugin({
-                sourceMap: context.options.sourcemap,
-                ...context.options.rollup.polyfillNode,
-            }),
+                && polyfillPlugin({
+                    sourceMap: context.options.sourcemap,
+                    ...context.options.rollup.polyfillNode,
+                }),
 
             !isRolldown
-            && context.options.rollup.json
-            && JsonPlugin({
-                ...context.options.rollup.json,
-            }),
+                && context.options.rollup.json
+                && JsonPlugin({
+                    ...context.options.rollup.json,
+                }),
 
             context.options.rollup.debarrel && debarrelPlugin(context.options.rollup.debarrel, getLogger(context)),
 
@@ -306,36 +306,36 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             // that exact condition above), so gating on it both selects the slot and lets
             // the type narrow to the loaded module — no non-null assertion needed.
             cssPluginModule
-            && cachingPlugin(
-                cssPluginModule.rollupCssPlugin(
-                    {
-                        dts: Boolean(context.options.declaration),
-                        sourceMap: context.options.sourcemap,
-                        ...context.options.rollup.css,
-                    },
-                    // For per-group browser builds the global `browserTargets` may
-                    // have been cleared (when the global runtime is node), so fall
-                    // back to the preserved `resolvedBrowserTargets`.
-                    context.options.runtime === "browser" && (!context.options.browserTargets || context.options.browserTargets.length === 0)
-                        ? context.options.resolvedBrowserTargets ?? []
-                        : context.options.browserTargets ?? [],
-                    context.options.rootDir,
-                    context.options.sourceDir,
-                    context.environment,
-                    context.options.sourcemap,
-                    context.options.debug,
-                    context.options.minify ?? false,
-                    resolvedAliases,
+                && cachingPlugin(
+                    cssPluginModule.rollupCssPlugin(
+                        {
+                            dts: Boolean(context.options.declaration),
+                            sourceMap: context.options.sourcemap,
+                            ...context.options.rollup.css,
+                        },
+                        // For per-group browser builds the global `browserTargets` may
+                        // have been cleared (when the global runtime is node), so fall
+                        // back to the preserved `resolvedBrowserTargets`.
+                        context.options.runtime === "browser" && (!context.options.browserTargets || context.options.browserTargets.length === 0)
+                            ? (context.options.resolvedBrowserTargets ?? [])
+                            : (context.options.browserTargets ?? []),
+                        context.options.rootDir,
+                        context.options.sourceDir,
+                        context.environment,
+                        context.options.sourcemap,
+                        context.options.debug,
+                        context.options.minify ?? false,
+                        resolvedAliases,
+                    ),
+                    fileCache,
                 ),
-                fileCache,
-            ),
 
             context.options.rollup.css
-            && context.options.rollup.css.loaders
-            && context.options.rollup.css.loaders.length > 0
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean OR is intended: a falsy `declaration` must still fall through to the css.dts check
-            && (context.options.declaration || context.options.rollup.css.dts)
-            && cssPluginModule?.cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir),
+                && context.options.rollup.css.loaders
+                && context.options.rollup.css.loaders.length > 0
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean OR is intended: a falsy `declaration` must still fall through to the css.dts check
+                && (context.options.declaration || context.options.rollup.css.dts)
+                && cssPluginModule?.cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir),
 
             context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
 
@@ -344,38 +344,38 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             ...normalPlugins,
 
             context.options.rollup.minifyHTMLLiterals
-            && context.options.minify
-            && minifyHTMLLiteralsPlugin({
-                ...context.options.rollup.minifyHTMLLiterals,
-                logger: getLogger(context),
-            }),
+                && context.options.minify
+                && minifyHTMLLiteralsPlugin({
+                    ...context.options.rollup.minifyHTMLLiterals,
+                    logger: getLogger(context),
+                }),
 
             context.options.rollup.requireCJS
-            && context.options.emitESM
-            && cachingPlugin(
-                requireCJSTransformerPlugin(
-                    {
-                        ...context.options.rollup.requireCJS,
-                        cwd: context.options.rootDir,
-                    },
-                    getLogger(context),
+                && context.options.emitESM
+                && cachingPlugin(
+                    requireCJSTransformerPlugin(
+                        {
+                            ...context.options.rollup.requireCJS,
+                            cwd: context.options.rootDir,
+                        },
+                        getLogger(context),
+                    ),
+                    fileCache,
                 ),
-                fileCache,
-            ),
 
             context.options.rollup.babel
-            && cachingPlugin(
-                babelTransformPlugin({
-                    include: context.options.rollup.babel.include ?? BABEL_DEFAULT_INCLUDE_REGEX,
-                    ...context.options.rollup.babel,
-                    root: context.options.rootDir,
-                    // `sourceMaps` is not part of Babel 8's `InputOptions` type (so the property
-                    // access is otherwise an `any`/error type); cast to the concrete shape to read
-                    // it type-safely while preserving the runtime fallback to the build sourcemap.
-                    sourceMaps: (context.options.rollup.babel as { sourceMaps?: boolean | "both" | "inline" }).sourceMaps ?? context.options.sourcemap,
-                }),
-                fileCache,
-            ),
+                && cachingPlugin(
+                    babelTransformPlugin({
+                        include: context.options.rollup.babel.include ?? BABEL_DEFAULT_INCLUDE_REGEX,
+                        ...context.options.rollup.babel,
+                        root: context.options.rootDir,
+                        // `sourceMaps` is not part of Babel 8's `InputOptions` type (so the property
+                        // access is otherwise an `any`/error type); cast to the concrete shape to read
+                        // it type-safely while preserving the runtime fallback to the build sourcemap.
+                        sourceMaps: (context.options.rollup.babel as { sourceMaps?: boolean | "both" | "inline" }).sourceMaps ?? context.options.sourcemap,
+                    }),
+                    fileCache,
+                ),
 
             // pure-new-expression-plugin and rollup-plugin-pure call this.parse()
             // on module source in their transform hooks. Under rollup the
@@ -390,11 +390,11 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             isRolldown && rolldownPurePluginInstance,
 
             context.options.rollup.detectDuplicated !== false
-            && detectDuplicatedPlugin(getLogger(context), context.options.rootDir, context.options.rollup.detectDuplicated),
+                && detectDuplicatedPlugin(getLogger(context), context.options.rootDir, context.options.rollup.detectDuplicated),
 
             !isRolldown
-            && context.options.transformer
-            && cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
+                && context.options.transformer
+                && cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
 
             // preserve-directives runs under both backends: its transform hook
             // extracts the leading directive prologue with a manual scan (no
@@ -404,28 +404,28 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             // is still limited (chunkSplitter entry-promotion is rollup-only), but
             // single-entry / per-module directive preservation works on both.
             context.options.rollup.preserveDirectives
-            && preserveDirectivesPlugin({
-                directiveRegex: PRESERVE_DIRECTIVE_REGEX,
-                ...context.options.rollup.preserveDirectives,
-                logger: getLogger(context),
-            }),
+                && preserveDirectivesPlugin({
+                    directiveRegex: PRESERVE_DIRECTIVE_REGEX,
+                    ...context.options.rollup.preserveDirectives,
+                    logger: getLogger(context),
+                }),
 
             context.options.rollup.shebang
-            && shebangPlugin(
-                context.options.entries
-                    .filter((entry) => entry.executable)
-                    .map((entry) => entry.name)
-                    .filter(Boolean),
-                context.options.rollup.shebang as ShebangOptions,
-            ),
+                && shebangPlugin(
+                    context.options.entries
+                        .filter((entry) => entry.executable)
+                        .map((entry) => entry.name)
+                        .filter(Boolean),
+                    context.options.rollup.shebang as ShebangOptions,
+                ),
 
             !isRolldown
-            && context.options.cjsInterop
-            && context.options.emitCJS
-            && cjsInteropPlugin({
-                ...context.options.rollup.cjsInterop,
-                logger: getLogger(context),
-            }),
+                && context.options.cjsInterop
+                && context.options.emitCJS
+                && cjsInteropPlugin({
+                    ...context.options.rollup.cjsInterop,
+                    logger: getLogger(context),
+                }),
 
             context.options.rollup.dynamicVars && fixDynamicImportExtension(),
             // @rollup/plugin-dynamic-import-vars calls this.parse() on module
@@ -437,22 +437,22 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             !isRolldown && context.options.rollup.dynamicVars && dynamicImportVariablesPlugin(context.options.rollup.dynamicVars),
 
             !isRolldown
-            && context.options.rollup.commonjs
-            && cachingPlugin(
-                commonjsPlugin({
-                    sourceMap: context.options.sourcemap,
-                    ...context.options.rollup.commonjs,
-                }),
-                fileCache,
-            ),
+                && context.options.rollup.commonjs
+                && cachingPlugin(
+                    commonjsPlugin({
+                        sourceMap: context.options.sourcemap,
+                        ...context.options.rollup.commonjs,
+                    }),
+                    fileCache,
+                ),
 
             context.options.rollup.preserveDynamicImports
-            && ({
-                name: "packem:preserve-dynamic-imports",
-                renderDynamicImport() {
-                    return { left: "import(", right: ")" };
-                },
-            } as Plugin),
+                && ({
+                    name: "packem:preserve-dynamic-imports",
+                    renderDynamicImport() {
+                        return { left: "import(", right: ")" };
+                    },
+                } as Plugin),
 
             context.options.cjsInterop && context.options.rollup.shim && esmShimCjsSyntaxPlugin(context.pkg, context.options.rollup.shim),
 
@@ -463,17 +463,17 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             // transforms, so it instead runs in renderChunk on the transpiled
             // chunk (no transform to cache there).
             context.options.rollup.jsxRemoveAttributes
-            && (() => {
-                const instance = jsxRemoveAttributes({
-                    attributes: context.options.rollup.jsxRemoveAttributes.attributes,
-                    logger: getLogger(context),
-                    ...isRolldown ? { mode: "renderChunk" as const } : {},
-                });
+                && (() => {
+                    const instance = jsxRemoveAttributes({
+                        attributes: context.options.rollup.jsxRemoveAttributes.attributes,
+                        logger: getLogger(context),
+                        ...(isRolldown ? { mode: "renderChunk" as const } : {}),
+                    });
 
-                // Only the rollup transform path is cacheable; the rolldown path
-                // runs in renderChunk (no transform output to cache).
-                return isRolldown ? instance : cachingPlugin(instance, fileCache);
-            })(),
+                    // Only the rollup transform path is cacheable; the rolldown path
+                    // runs in renderChunk (no transform output to cache).
+                    return isRolldown ? instance : cachingPlugin(instance, fileCache);
+                })(),
 
             ...postPlugins,
 
@@ -486,29 +486,29 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             // would be reads off `false` (error-typed). Narrow off `false` up
             // front so the whole `&&` chain sees `LicenseOptions`.
             context.options.rollup.license !== false
-            && context.options.rollup.license?.path
-            && typeof context.options.rollup.license.dependenciesTemplate === "function"
-            && licensePlugin({
-                dtsMarker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
-                licenseFilePath: context.options.rollup.license.path,
-                licenseTemplate: context.options.rollup.license.dependenciesTemplate,
-                logger: getLogger(context),
-                marker: context.options.rollup.license.dependenciesMarker ?? "DEPENDENCIES",
-                mode: "dependencies",
-                packageName: context.pkg.name,
-            }),
+                && context.options.rollup.license?.path
+                && typeof context.options.rollup.license.dependenciesTemplate === "function"
+                && licensePlugin({
+                    dtsMarker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
+                    licenseFilePath: context.options.rollup.license.path,
+                    licenseTemplate: context.options.rollup.license.dependenciesTemplate,
+                    logger: getLogger(context),
+                    marker: context.options.rollup.license.dependenciesMarker ?? "DEPENDENCIES",
+                    mode: "dependencies",
+                    packageName: context.pkg.name,
+                }),
 
             context.options.analyze
-            && context.options.rollup.visualizer !== false
-            && visualizerPlugin({
-                brotliSize: true,
-                gzipSize: true,
-                projectRoot: context.options.rootDir,
-                sourcemap: context.options.sourcemap,
-                ...context.options.rollup.visualizer,
-                filename: "packem-bundle-analyze.html",
-                title: "Packem Visualizer",
-            }),
+                && context.options.rollup.visualizer !== false
+                && visualizerPlugin({
+                    brotliSize: true,
+                    gzipSize: true,
+                    projectRoot: context.options.rootDir,
+                    sourcemap: context.options.sourcemap,
+                    ...context.options.rollup.visualizer,
+                    filename: "packem-bundle-analyze.html",
+                    title: "Packem Visualizer",
+                }),
         ].filter(Boolean),
 
         preserveEntrySignatures: "strict",

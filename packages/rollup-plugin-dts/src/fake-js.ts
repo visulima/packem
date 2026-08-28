@@ -124,8 +124,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             const moduleToChunk = new Map<string, string>();
 
             for (const chunk of Object.values(bundle)) {
-                if (chunk.type !== "chunk")
-                    continue;
+                if (chunk.type !== "chunk") continue;
 
                 for (const moduleId of chunk.moduleIds) {
                     moduleToChunk.set(moduleId, chunk.fileName);
@@ -136,22 +135,18 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             const placeholderRe = new RegExp(`"${CROSS_CHUNK_PLACEHOLDER}(.+?)"`, "g");
 
             for (const chunk of Object.values(bundle)) {
-                if (chunk.type !== "chunk" || !RE_DTS.test(chunk.fileName))
-                    continue;
+                if (chunk.type !== "chunk" || !RE_DTS.test(chunk.fileName)) continue;
 
-                if (!chunk.code.includes(CROSS_CHUNK_PLACEHOLDER))
-                    continue;
+                if (!chunk.code.includes(CROSS_CHUNK_PLACEHOLDER)) continue;
 
                 chunk.code = chunk.code.replaceAll(placeholderRe, (_match, resolvedId: string) => {
                     const targetFileName = moduleToChunk.get(resolvedId);
 
-                    if (!targetFileName)
-                        return _match;
+                    if (!targetFileName) return _match;
 
                     let specifier = path.posix.relative(path.posix.dirname(chunk.fileName), targetFileName);
 
-                    if (!specifier.startsWith("."))
-                        specifier = `./${specifier}`;
+                    if (!specifier.startsWith(".")) specifier = `./${specifier}`;
 
                     specifier = filenameDtsTo(specifier, "js");
 
@@ -160,12 +155,10 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             }
 
             for (const chunk of Object.values(bundle)) {
-                if (!RE_DTS_MAP.test(chunk.fileName))
-                    continue;
+                if (!RE_DTS_MAP.test(chunk.fileName)) continue;
 
                 if (sourcemap) {
-                    if (chunk.type === "chunk" || typeof chunk.source !== "string")
-                        continue;
+                    if (chunk.type === "chunk" || typeof chunk.source !== "string") continue;
 
                     const map = JSON.parse(chunk.source) as ExistingRawSourceMap;
 
@@ -220,8 +213,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         },
 
         async transform(code: string, id: string) {
-            if (!RE_DTS.test(id))
-                return;
+            if (!RE_DTS.test(id)) return;
 
             return transform.call(this, code, id);
         },
@@ -307,8 +299,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         for (const [i, stmt] of program.body.entries()) {
             const setStmt = (stmt: t.ProgramStatement) => (program.body[i] = stmt);
 
-            if (rewriteImportExport(stmt, setStmt))
-                continue;
+            if (rewriteImportExport(stmt, setStmt)) continue;
 
             // `export as namespace X;` is a TypeScript UMD global declaration with no
             // JS equivalent. Strip it — leaving it in the output makes rollup's parser
@@ -476,8 +467,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     return placeholder;
                 }),
             });
-            const sideEffectNode
-                = sideEffect && b.CallExpression({ arguments: [bindings[0]], callee: b.Identifier({ name: "sideEffect" }), optional: false });
+            const sideEffectNode = sideEffect && b.CallExpression({ arguments: [bindings[0]], callee: b.Identifier({ name: "sideEffect" }), optional: false });
             const runtimeArrayNode = runtimeBindingArrayExpression(
                 sideEffectNode ? [declarationIdNode, depsNode, childrenNode, sideEffectNode] : [declarationIdNode, depsNode, childrenNode],
             );
@@ -495,7 +485,11 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             const runtimeAssignment = b.VariableDeclaration({
                 declarations: [
                     b.VariableDeclarator({
-                        id: b.ArrayPattern({ elements: bindings.map((binding) => { return { ...binding, typeAnnotation: null }; }) }),
+                        id: b.ArrayPattern({
+                            elements: bindings.map((binding) => {
+                                return { ...binding, typeAnnotation: null };
+                            }),
+                        }),
                         init: runtimeArrayNode,
                     }),
                 ],
@@ -530,9 +524,9 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
         const result = print(program, {
             comments: false,
-            ...sourcemap && {
+            ...(sourcemap && {
                 sourceMaps: { source: code, sourceFileName: id },
-            },
+            }),
         });
 
         return {
@@ -572,22 +566,17 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
         program.body = program.body
             .flatMap((node) => {
-                if (isHelperImport(node))
-                    return [];
+                if (isHelperImport(node)) return [];
 
-                if (node.type === "ExpressionStatement")
-                    return [];
+                if (node.type === "ExpressionStatement") return [];
 
                 const newNode = patchImportExport(node, exportInfo, cjsDefault);
 
-                if (newNode === false)
-                    return [];
+                if (newNode === false) return [];
 
-                if (newNode)
-                    return [newNode];
+                if (newNode) return [newNode];
 
-                if (node.type !== "VariableDeclaration")
-                    return [node];
+                if (node.type !== "VariableDeclaration") return [node];
 
                 if (!isRuntimeBindingVariableDeclaration(node)) {
                     return [];
@@ -654,8 +643,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     const originalDep = declaration.deps[i];
                     let transformedDep = transformedDeps[i];
 
-                    if (!transformedDep)
-                        continue;
+                    if (!transformedDep) continue;
 
                     if (transformedDep.type === "UnaryExpression" && transformedDep.operator === "void") {
                         const undefinedDep = b.Identifier({ name: "undefined" });
@@ -724,8 +712,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                         for (const [i, originalDep] of overload.deps.entries()) {
                             let transformedDep = transformedDeps[overload.depsOffset + i];
 
-                            if (!transformedDep)
-                                continue;
+                            if (!transformedDep) continue;
 
                             if (transformedDep.type === "UnaryExpression" && transformedDep.operator === "void") {
                                 const undefinedDep = b.Identifier({ name: "undefined" });
@@ -794,8 +781,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     const rebased = rebaseReferencePath(c, sourceDirectory, chunkOutputDirectory);
                     const dedupeKey = rebased.type + rebased.value;
 
-                    if (commentsValue.has(dedupeKey))
-                        return;
+                    if (commentsValue.has(dedupeKey)) return;
 
                     commentsValue.add(dedupeKey);
                     comments.add(rebased);
@@ -820,9 +806,9 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
         const result = print(program, {
             comments: true,
-            ...sourcemap && {
+            ...(sourcemap && {
                 sourceMaps: { source: code, sourceFileName: chunk.fileName },
-            },
+            }),
         });
 
         return {
@@ -982,8 +968,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                         addDependency(heritage.expression);
                     }
                 } else if (node.type === "ClassDeclaration") {
-                    if (node.superClass)
-                        addDependency(node.superClass);
+                    if (node.superClass) addDependency(node.superClass);
 
                     if (node.implements) {
                         for (const implement of node.implements) {
@@ -1016,17 +1001,14 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                             const { qualifier, source } = node;
                             const dep = importNamespace(node, qualifier, source, namespaceStmts, identifierMap, preserveImportTypeCache);
 
-                            if (dep)
-                                addDependency(dep);
+                            if (dep) addDependency(dep);
 
                             break;
                         }
                         case "TSTypeQuery": {
-                            if (seen.has(node.exprName))
-                                return;
+                            if (seen.has(node.exprName)) return;
 
-                            if (node.exprName.type === "TSImportType")
-                                break;
+                            if (node.exprName.type === "TSImportType") break;
 
                             addDependency(TSEntityNameToRuntime(node.exprName));
 
@@ -1049,8 +1031,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         return [...deps];
 
         function addDependency(node: Dep) {
-            if (isThisExpression(node) || isInferred(node))
-                return;
+            if (isThisExpression(node) || isInferred(node)) return;
 
             deps.add(node);
         }
@@ -1125,11 +1106,9 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 };
 
 function isChildSymbol(node: t.Node, parent: t.Node): boolean {
-    if (node.type === "Identifier")
-        return true;
+    if (node.type === "Identifier") return true;
 
-    if (is.oneOf(parent, ["TSPropertySignature", "TSMethodSignature"]) && parent.key === node)
-        return true;
+    if (is.oneOf(parent, ["TSPropertySignature", "TSMethodSignature"]) && parent.key === node) return true;
 
     return false;
 }
@@ -1187,7 +1166,11 @@ const rebaseReferencePath = (comment: t.Comment, sourceDirectory: string, chunkO
 type ExportComments = Map<string /* exported name */, t.AttachedComment[]>;
 
 const isDocumentationComment = (comment: t.AttachedComment): boolean =>
-    comment.position === "before" && comment.type === "Block" && comment.value.startsWith("*") && !REFERENCE_RE.test(comment.value) && !isSourceMapPragma(comment);
+    comment.position === "before"
+    && comment.type === "Block"
+    && comment.value.startsWith("*")
+    && !REFERENCE_RE.test(comment.value)
+    && !isSourceMapPragma(comment);
 
 /**
  * The JSDoc block TypeScript associates with a node is the *nearest* preceding one — an
@@ -1195,7 +1178,8 @@ const isDocumentationComment = (comment: t.AttachedComment): boolean =>
  * that happens to follow it. Mirror that rule so only the doc comment a user actually wrote
  * for the export is carried over.
  */
-const nearestDocumentationComment = (comments: t.AttachedComment[] | undefined): t.AttachedComment | undefined => comments?.findLast((comment) => isDocumentationComment(comment));
+const nearestDocumentationComment = (comments: t.AttachedComment[] | undefined): t.AttachedComment | undefined =>
+    comments?.findLast((comment) => isDocumentationComment(comment));
 
 /**
  * Collect the leading JSDoc of specifier-based export statements (`export { x } from "…"`,
@@ -1259,7 +1243,8 @@ const collectExportComments = (nodes: t.ProgramStatement[]): ExportComments => {
     return result;
 };
 
-const sameComments = (a: t.AttachedComment[], b: t.AttachedComment[]): boolean => a.length === b.length && a.every((comment, index) => comment.value === b[index].value);
+const sameComments = (a: t.AttachedComment[], b: t.AttachedComment[]): boolean =>
+    a.length === b.length && a.every((comment, index) => comment.value === b[index].value);
 
 /**
  * Merge the per-module maps of every module in `chunk` into one lookup keyed by exported name.
@@ -1273,7 +1258,10 @@ const sameComments = (a: t.AttachedComment[], b: t.AttachedComment[]): boolean =
 const resolveChunkExportComments = (chunk: RenderedChunk, exportCommentsMap: Map<string, ExportComments>): Map<string, t.AttachedComment[] | undefined> => {
     const resolved = new Map<string, t.AttachedComment[] | undefined>();
     const { facadeModuleId } = chunk;
-    const moduleIds = facadeModuleId && chunk.moduleIds.includes(facadeModuleId) ? [facadeModuleId, ...chunk.moduleIds.filter((moduleId) => moduleId !== facadeModuleId)] : chunk.moduleIds;
+    const moduleIds =
+        facadeModuleId && chunk.moduleIds.includes(facadeModuleId)
+            ? [facadeModuleId, ...chunk.moduleIds.filter((moduleId) => moduleId !== facadeModuleId)]
+            : chunk.moduleIds;
     const fromFacade = new Set<string>();
 
     for (const moduleId of moduleIds) {
@@ -1338,7 +1326,7 @@ const restoreExportComments = (nodes: t.ProgramStatement[], commentsByName: Map<
             return;
         }
 
-        target.comments = [...comments, ...target.comments ?? []];
+        target.comments = [...comments, ...(target.comments ?? [])];
     };
 
     for (const node of nodes) {
@@ -1899,13 +1887,11 @@ const patchTsNamespace = (nodes: t.ProgramStatement[]) => {
     for (const [i, node] of nodes.entries()) {
         const result = handleExport(node);
 
-        if (!result)
-            continue;
+        if (!result) continue;
 
         const [binding, exports] = result;
 
-        if (exports.properties.length === 0)
-            continue;
+        if (exports.properties.length === 0) continue;
 
         const namespaceExport = exportNamedDeclaration(
             exports.properties
@@ -2104,9 +2090,7 @@ const overwriteNode = <T>(node: t.Node, newNode: T): T => {
 const inheritNodeComments = <T extends t.Node>(oldNode: t.Node, newNode: T): T => {
     newNode.comments ||= [];
 
-    const pragmas = oldNode.comments?.filter(
-        (comment) => comment.position === "before" && comment.value.startsWith("#") && !isSourceMapPragma(comment),
-    );
+    const pragmas = oldNode.comments?.filter((comment) => comment.position === "before" && comment.value.startsWith("#") && !isSourceMapPragma(comment));
 
     if (pragmas) {
         newNode.comments.unshift(...pragmas);

@@ -55,32 +55,32 @@ const createPreactAliasTransformPlugin = (): Plugin => {
             let transformedCode = code;
 
             // Rewrite react imports to preact/compat
-            if (transformedCode.includes("from \"react\"") || transformedCode.includes("from 'react'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react["']/g, "from \"preact/compat\"");
+            if (transformedCode.includes('from "react"') || transformedCode.includes("from 'react'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react["']/g, 'from "preact/compat"');
                 modified = true;
             }
 
             // Rewrite react-dom imports to preact/compat
-            if (transformedCode.includes("from \"react-dom\"") || transformedCode.includes("from 'react-dom'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom["']/g, "from \"preact/compat\"");
+            if (transformedCode.includes('from "react-dom"') || transformedCode.includes("from 'react-dom'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom["']/g, 'from "preact/compat"');
                 modified = true;
             }
 
             // Rewrite react-dom/test-utils imports to preact/test-utils
-            if (transformedCode.includes("from \"react-dom/test-utils\"") || transformedCode.includes("from 'react-dom/test-utils'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom\/test-utils["']/g, "from \"preact/test-utils\"");
+            if (transformedCode.includes('from "react-dom/test-utils"') || transformedCode.includes("from 'react-dom/test-utils'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom\/test-utils["']/g, 'from "preact/test-utils"');
                 modified = true;
             }
 
             // Rewrite react-dom/client imports to preact/compat
-            if (transformedCode.includes("from \"react-dom/client\"") || transformedCode.includes("from 'react-dom/client'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom\/client["']/g, "from \"preact/compat\"");
+            if (transformedCode.includes('from "react-dom/client"') || transformedCode.includes("from 'react-dom/client'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom\/client["']/g, 'from "preact/compat"');
                 modified = true;
             }
 
             // Rewrite react/jsx-runtime imports to preact/jsx-runtime
-            if (transformedCode.includes("from \"react/jsx-runtime\"") || transformedCode.includes("from 'react/jsx-runtime'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react\/jsx-runtime["']/g, "from \"preact/jsx-runtime\"");
+            if (transformedCode.includes('from "react/jsx-runtime"') || transformedCode.includes("from 'react/jsx-runtime'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react\/jsx-runtime["']/g, 'from "preact/jsx-runtime"');
                 modified = true;
             }
 
@@ -166,8 +166,8 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
     // This plugin enhances Preact Devtools by adding hook names
     babelPlugins.push("babel-plugin-transform-hook-names");
 
-    const finalPlugins = [...babelPlugins, ...Array.isArray(plugins) ? plugins : []];
-    const finalPresets = [...babelPresets, ...Array.isArray(presets) ? presets : []];
+    const finalPlugins = [...babelPlugins, ...(Array.isArray(plugins) ? plugins : [])];
+    const finalPresets = [...babelPresets, ...(Array.isArray(presets) ? presets : [])];
 
     return {
         hooks: {
@@ -186,7 +186,7 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
                             preset[0],
                             {
                                 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `typeof x === "object"` is also true for null, so the explicit null check is a real runtime guard; relaxed strictNullChecks hides the union from the type checker.
-                                ...typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {},
+                                ...(typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {}),
                                 development: !isProduction,
                             },
                         ];

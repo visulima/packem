@@ -6,7 +6,15 @@ import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, expectNoUnexpectedStderrWarnings, installPackage, UNDECLARED_DEPENDENCY_WARNING_REGEX } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    expectNoUnexpectedStderrWarnings,
+    installPackage,
+    UNDECLARED_DEPENDENCY_WARNING_REGEX,
+} from "../helpers";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 describe("packem cli", () => {
@@ -220,8 +228,8 @@ export const ignored = process.env.OTHER_VAR;`,
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toContain("const apiUrl = \"https://api.example.com\"");
-        expect(mtsContent).toContain("const version = \"1.0.0\"");
+        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
+        expect(mtsContent).toContain('const version = "1.0.0"');
         expect(mtsContent).toContain("const ignored = process.env.OTHER_VAR");
     });
 
@@ -267,8 +275,8 @@ export const version = process.env.PACKEM_VERSION;`,
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toContain("const apiUrl = \"https://api.example.com\"");
-        expect(mtsContent).toContain("const version = \"1.0.0\"");
+        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
+        expect(mtsContent).toContain('const version = "1.0.0"');
     });
 
     it("should allow CLI env vars to override .env file vars", async () => {
@@ -308,8 +316,8 @@ export const version = process.env.PACKEM_VERSION;`,
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toContain("const apiUrl = \"https://api.example.com\"");
-        expect(mtsContent).toContain("const version = \"2.0.0\""); // CLI override
+        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
+        expect(mtsContent).toContain('const version = "2.0.0"'); // CLI override
     });
 
     // On Node.js v20+, --env-file is a Node.js CLI option that fails with exit 9
@@ -877,7 +885,7 @@ export function barFunction() {
                 },
             });
 
-            writeFileSync(`${temporaryDirectoryPath}/tsup.config.ts`, "export default { entry: [\"src/index.ts\"] }");
+            writeFileSync(`${temporaryDirectoryPath}/tsup.config.ts`, 'export default { entry: ["src/index.ts"] }');
 
             const binProcess = await execPackem("migrate", ["--dry-run"], {
                 cwd: temporaryDirectoryPath,
@@ -1374,7 +1382,7 @@ export default defineConfig({
                 { content: "module.exports = { entry: ['src/index.ts'] }", file: "tsup.config.js" },
                 { content: "module.exports = { entry: ['src/index.ts'] }", file: "tsup.config.cjs" },
                 { content: "export default { entry: ['src/index.ts'] }", file: "tsup.config.mjs" },
-                { content: "{\"entry\": [\"src/index.ts\"]}", file: "tsup.config.json" },
+                { content: '{"entry": ["src/index.ts"]}', file: "tsup.config.json" },
             ];
 
             for (const config of configs) {

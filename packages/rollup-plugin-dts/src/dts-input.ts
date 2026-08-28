@@ -20,17 +20,17 @@ const createDtsInputPlugin = ({ entry, sideEffects }: Pick<OptionsResolved, "ent
         options: sideEffects
             ? undefined
             : (options) => {
-                return {
-                    ...options,
-                    treeshake:
+                  return {
+                      ...options,
+                      treeshake:
                           options.treeshake === false
                               ? false
                               : {
-                                  ...typeof options.treeshake === "object" ? options.treeshake : {},
-                                  moduleSideEffects: false,
-                              },
-                };
-            },
+                                    ...(typeof options.treeshake === "object" ? options.treeshake : {}),
+                                    moduleSideEffects: false,
+                                },
+                  };
+              },
 
         outputOptions(options) {
             return {

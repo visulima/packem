@@ -166,8 +166,8 @@ export const defaultMinifyOptions: HTMLOptions = {
 
 export const adjustMinifyCSSOptions = (options: CleanCSS.Options = {}): CleanCSS.Options => {
     const level = optimizationLevelFrom(options.level);
-    const originalTransform: ((property: string, value: string) => string) | false
-        = typeof options.level === "object" && typeof options.level[1]?.transform === "function" ? options.level[1].transform : false;
+    const originalTransform: ((property: string, value: string) => string) | false =
+        typeof options.level === "object" && typeof options.level[1]?.transform === "function" ? options.level[1].transform : false;
 
     level[OptimizationLevel.One].transform = (property: string, value: string): string => {
         if (value.startsWith("@TEMPLATE_EXPRESSION") && !value.endsWith(";")) {

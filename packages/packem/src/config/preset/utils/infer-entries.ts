@@ -404,8 +404,8 @@ const createOrUpdateEntry = (
     );
 
     if (entry === undefined) {
-        entry
-            = entries[
+        entry =
+            entries[
                 entries.push({
                     environment: entryEnvironment,
                     exportKey: new Set([output.exportKey].filter(Boolean)),
@@ -872,7 +872,9 @@ const inferEntries = async (
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if ((output.file.includes("/*") || outputSlug.includes("*")) && output.key === "exports") {
             if (!privateSubfolderWarningShown) {
-                (context.logger as InferEntriesLogger | undefined)?.debug("Private subfolders are not supported, if you need this feature please open an issue on GitHub.");
+                (context.logger as InferEntriesLogger | undefined)?.debug(
+                    "Private subfolders are not supported, if you need this feature please open an issue on GitHub.",
+                );
 
                 privateSubfolderWarningShown = true;
             }
@@ -1227,16 +1229,16 @@ const inferEntries = async (
                 // Skip if we've already processed this export key (check if entry already exists)
                 const dtsOutput = allOutputsForExportKey.find((o) => o.file.endsWith(".d.ts"));
                 // If no .d.ts, use .d.mts or .d.cts as fallback
-                const baseOutput
-                    = dtsOutput
-                        ?? allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts"))
-                        ?? allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts"))
-                        ?? output;
+                const baseOutput =
+                    dtsOutput
+                    ?? allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts"))
+                    ?? allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts"))
+                    ?? output;
 
                 // Only process if this is the .d.ts output (or the first one if no .d.ts)
                 // This ensures we only create ONE entry per export key
-                const isBaseOutput
-                    = baseOutput === output || (dtsOutput !== undefined && output === dtsOutput) || (dtsOutput === undefined && baseOutput === output);
+                const isBaseOutput =
+                    baseOutput === output || (dtsOutput !== undefined && output === dtsOutput) || (dtsOutput === undefined && baseOutput === output);
 
                 if (!isBaseOutput) {
                     // Skip other declaration outputs for this export key - we'll handle them in the base output
@@ -1305,7 +1307,7 @@ const inferEntries = async (
                         ...output,
                         file: outputPath,
                         // Don't set type for declaration files - they should not trigger JS builds
-                        ...!isOutputDeclarationFilePath && derivedInferredType && { type: derivedInferredType },
+                        ...(!isOutputDeclarationFilePath && derivedInferredType && { type: derivedInferredType }),
                     };
 
                     createOrUpdateEntry(entries, input, false, outputSlug, specificOutput, context, true, outputs);

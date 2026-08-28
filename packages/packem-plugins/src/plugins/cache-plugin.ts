@@ -162,8 +162,8 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             }
 
             // Store raw plugin results in a wrapped form to avoid type coercion issues
-            const toStore: unknown
-                = typeof result === "object" && "code" in (result as Record<string, unknown>)
+            const toStore: unknown =
+                typeof result === "object" && "code" in (result as Record<string, unknown>)
                     ? result
                     : ({ data: result, [PACKEM_CACHE_WRAPPED]: true } satisfies WrappedCacheValue);
 

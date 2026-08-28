@@ -179,9 +179,7 @@ export const normalizeRolldownOutput = (content: string): string => {
         return content;
     }
 
-    return content
-        .replaceAll(ROLLDOWN_PNPM_STORE_PATH_REGEX, "<root>/node_modules/.pnpm/")
-        .replaceAll(ROLLDOWN_SHARED_CHUNK_HASH_REGEX, "$1[HASH]$2");
+    return content.replaceAll(ROLLDOWN_PNPM_STORE_PATH_REGEX, "<root>/node_modules/.pnpm/").replaceAll(ROLLDOWN_SHARED_CHUNK_HASH_REGEX, "$1[HASH]$2");
 };
 
 // Advisory packem emits to stderr when a fixture imports a dependency it does not declare,

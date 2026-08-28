@@ -130,7 +130,7 @@ describe("stylus loader", () => {
     it("should track dependencies for imported files", async () => {
         expect.assertions(1);
 
-        const { context } = await run(join(FIXTURE_ROOT, "style.styl"), ".style\n  @import \"foo.styl\"\n");
+        const { context } = await run(join(FIXTURE_ROOT, "style.styl"), '.style\n  @import "foo.styl"\n');
 
         expect([...context.deps].some((dep) => dep.endsWith("foo.styl"))).toBe(true);
     });

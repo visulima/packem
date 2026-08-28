@@ -147,8 +147,7 @@ const createDtsResolvePlugin = ({
     };
 
     function shouldBundleNodeModule(id: string) {
-        if (typeof resolve === "boolean")
-            return resolve;
+        if (typeof resolve === "boolean") return resolve;
 
         return resolve.some((pattern) => {
             if (typeof pattern === "string") {
@@ -169,8 +168,7 @@ const createDtsResolvePlugin = ({
         const marker = "/node_modules/";
         const lastIndex = normalized.lastIndexOf(marker);
 
-        if (lastIndex === -1)
-            return false;
+        if (lastIndex === -1) return false;
 
         const after = normalized.slice(lastIndex + marker.length);
         const firstSlash = after.indexOf("/");

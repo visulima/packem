@@ -272,14 +272,10 @@ describe("packem watch", () => {
         expect.assertions(4);
 
         // Start watch with a failing onSuccess command (exit 1)
-        const proc = execaNode(
-            join(distributionPath, "cli/index.js"),
-            ["build", "--development", "--watch", "--onSuccess=exit 1", "--no-validation"],
-            {
-                cwd: temporaryDirectoryPath,
-                reject: false,
-            },
-        );
+        const proc = execaNode(join(distributionPath, "cli/index.js"), ["build", "--development", "--watch", "--onSuccess=exit 1", "--no-validation"], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
 
         // Accumulate both stdout and stderr — logger.error may write to either
         let output = "";

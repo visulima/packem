@@ -67,13 +67,13 @@ export const cssStyleInject = (
     const singleTag = options.singleTag === true;
     const insertAt = options.insertAt ?? "last";
 
-    const container
-        = typeof options.container === "string"
+    const container =
+        typeof options.container === "string"
             ? document.querySelector<HTMLElement>(options.container)
-            // Prefer the native `document.head` (fast path in real browsers); fall back to
-            // a `head` lookup for environments/test doubles where `document.head` is absent.
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- lib.dom types `document.head` as non-null, but it is genuinely absent in SSR/test-double environments; the fallback is load-bearing.
-            : ((document.head ?? document.querySelectorAll("head")[0]) as HTMLElement | undefined);
+            : // Prefer the native `document.head` (fast path in real browsers); fall back to
+              // a `head` lookup for environments/test doubles where `document.head` is absent.
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- lib.dom types `document.head` as non-null, but it is genuinely absent in SSR/test-double environments; the fallback is load-bearing.
+              ((document.head ?? document.querySelectorAll("head")[0]) as HTMLElement | undefined);
 
     if (!container) {
         throw new Error(`Unable to find container element${options.container ? ` matching selector "${options.container}"` : ""}`);

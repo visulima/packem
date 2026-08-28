@@ -111,7 +111,7 @@ const scanLeadingDirectives = (code: string): ScannedDirective[] => {
 
         const quote = code[index];
 
-        if (quote !== "\"" && quote !== "'") {
+        if (quote !== '"' && quote !== "'") {
             break; // first non-string statement ends the prologue
         }
 
@@ -215,7 +215,8 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 // incremental, cache-hit rebuilds (otherwise an unchanged module
                 // silently loses its `"use client"`/`"use server"` banner).
                 const directivesForId = (id: string): Set<string> | undefined => {
-                    const metaDirectives = (this.getModuleInfo(id)?.meta as { preserveDirectives?: { directives?: string[] } } | undefined)?.preserveDirectives?.directives;
+                    const metaDirectives = (this.getModuleInfo(id)?.meta as { preserveDirectives?: { directives?: string[] } } | undefined)?.preserveDirectives
+                        ?.directives;
 
                     if (metaDirectives && metaDirectives.length > 0) {
                         return new Set<string>(metaDirectives);
@@ -269,8 +270,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                     // Same cache-hit concern as directives above: prefer the
                     // persisted `meta` shebang, fall back to the side-channel.
                     const metaShebang = (this.getModuleInfo(chunk.facadeModuleId)?.meta as { preserveDirectives?: { shebang?: string } } | undefined)
-                        ?.preserveDirectives
-                        ?.shebang;
+                        ?.preserveDirectives?.shebang;
 
                     if (typeof metaShebang === "string") {
                         shebang = metaShebang;
@@ -421,7 +421,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 map: magicString.generateMap({ hires: true }),
                 meta: {
                     preserveDirectives: {
-                        directives: [...directives[id] ?? []],
+                        directives: [...(directives[id] ?? [])],
 
                         shebang: shebangs[id] ?? undefined,
                     },

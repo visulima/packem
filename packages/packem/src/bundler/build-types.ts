@@ -150,9 +150,7 @@ const resolveEntryExtensions = (entry: BuildEntry, context: BuildContext<Interna
 const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): Promise<void> => {
     const isRolldown = context.options.bundler === "rolldown";
 
-    const typeOptions = isRolldown
-        ? await getRolldownDtsOptions(context, fileCache)
-        : await getRollupDtsOptions(context, fileCache);
+    const typeOptions = isRolldown ? await getRolldownDtsOptions(context, fileCache) : await getRollupDtsOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:dts:options", context, typeOptions);
 

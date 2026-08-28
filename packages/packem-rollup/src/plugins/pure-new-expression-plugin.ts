@@ -5,7 +5,6 @@ import MagicString from "magic-string";
 import type { Plugin } from "rollup";
 
 interface NewExpressionWithRollupExtras {
-
     _rollupAnnotations?: { type: string }[];
     callee?: { name?: string; type?: string };
     rollupAnnotations?: { type: string }[];
@@ -102,8 +101,8 @@ export const pureNewExpressionPlugin = (options: {
         quickTokens.add(functionName.split(".")[0] as string);
     }
 
-    const quickCheckRegExp
-        = quickTokens.size > 0 ? new RegExp(String.raw`\b(?:${[...quickTokens].map((value) => escapeForRegExp(value)).join("|")})\b`) : undefined;
+    const quickCheckRegExp =
+        quickTokens.size > 0 ? new RegExp(String.raw`\b(?:${[...quickTokens].map((value) => escapeForRegExp(value)).join("|")})\b`) : undefined;
 
     if (options.mode === "renderChunk") {
         return {
@@ -149,7 +148,12 @@ export const pureNewExpressionPlugin = (options: {
 
                             let matched = false;
 
-                            if (node.type === "NewExpression" && node.callee?.type === "Identifier" && typeof node.callee.name === "string" && constructorSet.has(node.callee.name)) {
+                            if (
+                                node.type === "NewExpression"
+                                && node.callee?.type === "Identifier"
+                                && typeof node.callee.name === "string"
+                                && constructorSet.has(node.callee.name)
+                            ) {
                                 matched = true;
                             } else if (node.type === "CallExpression") {
                                 const name = calleeToName(node.callee);

@@ -10,18 +10,18 @@ export interface ReactPresetOptions {
     compiler?:
         | boolean
         | {
-            /**
-             * React Compiler compilation mode
-             * @default "infer"
-             */
-            compilationMode?: "infer" | "annotation";
+              /**
+               * React Compiler compilation mode
+               * @default "infer"
+               */
+              compilationMode?: "infer" | "annotation";
 
-            /**
-             * React Compiler panic threshold
-             * @default "critical_errors"
-             */
-            panicThreshold?: "critical_errors" | "all_errors";
-        };
+              /**
+               * React Compiler panic threshold
+               * @default "critical_errors"
+               */
+              panicThreshold?: "critical_errors" | "all_errors";
+          };
 
     /**
      * Custom Babel plugins to add
@@ -89,8 +89,8 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
         },
     ]);
 
-    const finalPlugins = [...babelPlugins, ...Array.isArray(plugins) ? plugins : []];
-    const finalPresets = [...babelPresets, ...Array.isArray(presets) ? presets : []];
+    const finalPlugins = [...babelPlugins, ...(Array.isArray(plugins) ? plugins : [])];
+    const finalPresets = [...babelPresets, ...(Array.isArray(presets) ? presets : [])];
 
     return {
         hooks: {
@@ -107,7 +107,7 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
                             preset[0],
                             {
                                 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `typeof x === "object"` is also true for null, so the explicit null check is a real runtime guard; relaxed strictNullChecks hides the union from the type checker.
-                                ...typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {},
+                                ...(typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {}),
                                 development: context.environment === "development",
                             },
                         ];

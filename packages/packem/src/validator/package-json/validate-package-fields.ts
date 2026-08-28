@@ -230,7 +230,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
         const isBinOnlyPackage = context.pkg.bin !== undefined && nonDotKeys.length <= 1 && nonDotKeys.every((key) => key === "./package.json");
 
         if (!keys.includes(".") && !isBinOnlyPackage) {
-            warn(context, "Missing main export \".\". Subpaths exports should include a main export entry");
+            warn(context, 'Missing main export ".". Subpaths exports should include a main export entry');
         }
 
         for (const key of keys) {
@@ -252,7 +252,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
         const conditionKeys = keys.filter((key) => !key.startsWith("."));
 
         if (subpathKeys.length > 0 && conditionKeys.length > 0) {
-            warn(context, "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both");
+            warn(context, 'Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with ".") or conditions, not both');
 
             return;
         }

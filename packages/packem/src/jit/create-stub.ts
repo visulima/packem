@@ -48,24 +48,24 @@ const serializeJitiOptions = (context: BuildContext<InternalBuildOptions>, impor
         undefined,
         2,
     ).replace(
-        "\"__$BABEL_PLUGINS\"",
+        '"__$BABEL_PLUGINS"',
         Array.isArray(babelPlugins)
             ? `[${babelPlugins
-                .map((plugin: BabelPluginEntry, index: number): string => {
-                    if (Array.isArray(plugin)) {
-                        // eslint-disable-next-line @typescript-eslint/naming-convention
-                        const [name, ...arguments_] = plugin;
+                  .map((plugin: BabelPluginEntry, index: number): string => {
+                      if (Array.isArray(plugin)) {
+                          // eslint-disable-next-line @typescript-eslint/naming-convention
+                          const [name, ...arguments_] = plugin;
 
-                        importedBabelPlugins.push(name);
+                          importedBabelPlugins.push(name);
 
-                        return `[${[`plugin${String(index)}`, ...arguments_.map((value) => JSON.stringify(value))].join(", ")}]`;
-                    }
+                          return `[${[`plugin${String(index)}`, ...arguments_.map((value) => JSON.stringify(value))].join(", ")}]`;
+                      }
 
-                    importedBabelPlugins.push(plugin);
+                      importedBabelPlugins.push(plugin);
 
-                    return `plugin${String(index)}`;
-                })
-                .join(",")}]`
+                      return `plugin${String(index)}`;
+                  })
+                  .join(",")}]`
             : "[]",
     );
 };
@@ -120,19 +120,19 @@ const buildEsmStub = async (
     writeFileSync(
         `${output}.${getOutputExtension(context, "esm")}`,
         shebang
-        + [
-            `import { createJiti } from "${jitiESMPath}";`,
+            + [
+                `import { createJiti } from "${jitiESMPath}";`,
 
-            ...importedBabelPlugins.map((plugin, index) => `import plugin${String(index)} from "${plugin}";`),
-            "",
-            `const jiti = createJiti(import.meta.url, ${serializedJitiOptions});`,
-            "",
-            `/** @type {import("${typePath}")} */`,
+                ...importedBabelPlugins.map((plugin, index) => `import plugin${String(index)} from "${plugin}";`),
+                "",
+                `const jiti = createJiti(import.meta.url, ${serializedJitiOptions});`,
+                "",
+                `/** @type {import("${typePath}")} */`,
 
-            `const _module = await jiti.import("${resolvedEntry}");`,
-            ...hasDefaultExport ? [`export default _module?.default ?? _module;`] : [],
-            ...buildNamedExportLines(namedExports),
-        ].join("\n"),
+                `const _module = await jiti.import("${resolvedEntry}");`,
+                ...(hasDefaultExport ? [`export default _module?.default ?? _module;`] : []),
+                ...buildNamedExportLines(namedExports),
+            ].join("\n"),
     );
 
     if (context.options.declaration) {
@@ -166,17 +166,17 @@ const buildCjsStub = async (
     writeFileSync(
         `${output}.${getOutputExtension(context, "cjs")}`,
         shebang
-        + [
-            `const { createJiti } = require("${jitiCJSPath}");`,
+            + [
+                `const { createJiti } = require("${jitiCJSPath}");`,
 
-            ...importedBabelPlugins.map((plugin, index) => `const plugin${String(index)} = require(${JSON.stringify(plugin)})`),
-            "",
-            `const jiti = createJiti(__filename, ${serializedJitiOptions});`,
-            "",
-            `/** @type {import("${typePath}")} */`,
+                ...importedBabelPlugins.map((plugin, index) => `const plugin${String(index)} = require(${JSON.stringify(plugin)})`),
+                "",
+                `const jiti = createJiti(__filename, ${serializedJitiOptions});`,
+                "",
+                `/** @type {import("${typePath}")} */`,
 
-            `module.exports = jiti("${resolvedEntry}")`,
-        ].join("\n"),
+                `module.exports = jiti("${resolvedEntry}")`,
+            ].join("\n"),
     );
 
     if (context.options.declaration) {
