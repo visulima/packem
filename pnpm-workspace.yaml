@@ -320,10 +320,12 @@ minimumReleaseAgeExclude:
   - "@oxc-parser/*"
   - "@oxc-transform/*"
   - "@oxc-project/*"
+  - yuku-ast
   - yuku-parser
   - yuku-codegen
   - "@yuku-parser/*"
   - "@yuku-codegen/*"
+  - "@yuku-toolchain/*"
   # @visulima/* is our own org — we publish these and adopt them immediately, so exempt the
   # whole family by name rather than pinning each version (which every renovate/lockfile bump churns).
   - "@visulima/*"
