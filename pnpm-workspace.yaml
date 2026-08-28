@@ -108,7 +108,7 @@ catalogs:
     react: 19.2.8
     react-dom: 19.2.8
     svelte: 5.56.9
-    vue: 3.5.40
+    vue: 3.5.41
   icons:
     lucide-static: 1.24.0
   lint:
