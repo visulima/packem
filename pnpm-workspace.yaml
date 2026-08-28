@@ -194,9 +194,9 @@ catalogs:
     "@csstools/css-tokenizer": 4.0.0
     "@csstools/postcss-slow-plugins": 3.0.0
     "@tailwindcss/forms": 0.5.11
-    "@tailwindcss/node": 4.3.2
-    "@tailwindcss/oxide": 4.3.2
-    "@tailwindcss/postcss": 4.3.2
+    "@tailwindcss/node": 4.3.3
+    "@tailwindcss/oxide": 4.3.3
+    "@tailwindcss/postcss": 4.3.3
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.0-alpha.15
     clean-css: ^5.3.3
@@ -216,7 +216,7 @@ catalogs:
     postcss-value-parser: ^4.2.0
     sass: 1.101.7
     sass-embedded: 1.100.0
-    tailwindcss: 4.3.2
+    tailwindcss: 4.3.3
   test:
     "@codspeed/vitest-plugin": ^5.5.0
     "@jridgewell/source-map": ^0.3.11
