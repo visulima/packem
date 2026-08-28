@@ -311,7 +311,7 @@ describe("packem watch", () => {
         await waitForMessage("onSuccess script failed with exit code 1");
 
         // The process must still be alive after a failing onSuccess (execa uses null for "not yet exited")
-        expect(proc.exitCode).toBeNull();
+        expect(proc.nodeChildProcess.exitCode).toBeNull();
 
         // Trigger a rebuild to confirm the watcher kept running
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const a = 2;\n`);
@@ -338,7 +338,7 @@ describe("packem watch", () => {
         await waitForSecondFailure();
 
         // The process must still be alive after the second failure (execa uses null for "not yet exited")
-        expect(proc.exitCode).toBeNull();
+        expect(proc.nodeChildProcess.exitCode).toBeNull();
 
         // Stop the watcher
         proc.kill("SIGINT");

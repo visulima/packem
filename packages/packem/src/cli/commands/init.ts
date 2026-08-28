@@ -5,6 +5,7 @@ import { confirm, intro, log, multiselect, outro, select, spinner } from "@clack
 import type { Cli } from "@visulima/cerebro";
 import { isAccessibleSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
+import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
 
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
@@ -322,7 +323,7 @@ const selectCssMinifier = async (cssLoaders: string[], packagesToInstall: string
     return cssMinifier;
 };
 
-const createInitCommand = (cli: Cli<Console>): void => {
+const createInitCommand = (cli: Cli<Pail>): void => {
     cli.addCommand({
         description: "Initialize packem configuration",
 

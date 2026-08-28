@@ -4,6 +4,7 @@ import process from "node:process";
 import { createInterface } from "node:readline/promises";
 
 import type { Cli } from "@visulima/cerebro";
+import type { Pail } from "@visulima/pail";
 
 import packageJson from "../../../package.json";
 
@@ -388,7 +389,7 @@ const migrate = async ({ cwd, dryRun, logger }: { cwd?: string; dryRun?: boolean
  * ```
  * @internal
  */
-const createMigrateCommand = (cli: Cli<Console>): void => {
+const createMigrateCommand = (cli: Cli<Pail>): void => {
     cli.addCommand({
         description: "Migrate from other bundlers (tsup, unbuild, bunchee, etc.) to packem",
 

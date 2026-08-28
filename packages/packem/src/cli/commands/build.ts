@@ -3,6 +3,7 @@ import { cwd, exit } from "node:process";
 import type { Cli } from "@visulima/cerebro";
 import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "@visulima/packem-share/constants";
 import { resolve } from "@visulima/path";
+import type { Pail } from "@visulima/pail";
 import { createJiti } from "jiti";
 
 import { runFirstRunWizard } from "../../bundler/first-run-wizard";
@@ -141,7 +142,7 @@ const collectExternals = (options: BuildCommandOptions): string[] => {
  * ```
  * @internal
  */
-const createBuildCommand = (cli: Cli<Console>): void => {
+const createBuildCommand = (cli: Cli<Pail>): void => {
     cli.addCommand({
         description: "Build the package using the resolved packem configuration",
 
