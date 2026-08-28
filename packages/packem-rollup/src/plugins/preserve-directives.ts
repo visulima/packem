@@ -8,7 +8,11 @@
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import MagicString from "magic-string";
-import type { Plugin, SourceMap } from "rollup";
+// rollup 4.63 types its own `SourceMap.sourcesContent` as `(string | null)[]` while
+// `SourceMapInput` still demands `string[]`, so rollup's map type no longer satisfies
+// the hooks that return it. magic-string's map is what we actually produce here.
+import type { SourceMap } from "magic-string";
+import type { Plugin } from "rollup";
 
 type PreserveDirectivesPluginOptions = {
     directiveRegex: RegExp;
