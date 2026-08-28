@@ -45,7 +45,11 @@ catalogs:
     esbuild: 0.28.2
     rolldown: 1.2.6
     rollup: 4.63.1
-    rollup-plugin-dts: 6.5.1
+    # 6.5.1 declares its own typescript devDependency as an alias
+    # (npm:@typescript/typescript6), which makes `npm audit signatures` ask the registry
+    # for @typescript/typescript6 at the workspace's typescript version and fail: that
+    # alias package stops at 6.0.2. Stay on 6.4.1 until the alias is gone.
+    rollup-plugin-dts: 6.4.1
     rollup-plugin-import-trace: 1.0.1
     rollup-plugin-license: 3.7.1
     rollup-plugin-lit-css: 6.0.1
