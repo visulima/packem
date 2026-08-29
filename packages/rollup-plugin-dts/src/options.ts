@@ -26,7 +26,6 @@ export type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | u
 export type Generator = "oxc" | "tsc" | "tsgo";
 
 export interface Logger {
-
     error: (...args: any[]) => void;
 
     info: (...args: any[]) => void;
@@ -332,11 +331,11 @@ export type OptionsResolved = Overwrite<
         oxc: IsolatedDeclarationsOptions | false;
         tsconfig?: string;
         tsconfigRaw: TsConfigJson;
-        tsgo: { path?: string } | false;
+        tsgo: false | { path?: string };
     }
 >;
 
-let warnedTsgo = false;
+let isWarnedTsgo = false;
 
 type RawTsconfig = {
     [key: string]: unknown;
@@ -390,7 +389,7 @@ const readTsconfigFile = (p: string): string | undefined => {
             // The classic compiler's `ts.sys.readFile` strips a leading UTF-8 BOM before
             // handing the text to `ts.readConfigFile`; `readFileSync` does not. Strip it here
             // so a BOM-prefixed tsconfig parses identically under both compilers.
-            return content.codePointAt(0) === 0xFE_FF ? content.slice(1) : content;
+            return content.codePointAt(0) === 0xfe_ff ? content.slice(1) : content;
         } catch {
             return undefined;
         }
@@ -540,8 +539,8 @@ const validateGenerator = (generator: Generator, logger: Logger): void => {
         return;
     }
 
-    if (generator === "tsgo" && !warnedTsgo) {
-        warnedTsgo = true;
+    if (generator === "tsgo" && !isWarnedTsgo) {
+        isWarnedTsgo = true;
         logger.warn(
             "[@visulima/rollup-plugin-dts] The `tsgo` generator is experimental: TypeScript 7.0 does not yet have a stable API, and some options (such as `isolatedDeclarations`) are unavailable.",
         );
@@ -570,7 +569,10 @@ const normalizeTsgo = (tsgoOption: boolean | TsgoOptions): false | { path?: stri
  * Whether the user asked for oxc, either explicitly or implicitly via `isolatedDeclarations`.
  * This is about *intent* — the generator that actually runs is decided by {@link resolveGenerator}.
  */
-const isOxcRequested = (oxcOption: boolean | Omit<IsolatedDeclarationsOptions, "sourcemap"> | undefined, compilerOptions: TsConfigJson.CompilerOptions): boolean => {
+const isOxcRequested = (
+    oxcOption: boolean | Omit<IsolatedDeclarationsOptions, "sourcemap"> | undefined,
+    compilerOptions: TsConfigJson.CompilerOptions,
+): boolean => {
     if (oxcOption === false) {
         return false;
     }
@@ -588,7 +590,11 @@ const applyOxcDefaults = (
 ): IsolatedDeclarationsOptions => {
     const oxcResolved: IsolatedDeclarationsOptions = typeof oxcOption === "object" ? oxcOption : {};
 
-    oxcResolved.stripInternal ??= compilerOptions.stripInternal ?? false;
+    // `stripInternal` is a real tsconfig compiler option, but TsConfigJson.CompilerOptions
+    // does not model it (TypeScript marks it internal), so widen to read it.
+    const { stripInternal } = compilerOptions as TsConfigJson.CompilerOptions & { stripInternal?: boolean };
+
+    oxcResolved.stripInternal ??= stripInternal ?? false;
     oxcResolved.sourcemap = compilerOptions.declarationMap ?? false;
 
     return oxcResolved;
@@ -697,14 +703,14 @@ export const resolveOptions = ({
     // TypeScript's parser and `@visulima/tsconfig` auto-add `incremental: true`
     // whenever `composite: true` is set, which would otherwise force every
     // composite project into disk mode and leave `.tsbuildinfo` files behind.
-    const incremental
-        = incrementalOption
-            || pluginCompilerOptions.incremental === true
-            || typeof pluginCompilerOptions.tsBuildInfoFile === "string"
-            || (typeof tsconfig === "string" && hasExplicitIncrementalInTsconfig(tsconfig));
-    const sourcemap = sourcemapOption ?? Boolean(compilerOptions.declarationMap);
+    const isIncremental =
+        incrementalOption
+        || pluginCompilerOptions.incremental === true
+        || typeof pluginCompilerOptions.tsBuildInfoFile === "string"
+        || (typeof tsconfig === "string" && hasExplicitIncrementalInTsconfig(tsconfig));
+    const isSourcemap = sourcemapOption ?? Boolean(compilerOptions.declarationMap);
 
-    compilerOptions.declarationMap = sourcemap;
+    compilerOptions.declarationMap = isSourcemap;
 
     let resolvedEntry: string[] | undefined;
 
@@ -748,7 +754,7 @@ export const resolveOptions = ({
     // extra work") must not veto `allowJs: true`, which still requires `.js`
     // declarations to be emitted.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- `||` is intentional: this is boolean OR semantics (either flag enables JS emit), not a null/undefined fallback; `??` would let an explicit `checkJs: false` veto `allowJs: true`.
-    const emitJs = emitJsOption ?? Boolean(compilerOptions.checkJs || compilerOptions.allowJs);
+    const isEmitJs = emitJsOption ?? Boolean(compilerOptions.checkJs || compilerOptions.allowJs);
 
     return {
         banner,
@@ -759,13 +765,13 @@ export const resolveOptions = ({
         dtsInput,
         eager,
         emitDtsOnly,
-        emitJs,
+        emitJs: isEmitJs,
         entry: resolvedEntry,
         exclude,
         footer,
         generator,
         include,
-        incremental,
+        incremental: isIncremental,
         logger,
         newContext,
         oxc: oxcResolved,
@@ -774,7 +780,7 @@ export const resolveOptions = ({
         resolve,
         resolver,
         sideEffects,
-        sourcemap,
+        sourcemap: isSourcemap,
         tsconfig,
         tsconfigRaw,
         tsgo,

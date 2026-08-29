@@ -162,10 +162,10 @@ export const babelTransformPlugin = ({
     // non-serializable options, or worker script not found). `parallel <= 0` (or
     // `false`) means "disabled" — a worker count of 0 would otherwise be treated as a
     // pool size and break.
-    let parallelDisabled = parallel === false || (typeof parallel === "number" && parallel <= 0);
+    let isParallelDisabled = parallel === false || (typeof parallel === "number" && parallel <= 0);
 
     const ensurePool = (): Pool | undefined => {
-        if (parallelDisabled) {
+        if (isParallelDisabled) {
             return undefined;
         }
 
@@ -182,7 +182,7 @@ export const babelTransformPlugin = ({
         const nonSerializableKey = findNonSerializableOption(baseTransformOptions as Record<string, unknown>);
 
         if (nonSerializableKey !== undefined) {
-            parallelDisabled = true;
+            isParallelDisabled = true;
 
             logger?.warn(
                 `[packem:babel] Parallel transforms disabled: the Babel option "${nonSerializableKey}" is not serializable across a worker thread (e.g. a function plugin/preset or a function-form babel config). Falling back to in-process transforms.`,
@@ -194,7 +194,7 @@ export const babelTransformPlugin = ({
         const script = resolveWorkerScript();
 
         if (!script) {
-            parallelDisabled = true;
+            isParallelDisabled = true;
 
             logger?.debug(
                 "[packem:babel] Parallel transforms disabled: the worker script was not found on disk (running from source, or the build did not copy it into dist/babel-runtime/). Falling back to in-process transforms.",
@@ -214,10 +214,12 @@ export const babelTransformPlugin = ({
 
     return <Plugin>{
         async closeBundle() {
-            if (!this.meta.watchMode) {
-                await workerPool?.terminate();
-                workerPool = undefined;
+            if (this.meta.watchMode) {
+                return;
             }
+
+            await workerPool?.terminate();
+            workerPool = undefined;
         },
 
         async closeWatcher() {

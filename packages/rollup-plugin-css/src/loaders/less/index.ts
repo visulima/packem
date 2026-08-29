@@ -68,10 +68,10 @@ const loader: Loader<LESSLoaderOptions> = {
         });
 
         // Track file dependencies for watch mode
-        const deps = result.imports;
+        const dependencies = result.imports;
 
-        for (const dep of deps) {
-            this.deps.add(normalize(dep));
+        for (const dependency of dependencies) {
+            this.deps.add(normalize(dependency));
         }
 
         return { code: result.css, map: result.map || map };

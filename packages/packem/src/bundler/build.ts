@@ -23,15 +23,15 @@ const dependencyValidationEnabled = (context: BuildContext<InternalBuildOptions>
 // populated by our own plugins and feeds dependency validation, so both the
 // rollup and rolldown paths must load it identically.
 const loadDependenciesCache = (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): void => {
-    const cachedDeps = fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
+    const cachedDependencies = fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
 
-    if (cachedDeps) {
+    if (cachedDependencies) {
         // The deserialized cache payload can be partial despite the typed
         // shape, so the runtime guards are intentional.
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
-        cachedDeps.used?.forEach((dep) => context.usedDependencies.add(dep));
+        cachedDependencies.used?.forEach((dependency) => context.usedDependencies.add(dependency));
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cache JSON read from disk may omit fields
-        cachedDeps.hoisted?.forEach((dep) => context.hoistedDependencies.add(dep));
+        cachedDependencies.hoisted?.forEach((dependency) => context.hoistedDependencies.add(dependency));
     }
 };
 
@@ -56,17 +56,16 @@ const buildWithRollup = async (
     subDirectory: string,
     rollupOptions: RollupOptions,
 ): Promise<void> => {
-    const hasCachedDependencies
-        = dependencyValidationEnabled(context)
-            && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
+    const hasCachedDependencies =
+        dependencyValidationEnabled(context) && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
 
-    const loadCache = !dependencyValidationEnabled(context) || hasCachedDependencies;
+    const isLoadCache = !dependencyValidationEnabled(context) || hasCachedDependencies;
 
     // Build the effective options without mutating the caller's object: only
     // inject the persisted rollup cache when cache loading is enabled.
     let effectiveOptions: RollupOptions = rollupOptions;
 
-    if (loadCache) {
+    if (isLoadCache) {
         effectiveOptions = {
             ...rollupOptions,
             cache: fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory),
@@ -81,7 +80,7 @@ const buildWithRollup = async (
     const buildResult = await rollup(effectiveOptions);
 
     try {
-        if (loadCache) {
+        if (isLoadCache) {
             fileCache.set(BUNDLE_CACHE_KEY, buildResult.cache, subDirectory);
         }
 
@@ -114,9 +113,8 @@ const buildWithRolldown = async (
     // BUNDLE_CACHE_KEY the way the rollup path does. The dependencies cache,
     // however, is populated by our own plugins and feeds dependency
     // validation — so it must stay in sync regardless of bundler.
-    const hasCachedDependencies
-        = dependencyValidationEnabled(context)
-            && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
+    const hasCachedDependencies =
+        dependencyValidationEnabled(context) && Boolean(fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory));
 
     if (hasCachedDependencies) {
         loadDependenciesCache(context, fileCache, subDirectory);

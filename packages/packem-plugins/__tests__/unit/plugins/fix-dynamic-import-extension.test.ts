@@ -53,14 +53,14 @@ describe(fixDynamicImportExtension, () => {
             expect.assertions(3);
 
             const code1 = "import('./module.ts')";
-            const code2 = "import(\"./module.ts\")";
+            const code2 = 'import("./module.ts")';
             const code3 = "import(`./module.ts`)";
             const result1 = renderChunk(code1, {} as RenderedChunk, { format: "es", sourcemap: false } as NormalizedOutputOptions);
             const result2 = renderChunk(code2, {} as RenderedChunk, { format: "es", sourcemap: false } as NormalizedOutputOptions);
             const result3 = renderChunk(code3, {} as RenderedChunk, { format: "es", sourcemap: false } as NormalizedOutputOptions);
 
             expect(result1?.code).toBe("import('./module.mjs')");
-            expect(result2?.code).toBe("import(\"./module.mjs\")");
+            expect(result2?.code).toBe('import("./module.mjs")');
             expect(result3?.code).toBe("import(`./module.mjs`)");
         });
 

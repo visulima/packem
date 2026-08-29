@@ -56,7 +56,7 @@ const createTsProgramFromParsedConfig = ({
         // entry that no `.ts` file imports. Only relevant when a language plugin
         // (Vue/ts-macro) registers such extensions; module resolution already handles the
         // imported-file case. See sxzz/rolldown-plugin-dts#272.
-        ...vue || tsMacro ? { allowNonTsExtensions: true } : undefined,
+        ...((vue === true || tsMacro === true) && { allowNonTsExtensions: true }),
     };
 
     // Root the program at only this module. TypeScript still pulls in everything `id`
@@ -94,10 +94,10 @@ const createTsProgramFromParsedConfig = ({
             throw new Error(
                 `Unable to load file ${id} from the program. This seems like a bug of rollup-plugin-dts. Please report this issue to https://github.com/visulima/packem/issues`,
             );
-        } else {
-            debug(`File ${id} does not exist on disk.`);
-            throw new Error(`Source file not found: ${id}`);
         }
+
+        debug(`File ${id} does not exist on disk.`);
+        throw new Error(`Source file not found: ${id}`);
     }
 
     return {

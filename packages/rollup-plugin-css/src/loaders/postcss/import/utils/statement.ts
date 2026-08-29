@@ -2,10 +2,10 @@ import type { Warning } from "postcss";
 
 import type { ImportStatement, NodesStatement, PreImportStatement, Statement } from "../types";
 
-export const isWarning = (stmt: Statement): stmt is Warning => stmt.type === "warning";
+export const isWarning = (statement: Statement): statement is Warning => statement.type === "warning";
 
-export const isNodesStatement = (stmt: Statement): stmt is NodesStatement => stmt.type === "nodes";
+export const isNodesStatement = (statement: Statement): statement is NodesStatement => statement.type === "nodes";
 
-export const isImportStatement = (stmt: Statement): stmt is ImportStatement => stmt.type === "import";
+export const isImportStatement = (statement: Statement): statement is ImportStatement => statement.type === "import";
 
-export const isPreImportStatement = (stmt: Statement): stmt is PreImportStatement => stmt.type === "pre-import";
+export const isPreImportStatement = (statement: Statement): statement is PreImportStatement => statement.type === "pre-import";

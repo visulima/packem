@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
-const SEA_SUPPORTED = !process.versions.bun && !process.versions.deno && satisfies(process.version, ">=25.7.0");
+const IS_SEA_SUPPORTED = !process.versions.bun && !process.versions.deno && satisfies(process.version, ">=25.7.0");
 
 const EXE_UNSUPPORTED_REGEX = /does not support `exe` option/;
 
@@ -31,9 +31,9 @@ describe("packem exe (SEA)", () => {
     it("fails with a clear error when Node version is below 25.7.0", async ({ skip }) => {
         expect.assertions(2);
 
-        skip(SEA_SUPPORTED, "Skipping negative test on a SEA-supported runtime");
+        skip(IS_SEA_SUPPORTED, "Skipping negative test on a SEA-supported runtime");
 
-        writeFileSync(`${temporaryDirectoryPath}/src/cli.ts`, "console.log(\"hello from packem exe\");\n");
+        writeFileSync(`${temporaryDirectoryPath}/src/cli.ts`, 'console.log("hello from packem exe");\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -52,12 +52,12 @@ describe("packem exe (SEA)", () => {
         expect(`${String(result.stdout)}\n${String(result.stderr)}`).toMatch(EXE_UNSUPPORTED_REGEX);
     });
 
-    it.skipIf(!SEA_SUPPORTED)(
+    it.skipIf(!IS_SEA_SUPPORTED)(
         "builds a runnable standalone executable on Node >= 25.7.0",
         async () => {
             expect.assertions(3);
 
-            writeFileSync(`${temporaryDirectoryPath}/src/cli.ts`, "console.log(\"hello from packem exe\");\n");
+            writeFileSync(`${temporaryDirectoryPath}/src/cli.ts`, 'console.log("hello from packem exe");\n');
 
             await installPackage(temporaryDirectoryPath, "typescript");
 

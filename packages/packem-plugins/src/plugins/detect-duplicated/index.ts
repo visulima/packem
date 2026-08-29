@@ -78,13 +78,13 @@ export interface DetectDuplicatedPluginOptions {
 const sortImporters = (importers: Set<string>): Set<string> => new Set([...importers].toSorted((a, b) => a.localeCompare(b)));
 
 const sortDirectoryMap = (directoryMap: Map<string, Set<string>>): Map<string, Set<string>> =>
-    new Map([...directoryMap.entries()].toSorted((a, b) => a[0].localeCompare(b[0])).map(([directory, importers]) => [directory, sortImporters(importers)]));
+    new Map([...directoryMap].toSorted((a, b) => a[0].localeCompare(b[0])).map(([directory, importers]) => [directory, sortImporters(importers)]));
 
 const sortVersionMap = (versionMap: Map<string, Map<string, Set<string>>>): Map<string, Map<string, Set<string>>> =>
-    new Map([...versionMap.entries()].toSorted((a, b) => compare(a[0], b[0])).map(([version, directoryMap]) => [version, sortDirectoryMap(directoryMap)]));
+    new Map([...versionMap].toSorted((a, b) => compare(a[0], b[0])).map(([version, directoryMap]) => [version, sortDirectoryMap(directoryMap)]));
 
 const sortPackagesInfo = (packagesInfo: PackagesInfo): PackagesInfo =>
-    new Map([...packagesInfo.entries()].toSorted((a, b) => a[0].localeCompare(b[0])).map(([name, versionMap]) => [name, sortVersionMap(versionMap)]));
+    new Map([...packagesInfo].toSorted((a, b) => a[0].localeCompare(b[0])).map(([name, versionMap]) => [name, sortVersionMap(versionMap)]));
 
 const addImporter = (packagesInfo: PackagesInfo, name: string, version: string, directory: string, importer: string): void => {
     let versionMap = packagesInfo.get(name);
@@ -208,10 +208,10 @@ export const detectDuplicatedPlugin = (
             const packagesInfo = sortPackagesInfo(collected);
 
             // analyze duplicated packages
-            const duplicatedDeps: Record<string, string[]> = {};
+            const duplicatedDependencies: Record<string, string[]> = {};
             const issuePackagesMap = new Map<string, string[]>();
 
-            for (const [packageName, versionMap] of packagesInfo.entries()) {
+            for (const [packageName, versionMap] of packagesInfo) {
                 const directoryMaps = [...versionMap.values()];
                 // multiple versions, or one version and multiple directories
                 const isDuplicated = directoryMaps.length > 1 || (directoryMaps.length === 1 && (directoryMaps[0]?.size ?? 0) > 1);
@@ -220,13 +220,13 @@ export const detectDuplicatedPlugin = (
                     continue;
                 }
 
-                duplicatedDeps[packageName] = [...versionMap.keys()];
+                duplicatedDependencies[packageName] = [...versionMap.keys()];
 
                 for (const version of versionMap.keys()) {
                     const ignoredVersions = ignore[packageName];
-                    const pass = ignoredVersions !== undefined && (ignoredVersions.includes("*") || ignoredVersions.includes(version));
+                    const isPass = ignoredVersions !== undefined && (ignoredVersions.includes("*") || ignoredVersions.includes(version));
 
-                    if (!pass) {
+                    if (!isPass) {
                         const newIssueVersions = issuePackagesMap.get(packageName) ?? [];
 
                         newIssueVersions.push(version);
@@ -252,7 +252,7 @@ export const detectDuplicatedPlugin = (
                 logger.error(message);
                 logger.info(`Fix this error by eliminating the duplicated dependencies or adjusting the ${magenta("ignore")} option.`);
                 logger.info(`You can copy the following duplicated dependencies as the value of the ${magenta("ignore")} option:`);
-                logger.info(`\n${JSON.stringify(duplicatedDeps, undefined, 4)}\n`);
+                logger.info(`\n${JSON.stringify(duplicatedDependencies, undefined, 4)}\n`);
 
                 this.error("Duplicated dependencies detected.");
             }

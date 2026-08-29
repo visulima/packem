@@ -91,7 +91,7 @@ const promptAndInstall = async (
         throw error;
     }
 
-    if (!await verifyInstalled()) {
+    if (!(await verifyInstalled())) {
         logger.error(`Installed ${packageName} but it still cannot be loaded. Try restarting packem.`);
 
         throw new Error(`${packageName} was installed but is not loadable in the current process. Re-run packem to pick it up.`);
@@ -109,7 +109,8 @@ export const ensureBundlerInstalled = async (bundler: BundlerName, rootDirectory
     }
 
     await promptAndInstall(bundler, `${bundler} is required as the bundler but is not installed. Install it now?`, rootDirectory, logger, () =>
-        isBundlerAvailable(bundler));
+        isBundlerAvailable(bundler),
+    );
 };
 
 /**

@@ -208,8 +208,8 @@ const buildMergedWatchOptions = (context: BuildContext<InternalBuildOptions>, cu
 const configureWatchOptions = (context: BuildContext<InternalBuildOptions>, currentWatch: WatchOptions): WatchOptions => {
     const userWatch: WatchOptions = context.options.rollup.watch;
 
-    const result: WatchOptions
-        = !userWatch || typeof currentWatch !== "object" || currentWatch.include !== undefined
+    const result: WatchOptions =
+        !userWatch || typeof currentWatch !== "object" || currentWatch.include !== undefined
             ? currentWatch
             : buildMergedWatchOptions(context, currentWatch, userWatch);
 
@@ -236,7 +236,7 @@ const configureRolldownWatchOptions = (context: BuildContext<InternalBuildOption
         }
 
         if (userWatch.exclude !== undefined) {
-            exclude.push(...Array.isArray(userWatch.exclude) ? userWatch.exclude : [userWatch.exclude]);
+            exclude.push(...(Array.isArray(userWatch.exclude) ? userWatch.exclude : [userWatch.exclude]));
         }
     }
 
@@ -253,7 +253,7 @@ const watch = async (
     // Watch-mode caching is always enabled today; kept as a single named flag so
     // the rollup cache-restore gating points below stay explicit (the rolldown
     // branches set their own cache flag to false instead).
-    const useCache = true;
+    const isUseCache = true;
 
     // Only `.close()` is used across both backends' watchers, so a structural
     // type keeps the array bundler-agnostic (rolldown's watcher is not a RollupWatcher).
@@ -273,7 +273,7 @@ const watch = async (
         // starts a DTS watcher when there are no entries to build.
         let bundleWatcher: RollupWatcher;
         let bundleOptions: { input?: Record<string, string> | string | string[] };
-        let bundleUseCache: boolean;
+        let isBundleUseCache: boolean;
 
         if (isRolldown) {
             // Rolldown bundle watcher (native). DTS watching, when enabled, also
@@ -293,7 +293,7 @@ const watch = async (
             bundleOptions = rolldownOptions;
             // Rolldown manages its own incremental state; there is no rollup-style
             // serializable `cache`, so cache reuse is disabled for this watcher.
-            bundleUseCache = false;
+            isBundleUseCache = false;
         } else {
             const rollupWatch = await getRollupWatch();
             const rollupOptions = await getRollupOptions(context, fileCache);
@@ -305,7 +305,7 @@ const watch = async (
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- useCache is a feature flag, intentionally always-on today; the guard marks the cache-restore toggle point.
-            if (useCache) {
+            if (isUseCache) {
                 rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
             }
 
@@ -313,7 +313,7 @@ const watch = async (
 
             bundleWatcher = rollupWatch(rollupOptions);
             bundleOptions = rollupOptions;
-            bundleUseCache = useCache;
+            isBundleUseCache = isUseCache;
         }
 
         await context.hooks.callHook("rollup:watch", context, bundleWatcher);
@@ -327,7 +327,7 @@ const watch = async (
             mode: "bundle",
             runBuilder,
             runOnsuccess,
-            useCache: bundleUseCache,
+            useCache: isBundleUseCache,
             watcher: bundleWatcher,
         });
 
@@ -335,7 +335,7 @@ const watch = async (
 
         if (context.options.declaration) {
             let dtsWatcher: RollupWatcher;
-            let dtsUseCache: boolean;
+            let isDtsUseCache: boolean;
 
             if (isRolldown) {
                 // Rolldown DTS watcher: uses the rolldown-native watch path, mirroring
@@ -350,20 +350,20 @@ const watch = async (
                 (rolldownDtsOptions as Record<string, unknown>).watch = configureRolldownWatchOptions(context);
 
                 dtsWatcher = rolldownDtsWatch(rolldownDtsOptions) as unknown as RollupWatcher;
-                dtsUseCache = false;
+                isDtsUseCache = false;
             } else {
                 const rollupWatch = await getRollupWatch();
                 const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
 
                 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- useCache is a feature flag, intentionally always-on today; the guard marks the cache-restore toggle point.
-                if (useCache) {
+                if (isUseCache) {
                     rollupDtsOptions.cache = fileCache.get(`dts-${WATCH_CACHE_KEY}`);
                 }
 
                 await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);
 
                 dtsWatcher = rollupWatch(rollupDtsOptions);
-                dtsUseCache = useCache;
+                isDtsUseCache = isUseCache;
             }
 
             await context.hooks.callHook("rollup:watch", context, dtsWatcher);
@@ -372,7 +372,7 @@ const watch = async (
                 context,
                 fileCache,
                 mode: "types",
-                useCache: dtsUseCache,
+                useCache: isDtsUseCache,
                 watcher: dtsWatcher,
             });
 

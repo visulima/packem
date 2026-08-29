@@ -40,16 +40,12 @@ interface BuildResult {
     dtsChunks: OutputChunk[];
 }
 
-const rolldownBuildHelper = async (
-    input: string | string[] | Record<string, string>,
-    pluginOptions: Parameters<typeof dts>[0] = {},
-): Promise<BuildResult> => {
+const rolldownBuildHelper = async (input: string | string[] | Record<string, string>, pluginOptions: Parameters<typeof dts>[0] = {}): Promise<BuildResult> => {
     const bundle = await rolldown({
         checks: { pluginTimings: false },
         input,
         onwarn(warning, defaultHandler) {
-            if (["UNRESOLVED_IMPORT", "UNUSED_EXTERNAL_IMPORT"].includes(warning.code ?? ""))
-                return;
+            if (["UNRESOLVED_IMPORT", "UNUSED_EXTERNAL_IMPORT"].includes(warning.code ?? "")) return;
 
             defaultHandler(warning);
         },

@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prevent-abbreviations -- file name matches existing import paths across the package */
 import MagicString from "magic-string";
 import type { ESMExport, ParsedStaticImport } from "mlly";
 import { findExports, findStaticImports, parseStaticImport } from "mlly";
@@ -146,7 +145,7 @@ const extractExports = (code: string, info: CodeInfo, options: Options): ParsedE
 /**
  * Represents a declaration span with additional properties.
  */
-interface Decl extends Span {
+interface CollectedDeclaration extends Span {
     /** Whether the declaration is a `declare` statement. */
     declare: boolean;
 
@@ -174,13 +173,13 @@ interface Export {
 }
 
 /** Oxc AST declaration node types that the plugin handles. */
-type Declaration
-    = | import("oxc-parser").Class
-        | import("oxc-parser").Function
-        | import("oxc-parser").TSEnumDeclaration
-        | import("oxc-parser").TSInterfaceDeclaration
-        | import("oxc-parser").TSTypeAliasDeclaration
-        | import("oxc-parser").VariableDeclaration;
+type Declaration =
+    | import("oxc-parser").Class
+    | import("oxc-parser").Function
+    | import("oxc-parser").TSEnumDeclaration
+    | import("oxc-parser").TSInterfaceDeclaration
+    | import("oxc-parser").TSTypeAliasDeclaration
+    | import("oxc-parser").VariableDeclaration;
 
 /**
  * Prepares a declaration node by extracting its name and span, and adds it to the declarations map.
@@ -188,7 +187,7 @@ type Declaration
  * @param decl The AST declaration node to process.
  * @param unnamed A function to generate a unique name for unnamed declarations.
  */
-const prepareDeclaration = (decls: Map<string, Decl>, decl: Declaration, unnamed: () => string): void => {
+const prepareDeclaration = (decls: Map<string, CollectedDeclaration>, decl: Declaration, unnamed: () => string): void => {
     // VariableDeclaration
     if ("declarations" in decl && decl.declarations.length > 0) {
         const variableDeclarator = decl.declarations[0];
@@ -255,7 +254,7 @@ const createCjsNamespace = (
         return `__unnamed_${String(unnamedCounter)}$$`;
     };
 
-    const declarations = new Map<string, Decl>();
+    const declarations = new Map<string, CollectedDeclaration>();
     const exportsMap = new Map<string, Export>();
     const { program } = parsed;
 
@@ -275,7 +274,7 @@ const createCjsNamespace = (
         } else if (node.type === "ImportDeclaration") {
             // Imports should remain top-level and are not part of the namespace content.
             // Do not add them to the declarations map.
-            continue; // Skip to the next node
+            // Skip to the next node
         } else {
             // eslint-disable-next-line default-case
             switch (node.type) {
@@ -311,7 +310,7 @@ const createCjsNamespace = (
 
     if (defaultExport) {
         // Only populate if defaultExport is found, to avoid issues with pure type-only runs
-        for (const [name, exp] of exportsMap.entries()) {
+        for (const [name, exp] of exportsMap) {
             if (name === defaultExport.local) {
                 continue;
             }
@@ -350,21 +349,21 @@ const createCjsNamespace = (
     const ms = new MagicString(`${finalPreamble}\ndeclare namespace ${defaultExport.local} {\n`);
 
     // write the declarations
-    for (const [name, decl] of declarations.entries()) {
+    for (const [name, declaration] of declarations) {
         // Use localTypeExports derived inside this function
         if (localTypeExports.includes(name) && name !== defaultExport.local) {
             continue;
         }
 
-        const chunk = code.slice(decl.start, decl.end).replace(TRIM_TRAILING_BRACE_RE, " }");
+        const chunk = code.slice(declaration.start, declaration.end).replace(TRIM_TRAILING_BRACE_RE, " }");
 
-        ms.append("    ");
+        ms.append(" ".repeat(4));
 
         // replace declare with export
-        if (decl.declare) {
-            ms.append(chunk.replace("declare", "export").replaceAll("    ", "        "));
+        if (declaration.declare) {
+            ms.append(chunk.replace("declare", "export").replaceAll(" ".repeat(4), " ".repeat(8)));
         } else {
-            ms.append(`export ${chunk}`.replaceAll("    ", "        "));
+            ms.append(`export ${chunk}`.replaceAll(" ".repeat(4), " ".repeat(8)));
         }
 
         ms.append("\n");
@@ -391,8 +390,8 @@ const handleDefaultCJSExportAsDefault = (code: string, parsedExportsInfo: Parsed
 
     if (defaultImport) {
         // Logic for when defaultImport IS present
-        const replacementCode
-            = exportList.length === 0
+        const replacementCode =
+            exportList.length === 0
                 ? `export = ${defaultImport.defaultImport ?? ""};`
                 : `// @ts-ignore\nexport = ${defaultImport.defaultImport ?? ""};\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier ?? ""}'`;
 
@@ -491,7 +490,7 @@ const handleDefaultNamedCJSExport = (
     const importStatement = `import { ${defaultAlias} } from '${defaultExport.specifier ?? ""}';\n`;
     let modifiedCode = code;
 
-    const lastExistingImportEnd = originalStaticImports.length > 0 ? originalStaticImports.at(-1)?.end ?? 0 : 0;
+    const lastExistingImportEnd = originalStaticImports.length > 0 ? (originalStaticImports.at(-1)?.end ?? 0) : 0;
 
     const ms = new MagicString(modifiedCode);
 
@@ -682,11 +681,11 @@ const fixDtsDefaultCJSExports = (
                 // eslint-disable-next-line no-secrets/no-secrets
                 // If handleDefaultNamedCJSExport warned and returned undefined because the specific named import was missing,
                 // we should honor that and not proceed to the general noSpecifier fallback.
-                const wasSpecificNamedExportWarning
-                    = defaultImport // An import for the module existed
-                        && parsedExports.defaultExport.specifier // It was a re-export
-                        && defaultAlias !== "default" // It was a named alias to default
-                        && defaultImport.namedImports?.[defaultAlias] !== defaultAlias; // And the specific alias wasn't found in the import
+                const wasSpecificNamedExportWarning =
+                    defaultImport // An import for the module existed
+                    && parsedExports.defaultExport.specifier // It was a re-export
+                    && defaultAlias !== "default" // It was a named alias to default
+                    && defaultImport.namedImports?.[defaultAlias] !== defaultAlias; // And the specific alias wasn't found in the import
 
                 if (resultString === undefined && wasSpecificNamedExportWarning) {
                     // Do nothing here. resultString is already undefined, and we want to propagate that.

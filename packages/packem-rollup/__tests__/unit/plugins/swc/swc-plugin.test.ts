@@ -9,8 +9,7 @@ const FOO_TS_REGEX = /\.foo\.ts$/;
 const callTransform = async (plugin: ReturnType<typeof swcPlugin>, code: string, id: string) => {
     const { transform } = plugin;
     const handler = (typeof transform === "function" ? transform : transform?.handler) as
-        | ((this: PluginContext, code: string, id: string) => Promise<{ code: string; map?: unknown } | undefined>)
-        | undefined;
+        ((this: PluginContext, code: string, id: string) => Promise<{ code: string; map?: unknown } | undefined>) | undefined;
 
     return handler?.call({} as PluginContext, code, id);
 };

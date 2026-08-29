@@ -18,32 +18,34 @@ interface Logger {
 }
 
 const cleanDistributionDirectories = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
-    if (context.options.clean) {
-        const logger = context.logger as unknown as Logger;
-        const cleanedDirectories: string[] = [];
+    if (!context.options.clean) {
+        return;
+    }
 
-        for (const directory of new Set(
-            context.options.entries
-                .map((entry) => entry.outDir)
-                .filter(Boolean)
-                .toSorted((a, b) => a.localeCompare(b)),
-        )) {
-            if (
-                directory === context.options.rootDir
-                || directory === context.options.sourceDir
-                || context.options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`)
-                || cleanedDirectories.some((c) => directory.startsWith(c))
-            ) {
-                continue;
-            }
+    const logger = context.logger as unknown as Logger;
+    const cleanedDirectories: string[] = [];
 
-            cleanedDirectories.push(directory);
-
-            logger.info(`Cleaning dist directory: \`./${relative(context.options.rootDir, directory)}\``);
-
-            // eslint-disable-next-line no-await-in-loop
-            await emptyDir(directory);
+    for (const directory of new Set(
+        context.options.entries
+            .map((entry) => entry.outDir)
+            .filter(Boolean)
+            .toSorted((a, b) => a.localeCompare(b)),
+    )) {
+        if (
+            directory === context.options.rootDir
+            || directory === context.options.sourceDir
+            || context.options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`)
+            || cleanedDirectories.some((c) => directory.startsWith(c))
+        ) {
+            continue;
         }
+
+        cleanedDirectories.push(directory);
+
+        logger.info(`Cleaning dist directory: \`./${relative(context.options.rootDir, directory)}\``);
+
+        // eslint-disable-next-line no-await-in-loop
+        await emptyDir(directory);
     }
 };
 

@@ -122,7 +122,7 @@ describe(patchTypescriptTypes, () => {
 
             // Indentation before the comment is NOT part of the comment, so line 3 retains
             // its 4-space indent (followed by the newline that originally ended the comment line).
-            const expected = ["declare class C {", "    foo: number;", "    ", "    baz: boolean;", "}", ""].join("\n");
+            const expected = ["declare class C {", "    foo: number;", " ".repeat(4), "    baz: boolean;", "}", ""].join("\n");
 
             expect(runRenderChunk(code)).toBe(expected);
         });
@@ -220,7 +220,7 @@ describe(patchTypescriptTypes, () => {
             // PropertyDefinition). The matcher walks every node, so it picks them up too.
             const code = ["declare interface I {", "    foo: number;", "    /* @internal */", "    bar: string;", "    baz: boolean;", "}", ""].join("\n");
 
-            const expected = ["declare interface I {", "    foo: number;", "    ", "    baz: boolean;", "}", ""].join("\n");
+            const expected = ["declare interface I {", "    foo: number;", " ".repeat(4), "    baz: boolean;", "}", ""].join("\n");
 
             expect(runRenderChunk(code, { fileName: "interface.d.ts" })).toBe(expected);
         });

@@ -45,7 +45,7 @@ const stripHash = (string_: string): string => {
     }
 
     try {
-        const url = new URL(string_, "http://example.com");
+        const url = new URL(string_, "https://example.com");
 
         if (!url.hash) {
             return string_;

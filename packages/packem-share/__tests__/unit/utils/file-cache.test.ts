@@ -1,4 +1,3 @@
-/* eslint-disable vitest/require-mock-type-parameters */
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join as pathJoin } from "node:path";

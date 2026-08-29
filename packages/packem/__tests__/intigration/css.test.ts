@@ -27,8 +27,8 @@ const CSS_DTS_SUFFIX_REGEX = /\.css\.d\.ts$/;
 //   • url resolution of intentionally-missing assets ("Unresolved URL")
 //   • demo deps imported by fixtures but not declared (e.g. `lit`)
 //   • multi-entry css chunks that share an output name
-const CSS_BENIGN_STDERR_WARNING_REGEX
-    = /Deprecation Warning|repetitive deprecation warnings omitted|Exported `[^`]+` as `[^`]+`|Unresolved URL|but not declared in package\.json|ould not (?:be )?resolve|overwrites a previously emitted file/;
+const CSS_BENIGN_STDERR_WARNING_REGEX =
+    /Deprecation Warning|repetitive deprecation warnings omitted|Exported `[^`]+` as `[^`]+`|Unresolved URL|but not declared in package\.json|ould not (?:be )?resolve|overwrites a previously emitted file/;
 
 const AUTO_MODULES_STYL_REGEX = /(?<!\.module\.)\.styl/;
 
@@ -61,11 +61,11 @@ type StringWriteData = BaseWriteData & {
     styleOptions?: string;
 };
 
-type WriteData
-    = | StringWriteData
-        | (BaseWriteData & {
-            styleOptions?: StyleOptions;
-        });
+type WriteData =
+    | StringWriteData
+    | (BaseWriteData & {
+          styleOptions?: StyleOptions;
+      });
 
 interface WriteFailResult {
     exitCode: number;
@@ -115,12 +115,12 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         // local type that the config alias still accepts.
         const rollupOutputConfig: { rollup: { output: OutputOptions } } | undefined = data.outputOpts
             ? {
-                rollup: {
-                    output: {
-                        ...data.outputOpts,
-                    },
-                },
-            }
+                  rollup: {
+                      output: {
+                          ...data.outputOpts,
+                      },
+                  },
+              }
             : undefined;
 
         const packemConfigProperties: PackemConfigProperties = {
@@ -162,6 +162,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         }
 
         expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [CSS_BENIGN_STDERR_WARNING_REGEX]);
+
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).toSatisfy((content: string) => {
@@ -188,7 +189,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 match = regex.exec(content);
             }
 
-            return matches.filter(Boolean).length === 0;
+            return !matches.some(Boolean);
         });
 
         const distributionPath = join(temporaryDirectoryPath, "dist");
@@ -323,8 +324,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         }
 
         const optionMode: StyleOptions["mode"] = typeof data.styleOptions === "object" ? data.styleOptions.mode : (data as StringWriteData).mode;
-        const optionSourceMap: StyleOptions["sourceMap"]
-            = typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
+        const optionSourceMap: StyleOptions["sourceMap"] =
+            typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
 
         const mode = inferModeOption(optionMode ?? "inject");
 
@@ -357,8 +358,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         }
 
         const optionMode: StyleOptions["mode"] = typeof data.styleOptions === "object" ? data.styleOptions.mode : (data as StringWriteData).mode;
-        const optionSourceMap: StyleOptions["sourceMap"]
-            = typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
+        const optionSourceMap: StyleOptions["sourceMap"] =
+            typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
 
         const mode = inferModeOption(optionMode ?? "inject");
 
@@ -969,7 +970,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 input: "simple/index.js",
                 styleOptions:
                     // eslint-disable-next-line no-template-curly-in-string, no-secrets/no-secrets -- this is a literal JS injector snippet written into the test packem config, not a credential; its high char entropy is incidental.
-                    "mode: [\"inject\", (varname, id) => `console.log(${varname},${JSON.stringify(id.replace(\"__REPLACE__\", \"\"))})`],",
+                    'mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id.replace("__REPLACE__", ""))})`],',
                 title: "function",
             },
         ] as WriteData[])("should work with injected processed $title css", async ({ title: _title, ...data }: WriteData) => {
@@ -1590,7 +1591,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 title: "named-exports",
             },
             {
-                errorMessage: "\"css\" is not exported by",
+                errorMessage: '"css" is not exported by',
                 input: "named-exports/index.js",
                 shouldFail: true,
                 styleOptions: {

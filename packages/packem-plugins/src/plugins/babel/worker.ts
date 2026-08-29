@@ -21,12 +21,7 @@ import { MISSING_OPTIONS_SENTINEL, transformCode } from "./transform-code";
  */
 const optionsByKey = new Map<string, TransformCodeOptions>();
 
-const transform = async (
-    sourcecode: string,
-    id: string,
-    optionsKey: string,
-    options?: TransformCodeOptions,
-): Promise<TransformCodeResult | undefined> => {
+const transform = async (sourcecode: string, id: string, optionsKey: string, options?: TransformCodeOptions): Promise<TransformCodeResult | undefined> => {
     if (options !== undefined) {
         optionsByKey.set(optionsKey, options);
     }

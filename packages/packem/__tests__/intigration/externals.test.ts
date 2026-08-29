@@ -9,7 +9,15 @@ import { execaNode } from "execa";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, expectNoUnexpectedStderrWarnings, installPackage, normalizeRolldownOutput } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    expectNoUnexpectedStderrWarnings,
+    installPackage,
+    normalizeRolldownOutput,
+} from "../helpers";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 const DECLARE_TRANSFORM_REGEX = /declare const transform/u;
@@ -261,6 +269,7 @@ export const transform = svgrTransform;
         // That advisory is expected here (the test asserts type *inlining*, not identifier names);
         // assert no OTHER warnings reached stderr.
         expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [/contains confusing identifier names/]);
+
         expect(binProcess.exitCode).toBe(0);
 
         // JS output should still have the external import
@@ -744,21 +753,21 @@ export const indent = dIndent;
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).not.toContain("from 'detect-indent'");
-        expect(dMtsContent).not.toContain("from \"detect-indent\"");
+        expect(dMtsContent).not.toContain('from "detect-indent"');
         expect(dMtsContent).toContain("indent");
 
         // CJS DTS output should NOT have an import from detect-indent (types are inlined)
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).not.toContain("from 'detect-indent'");
-        expect(dCtsContent).not.toContain("from \"detect-indent\"");
+        expect(dCtsContent).not.toContain('from "detect-indent"');
         expect(dCtsContent).toContain("indent");
 
         // Default DTS output should NOT have an import from detect-indent (types are inlined)
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dTsContent).not.toContain("from 'detect-indent'");
-        expect(dTsContent).not.toContain("from \"detect-indent\"");
+        expect(dTsContent).not.toContain('from "detect-indent"');
     });
 
     it("should externalize a declared peerDep even when tsconfig `paths` has a catch-all `*` entry", async () => {
@@ -775,7 +784,7 @@ export const indent = dIndent;
         // over `paths` catch-alls.
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "detect-indent");
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import detectIndent from \"detect-indent\";\nexport default detectIndent;\n");
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import detectIndent from "detect-indent";\nexport default detectIndent;\n');
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "^4.4.3",

@@ -72,7 +72,7 @@ export default Tr;`,
         // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown's native oxc transform emits the dev JSX runtime (jsxDEV, with `_jsxFileName`) under --development, while rollup uses esbuild (production jsx). The jsx-attribute removal under test is asserted on both; the dev-runtime shape difference is not normalize-able.
         if (isRolldown) {
             // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above; the stripped attribute must be absent regardless of jsx runtime shape
-            expect(mjsContent.includes("data-testid")).toBe(false);
+            expect(mjsContent).not.toContain("data-testid");
         } else {
             // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above
             expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
@@ -264,7 +264,7 @@ export default Tr;`,
         // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown's native oxc transform emits the dev JSX runtime (jsxDEV, with `_jsxFileName`) under --development, while rollup uses esbuild (production jsx). The jsx-attribute removal under test is asserted on both; the dev-runtime shape difference is not normalize-able.
         if (isRolldown) {
             // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above; the stripped attribute must be absent regardless of jsx runtime shape
-            expect(mjsContent.includes("data-testid")).toBe(false);
+            expect(mjsContent).not.toContain("data-testid");
         } else {
             // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above
             expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
@@ -368,8 +368,8 @@ export default Tr;`,
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // The stripped first-position attribute must be gone and the kept attribute intact.
-        expect(mjsContent.includes("data-testid")).toBe(false);
-        expect(mjsContent.includes("keep-me")).toBe(true);
+        expect(mjsContent).not.toContain("data-testid");
+        expect(mjsContent).toContain("keep-me");
     });
 
     it("should delete a attributes if the jsxRemoveAttributes is configured", async () => {
@@ -430,7 +430,7 @@ export default Tr;`,
         // eslint-disable-next-line vitest/no-conditional-in-test -- deterministic bundler branch: rolldown's native oxc transform emits the dev JSX runtime (jsxDEV, with `_jsxFileName`) under --development, while rollup uses esbuild (production jsx). The jsx-attribute removal under test is asserted on both; the dev-runtime shape difference is not normalize-able.
         if (isRolldown) {
             // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above; the stripped attribute must be absent regardless of jsx runtime shape
-            expect(mjsContent.includes("data-testid")).toBe(false);
+            expect(mjsContent).not.toContain("data-testid");
         } else {
             // eslint-disable-next-line vitest/no-conditional-expect -- see branch comment above
             expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';

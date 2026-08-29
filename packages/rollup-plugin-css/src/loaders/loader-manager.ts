@@ -18,7 +18,7 @@ const DEFAULT_THREAD_POOL_SIZE = 4;
  * Uses UV_THREADPOOL_SIZE environment variable if set, otherwise defaults to 4.
  * Leaves one thread available to prevent blocking in certain scenarios.
  */
-const parsedThreadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.env.UV_THREADPOOL_SIZE, 10) : Number.NaN;
+const parsedThreadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.env.UV_THREADPOOL_SIZE, 10) : NaN;
 const threadPoolSize = Number.isFinite(parsedThreadPoolSize) && parsedThreadPoolSize > 0 ? parsedThreadPoolSize : DEFAULT_THREAD_POOL_SIZE; // default `libuv` threadpool size
 
 // Always leave one thread available (see the node-sass note above) while

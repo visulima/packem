@@ -147,8 +147,7 @@ const createDtsResolvePlugin = ({
     };
 
     function shouldBundleNodeModule(id: string) {
-        if (typeof resolve === "boolean")
-            return resolve;
+        if (typeof resolve === "boolean") return resolve;
 
         return resolve.some((pattern) => {
             if (typeof pattern === "string") {
@@ -169,8 +168,7 @@ const createDtsResolvePlugin = ({
         const marker = "/node_modules/";
         const lastIndex = normalized.lastIndexOf(marker);
 
-        if (lastIndex === -1)
-            return false;
+        if (lastIndex === -1) return false;
 
         const after = normalized.slice(lastIndex + marker.length);
         const firstSlash = after.indexOf("/");
@@ -181,7 +179,7 @@ const createDtsResolvePlugin = ({
             const scopedSlash = scopedRest.indexOf("/");
             const subName = scopedSlash === -1 ? scopedRest : scopedRest.slice(0, scopedSlash);
 
-            packageName = `${packageName}/${subName}`;
+            packageName += `/${subName}`;
         }
 
         return shouldBundleNodeModule(packageName);
@@ -294,21 +292,21 @@ const canFallBackToSiblingDts = (resolvedJsPath: string): boolean => {
         const pkgPath = path.join(directory, "package.json");
 
         if (existsSync(pkgPath)) {
-            let result = false;
+            let isResult = false;
 
             try {
                 const { exports: exportsField } = JSON.parse(readFileSync(pkgPath, "utf8")) as { exports?: unknown };
 
                 // Apply the fallback when there's no conditional type resolution:
                 // exports missing (classic `main`+`types` layout) or string-form shorthand.
-                result = exportsField === undefined || typeof exportsField === "string";
+                isResult = exportsField === undefined || typeof exportsField === "string";
             } catch {
                 /* malformed package.json → don't apply the fallback */
             }
 
-            siblingFallbackCache.set(start, result);
+            siblingFallbackCache.set(start, isResult);
 
-            return result;
+            return isResult;
         }
 
         directory = path.dirname(directory);

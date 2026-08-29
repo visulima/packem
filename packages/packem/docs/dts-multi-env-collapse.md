@@ -18,11 +18,11 @@ shared declaration file** but uses **different JS files per condition**, e.g.
         "browser": {
             "types": "./dist/index.d.ts",
             "development": { "types": "./dist/index.d.ts", "import": "./dist/index.development.js" },
-            "import": "./dist/index.browser.js"
+            "import": "./dist/index.browser.js",
         },
         "node": { "types": "./dist/index.d.ts", "import": "./dist/index.server.js" },
-        "import": "./dist/index.js"
-    }
+        "import": "./dist/index.js",
+    },
 }
 ```
 
@@ -47,8 +47,8 @@ concurrent browser builds read/wrote the same slot and clobbered each other —
 the default entry's declaration collapsed and a sibling's chunk
 (`index.development.d`) was written in place of the real `index.d.ts`.
 
-(The earlier `entriesKey` work in `getRollupDtsOptions` only isolated the *plugin
-instance* memoization, not this `fileCache` slot.)
+(The earlier `entriesKey` work in `getRollupDtsOptions` only isolated the _plugin
+instance_ memoization, not this `fileCache` slot.)
 
 ## Fix
 

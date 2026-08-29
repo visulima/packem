@@ -11,7 +11,7 @@ import levenstein from "../../utils/find-alternatives";
 
 // Strips a trailing glob segment (and anything after it) so wildcard export
 // entries resolve to their containing directory.
-const GLOB_SUFFIX_REGEX = /\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/;
+const GLOB_SUFFIX_REGEX = /\/[^*/]*\*[^\n\r/\u{2028}\u{2029}]*(?:[\n\r\u{2028}\u{2029}][^*/]*\*[^\n\r/\u{2028}\u{2029}]*)*(?:\/.*)?$/u;
 
 const collectExportFilenames = (context: BuildContext<InternalBuildOptions>, packageType: "cjs" | "esm"): (string | undefined)[] => {
     const { options } = context;

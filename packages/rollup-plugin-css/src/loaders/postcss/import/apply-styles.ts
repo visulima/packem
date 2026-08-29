@@ -21,14 +21,14 @@ const applyStyles = (stylesheet: Stylesheet, styles: Document | Root): void => {
     }
 
     // Strip additional statements.
-    stylesheet.statements.forEach((stmt) => {
-        if (isImportStatement(stmt)) {
+    stylesheet.statements.forEach((statement) => {
+        if (isImportStatement(statement)) {
             // eslint-disable-next-line no-param-reassign
-            stmt.node.parent = undefined;
+            statement.node.parent = undefined;
 
-            styles.append(stmt.node);
-        } else if (isNodesStatement(stmt)) {
-            stmt.nodes.forEach((node) => {
+            styles.append(statement.node);
+        } else if (isNodesStatement(statement)) {
+            statement.nodes.forEach((node) => {
                 // eslint-disable-next-line no-param-reassign
                 node.parent = undefined;
 

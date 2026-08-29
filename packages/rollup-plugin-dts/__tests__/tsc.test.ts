@@ -268,15 +268,18 @@ describe("tsc", () => {
         expect.assertions(1);
 
         const root = path.resolve(dirname, "fixtures/vue-sfc-entries");
-        const { snapshot } = await rolldownBuild([path.resolve(root, "Foo.vue"), path.resolve(root, "Bar.vue")], [
-            dts({
-                compilerOptions: {
-                    isolatedDeclarations: false,
-                },
-                emitDtsOnly: true,
-                vue: true,
-            }),
-        ]);
+        const { snapshot } = await rolldownBuild(
+            [path.resolve(root, "Foo.vue"), path.resolve(root, "Bar.vue")],
+            [
+                dts({
+                    compilerOptions: {
+                        isolatedDeclarations: false,
+                    },
+                    emitDtsOnly: true,
+                    vue: true,
+                }),
+            ],
+        );
 
         expect(snapshot).toMatchSnapshot();
     });

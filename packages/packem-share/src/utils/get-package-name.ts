@@ -6,7 +6,7 @@
 const getPackageName = (id = ""): string => {
     // `String.split` always yields at least one element, so `first` is never the
     // default; the default only satisfies `noUncheckedIndexedAccess` without a cast.
-    const [first = "", second] = id.split("/");
+    const [first = "", second] = id.split("/", 2);
 
     if (first.startsWith("@")) {
         // A bare scoped specifier with no subpath (e.g. "@scope") has no second

@@ -2,8 +2,8 @@ import { cwd, exit } from "node:process";
 
 import type { Cli } from "@visulima/cerebro";
 import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "@visulima/packem-share/constants";
-import { resolve } from "@visulima/path";
 import type { Pail } from "@visulima/pail";
+import { resolve } from "@visulima/path";
 import { createJiti } from "jiti";
 
 import { runFirstRunWizard } from "../../bundler/first-run-wizard";
@@ -138,7 +138,7 @@ const collectExternals = (options: BuildCommandOptions): string[] => {
  * // packem build --watch --development
  *
  * // With custom environment variables:
- * // packem build --env.API_URL=http://api.example.com
+ * // packem build --env.API_URL=https://api.example.com
  * ```
  * @internal
  */
@@ -231,21 +231,19 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                             path: options.license,
                         },
                         metafile: options.metafile,
-                        ...Object.keys(environments).length > 0 || Object.keys(cliEnvVariables).length > 0
-                            ? {
-                                replace: {
-                                    values: environments,
-                                },
-                            }
-                            : {},
+                        ...((Object.keys(environments).length > 0 || Object.keys(cliEnvVariables).length > 0) && {
+                            replace: {
+                                values: environments,
+                            },
+                        }),
                         resolveExternals: options.noExternal
                             ? {
-                                builtins: false,
-                                deps: false,
-                                devDeps: false,
-                                optDeps: false,
-                                peerDeps: false,
-                            }
+                                  builtins: false,
+                                  deps: false,
+                                  devDeps: false,
+                                  optDeps: false,
+                                  peerDeps: false,
+                              }
                             : {},
                     },
                     runtime: options.runtime,
@@ -254,14 +252,12 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                     unbundle: options.unbundle,
                     // validation will take the default values
                     validation: options.validation === false ? false : {},
-                    ...options.exe ? { exe: true } : {},
-                    ...options.typedoc
-                        ? {
-                            typedoc: {
-                                format: "html",
-                            },
-                        }
-                        : {},
+                    ...(options.exe && { exe: true }),
+                    ...(options.typedoc && {
+                        typedoc: {
+                            format: "html",
+                        },
+                    }),
                 });
 
                 // --no-validation must override preset validation settings but not user-configured validation
@@ -280,7 +276,7 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                     nodeEnvironment as Environment,
                     // cerebro injects a Pail logger at runtime; the toolbox types it
                     // as the narrower `Console`, so widen it to what packem expects.
-                    logger as unknown as Parameters<typeof packem>[3],
+                    logger,
                     options.debug ?? false,
                     mergedConfig as unknown as BuildConfig,
                     options.tsconfig ?? undefined,
@@ -444,7 +440,7 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                 type: String,
             },
             {
-                description: "Signal to kill child process, \"SIGTERM\" or \"SIGKILL\"",
+                description: 'Signal to kill child process, "SIGTERM" or "SIGKILL"',
                 name: "killSignal",
                 type: (input: string) => {
                     if (input === "SIGTERM" || input === "SIGKILL") {

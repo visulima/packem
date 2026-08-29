@@ -54,11 +54,11 @@ const cssnanoMinifier: Minifier<Options> = {
         try {
             const cssNanoMap = sourceMap
                 ? {
-                    annotation: false,
-                    inline: false,
-                    prev: data.map,
-                    sourcesContent: sourceMap.content,
-                }
+                      annotation: false,
+                      inline: false,
+                      prev: data.map,
+                      sourcesContent: sourceMap.content,
+                  }
                 : undefined;
 
             // Process CSS with source map support

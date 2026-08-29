@@ -10,15 +10,15 @@ vi.mock(import("../../../../src/plugins/esbuild/utils/optimize-deps"), () => {
 // eslint-disable-next-line import/first
 import esbuildPlugin from "../../../../src/plugins/esbuild/esbuild-plugin";
 // eslint-disable-next-line import/first
-import type { OptimizeDepsResult } from "../../../../src/plugins/esbuild/types";
+import type { OptimizeDepsResult as OptimizeDependenciesResult } from "../../../../src/plugins/esbuild/types";
 // eslint-disable-next-line import/first
-import doOptimizeDeps from "../../../../src/plugins/esbuild/utils/optimize-deps";
+import doOptimizeDependencies from "../../../../src/plugins/esbuild/utils/optimize-deps";
 
 const makeLogger = () => ({ debug: vi.fn(), error: vi.fn(), info: vi.fn(), log: vi.fn(), warn: vi.fn() }) as unknown as Console;
 
 const AS_DEFAULT_REGEX = /as default/;
 
-const primeOptimizeDeps = async (plugin: ReturnType<typeof esbuildPlugin>) => {
+const primeOptimizeDependencies = async (plugin: ReturnType<typeof esbuildPlugin>) => {
     const buildStart = plugin.buildStart as (this: PluginContext, options: NormalizedInputOptions) => Promise<void>;
 
     await buildStart.call({} as PluginContext, {} as NormalizedInputOptions);
@@ -26,18 +26,18 @@ const primeOptimizeDeps = async (plugin: ReturnType<typeof esbuildPlugin>) => {
 
 describe("esbuildPlugin — optimizeDeps integration", () => {
     beforeEach(() => {
-        vi.mocked(doOptimizeDeps).mockReset();
+        vi.mocked(doOptimizeDependencies).mockReset();
     });
 
     it("should invoke doOptimizeDeps from buildStart and emit a `optimized` debug log", async () => {
         expect.assertions(3);
 
-        const optimized: OptimizeDepsResult = {
+        const optimized: OptimizeDependenciesResult = {
             cacheDir: "/cache",
             optimized: new Map([["react", { file: "/cache/react.js" }]]),
         };
 
-        vi.mocked(doOptimizeDeps).mockResolvedValueOnce(optimized);
+        vi.mocked(doOptimizeDependencies).mockResolvedValueOnce(optimized);
 
         const logger = makeLogger();
         const plugin = esbuildPlugin({
@@ -45,17 +45,17 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
             optimizeDeps: { include: ["react"] },
         });
 
-        await primeOptimizeDeps(plugin);
+        await primeOptimizeDependencies(plugin);
 
-        expect(doOptimizeDeps).toHaveBeenCalledTimes(1);
-        expect(vi.mocked(doOptimizeDeps).mock.calls[0]?.[0]).toMatchObject({ include: ["react"] });
+        expect(doOptimizeDependencies).toHaveBeenCalledTimes(1);
+        expect(vi.mocked(doOptimizeDependencies).mock.calls[0]?.[0]).toMatchObject({ include: ["react"] });
         expect((logger as unknown as { debug: ReturnType<typeof vi.fn> }).debug).toHaveBeenCalledWith("optimized %O", optimized.optimized);
     });
 
     it("should not call doOptimizeDeps a second time after the first buildStart populates the result", async () => {
         expect.assertions(1);
 
-        vi.mocked(doOptimizeDeps).mockResolvedValue({
+        vi.mocked(doOptimizeDependencies).mockResolvedValue({
             cacheDir: "/cache",
             optimized: new Map([["react", { file: "/cache/react.js" }]]),
         });
@@ -65,16 +65,16 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
             optimizeDeps: { include: ["react"] },
         });
 
-        await primeOptimizeDeps(plugin);
-        await primeOptimizeDeps(plugin);
+        await primeOptimizeDependencies(plugin);
+        await primeOptimizeDependencies(plugin);
 
-        expect(doOptimizeDeps).toHaveBeenCalledTimes(1);
+        expect(doOptimizeDependencies).toHaveBeenCalledTimes(1);
     });
 
     it("should resolveId(id) to the cached file path for an optimized id", async () => {
         expect.assertions(1);
 
-        vi.mocked(doOptimizeDeps).mockResolvedValueOnce({
+        vi.mocked(doOptimizeDependencies).mockResolvedValueOnce({
             cacheDir: "/cache",
             optimized: new Map([["lodash-es", { file: "/cache/lodash-es.js" }]]),
         });
@@ -84,7 +84,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
             optimizeDeps: { include: ["lodash-es"] },
         });
 
-        await primeOptimizeDeps(plugin);
+        await primeOptimizeDependencies(plugin);
 
         const resolveId = plugin.resolveId as (this: PluginContext, id: string) => string | undefined;
 
@@ -94,7 +94,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
     it("should return undefined from resolveId for ids that were not optimized", async () => {
         expect.assertions(1);
 
-        vi.mocked(doOptimizeDeps).mockResolvedValueOnce({
+        vi.mocked(doOptimizeDependencies).mockResolvedValueOnce({
             cacheDir: "/cache",
             optimized: new Map([["lodash-es", { file: "/cache/lodash-es.js" }]]),
         });
@@ -104,7 +104,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
             optimizeDeps: { include: ["lodash-es"] },
         });
 
-        await primeOptimizeDeps(plugin);
+        await primeOptimizeDependencies(plugin);
 
         const resolveId = plugin.resolveId as (this: PluginContext, id: string) => string | undefined;
 
@@ -114,7 +114,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
     it("should short-circuit transform for ids that resolved via the optimize-deps cache", async () => {
         expect.assertions(1);
 
-        vi.mocked(doOptimizeDeps).mockResolvedValueOnce({
+        vi.mocked(doOptimizeDependencies).mockResolvedValueOnce({
             cacheDir: "/cache",
             optimized: new Map([["/foo.ts", { file: "/cache/foo.js" }]]),
         });
@@ -124,7 +124,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
             optimizeDeps: { include: ["/foo.ts"] },
         });
 
-        await primeOptimizeDeps(plugin);
+        await primeOptimizeDependencies(plugin);
 
         const transform = plugin.transform as {
             handler: (this: PluginContext, code: string, id: string) => Promise<unknown>;
@@ -149,7 +149,7 @@ describe("esbuildPlugin — optimizeDeps integration", () => {
             handler: (this: PluginContext, code: string, id: string) => Promise<{ code: string } | undefined>;
         };
 
-        const result = await transform.handler.call({ warn: vi.fn() } as unknown as PluginContext, "{ \"hello\": 1 }", "/data.json");
+        const result = await transform.handler.call({ warn: vi.fn() } as unknown as PluginContext, '{ "hello": 1 }', "/data.json");
 
         expect(result?.code).toMatch(AS_DEFAULT_REGEX);
         expect(result?.code).toContain("export {");

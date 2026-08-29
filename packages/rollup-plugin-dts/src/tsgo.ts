@@ -103,13 +103,13 @@ export const buildTsgoArgs = (project: string | undefined, tsgoDist: string, roo
     "false",
     "--declaration",
     "--emitDeclarationOnly",
-    ...project ? ["-p", project] : [],
+    ...(project ? ["-p", project] : []),
     "--outDir",
     tsgoDist,
     "--rootDir",
     rootDirectory,
     "--noCheck",
-    ...sourcemap ? ["--declarationMap"] : [],
+    ...(sourcemap ? ["--declarationMap"] : []),
 ];
 
 export const runTsgo = async (

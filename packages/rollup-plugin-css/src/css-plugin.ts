@@ -296,8 +296,8 @@ const cssPlugin = (
             const emittedList: [string, string[]][] = [];
 
             const getExtractedData = async (name: string, ids: string[]): Promise<ExtractedData> => {
-                const fileName
-                    = typeof loaderOptions.extract === "string" ? normalize(loaderOptions.extract).replace(RELATIVE_PATH_RE, "") : normalize(`${name}.css`);
+                const fileName =
+                    typeof loaderOptions.extract === "string" ? normalize(loaderOptions.extract).replace(RELATIVE_PATH_RE, "") : normalize(`${name}.css`);
 
                 if (isAbsolute(fileName)) {
                     this.error(["Extraction path must be relative to the output directory,", `which is ${relative(cwd, directory)}`].join("\n"));
@@ -428,11 +428,7 @@ const cssPlugin = (
                     const { css: minifiedCss, map: minifiedMap } = await options.minifier.handler.bind({
                         browserTargets,
                         logger,
-                    })(
-                        extractedData,
-                        sourceMap,
-                        (options[options.minifier.name as keyof StyleOptions] as Record<string, unknown> | undefined) ?? {},
-                    );
+                    })(extractedData, sourceMap, (options[options.minifier.name as keyof StyleOptions] as Record<string, unknown> | undefined) ?? {});
 
                     extractedData.css = minifiedCss;
                     extractedData.map = minifiedMap;
@@ -610,8 +606,8 @@ const cssPlugin = (
                 plugin: "css",
             });
 
-            for (const dep of context.deps) {
-                this.addWatchFile(dep);
+            for (const dependency of context.deps) {
+                this.addWatchFile(dependency);
             }
 
             for (const [fileName, source] of context.assets) {

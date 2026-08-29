@@ -10,7 +10,15 @@ import { join } from "@visulima/path";
 import { execa } from "execa";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, expectNoUnexpectedStderrWarnings, installPackage, normalizeRolldownOutput } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    expectNoUnexpectedStderrWarnings,
+    installPackage,
+    normalizeRolldownOutput,
+} from "../helpers";
 import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 // Tests that compare bundled output byte-exactly fail under rolldown because
@@ -150,7 +158,7 @@ describe("packem typescript", () => {
         it("should resolve .jsx -> .tsx", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.jsx\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.jsx";');
             await writeFile(`${temporaryDirectoryPath}/src/file.tsx`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -182,8 +190,8 @@ describe("packem typescript", () => {
         it("should resolve .jsx -> .ts when .tsx does not exist", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { value } from \"./utils.jsx\";\nconsole.log(value);");
-            await writeFile(`${temporaryDirectoryPath}/src/utils.ts`, "export const value = \"from-ts-via-jsx\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { value } from "./utils.jsx";\nconsole.log(value);');
+            await writeFile(`${temporaryDirectoryPath}/src/utils.ts`, 'export const value = "from-ts-via-jsx";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -211,8 +219,8 @@ describe("packem typescript", () => {
         it("should resolve .js -> .tsx when .ts does not exist", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { Component } from \"./component.js\";\nconsole.log(Component);");
-            await writeFile(`${temporaryDirectoryPath}/src/component.tsx`, "export const Component = \"tsx-component\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { Component } from "./component.js";\nconsole.log(Component);');
+            await writeFile(`${temporaryDirectoryPath}/src/component.tsx`, 'export const Component = "tsx-component";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -240,7 +248,7 @@ describe("packem typescript", () => {
         it("should resolve .jsx -> .js", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.js`, "import \"./file.jsx\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.js`, 'import "./file.jsx";');
             await writeFile(`${temporaryDirectoryPath}/src/file.jsx`, "console.log(1);");
 
             await createPackageJson(temporaryDirectoryPath, {
@@ -267,7 +275,7 @@ describe("packem typescript", () => {
         it("should resolve .mjs -> .ts", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.mjs\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.mjs";');
             await writeFile(`${temporaryDirectoryPath}/src/file.mjs`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -299,7 +307,7 @@ describe("packem typescript", () => {
         it("should resolve .cjs -> .ts", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.cjs\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.cjs";');
             await writeFile(`${temporaryDirectoryPath}/src/file.cjs`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -333,10 +341,10 @@ describe("packem typescript", () => {
 
             // In source code, TypeScript files should be preferred over JavaScript
             // when both exist for the same import specifier
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { value } from \"./file.js\"; console.log(value);");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { value } from "./file.js"; console.log(value);');
             // Both files exist, .ts should be preferred
-            await writeFile(`${temporaryDirectoryPath}/src/file.ts`, "export const value = \"from-typescript\";");
-            await writeFile(`${temporaryDirectoryPath}/src/file.js`, "export const value = \"from-javascript\";");
+            await writeFile(`${temporaryDirectoryPath}/src/file.ts`, 'export const value = "from-typescript";');
+            await writeFile(`${temporaryDirectoryPath}/src/file.js`, 'export const value = "from-javascript";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -388,19 +396,19 @@ console.log(fromBoth, fromTs);
                 type: "module",
             });
             // Entry point imports from a relative file
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "index.js"), "export { fromBoth } from \"./file.js\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "index.js"), 'export { fromBoth } from "./file.js";');
             // Package accidentally ships both .js and .ts for the same file
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.js"), "export const fromBoth = \"compiled-js\";");
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.ts"), "export const fromBoth: string = \"source-ts\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.js"), 'export const fromBoth = "compiled-js";');
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.ts"), 'export const fromBoth: string = "source-ts";');
 
             await writeJson(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "package.json"), {
                 main: "./index.js",
                 name: "pkg-with-only-ts",
                 type: "module",
             });
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "index.js"), "export { fromTs } from \"./file.js\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "index.js"), 'export { fromTs } from "./file.js";');
             // Package only ships .ts (forgot to compile or .npmignore misconfigured)
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "file.ts"), "export const fromTs: string = \"only-ts\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "file.ts"), 'export const fromTs: string = "only-ts";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -422,6 +430,7 @@ console.log(fromBoth, fromTs);
             // packem advises it will bundle those undeclared deps. That advisory is expected
             // here; assert no OTHER warnings reached stderr.
             expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [/but not declared in package\.json/]);
+
             expect(binProcess.exitCode).toBe(0);
 
             const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
@@ -452,7 +461,7 @@ console.log(value);
                 name: "dep-wildcard",
                 type: "module",
             });
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-wildcard", "dist", "utils.js"), "export const value = \"hello\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-wildcard", "dist", "utils.js"), 'export const value = "hello";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -496,7 +505,7 @@ console.log(value);
                 name: "@scope/dep-wildcard",
                 type: "module",
             });
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "@scope", "dep-wildcard", "dist", "utils.js"), "export const value = \"scoped-hello\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "@scope", "dep-wildcard", "dist", "utils.js"), 'export const value = "scoped-hello";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -539,7 +548,7 @@ console.log(value);
                 name: "dep-mjs",
                 type: "module",
             });
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-mjs", "dist", "utils.mjs"), "export const value = \"from-mjs\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-mjs", "dist", "utils.mjs"), 'export const value = "from-mjs";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -580,8 +589,8 @@ console.log(value);
                 name: "dep-both",
                 type: "module",
             });
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-both", "file.js"), "export const value = \"compiled-js\";");
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-both", "file.ts"), "export const value: string = \"source-ts\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-both", "file.js"), 'export const value = "compiled-js";');
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-both", "file.ts"), 'export const value: string = "source-ts";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -623,7 +632,7 @@ console.log(value);
                 name: "dep-ts-only",
                 type: "module",
             });
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-ts-only", "file.ts"), "export const value: string = \"only-ts\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-ts-only", "file.ts"), 'export const value: string = "only-ts";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -658,7 +667,7 @@ console.log(value);
 
             await writeFile(
                 `${temporaryDirectoryPath}/src/index.ts`,
-                "import \"components:Test\";\n import { test2 } from \"components:Test2\";\n\nconsole.log(test2);",
+                'import "components:Test";\n import { test2 } from "components:Test2";\n\nconsole.log(test2);',
             );
             await writeFile(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
             await writeFile(`${temporaryDirectoryPath}/src/components/Test2.ts`, "export const test2 = 'test'");
@@ -756,9 +765,9 @@ console.log(value);
 
             await installPackage(temporaryDirectoryPath, "typescript");
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { b } from \"./bb\";\n\nconsole.log(b);");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { b } from "./bb";\n\nconsole.log(b);');
             await writeFile(`${temporaryDirectoryPath}/tt/a/aa.ts`, "export const a = 1;");
-            await writeFile(`${temporaryDirectoryPath}/tt/b/bb.ts`, "import { a } from \"./aa\";\nnconsole.log(a);\n\nexport const b = 2;");
+            await writeFile(`${temporaryDirectoryPath}/tt/b/bb.ts`, 'import { a } from "./aa";\nnconsole.log(a);\n\nexport const b = 2;');
 
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
@@ -848,7 +857,7 @@ export class ExampleClass {
         expect(cjs).toMatchSnapshot("cjs code output");
     });
 
-    it("should allow support for \"allowJs\" and generate proper assets", async () => {
+    it('should allow support for "allowJs" and generate proper assets', async () => {
         expect.assertions(4);
 
         await writeFile(`${temporaryDirectoryPath}/src/index.js`, `export default () => 'index';`);
@@ -933,7 +942,7 @@ export { version };
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(dCtsContent).toBe(
-            "var version$1 = \"0.0.1\";\nconst pkgJson = {\n\tversion: version$1};\n\nconst version = pkgJson.version;\n\nexport { version };\n",
+            'var version$1 = "0.0.1";\nconst pkgJson = {\n\tversion: version$1};\n\nconst version = pkgJson.version;\n\nexport { version };\n',
         );
     });
 
@@ -1095,9 +1104,9 @@ export { _default as default };
 export default fn({ value: 1 });`,
         );
 
-        const depAIndexDtsPath = `${temporaryDirectoryPath}/store/dep-a/index.d.ts`;
+        const dependencyAIndexDtsPath = `${temporaryDirectoryPath}/store/dep-a/index.d.ts`;
 
-        await writeFile(depAIndexDtsPath, `export * from 'dep-b';`);
+        await writeFile(dependencyAIndexDtsPath, `export * from 'dep-b';`);
         await writeFile(
             `${temporaryDirectoryPath}/store/dep-a/node_modules/dep-b/index.d.ts`,
             `type data = {
@@ -1111,7 +1120,7 @@ export declare function fn(a: data): data;
         await writeJson(join(temporaryDirectoryPath, "node_modules", "dep-a", "package.json"), { main: "index.js", name: "dep-a" });
         await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-a", "index.js"), "console.log('dep-a');");
 
-        symlinkSync(depAIndexDtsPath, join(temporaryDirectoryPath, "node_modules", "dep-a", "index.d.ts"));
+        symlinkSync(dependencyAIndexDtsPath, join(temporaryDirectoryPath, "node_modules", "dep-a", "index.d.ts"));
 
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
@@ -2837,10 +2846,10 @@ throw new Error('line 9');
         // "some-devdep". Consumers then pull the transitive specifier into their own build
         // and get "Inlined implicit external" / "shamefully hoisted" warnings for packages
         // that are not runtime deps of the package they imported from.
-        const devDepRoot = `${temporaryDirectoryPath}/node_modules/fake-bundled-devdep`;
+        const devDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-bundled-devdep`;
 
         await writeFile(
-            `${devDepRoot}/package.json`,
+            `${devDependencyRoot}/package.json`,
             // `types` must be listed before `default` — Node.js exports resolution picks the
             // first matching condition in object order, so if default comes first we'd get
             // `./index.js` back even when asking for the types condition.
@@ -2852,13 +2861,13 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${devDepRoot}/index.js`, "export default function work(value) { return value; }\n");
+        await writeFile(`${devDependencyRoot}/index.js`, "export default function work(value) { return value; }\n");
         await writeFile(
-            `${devDepRoot}/index.d.ts`,
+            `${devDependencyRoot}/index.d.ts`,
             "export interface WorkOptions { verbose?: boolean }\ndeclare function work(value: string): string;\nexport default work;\n",
         );
 
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "export { type WorkOptions, default as work } from \"fake-bundled-devdep\";\n");
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'export { type WorkOptions, default as work } from "fake-bundled-devdep";\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -2887,7 +2896,7 @@ throw new Error('line 9');
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         // The devDep's types must be inlined — no bare specifier left in the emitted .d.ts.
-        expect(dMtsContent).not.toContain("from \"fake-bundled-devdep\"");
+        expect(dMtsContent).not.toContain('from "fake-bundled-devdep"');
         expect(dMtsContent).not.toContain("from 'fake-bundled-devdep'");
         // The re-exported symbols should still be present (inlined, not dropped).
         expect(dMtsContent).toMatch(WORK_OPTIONS_REGEX);
@@ -2902,10 +2911,10 @@ throw new Error('line 9');
         // casts would leak into every emitted .d.ts. We only inline devDeps that
         // show up in `context.usedDependencies` — i.e. the JS build actually reached
         // them — to match the JS build's bundling decisions.
-        const usedDepRoot = `${temporaryDirectoryPath}/node_modules/fake-used-devdep`;
+        const usedDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-used-devdep`;
 
         await writeFile(
-            `${usedDepRoot}/package.json`,
+            `${usedDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -2914,18 +2923,18 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${usedDepRoot}/index.js`, "export default function used(value) { return value; }\n");
+        await writeFile(`${usedDependencyRoot}/index.js`, "export default function used(value) { return value; }\n");
         await writeFile(
-            `${usedDepRoot}/index.d.ts`,
+            `${usedDependencyRoot}/index.d.ts`,
             "export interface UsedOptions { verbose?: boolean }\ndeclare function used(value: string): string;\nexport default used;\n",
         );
 
         // Declared but never imported anywhere — simulates the "long tail" of
         // build-time-only devDeps (typescript, eslint, type-fest used only for casts …).
-        const unusedDepRoot = `${temporaryDirectoryPath}/node_modules/fake-unused-devdep`;
+        const unusedDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-unused-devdep`;
 
         await writeFile(
-            `${unusedDepRoot}/package.json`,
+            `${unusedDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -2934,14 +2943,14 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${unusedDepRoot}/index.js`, "export default function unused(value) { return value; }\n");
+        await writeFile(`${unusedDependencyRoot}/index.js`, "export default function unused(value) { return value; }\n");
         await writeFile(
-            `${unusedDepRoot}/index.d.ts`,
+            `${unusedDependencyRoot}/index.d.ts`,
             "export interface UnusedOptions { verbose?: boolean }\ndeclare function unused(value: string): string;\nexport default unused;\n",
         );
 
         // src only uses fake-used-devdep; fake-unused-devdep is declared but never imported.
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "export { type UsedOptions, default as used } from \"fake-used-devdep\";\n");
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'export { type UsedOptions, default as used } from "fake-used-devdep";\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -2986,10 +2995,10 @@ throw new Error('line 9');
         // .d.ts must externalize it too — otherwise we bundle the dep's .d.ts, which can
         // hit TS declaration-merging patterns (e.g. `export interface X` + `export const X`)
         // that produce duplicate ES-module exports rollup rejects.
-        const peerDepRoot = `${temporaryDirectoryPath}/node_modules/fake-peer-devdep`;
+        const peerDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-peer-devdep`;
 
         await writeFile(
-            `${peerDepRoot}/package.json`,
+            `${peerDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -2998,13 +3007,13 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${peerDepRoot}/index.js`, "export function parse(value) { return value; }\n");
+        await writeFile(`${peerDependencyRoot}/index.js`, "export function parse(value) { return value; }\n");
         await writeFile(
-            `${peerDepRoot}/index.d.ts`,
+            `${peerDependencyRoot}/index.d.ts`,
             "export declare function parse(value: string): string;\nexport declare namespace parse { const FLAG: unique symbol; }\n",
         );
 
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "export { parse } from \"fake-peer-devdep\";\n");
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'export { parse } from "fake-peer-devdep";\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -3078,9 +3087,9 @@ throw new Error('line 9');
         await writeFile(
             `${temporaryDirectoryPath}/src/index.ts`,
             [
-                "import type { LiteralUnion } from \"fake-types-only\";",
+                'import type { LiteralUnion } from "fake-types-only";',
                 "",
-                "export type Color = LiteralUnion<\"red\" | \"green\" | \"blue\">;",
+                'export type Color = LiteralUnion<"red" | "green" | "blue">;',
                 "",
                 "export function render(color: Color): string {",
                 "    return String(color);",
@@ -3153,9 +3162,9 @@ throw new Error('line 9');
         await writeFile(
             `${temporaryDirectoryPath}/src/index.ts`,
             [
-                "import type { LiteralUnion } from \"fake-types-only\";",
+                'import type { LiteralUnion } from "fake-types-only";',
                 "",
-                "export type Color = LiteralUnion<\"red\" | \"green\" | \"blue\">;",
+                'export type Color = LiteralUnion<"red" | "green" | "blue">;',
                 "",
                 "export function render(color: Color): string {",
                 "    return String(color);",
@@ -3207,10 +3216,10 @@ throw new Error('line 9');
         //
         // Emitting dual CJS+ESM is enough to trip the original cache (two DTS
         // outputs, same tsconfig) — the fix hashes `dtsResolve` into the key.
-        const devDepRoot = `${temporaryDirectoryPath}/node_modules/fake-dual-dep`;
+        const devDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-dual-dep`;
 
         await writeFile(
-            `${devDepRoot}/package.json`,
+            `${devDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -3219,13 +3228,13 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${devDepRoot}/index.js`, "export function sign(v) { return v; }\n");
+        await writeFile(`${devDependencyRoot}/index.js`, "export function sign(v) { return v; }\n");
         await writeFile(
-            `${devDepRoot}/index.d.ts`,
+            `${devDependencyRoot}/index.d.ts`,
             "export interface DualOptions { verbose?: boolean }\nexport declare function sign(value: string): string;\n",
         );
 
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "export { type DualOptions, sign } from \"fake-dual-dep\";\n");
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'export { type DualOptions, sign } from "fake-dual-dep";\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -3261,7 +3270,7 @@ throw new Error('line 9');
         expect(dCtsContent).not.toMatch(FROM_FAKE_DUAL_DEP_REGEX);
     });
 
-    it("should inline types for a bundled devDep whose package.json has `exports: \"./index.js\"` (no types condition)", async () => {
+    it('should inline types for a bundled devDep whose package.json has `exports: "./index.js"` (no types condition)', async () => {
         expect.assertions(3);
 
         // Repro for @visulima/string's `indent-string`/`redent`/`strip-indent`
@@ -3273,10 +3282,10 @@ throw new Error('line 9');
         // string doesn't go through conditional resolution — leaving the
         // emitted .d.ts to import the bare specifier, which then triggers
         // "shamefully hoisted" warnings at downstream consumers.
-        const devDepRoot = `${temporaryDirectoryPath}/node_modules/fake-exports-string`;
+        const devDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-exports-string`;
 
         await writeFile(
-            `${devDepRoot}/package.json`,
+            `${devDependencyRoot}/package.json`,
             // Exact shape of the sindresorhus packages: string exports, no types
             // condition, sibling `index.d.ts` by convention.
             JSON.stringify({
@@ -3287,13 +3296,13 @@ throw new Error('line 9');
                 version: "1.0.0",
             }),
         );
-        await writeFile(`${devDepRoot}/index.js`, "export default function work(value) { return value; }\n");
+        await writeFile(`${devDependencyRoot}/index.js`, "export default function work(value) { return value; }\n");
         await writeFile(
-            `${devDepRoot}/index.d.ts`,
+            `${devDependencyRoot}/index.d.ts`,
             "export interface WorkOptions { verbose?: boolean }\ndeclare function work(value: string): string;\nexport default work;\n",
         );
 
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "export { type WorkOptions, default as work } from \"fake-exports-string\";\n");
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'export { type WorkOptions, default as work } from "fake-exports-string";\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -3355,7 +3364,7 @@ throw new Error('line 9');
             // Transitive bare specifier from INSIDE the package's own .d.ts —
             // mimics type-fest re-exporting `tagged-tag`'s symbols.
             [
-                "import type { SomeHelper } from \"fake-transitive-helper\";",
+                'import type { SomeHelper } from "fake-transitive-helper";',
                 "export interface WorkOptions { verbose?: boolean; helper?: SomeHelper }",
                 "export declare function work(value: string): string;",
                 "",
@@ -3365,7 +3374,7 @@ throw new Error('line 9');
         // Note: fake-transitive-helper is NOT installed — if packem ran node-resolve
         // on it, the build would crash. It must be silently externalized.
 
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "export { type WorkOptions, work } from \"fake-bundled-with-transitive\";\n");
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'export { type WorkOptions, work } from "fake-bundled-with-transitive";\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -3418,7 +3427,7 @@ throw new Error('line 9');
             `${sharedPackageDirectory}/index.d.ts`,
             [
                 // Transitive bare specifier from inside the workspace sibling's dist.
-                "import type { Helper } from \"fake-workspace-transitive\";",
+                'import type { Helper } from "fake-workspace-transitive";',
                 "export interface WorkOptions { verbose?: boolean; helper?: Helper }",
                 "export declare function work(value: string): string;",
                 "",
@@ -3442,7 +3451,7 @@ throw new Error('line 9');
         await writeFile(`${temporaryDirectoryPath}/node_modules/.anchor`, "");
         symlinkSync(`${temporaryDirectoryPath}-workspace-sibling/fake-workspace-dep`, `${temporaryDirectoryPath}/node_modules/fake-workspace-dep`);
 
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "export { type WorkOptions, work } from \"fake-workspace-dep\";\n");
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'export { type WorkOptions, work } from "fake-workspace-dep";\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -3537,10 +3546,10 @@ throw new Error('line 9');
         // + `const ZodError`). The plugin must fold the companion into the primary so
         // fake-JS emits exactly one `export { X }` while still rendering both declaration
         // bodies in the final .d.ts.
-        const mergedDepRoot = `${temporaryDirectoryPath}/node_modules/fake-merged-devdep`;
+        const mergedDependencyRoot = `${temporaryDirectoryPath}/node_modules/fake-merged-devdep`;
 
         await writeFile(
-            `${mergedDepRoot}/package.json`,
+            `${mergedDependencyRoot}/package.json`,
             JSON.stringify({
                 exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
@@ -3550,11 +3559,11 @@ throw new Error('line 9');
             }),
         );
         await writeFile(
-            `${mergedDepRoot}/index.js`,
+            `${mergedDependencyRoot}/index.js`,
             "export function visit(node, visitor) { visitor(node); }\nvisit.BREAK = Symbol('BREAK');\nexport const ZodError = class { constructor(issues) { this.issues = issues; } };\n",
         );
         await writeFile(
-            `${mergedDepRoot}/index.d.ts`,
+            `${mergedDependencyRoot}/index.d.ts`,
             [
                 "export declare function visit(node: unknown, visitor: (n: unknown) => void): void;",
                 "export declare namespace visit {",
@@ -3568,7 +3577,7 @@ throw new Error('line 9');
             ].join("\n"),
         );
 
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "export { visit, ZodError } from \"fake-merged-devdep\";\n");
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'export { visit, ZodError } from "fake-merged-devdep";\n');
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -3667,62 +3676,59 @@ throw new Error('line 9');
         expect(dCtsContent).not.toMatch(FROM_MTS_REGEX);
     });
 
-    it.runIf(isRolldown)(
-        "should emit declaration files without //#region comments when using rolldown bundler",
-        async () => {
-            // Regression guard for plan 015: rolldown natively injects //#region <path>
-            // and //#endregion comments into emitted chunks including .d.ts files.
-            // packem's stripRolldownRegionCommentsPlugin must remove them so that:
-            //   1. The emitted d.ts is machine-independent (no worktree-path content).
-            //   2. Snapshots remain stable across worktree locations.
-            expect.assertions(6);
+    it.runIf(isRolldown)("should emit declaration files without //#region comments when using rolldown bundler", async () => {
+        // Regression guard for plan 015: rolldown natively injects //#region <path>
+        // and //#endregion comments into emitted chunks including .d.ts files.
+        // packem's stripRolldownRegionCommentsPlugin must remove them so that:
+        //   1. The emitted d.ts is machine-independent (no worktree-path content).
+        //   2. Snapshots remain stable across worktree locations.
+        expect.assertions(6);
 
-            await writeFile(
-                `${temporaryDirectoryPath}/src/index.ts`,
-                [
-                    "export interface RolldownDtsConfig {",
-                    "  name: string;",
-                    "  value: number;",
-                    "}",
-                    "",
-                    "export function build(config: RolldownDtsConfig): RolldownDtsConfig {",
-                    "  return config;",
-                    "}",
-                    "",
-                ].join("\n"),
-            );
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            [
+                "export interface RolldownDtsConfig {",
+                "  name: string;",
+                "  value: number;",
+                "}",
+                "",
+                "export function build(config: RolldownDtsConfig): RolldownDtsConfig {",
+                "  return config;",
+                "}",
+                "",
+            ].join("\n"),
+        );
 
-            await installPackage(temporaryDirectoryPath, "typescript");
-            await createTsConfig(temporaryDirectoryPath);
-            await createPackageJson(temporaryDirectoryPath, {
-                devDependencies: { typescript: "*" },
-                exports: {
-                    ".": {
-                        import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
-                        require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
-                    },
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: { typescript: "*" },
+            exports: {
+                ".": {
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
-                main: "./dist/index.cjs",
-                module: "./dist/index.mjs",
-            });
-            await createPackemConfig(temporaryDirectoryPath);
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
 
-            const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
 
-            expect(binProcess.exitCode).toBe(0);
+        expect(binProcess.exitCode).toBe(0);
 
-            const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-            // Declarations must be present.
-            expect(dTsContent).toContain("RolldownDtsConfig");
-            expect(dTsContent).toContain("build");
+        // Declarations must be present.
+        expect(dTsContent).toContain("RolldownDtsConfig");
+        expect(dTsContent).toContain("build");
 
-            // No //#region or //#endregion comments (worktree-path sensitive).
-            expect(dTsContent).not.toContain("//#region");
-            expect(dTsContent).not.toContain("//#endregion");
+        // No //#region or //#endregion comments (worktree-path sensitive).
+        expect(dTsContent).not.toContain("//#region");
+        expect(dTsContent).not.toContain("//#endregion");
 
-            // No absolute paths leaking into the output.
-            expect(dTsContent).not.toContain(temporaryDirectoryPath);
-        },
-    );
+        // No absolute paths leaking into the output.
+        expect(dTsContent).not.toContain(temporaryDirectoryPath);
+    });
 });

@@ -7,8 +7,7 @@ import { sucrasePlugin } from "../../../../src/plugins/sucrase";
 const callTransform = (plugin: ReturnType<typeof sucrasePlugin>, code: string, id: string) => {
     const { transform } = plugin;
     const handler = (typeof transform === "function" ? transform : transform?.handler) as
-        | ((this: PluginContext, code: string, id: string) => { code: string; map?: unknown } | undefined)
-        | undefined;
+        ((this: PluginContext, code: string, id: string) => { code: string; map?: unknown } | undefined) | undefined;
 
     return handler?.call({} as PluginContext, code, id);
 };

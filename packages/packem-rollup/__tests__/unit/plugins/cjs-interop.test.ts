@@ -96,11 +96,11 @@ describe("cjsInteropPlugin", () => {
         const plugin = cjsInteropPlugin({ logger: createLogger() });
         // The string literal contains a decoy `exports.foo = 1;`. Only the real
         // top-level `exports.default` assignment must be rewritten.
-        const input = ["const banner = \"exports.foo = 1;\";", "exports.default = banner;"].join("\n");
+        const input = ['const banner = "exports.foo = 1;";', "exports.default = banner;"].join("\n");
         const result = callRenderChunk(plugin, input, { fileName: "out.cjs", isEntry: true }, { exports: "auto", format: "cjs" });
 
         // The decoy inside the string literal is untouched.
-        expect(result?.code).toContain("\"exports.foo = 1;\"");
+        expect(result?.code).toContain('"exports.foo = 1;"');
         // The real assignment is rewritten.
         expect(result?.code).toContain("module.exports = banner;");
     });

@@ -2,7 +2,9 @@
     "$schema": "https://json.schemastore.org/tsconfig",
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "lib": ["ES2023", "DOM"],
+        // ES2025 for Set.prototype.union and friends; the package's node floor is 22,
+        // which ships them.
+        "lib": ["ES2025", "DOM"],
         "moduleResolution": "Bundler",
         // packem source is pure TypeScript, so checkJs from the base config
         // adds no safety here. It was triggering false positives by following

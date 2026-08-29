@@ -6,7 +6,7 @@ import { findPackageJson } from "@visulima/package/package-json";
 import { init, parse } from "cjs-module-lexer";
 import type { ResolvedId } from "rollup";
 
-let initted = false;
+let isInitted = false;
 
 // Shared package.json cache so the require-cjs-transformer renderChunk pass doesn't
 // re-walk and re-read package.json for every module classification.
@@ -34,14 +34,13 @@ export const isPureCJS = async (
     rollupResolve?: (id: string, importer?: string) => Promise<ResolvedId | null>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<boolean> => {
-    if (!initted) {
+    if (!isInitted) {
         await init();
-        initted = true;
+        isInitted = true;
     }
 
     // ignore Node.js built-in modules, as their performance is comparable
-    if (id.startsWith("node:"))
-        return false;
+    if (id.startsWith("node:")) return false;
 
     // Check if it's a .cjs file
     if (id.endsWith(".cjs")) {

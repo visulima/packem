@@ -14,7 +14,6 @@ export const filenameToDts = (id: string): string =>
     id.replace(RE_VUE, ".vue.ts").replace(RE_TS, ".d.$1ts").replace(RE_JS, ".d.$1ts").replace(RE_JSON, ".json.d.ts");
 export const filenameDtsTo = (id: string, extension: "js" | "ts"): string => id.replace(RE_DTS, `.$1${extension}`);
 
-// eslint-disable-next-line no-confusing-arrow -- conflicts with arrow-body-style / func-style preferences
 export const resolveTemplateFunction = (function_: ((chunk: PreRenderedChunk) => string) | string, chunk: PreRenderedChunk): string =>
     typeof function_ === "function" ? function_(chunk) : function_;
 

@@ -11,19 +11,19 @@ import base64EncodedConditionalImport from "./utils/base64-encoded-import";
 import { isImportStatement, isPreImportStatement, isWarning } from "./utils/statement";
 
 const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps) => AtRule): void => {
-    stylesheet.statements.forEach((stmt, index) => {
-        if (isWarning(stmt) || isPreImportStatement(stmt) || stmt.conditions.length === 0) {
+    stylesheet.statements.forEach((statement, index) => {
+        if (isWarning(statement) || isPreImportStatement(statement) || statement.conditions.length === 0) {
             return;
         }
 
-        if (isImportStatement(stmt)) {
+        if (isImportStatement(statement)) {
             // eslint-disable-next-line no-param-reassign
-            stmt.node.params = base64EncodedConditionalImport(stmt.fullUri, stmt.conditions);
+            statement.node.params = base64EncodedConditionalImport(statement.fullUri, statement.conditions);
 
             return;
         }
 
-        const { nodes } = stmt;
+        const { nodes } = statement;
 
         if (nodes.length === 0) {
             return;
@@ -38,12 +38,12 @@ const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps
         const atRules = [];
 
         // Convert conditions to at-rules
-        for (const condition of stmt.conditions) {
+        for (const condition of statement.conditions) {
             if (condition.media !== undefined) {
                 const mediaNode = atRule({
                     name: "media",
                     params: condition.media,
-                    source: stmt.importingNode?.source ?? parent.source,
+                    source: statement.importingNode?.source ?? parent.source,
                 });
 
                 atRules.push(mediaNode);
@@ -53,7 +53,7 @@ const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps
                 const scopeNode = atRule({
                     name: "scope",
                     params: condition.scope,
-                    source: stmt.importingNode?.source ?? parent.source,
+                    source: statement.importingNode?.source ?? parent.source,
                 });
 
                 atRules.push(scopeNode);
@@ -63,7 +63,7 @@ const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps
                 const supportsNode = atRule({
                     name: "supports",
                     params: `(${condition.supports})`,
-                    source: stmt.importingNode?.source ?? parent.source,
+                    source: statement.importingNode?.source ?? parent.source,
                 });
 
                 atRules.push(supportsNode);
@@ -73,7 +73,7 @@ const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps
                 const layerNode = atRule({
                     name: "layer",
                     params: condition.layer,
-                    source: stmt.importingNode?.source ?? parent.source,
+                    source: statement.importingNode?.source ?? parent.source,
                 });
 
                 atRules.push(layerNode);
@@ -107,9 +107,9 @@ const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps
 
         // eslint-disable-next-line no-param-reassign
         stylesheet.statements[index] = {
-            conditions: stmt.conditions,
-            from: stmt.from,
-            importingNode: stmt.importingNode,
+            conditions: statement.conditions,
+            from: statement.from,
+            importingNode: statement.importingNode,
             nodes: [outerAtRule],
             type: "nodes",
         };

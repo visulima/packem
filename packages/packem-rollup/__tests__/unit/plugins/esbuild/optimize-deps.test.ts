@@ -30,7 +30,7 @@ const { readFile } = await import("@visulima/fs");
 
 const rsModuleLexer = await import("rs-module-lexer");
 
-const { default: optimizeDeps } = await import("../../../../src/plugins/esbuild/utils/optimize-deps");
+const { default: optimizeDependencies } = await import("../../../../src/plugins/esbuild/utils/optimize-deps");
 
 const CACHE_DIR_ERROR_REGEX = /failed to find or create cache directory/;
 
@@ -46,7 +46,7 @@ describe("esbuild optimizeDeps", () => {
 
         vi.mocked(findCacheDirSync).mockReturnValueOnce(undefined);
 
-        await expect(optimizeDeps({ cwd: "/virtual/project", include: ["react"], sourceMap: false })).rejects.toThrow(CACHE_DIR_ERROR_REGEX);
+        await expect(optimizeDependencies({ cwd: "/virtual/project", include: ["react"], sourceMap: false })).rejects.toThrow(CACHE_DIR_ERROR_REGEX);
     });
 
     it("should build the optimized Map keyed by each include entry, pointing at <cacheDir>/<id>.js", async () => {
@@ -54,7 +54,7 @@ describe("esbuild optimizeDeps", () => {
 
         vi.mocked(findCacheDirSync).mockReturnValueOnce("/cache/optimize-deps");
 
-        const result = await optimizeDeps({ cwd: "/virtual/project", include: ["react", "react-dom"], sourceMap: false });
+        const result = await optimizeDependencies({ cwd: "/virtual/project", include: ["react", "react-dom"], sourceMap: false });
 
         expect(result.cacheDir).toBe("/cache/optimize-deps");
         expect(result.optimized.get("react")).toStrictEqual({ file: "/cache/optimize-deps/react.js" });
@@ -66,7 +66,7 @@ describe("esbuild optimizeDeps", () => {
 
         vi.mocked(findCacheDirSync).mockReturnValueOnce("/cache/optimize-deps");
 
-        await optimizeDeps({ cwd: "/virtual/project", include: ["lodash-es"], sourceMap: true });
+        await optimizeDependencies({ cwd: "/virtual/project", include: ["lodash-es"], sourceMap: true });
 
         expect(esbuildBuild).toHaveBeenCalledTimes(1);
         expect(vi.mocked(esbuildBuild).mock.calls[0]?.[0]).toMatchObject({
@@ -87,7 +87,7 @@ describe("esbuild optimizeDeps", () => {
 
         const userPlugin = { name: "user:custom", setup() {} };
 
-        await optimizeDeps({
+        await optimizeDependencies({
             cwd: "/virtual/project",
             esbuildOptions: { plugins: [userPlugin] },
             include: ["react"],
@@ -105,7 +105,7 @@ describe("esbuild optimizeDeps", () => {
 
         vi.mocked(findCacheDirSync).mockReturnValueOnce("/cache/optimize-deps");
 
-        await optimizeDeps({
+        await optimizeDependencies({
             cwd: "/virtual/project",
             esbuildOptions: { format: "cjs" },
             include: ["react"],
@@ -161,7 +161,7 @@ const captureInnerPluginHandlers = async (options: {
         return { errors: [], warnings: [] } as never;
     });
 
-    await optimizeDeps(options);
+    await optimizeDependencies(options);
 
     if (!onResolve || !onLoad) {
         throw new Error("inner plugin setup did not register both onResolve and onLoad");
@@ -247,7 +247,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             return { errors: [], warnings: [] } as never;
         });
 
-        await optimizeDeps({ cwd: "/virtual", include: ["react"], sourceMap: false });
+        await optimizeDependencies({ cwd: "/virtual", include: ["react"], sourceMap: false });
 
         // eslint-disable-next-line vitest/no-conditional-in-test -- narrowing guard before invoking the captured callback
         if (!onResolve) {
@@ -273,7 +273,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
         expect(result).toBeUndefined();
     });
 
-    it("should emit `export * from \"<absolute>\"` contents for a module that has named exports", async () => {
+    it('should emit `export * from "<absolute>"` contents for a module that has named exports', async () => {
         expect.assertions(1);
 
         const { onLoad } = await captureInnerPluginHandlers({
@@ -290,10 +290,10 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: "/abs/react.js", resolveDir: "/virtual/src" },
         });
 
-        expect(result).toStrictEqual({ contents: "export * from \"/abs/react.js\"", resolveDir: "/virtual/src" });
+        expect(result).toStrictEqual({ contents: 'export * from "/abs/react.js"', resolveDir: "/virtual/src" });
     });
 
-    it("should emit `module.exports = require(\"<absolute>\")` for a module with no named exports", async () => {
+    it('should emit `module.exports = require("<absolute>")` for a module with no named exports', async () => {
         expect.assertions(1);
 
         const { onLoad } = await captureInnerPluginHandlers({
@@ -310,7 +310,7 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: "/abs/react.js", resolveDir: "/virtual/src" },
         });
 
-        expect(result).toStrictEqual({ contents: "module.exports = require(\"/abs/react.js\")", resolveDir: "/virtual/src" });
+        expect(result).toStrictEqual({ contents: 'module.exports = require("/abs/react.js")', resolveDir: "/virtual/src" });
     });
 
     it("should normalize Windows-style backslashes in the absolute path to forward slashes", async () => {
@@ -332,6 +332,6 @@ describe("esbuild optimizeDeps — internal plugin callbacks", () => {
             pluginData: { absolute: String.raw`C:\abs\react.js`, resolveDir: String.raw`C:\tmp\src` },
         });
 
-        expect(result?.contents).toBe("export * from \"C:/abs/react.js\"");
+        expect(result?.contents).toBe('export * from "C:/abs/react.js"');
     });
 });

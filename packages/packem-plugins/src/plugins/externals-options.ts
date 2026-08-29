@@ -80,12 +80,12 @@ export type ExternalsBuildOptions = {
     validation?:
         | false
         | {
-            dependencies?:
-                | false
-                | {
-                    hoisted?: false | { exclude: string[] };
-                };
-        };
+              dependencies?:
+                  | false
+                  | {
+                        hoisted?: false | { exclude: string[] };
+                    };
+          };
 };
 
 export type ExternalsPluginOptions = {

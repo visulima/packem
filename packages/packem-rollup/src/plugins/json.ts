@@ -25,7 +25,7 @@ export const JsonPlugin = (options: RollupJsonOptions): Plugin => {
                     | { handler: (this: unknown, code: string, id: string) => TransformResult }
                     | undefined;
                 const transformHandler = typeof transform === "function" ? transform : transform?.handler;
-                const result = transformHandler?.call(this, code, id) as { code?: string } | string | null | undefined;
+                const result = transformHandler?.call(this, code, id) as string | { code?: string } | null | undefined;
 
                 // `@rollup/plugin-json` emits `export default <json>` for ESM. This
                 // adapter targets CJS interop, so rewrite that leading ESM default

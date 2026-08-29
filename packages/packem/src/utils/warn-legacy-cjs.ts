@@ -24,12 +24,14 @@ interface Logger {
  */
 const collectNodeTargets = (targets: unknown, candidateVersions: string[]): void => {
     for (const target of arrayify(targets ?? [])) {
-        if (typeof target === "string" && target.startsWith("node")) {
-            const coerced = coerce(target.slice("node".length));
+        if (!(typeof target === "string" && target.startsWith("node"))) {
+            continue;
+        }
 
-            if (coerced) {
-                candidateVersions.push(coerced.version);
-            }
+        const coerced = coerce(target.slice("node".length));
+
+        if (coerced) {
+            candidateVersions.push(coerced.version);
         }
     }
 };

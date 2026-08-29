@@ -5,7 +5,6 @@ import MagicString from "magic-string";
 import type { Plugin } from "rollup";
 
 interface NewExpressionWithRollupExtras {
-
     _rollupAnnotations?: { type: string }[];
     callee?: { name?: string; type?: string };
     rollupAnnotations?: { type: string }[];
@@ -99,11 +98,11 @@ export const pureNewExpressionPlugin = (options: {
     const quickTokens = new Set<string>(constructorSet);
 
     for (const functionName of functionSet) {
-        quickTokens.add(functionName.split(".")[0] as string);
+        quickTokens.add(functionName.split(".", 1)[0] as string);
     }
 
-    const quickCheckRegExp
-        = quickTokens.size > 0 ? new RegExp(String.raw`\b(?:${[...quickTokens].map((value) => escapeForRegExp(value)).join("|")})\b`) : undefined;
+    const quickCheckRegExp =
+        quickTokens.size > 0 ? new RegExp(String.raw`\b(?:${[...quickTokens].map((value) => escapeForRegExp(value)).join("|")})\b`) : undefined;
 
     if (options.mode === "renderChunk") {
         return {
@@ -123,7 +122,7 @@ export const pureNewExpressionPlugin = (options: {
                     }
 
                     const magicString = new MagicString(code);
-                    let changed = false;
+                    let isChanged = false;
 
                     walk(ast, {
                         enter(rawNode, parent) {
@@ -147,27 +146,32 @@ export const pureNewExpressionPlugin = (options: {
                                 return;
                             }
 
-                            let matched = false;
+                            let isMatched = false;
 
-                            if (node.type === "NewExpression" && node.callee?.type === "Identifier" && typeof node.callee.name === "string" && constructorSet.has(node.callee.name)) {
-                                matched = true;
+                            if (
+                                node.type === "NewExpression"
+                                && node.callee?.type === "Identifier"
+                                && typeof node.callee.name === "string"
+                                && constructorSet.has(node.callee.name)
+                            ) {
+                                isMatched = true;
                             } else if (node.type === "CallExpression") {
                                 const name = calleeToName(node.callee);
 
                                 if (name !== undefined && functionSet.has(name)) {
-                                    matched = true;
+                                    isMatched = true;
                                 }
                             }
 
-                            if (matched && !isAlreadyPure(code, node.start)) {
+                            if (isMatched && !isAlreadyPure(code, node.start)) {
                                 magicString.prependLeft(node.start, "/* @__PURE__ */ ");
-                                changed = true;
+                                isChanged = true;
                             }
                         },
                     });
 
                     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `changed` is mutated inside the walk() callback closure
-                    if (!changed) {
+                    if (!isChanged) {
                         return undefined;
                     }
 
@@ -205,7 +209,7 @@ export const pureNewExpressionPlugin = (options: {
                 }
 
                 const s = new MagicString(code);
-                let changed = false;
+                let isChanged = false;
 
                 walk(ast, {
                     enter(rawNode) {
@@ -224,13 +228,13 @@ export const pureNewExpressionPlugin = (options: {
                             && typeof node.start === "number"
                         ) {
                             s.prependLeft(node.start, "/* @__PURE__ */ ");
-                            changed = true;
+                            isChanged = true;
                         }
                     },
                 });
 
                 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `changed` is mutated inside the walk() callback closure
-                if (!changed) {
+                if (!isChanged) {
                     return undefined;
                 }
 

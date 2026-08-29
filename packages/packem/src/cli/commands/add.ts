@@ -132,12 +132,12 @@ const getReactTypeDependencies = async (rootDirectory: string): Promise<{ devPac
     if (hasTypescript) {
         devPackages.push("@types/react", "@types/react-dom");
     } else {
-        const useTypescript = (await confirm({
+        const isUseTypescript = (await confirm({
             initialValue: false,
             message: "Do you want to use TypeScript?",
         })) as boolean;
 
-        if (useTypescript) {
+        if (isUseTypescript) {
             devPackages.push("typescript", "@types/react", "@types/react-dom");
         }
     }
@@ -240,12 +240,12 @@ const getPreactTypeDependencies = async (rootDirectory: string): Promise<{ devPa
     if (hasTypescript) {
         devPackages.push("@types/preact");
     } else {
-        const useTypescript = (await confirm({
+        const isUseTypescript = (await confirm({
             initialValue: false,
             message: "Do you want to use TypeScript?",
         })) as boolean;
 
-        if (useTypescript) {
+        if (isUseTypescript) {
             devPackages.push("typescript", "@types/preact");
         }
     }
@@ -385,12 +385,12 @@ const promptCssMinifier = async (
     cssLoaders: string[],
     packagesToInstall: string[],
 ): Promise<"cssnano" | "lightningcss" | undefined> => {
-    const useCssMinifier = (await confirm({
+    const isUseCssMinifier = (await confirm({
         initialValue: false,
         message: "Do you want to minify your css?",
     })) as boolean;
 
-    if (!useCssMinifier) {
+    if (!isUseCssMinifier) {
         return undefined;
     }
 
@@ -511,12 +511,12 @@ const createAddCommand = (cli: Cli<Pail>): void => {
             const isGitDirty = await checkGitDirty(rootDirectory);
 
             if (isGitDirty) {
-                const proceed = (await confirm({
+                const isProceed = (await confirm({
                     initialValue: false,
                     message: "Git repository has uncommitted changes. Do you want to proceed?",
                 })) as boolean;
 
-                if (!proceed) {
+                if (!isProceed) {
                     cancel("Operation cancelled.");
 
                     return;
