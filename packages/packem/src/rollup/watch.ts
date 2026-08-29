@@ -5,6 +5,7 @@ import { isAccessibleSync } from "@visulima/fs";
 import type { FileCache } from "@visulima/packem-share";
 import { enhanceRollupError } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
+import { pruneStaleRollupCache } from "@visulima/packem-share/utils";
 import { join, relative } from "@visulima/path";
 import type { RollupCache, RollupWatcher, RollupWatcherEvent, WatcherOptions } from "rollup";
 
@@ -306,7 +307,7 @@ const watch = async (
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- useCache is a feature flag, intentionally always-on today; the guard marks the cache-restore toggle point.
             if (isUseCache) {
-                rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
+                rollupOptions.cache = pruneStaleRollupCache(fileCache.get<RollupCache>(WATCH_CACHE_KEY));
             }
 
             rollupOptions.watch = configureWatchOptions(context, rollupOptions.watch);
@@ -357,7 +358,7 @@ const watch = async (
 
                 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- useCache is a feature flag, intentionally always-on today; the guard marks the cache-restore toggle point.
                 if (isUseCache) {
-                    rollupDtsOptions.cache = fileCache.get(`dts-${WATCH_CACHE_KEY}`);
+                    rollupDtsOptions.cache = pruneStaleRollupCache(fileCache.get<RollupCache>(`dts-${WATCH_CACHE_KEY}`));
                 }
 
                 await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);

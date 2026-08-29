@@ -1,6 +1,6 @@
 import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
-import { getCacheHash, getChunkFilename, getDtsExtension } from "@visulima/packem-share/utils";
+import { getCacheHash, getChunkFilename, getDtsExtension, pruneStaleRollupCache } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
 import type { OutputBundle, Plugin, RollupBuild, RollupCache } from "rollup";
 
@@ -190,7 +190,7 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
                 .join(","),
         )}`;
 
-        typeOptions.cache = fileCache.get<RollupCache>(DTS_CACHE_KEY, dtsCacheNamespace);
+        typeOptions.cache = pruneStaleRollupCache(fileCache.get<RollupCache>(DTS_CACHE_KEY, dtsCacheNamespace));
 
         const rollup = await getRollupBuild();
 

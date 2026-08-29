@@ -11,6 +11,7 @@ export { default as getPackageName } from "./get-package-name";
 export { default as getRegexMatches } from "./get-regex-matches";
 export { isBareSpecifier, isFromNodeModules, isOutsideProject, parseSpecifier } from "./import-specifier";
 export { memoize, memoizeByKey, type Memoized } from "./memoize";
+export { default as pruneStaleRollupCache } from "./prune-stale-rollup-cache";
 export { default as replaceContentWithinMarker } from "./replace-content-within-marker";
 export { default as sortUserPlugins } from "./sort-user-plugins";
 export { svgToCssDataUri, svgToTinyDataUri } from "./svg-data-uri";
