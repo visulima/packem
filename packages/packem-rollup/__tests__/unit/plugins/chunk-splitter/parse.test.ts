@@ -94,7 +94,6 @@ describe("chunk-splitter parseExports", () => {
     it("should throw when module.code is null", () => {
         expect.assertions(1);
 
-        // eslint-disable-next-line unicorn/no-null -- ModuleInfo.code is typed `string | null`; this exercises the null branch.
         const moduleInfo = { code: null, id: "/a.js" } as unknown as ModuleInfo;
 
         expect(() => [...parseExports(buildContext(), moduleInfo)]).toThrow(NO_CODE_REGEX);

@@ -14,8 +14,8 @@ const tryImport = async <T>(load: () => Promise<unknown>, pick: (module_: unknow
 const NOT_INSTALLED_MESSAGE = "Rollup is not installed. Please install 'rollup' to use bundler: 'rollup' or DTS generation with the rollup driver.";
 
 export const getRollupBuild = async (): Promise<RollupBuildFactory> => {
-    // @ts-ignore optional peer dependency
     const factory = await tryImport(
+        // @ts-ignore optional peer dependency
         () => import("rollup"),
         (m) => (m as { rollup?: RollupBuildFactory }).rollup,
     );
@@ -28,8 +28,8 @@ export const getRollupBuild = async (): Promise<RollupBuildFactory> => {
 };
 
 export const getRollupWatch = async (): Promise<RollupWatchFactory> => {
-    // @ts-ignore optional peer dependency
     const factory = await tryImport(
+        // @ts-ignore optional peer dependency
         () => import("rollup"),
         (m) => (m as { watch?: RollupWatchFactory }).watch,
     );
@@ -42,8 +42,8 @@ export const getRollupWatch = async (): Promise<RollupWatchFactory> => {
 };
 
 export const getRollupVersion = async (): Promise<string | undefined> =>
-    // @ts-ignore optional peer dependency
     tryImport(
+        // @ts-ignore optional peer dependency
         () => import("rollup"),
         (m) => (m as { VERSION?: string }).VERSION,
     );

@@ -28,19 +28,19 @@ jobs:
             packages: "${{ steps.changes.outputs.packages }}"
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
+              uses: "step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c" # v2.21.0
               with:
                   egress-policy: "audit"
 
             - name: "Git checkout"
-              uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+              uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
               env:
                   GIT_COMMITTER_NAME: "GitHub Actions Shell"
                   GIT_AUTHOR_NAME: "GitHub Actions Shell"
                   EMAIL: "github-actions[bot]@users.noreply.github.com"
 
             - name: "Check for file changes"
-              uses: "dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706" # v4.0.2
+              uses: "dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d" # v4.0.3
               id: "changes"
               with:
                   token: "${{ github.token }}"
@@ -61,12 +61,12 @@ jobs:
 
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
+              uses: "step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c" # v2.21.0
               with:
                   egress-policy: "audit"
 
             - name: "Git checkout"
-              uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+              uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
               with:
                   # Number of commits to fetch. 0 indicates all history for all branches and tags.
                   # Pulls all commits (needed for NX)
@@ -82,7 +82,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
+              uses: "anolilab/workflows/step/setup@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
               with:
                   node-version: "22.x"
                   cache-prefix: "preview-release"

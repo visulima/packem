@@ -11,7 +11,8 @@ type CacheKeyResolver = string | ((...arguments_: any[]) => string);
 
 // NUL separator used to join the fast-path primitive key parts; it cannot appear
 // in a normal module id. Hoisted so it isn't reallocated on every memoized call.
-const KEY_SEPARATOR = String.fromCodePoint(0);
+// eslint-disable-next-line unicorn/prefer-code-point -- e18e/prefer-string-fromcharcode wants the opposite for a BMP code point, and NUL is one
+const KEY_SEPARATOR = String.fromCharCode(0);
 
 /**
  * A memoized function with an additional `destroy` method to clear its cache.
@@ -51,13 +52,13 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
         // collide, joined with a NUL separator that cannot appear in a normal
         // module id, and prefixed with the arity to disambiguate argument counts.
         let key = String(arguments_.length);
-        let allPrimitive = true;
+        let isAllPrimitive = true;
 
         for (const argument of arguments_) {
             const type = typeof argument;
 
             if (type !== "string" && type !== "number" && type !== "boolean" && argument !== undefined && argument !== null) {
-                allPrimitive = false;
+                isAllPrimitive = false;
 
                 break;
             }
@@ -65,7 +66,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
             key += `${KEY_SEPARATOR}${type}:${String(argument)}`;
         }
 
-        if (allPrimitive) {
+        if (isAllPrimitive) {
             return key;
         }
 
@@ -104,7 +105,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
  * @returns A function that returns memoized versions with optional cache key
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): (cacheKey?: CacheKeyResolver) => Memoized<T> => {
+export const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): ((cacheKey?: CacheKeyResolver) => Memoized<T>) => {
     const cache = new Map<string, ReturnType<T>>();
 
     return (cacheKey?: CacheKeyResolver) => memoize(function_, cacheKey, cache);

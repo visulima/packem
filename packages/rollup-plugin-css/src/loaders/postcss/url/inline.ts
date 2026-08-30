@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies, no-secrets/no-secrets */
+// eslint-disable-next-line e18e/ban-dependencies -- mime's lookup table covers extensions mrmime does not; the swap is tracked separately
 import liteMime from "mime/lite";
 
 /**

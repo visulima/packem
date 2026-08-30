@@ -90,11 +90,7 @@ export const computeDtsResolveKey = (dtsResolve: boolean | (string | RegExp)[]):
         return String(dtsResolve);
     }
 
-    const sources: string[] = [];
-
-    for (const pattern of dtsResolve) {
-        sources.push(regExpOrStringToString(pattern));
-    }
+    const sources: string[] = Array.from(dtsResolve, (pattern) => regExpOrStringToString(pattern));
 
     return sources.toSorted((a, b) => a.localeCompare(b)).join(",");
 };
@@ -136,7 +132,7 @@ export const createChunkFileNames = (getExtension: () => string, usePreserveModu
 export const createEntryFileNames = (
     getExtension: (chunk: PreRenderedChunk) => string,
     usePreserveModules: boolean,
-): (chunkInfo: PreRenderedChunk) => string | undefined => {
+): ((chunkInfo: PreRenderedChunk) => string | undefined) => {
     if (usePreserveModules) {
         return (chunkInfo: PreRenderedChunk): string | undefined => {
             const { name } = chunkInfo;
@@ -166,7 +162,7 @@ export const createEntryFileNames = (
 // of the rollup transformer adapter.
 // eslint-disable-next-line import/exports-last -- shared helper for the rolldown options builder; defined where it's wired into the rollup pipeline below
 export const resolveNodeTarget = (context: BuildContext<InternalBuildOptions>): string => {
-    const defaultTarget = `node${versions.node.split(".")[0]}`;
+    const defaultTarget = `node${versions.node.split(".", 1)[0]}`;
 
     if (!context.pkg.engines?.node) {
         return defaultTarget;
@@ -185,7 +181,10 @@ const resolveTransformerTarget = (context: BuildContext<InternalBuildOptions>, c
     // For per-group browser builds the global `browserTargets` may have been
     // cleared (when the global runtime is node), so prefer the preserved
     // `resolvedBrowserTargets`, falling back to `browserTargets`.
-    const browserTargets = context.options.browserTargets && context.options.browserTargets.length > 0 ? context.options.browserTargets : context.options.resolvedBrowserTargets ?? context.options.browserTargets ?? [];
+    const browserTargets =
+        context.options.browserTargets && context.options.browserTargets.length > 0
+            ? context.options.browserTargets
+            : (context.options.resolvedBrowserTargets ?? context.options.browserTargets ?? []);
 
     if (currentTarget) {
         const targets = arrayify(currentTarget);
@@ -328,17 +327,17 @@ export const getOxcTransformerConfig = (context: BuildContext<InternalBuildOptio
         sourcemap: context.options.sourcemap,
         typescript: context.tsconfig?.config
             ? {
-                allowDeclareFields: true,
-                allowNamespaces: true,
-                declaration: undefined,
-                jsxPragma: context.tsconfig.config.compilerOptions?.jsxFactory,
-                // jsxFragmentFactory is missing from type-fest@0.20.2 transitively
-                // resolved by @visulima/tsconfig — access through a string index.
-                jsxPragmaFrag: context.tsconfig.config.compilerOptions?.["jsxFragmentFactory"],
-                onlyRemoveTypeImports: true,
-                // Declaration generation is handled by @visulima/rollup-plugin-dts
-                rewriteImportExtensions: false,
-            }
+                  allowDeclareFields: true,
+                  allowNamespaces: true,
+                  declaration: undefined,
+                  jsxPragma: context.tsconfig.config.compilerOptions?.jsxFactory,
+                  // jsxFragmentFactory is missing from type-fest@0.20.2 transitively
+                  // resolved by @visulima/tsconfig — access through a string index.
+                  jsxPragmaFrag: context.tsconfig.config.compilerOptions?.["jsxFragmentFactory"],
+                  onlyRemoveTypeImports: true,
+                  // Declaration generation is handled by @visulima/rollup-plugin-dts
+                  rewriteImportExtensions: false,
+              }
             : undefined,
     } satisfies InternalOXCTransformPluginConfig;
 
@@ -420,9 +419,7 @@ export const getTransformerConfig = (
 // (e.g. `preferBuiltins`/`browser` set from the build runtime) still use them.
 // Fold the meaningful ones onto their oxc equivalents and strip every non-oxc key
 // so the result is safe to hand to `ResolverFactory`.
-const mergeNodeResolveIntoOxc = (
-    resolveOptions: Exclude<InternalBuildOptions["rollup"]["resolve"], false | undefined>,
-): OXCResolveOptions => {
+const mergeNodeResolveIntoOxc = (resolveOptions: Exclude<InternalBuildOptions["rollup"]["resolve"], false | undefined>): OXCResolveOptions => {
     const { browser, exportConditions } = resolveOptions;
     const base = { ...resolveOptions } as Record<string, unknown>;
 
@@ -448,8 +445,8 @@ const mergeNodeResolveIntoOxc = (
     // `browser: true` (node-resolve) → ensure the "browser" condition is active
     // and the browser alias field is consulted.
     if (browser) {
-        base.conditionNames = [...new Set(["browser", ...(base.conditionNames as string[] | undefined) ?? []])];
-        base.aliasFields = [["browser"], ...(base.aliasFields as unknown[] | undefined) ?? []];
+        base.conditionNames = [...new Set(["browser", ...((base.conditionNames as string[] | undefined) ?? [])])];
+        base.aliasFields = [["browser"], ...((base.aliasFields as unknown[] | undefined) ?? [])];
     }
 
     return base;
@@ -464,12 +461,7 @@ export const createNodeResolver = (context: BuildContext<InternalBuildOptions>):
         return undefined;
     }
 
-    return oxcResolvePlugin(
-        mergeNodeResolveIntoOxc(resolveOptions),
-        context.options.rootDir,
-        getLogger(context),
-        context.tsconfig?.path,
-    );
+    return oxcResolvePlugin(mergeNodeResolveIntoOxc(resolveOptions), context.options.rootDir, getLogger(context), context.tsconfig?.path);
 };
 
 // eslint-disable-next-line import/exports-last -- consumed by getRolldownDtsOptions in get-rolldown-options.ts
@@ -492,9 +484,9 @@ export const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalB
 
         const error: Error & { id?: string } = new Error(
             `Failed to resolve the module "${warning.exporter ?? ""}" imported by "${cyan(relative(resolve(), warning.id ?? ""))}"`
-            + `\nIs the module installed? Note:`
-            + `\n ↳ to inline a module into your bundle, install it to "devDependencies".`
-            + `\n ↳ to depend on a module via import/require, install it to "dependencies".`,
+                + `\nIs the module installed? Note:`
+                + `\n ↳ to inline a module into your bundle, install it to "devDependencies".`
+                + `\n ↳ to depend on a module via import/require, install it to "dependencies".`,
         );
 
         // Preserve the file id so rollup-plugin-import-trace can build the import chain
@@ -871,14 +863,18 @@ export const buildPurePlugins = (
  * To keep a devDep out of both the bundled code and the emitted types, name it in the
  * top-level `externals` option — auto-detection skips anything listed there.
  */
-const collectOptionalPeerDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
+const collectOptionalPeerDependencies = (
+    context: BuildContext<InternalBuildOptions>,
+    peerDependencies: Partial<Record<string, string>>,
+    autoResolve: string[],
+): void => {
     if (!context.pkg.peerDependenciesMeta) {
         return;
     }
 
     for (const [name, meta] of Object.entries(context.pkg.peerDependenciesMeta)) {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- runtime guard for malformed package.json: peerDependenciesMeta values come from untyped parsed JSON
-        if (meta && typeof meta === "object" && "optional" in meta && meta.optional && name in peerDeps) {
+        if (meta && typeof meta === "object" && "optional" in meta && meta.optional && name in peerDependencies) {
             autoResolve.push(name);
         }
     }
@@ -940,7 +936,11 @@ const isTypesOnlyPackage = (rootDirectory: string, name: string): boolean => {
     return manifest.types !== undefined || manifest.typings !== undefined;
 };
 
-const collectInlinableDevDeps = (context: BuildContext<InternalBuildOptions>, peerDeps: Partial<Record<string, string>>, autoResolve: string[]): void => {
+const collectInlinableDevDependencies = (
+    context: BuildContext<InternalBuildOptions>,
+    peerDependencies: Partial<Record<string, string>>,
+    autoResolve: string[],
+): void => {
     // A devDependency is one the consumer never installs, so a devDep left external in
     // the emitted .d.ts is an import that resolves only where the package manager
     // happens to hoist it, and fails for everyone else. Two disjoint cases reach the
@@ -976,7 +976,7 @@ const collectInlinableDevDeps = (context: BuildContext<InternalBuildOptions>, pe
         return;
     }
 
-    const deps = context.pkg.dependencies ?? {};
+    const dependencies = context.pkg.dependencies ?? {};
     const { externals: userExternals, rootDir } = context.options;
     const isUserExternal = (name: string): boolean =>
         userExternals.some((pattern) => {
@@ -997,7 +997,7 @@ const collectInlinableDevDeps = (context: BuildContext<InternalBuildOptions>, pe
         });
 
     for (const name of Object.keys(context.pkg.devDependencies ?? {})) {
-        if (name in peerDeps || name in deps || isUserExternal(name)) {
+        if (name in peerDependencies || name in dependencies || isUserExternal(name)) {
             continue;
         }
 
@@ -1067,10 +1067,10 @@ export const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): 
 
     // Include peer deps that are marked as optional in peerDependenciesMeta
     // (only if they're actually listed in peerDependencies)
-    const peerDeps = context.pkg.peerDependencies ?? {};
+    const peerDependencies = context.pkg.peerDependencies ?? {};
 
-    collectOptionalPeerDeps(context, peerDeps, autoResolve);
-    collectInlinableDevDeps(context, peerDeps, autoResolve);
+    collectOptionalPeerDependencies(context, peerDependencies, autoResolve);
+    collectInlinableDevDependencies(context, peerDependencies, autoResolve);
 
     if (autoResolve.length === 0 && !userResolve) {
         return false;
@@ -1078,7 +1078,7 @@ export const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): 
 
     // Merge and deduplicate auto-detected with user-provided patterns, then honour
     // any `!name` exclusions the user added.
-    return applyResolveExclusions(dedupeResolvePatterns([...autoResolve, ...userResolve ?? []]));
+    return applyResolveExclusions(dedupeResolvePatterns([...autoResolve, ...(userResolve ?? [])]));
 };
 
 const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>, dtsResolve: boolean | (string | RegExp)[]): Promise<Plugin[]> => {
@@ -1189,36 +1189,36 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
 
         output: [
             context.options.emitCJS
-            && <OutputOptions>{
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getDtsExtension(context, "cjs")),
-                compact: context.options.minify,
-                dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: `[name].${getDtsExtension(context, "cjs")}`,
-                format: "cjs",
-                sourcemap: context.options.sourcemap,
-                ...context.options.rollup.output,
-            },
+                && <OutputOptions>{
+                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getDtsExtension(context, "cjs")),
+                    compact: context.options.minify,
+                    dir: resolve(context.options.rootDir, context.options.outDir),
+                    entryFileNames: `[name].${getDtsExtension(context, "cjs")}`,
+                    format: "cjs",
+                    sourcemap: context.options.sourcemap,
+                    ...context.options.rollup.output,
+                },
             context.options.emitESM
-            && <OutputOptions>{
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getDtsExtension(context, "esm")),
-                compact: context.options.minify,
-                dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: `[name].${getDtsExtension(context, "esm")}`,
-                format: "esm",
-                sourcemap: context.options.sourcemap,
-                ...context.options.rollup.output,
-            },
+                && <OutputOptions>{
+                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getDtsExtension(context, "esm")),
+                    compact: context.options.minify,
+                    dir: resolve(context.options.rootDir, context.options.outDir),
+                    entryFileNames: `[name].${getDtsExtension(context, "esm")}`,
+                    format: "esm",
+                    sourcemap: context.options.sourcemap,
+                    ...context.options.rollup.output,
+                },
             // .d.ts for node10 compatibility (TypeScript version < 4.7)
             context.options.declaration === "compatible"
-            && <OutputOptions>{
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.ts"),
-                compact: context.options.minify,
-                dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: "[name].d.ts",
-                format: "cjs",
-                sourcemap: context.options.sourcemap,
-                ...context.options.rollup.output,
-            },
+                && <OutputOptions>{
+                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.ts"),
+                    compact: context.options.minify,
+                    dir: resolve(context.options.rootDir, context.options.outDir),
+                    entryFileNames: "[name].d.ts",
+                    format: "cjs",
+                    sourcemap: context.options.sourcemap,
+                    ...context.options.rollup.output,
+                },
         ].filter(Boolean),
 
         plugins: [
@@ -1254,27 +1254,27 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, getLogger(context), context.tsconfig), fileCache),
             context.tsconfig
-            && context.options.rollup.tsconfigPaths
-            && cachingPlugin(
-                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, getLogger(context), context.options.rollup.tsconfigPaths),
-                fileCache,
-            ),
+                && context.options.rollup.tsconfigPaths
+                && cachingPlugin(
+                    resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, getLogger(context), context.options.rollup.tsconfigPaths),
+                    fileCache,
+                ),
 
             resolveImplicitExternalsPlugin(context),
 
             context.options.rollup.replace
-            // cloneReplaceOptions returns `any` by design (its RollupReplaceOptions index
-            // signature can't be safely spread without a cast — see the helper's doc); the
-            // produced object is structurally RollupReplaceOptions, so type it back here.
-            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap }) as RollupReplaceOptions),
+                // cloneReplaceOptions returns `any` by design (its RollupReplaceOptions index
+                // signature can't be safely spread without a cast — see the helper's doc); the
+                // produced object is structurally RollupReplaceOptions, so type it back here.
+                && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap }) as RollupReplaceOptions),
 
             context.options.rollup.alias
-            && aliasPlugin({
-                // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                customResolver: nodeResolver as AliasResolverObject,
-                ...context.options.rollup.alias,
-                entries: resolvedAliases,
-            }),
+                && aliasPlugin({
+                    // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
+                    customResolver: nodeResolver as AliasResolverObject,
+                    ...context.options.rollup.alias,
+                    entries: resolvedAliases,
+                }),
 
             ...prePlugins,
 
@@ -1282,16 +1282,16 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
 
             ...normalPlugins,
 
-            ...await memoizeDtsPluginByKey(uniqueProcessId)(context, dtsResolve),
+            ...(await memoizeDtsPluginByKey(uniqueProcessId)(context, dtsResolve)),
 
             context.options.emitCJS && fixDtsDefaultCjsExportsPlugin(),
 
             context.options.cjsInterop
-            && context.options.emitCJS
-            && cjsInteropPlugin({
-                ...context.options.rollup.cjsInterop,
-                logger: getLogger(context),
-            }),
+                && context.options.emitCJS
+                && cjsInteropPlugin({
+                    ...context.options.rollup.cjsInterop,
+                    logger: getLogger(context),
+                }),
 
             context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, getLogger(context)), fileCache),
 
@@ -1303,16 +1303,16 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             // `LicenseOptions | false`, so narrow off `false` before the
             // optional chain to keep the property reads well-typed.
             context.options.rollup.license !== false
-            && context.options.rollup.license?.path
-            && typeof context.options.rollup.license.dtsTemplate === "function"
-            && licensePlugin({
-                licenseFilePath: context.options.rollup.license.path,
-                licenseTemplate: context.options.rollup.license.dtsTemplate,
-                logger: getLogger(context),
-                marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
-                mode: "types",
-                packageName: context.pkg.name,
-            }),
+                && context.options.rollup.license?.path
+                && typeof context.options.rollup.license.dtsTemplate === "function"
+                && licensePlugin({
+                    licenseFilePath: context.options.rollup.license.path,
+                    licenseTemplate: context.options.rollup.license.dtsTemplate,
+                    logger: getLogger(context),
+                    marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
+                    mode: "types",
+                    packageName: context.pkg.name,
+                }),
         ].filter(Boolean),
     };
 };

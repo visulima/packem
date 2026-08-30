@@ -5,6 +5,7 @@ import { confirm, intro, log, multiselect, outro, select, spinner } from "@clack
 import type { Cli } from "@visulima/cerebro";
 import { isAccessibleSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
+import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
 
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
@@ -286,7 +287,7 @@ const selectCssLoaders = async (packagesToInstall: string[]): Promise<string[]> 
     cssLoaders.push(...resolvedExtraLoaders);
 
     const shouldInstall = await confirm({
-        message: `Do you want to install "${cssLoaders.join("\", \"")}"?`,
+        message: `Do you want to install "${cssLoaders.join('", "')}"?`,
     });
 
     if (shouldInstall) {
@@ -322,7 +323,7 @@ const selectCssMinifier = async (cssLoaders: string[], packagesToInstall: string
     return cssMinifier;
 };
 
-const createInitCommand = (cli: Cli<Console>): void => {
+const createInitCommand = (cli: Cli<Pail>): void => {
     cli.addCommand({
         description: "Initialize packem configuration",
 
@@ -382,13 +383,13 @@ const createInitCommand = (cli: Cli<Console>): void => {
 
             const cssMinifier: CssMinifier = options.cssMinifier ? await selectCssMinifier(cssLoaders, packagesToInstall) : undefined;
 
-            const cssEnabled = options.css ?? false;
-            const cssMinifierEnabled = options.cssMinifier ?? false;
-            const useEsm = hasTypescript || packageJson.type === "module";
+            const isCssEnabled = options.css ?? false;
+            const isCssMinifierEnabled = options.cssMinifier ?? false;
+            const isUseEsm = hasTypescript || packageJson.type === "module";
 
-            const packemConfig = buildCssConfigBlock(cssEnabled, cssMinifier, cssMinifierEnabled, cssLoaders);
-            const imports = buildCssImports(cssEnabled, cssLoaders, cssMinifier, cssMinifierEnabled, useEsm);
-            const template = buildConfigTemplate(useEsm, options.transformer ?? "", options.runtime ?? "", imports, packemConfig);
+            const packemConfig = buildCssConfigBlock(isCssEnabled, cssMinifier, isCssMinifierEnabled, cssLoaders);
+            const imports = buildCssImports(isCssEnabled, cssLoaders, cssMinifier, isCssMinifierEnabled, isUseEsm);
+            const template = buildConfigTemplate(isUseEsm, options.transformer ?? "", options.runtime ?? "", imports, packemConfig);
 
             const s = spinner();
 

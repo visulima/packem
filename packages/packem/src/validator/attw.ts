@@ -210,7 +210,7 @@ const resolvePackageManager = async (pm: string, rootDirectory: string): Promise
 type AttwUtils = typeof import("@arethetypeswrong/core/utils");
 type AttwProblems = typeof import("@arethetypeswrong/core/problems");
 
-interface ProblemMessageDeps {
+interface ProblemMessageDependencies {
     allResolutionKinds: AttwUtils["allResolutionKinds"];
     filterProblems: AttwProblems["filterProblems"];
     getResolutionOption: AttwUtils["getResolutionOption"];
@@ -222,7 +222,7 @@ interface ProblemMessageDeps {
     problemKindInfo: AttwProblems["problemKindInfo"];
 }
 
-const buildProblemMessage = (analysis: Analysis, ignoreResolutions: string[], deps: ProblemMessageDeps): string => {
+const buildProblemMessage = (analysis: Analysis, ignoreResolutions: string[], dependencies: ProblemMessageDependencies): string => {
     const {
         allResolutionKinds,
         filterProblems,
@@ -231,7 +231,7 @@ const buildProblemMessage = (analysis: Analysis, ignoreResolutions: string[], de
         problemAffectsEntrypoint,
         problemAffectsResolutionKind,
         problemKindInfo,
-    } = deps;
+    } = dependencies;
 
     const requiredResolutions = allResolutionKinds.filter((kind) => !ignoreResolutions.includes(kind));
     const ignoredResolutions = allResolutionKinds.filter((kind) => ignoreResolutions.includes(kind));
@@ -285,11 +285,11 @@ const buildProblemMessage = (analysis: Analysis, ignoreResolutions: string[], de
     const grouped = groupProblemsByKind(analysis.problems);
     const summaryTexts = Object.entries(grouped).map(([kind, kindProblems]) => {
         const info = problemKindInfo[kind as ProblemKind];
-        const affectsRequiredResolution = kindProblems.some((p) => requiredResolutions.some((r) => problemAffectsResolutionKind(p, r, analysis)));
+        const isAffectsRequiredResolution = kindProblems.some((p) => requiredResolutions.some((r) => problemAffectsResolutionKind(p, r, analysis)));
         const descriptionText = `${info.description}${info.details ? ` Use \`-f json\` to see ${info.details}.` : ""}`;
         const description = `${descriptionText} ${info.docsUrl}`;
 
-        return `${affectsRequiredResolution ? "" : "(ignored per resolution) "}${problemKindColors[kind as ProblemKind](description)}`;
+        return `${isAffectsRequiredResolution ? "" : "(ignored per resolution) "}${problemKindColors[kind as ProblemKind](description)}`;
     });
 
     return `Are the types wrong problems found:\n\n${table.toString()}\n\n${summaryTexts.join("\n\n")}`;
@@ -371,10 +371,10 @@ const reportAnalysis = (
     ignoreResolutions: string[],
     level: string,
     startedAt: number,
-    deps: ProblemMessageDeps,
+    dependencies: ProblemMessageDependencies,
 ): void => {
     if (analysis.types !== false && analysis.problems.length > 0) {
-        const problemMessage = buildProblemMessage(analysis, ignoreResolutions, deps);
+        const problemMessage = buildProblemMessage(analysis, ignoreResolutions, dependencies);
 
         if (level === "error") {
             logger.error({

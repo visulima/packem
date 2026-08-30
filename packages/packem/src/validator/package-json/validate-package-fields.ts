@@ -57,7 +57,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
     const extraConditions = validation.packageJson?.extraConditions ?? [];
     const EXTRA_CONDITIONS = new Set(extraConditions);
 
-    const ALL_CONDITIONS = new Set([...COMMUNITY_CONDITIONS, ...EXTRA_CONDITIONS, ...STANDARD_CONDITIONS]);
+    const ALL_CONDITIONS = COMMUNITY_CONDITIONS.union(EXTRA_CONDITIONS).union(STANDARD_CONDITIONS);
 
     // eslint-disable-next-line sonarjs/cognitive-complexity
     const validateExportsValue = (value: unknown, path: string): void => {
@@ -107,7 +107,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
                         return;
                     }
 
-                    const invalidFiles = matchedFiles.filter((file) => !allValidExtensions.some((extension) => file.endsWith(extension)));
+                    const invalidFiles = matchedFiles.filter((file) => allValidExtensions.every((extension) => !file.endsWith(extension)));
 
                     if (invalidFiles.length > 0) {
                         warn(
@@ -230,7 +230,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
         const isBinOnlyPackage = context.pkg.bin !== undefined && nonDotKeys.length <= 1 && nonDotKeys.every((key) => key === "./package.json");
 
         if (!keys.includes(".") && !isBinOnlyPackage) {
-            warn(context, "Missing main export \".\". Subpaths exports should include a main export entry");
+            warn(context, 'Missing main export ".". Subpaths exports should include a main export entry');
         }
 
         for (const key of keys) {
@@ -252,7 +252,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
         const conditionKeys = keys.filter((key) => !key.startsWith("."));
 
         if (subpathKeys.length > 0 && conditionKeys.length > 0) {
-            warn(context, "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both");
+            warn(context, 'Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with ".") or conditions, not both');
 
             return;
         }
@@ -310,7 +310,7 @@ const validateNameAndFiles = ({ context, pkg, validation }: FieldValidationConte
     if (validation.packageJson?.files !== false && Array.isArray(pkg.files) && !pkg.files.includes("*")) {
         if (pkg.files.length === 0) {
             warn(context, "The 'files' field in your package.json is empty. Please specify the files to be included in the package.");
-        } else if (!pkg.files.some((file) => file.includes(context.options.outDir))) {
+        } else if (pkg.files.every((file) => !file.includes(context.options.outDir))) {
             warn(
                 context,
                 `The 'files' field in your package.json is missing the '${context.options.outDir}' directory. Ensure the output directory is included.`,
@@ -417,15 +417,15 @@ const validateDeclarationFields = ({ cjsJSExtension, context, pkg, validation }:
         return;
     }
 
-    let showWarning = true;
+    let isShowWarning = true;
 
     if (pkg.type === "module") {
-        showWarning = Boolean(pkg.main?.endsWith(`.${cjsJSExtension}`));
+        isShowWarning = Boolean(pkg.main?.endsWith(`.${cjsJSExtension}`));
     }
 
     const hasTypes = pkg.types !== undefined || pkg.typings !== undefined;
 
-    if (!hasTypes && showWarning && validation.packageJson?.types !== false) {
+    if (!hasTypes && isShowWarning && validation.packageJson?.types !== false) {
         warn(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
     }
 
@@ -433,12 +433,12 @@ const validateDeclarationFields = ({ cjsJSExtension, context, pkg, validation }:
     // keys (instead of "exports" subpaths) already resolves types under node10 via
     // "types"; "typesVersions" only matters for "exports" subpath resolution, so the
     // nudge would be spurious here.
-    const usesLegacyMainTypes = pkg.type === "module" && pkg.main !== undefined && hasTypes;
+    const isUsesLegacyMainTypes = pkg.type === "module" && pkg.main !== undefined && hasTypes;
 
     if (
         (context.options.declaration === true || context.options.declaration === "compatible")
-        && showWarning
-        && !usesLegacyMainTypes
+        && isShowWarning
+        && !isUsesLegacyMainTypes
         && validation.packageJson?.typesVersions !== false
         && (() => {
             // typesVersions is missing from the stale type-fest@0.20.2 transitively

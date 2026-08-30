@@ -67,7 +67,7 @@ describe(validateAliasEntries, () => {
 
         expect(() => {
             validateAliasEntries(entries);
-        }).toThrow("Alias name \"\" is invalid. Alias names should be non-empty strings.");
+        }).toThrow('Alias name "" is invalid. Alias names should be non-empty strings.');
     });
 
     it("should throw an error for alias names starting with invalid characters", () => {
@@ -78,7 +78,7 @@ describe(validateAliasEntries, () => {
         expect(() => {
             validateAliasEntries(entries);
         }).toThrow(
-            "Alias name \"1invalid\" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.",
+            'Alias name "1invalid" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.',
         );
     });
 
@@ -90,7 +90,7 @@ describe(validateAliasEntries, () => {
         expect(() => {
             validateAliasEntries(entries);
         }).toThrow(
-            "Alias name \"invalid!alias\" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.",
+            'Alias name "invalid!alias" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.',
         );
     });
 
@@ -101,7 +101,7 @@ describe(validateAliasEntries, () => {
 
         expect(() => {
             validateAliasEntries(entries);
-        }).toThrow("Alias name \"class\" is a reserved keyword and cannot be used.");
+        }).toThrow('Alias name "class" is a reserved keyword and cannot be used.');
     });
 
     it("should throw an error for target paths that do not exist", () => {
@@ -111,7 +111,7 @@ describe(validateAliasEntries, () => {
 
         expect(() => {
             validateAliasEntries(entries);
-        }).toThrow("Target path \"/invalid/path\" for alias \"validAlias\" does not exist.");
+        }).toThrow('Target path "/invalid/path" for alias "validAlias" does not exist.');
     });
 
     it("should throw an error if the entries object contains @/ or ~/", () => {
@@ -122,7 +122,7 @@ describe(validateAliasEntries, () => {
         expect(() => {
             validateAliasEntries(entries);
         }).toThrow(
-            "Alias name \"@/validAlias\" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.",
+            'Alias name "@/validAlias" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.',
         );
 
         const entries2 = { "~/validAlias": "/valid/path" };
@@ -130,7 +130,7 @@ describe(validateAliasEntries, () => {
         expect(() => {
             validateAliasEntries(entries2);
         }).toThrow(
-            "Alias name \"~/validAlias\" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.",
+            'Alias name "~/validAlias" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.',
         );
     });
 });

@@ -13,9 +13,9 @@ import type { Loader } from "esbuild";
 import { transform } from "esbuild";
 import type { Plugin as RollupPlugin } from "rollup";
 
-import type { EsbuildPluginConfig, OptimizeDepsResult } from "./types";
+import type { EsbuildPluginConfig, OptimizeDepsResult as OptimizeDependenciesResult } from "./types";
 import getRenderChunk from "./utils/get-render-chunk";
-import doOptimizeDeps from "./utils/optimize-deps";
+import doOptimizeDependencies from "./utils/optimize-deps";
 import warn from "./utils/warn";
 
 const SOURCE_FILE_TS_RE = /\.[cm]ts/;
@@ -66,7 +66,7 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
         logger.debug("`include` is constrained to files matching a configured loader extension (%O)", extensions);
     }
 
-    let optimizeDepsResult: OptimizeDepsResult | undefined;
+    let optimizeDependenciesResult: OptimizeDependenciesResult | undefined;
     const cwd = process.cwd();
 
     /*
@@ -78,23 +78,24 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
      * call pure so consumers can drop it silently loses that, and Rollup keeps the call as a side
      * effect. `renderChunk` minifies the finished chunk regardless, so the output is unchanged.
      */
-    const transformOptions = Object.fromEntries(
-        Object.entries(esbuildOptions).filter(([key]) => !MINIFY_OPTION_KEYS.has(key)),
-    ) as Omit<typeof esbuildOptions, "minify" | "minifyIdentifiers" | "minifySyntax" | "minifyWhitespace">;
+    const transformOptions = Object.fromEntries(Object.entries(esbuildOptions).filter(([key]) => !MINIFY_OPTION_KEYS.has(key))) as Omit<
+        typeof esbuildOptions,
+        "minify" | "minifyIdentifiers" | "minifySyntax" | "minifyWhitespace"
+    >;
 
     return {
         async buildStart() {
-            if (!optimizeDeps || optimizeDepsResult) {
+            if (!optimizeDeps || optimizeDependenciesResult) {
                 return;
             }
 
-            optimizeDepsResult = await doOptimizeDeps({
+            optimizeDependenciesResult = await doOptimizeDependencies({
                 cwd,
                 sourceMap: sourceMap ?? false,
                 ...optimizeDeps,
             });
 
-            logger.debug("optimized %O", optimizeDepsResult.optimized);
+            logger.debug("optimized %O", optimizeDependenciesResult.optimized);
         },
 
         name: "packem:esbuild",
@@ -105,8 +106,8 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
         }),
 
         resolveId(id): string | undefined {
-            if (optimizeDepsResult?.optimized.has(id)) {
-                const m = optimizeDepsResult.optimized.get(id);
+            if (optimizeDependenciesResult?.optimized.has(id)) {
+                const m = optimizeDependenciesResult.optimized.get(id);
 
                 if (m) {
                     logger.debug("resolved %s to %s", id, m.file);
@@ -129,7 +130,7 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
                     return undefined;
                 }
 
-                if (optimizeDepsResult?.optimized.has(id)) {
+                if (optimizeDependenciesResult?.optimized.has(id)) {
                     return undefined;
                 }
 

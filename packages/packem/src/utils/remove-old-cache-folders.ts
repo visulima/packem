@@ -60,9 +60,9 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Logg
     }
 
     const keyStorePath = join(cachePath, "keystore.json");
-    const keyStoreAccessible = await isAccessible(keyStorePath);
+    const isKeyStoreAccessible = await isAccessible(keyStorePath);
 
-    if (!keyStoreAccessible) {
+    if (!isKeyStoreAccessible) {
         return;
     }
 

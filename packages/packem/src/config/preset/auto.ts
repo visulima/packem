@@ -101,18 +101,18 @@ const resolveUnbundleEmitFormats = (context: BuildContext<InternalBuildOptions>,
     const packageType: "cjs" | "esm" = context.pkg.type === "module" ? "esm" : "cjs";
     const hasPlainJs = files.some((file) => JS_OUTPUT_REGEXP.test(file));
 
-    let emitESM = files.some((file) => MJS_OUTPUT_REGEXP.test(file)) || conditions.has("import") || conditions.has("module");
-    let emitCJS = files.some((file) => CJS_OUTPUT_REGEXP.test(file)) || conditions.has("require");
+    let isEmitESM = files.some((file) => MJS_OUTPUT_REGEXP.test(file)) || conditions.has("import") || conditions.has("module");
+    let isEmitCJS = files.some((file) => CJS_OUTPUT_REGEXP.test(file)) || conditions.has("require");
 
     // Plain `.js` (and the no-signal fallback) follow the package type.
-    if ((hasPlainJs || (!emitESM && !emitCJS)) && packageType === "esm") {
-        emitESM = true;
-    } else if (hasPlainJs || (!emitESM && !emitCJS)) {
-        emitCJS = true;
+    if ((hasPlainJs || (!isEmitESM && !isEmitCJS)) && packageType === "esm") {
+        isEmitESM = true;
+    } else if (hasPlainJs || (!isEmitESM && !isEmitCJS)) {
+        isEmitCJS = true;
     }
 
-    context.options.emitESM = emitESM;
-    context.options.emitCJS = emitCJS;
+    context.options.emitESM = isEmitESM;
+    context.options.emitCJS = isEmitCJS;
 };
 
 /**
@@ -165,8 +165,8 @@ const prepareUnbundleEntries = (context: BuildContext<InternalBuildOptions>): vo
     resolveUnbundleEmitFormats(context, conditions, files);
     resolveUnbundleDeclaration(context, conditions, files);
 
-    const emitESM = context.options.emitESM ?? false;
-    const emitCJS = context.options.emitCJS ?? false;
+    const isEmitESM = context.options.emitESM ?? false;
+    const isEmitCJS = context.options.emitCJS ?? false;
 
     for (const file of codeFiles) {
         const relativePath = file.replace(`${sourceDirectory}/`, "");
@@ -175,9 +175,9 @@ const prepareUnbundleEntries = (context: BuildContext<InternalBuildOptions>): vo
         const name = relativePath.replace(ALLOWED_TRANSFORM_EXTENSIONS_REGEX, "").replaceAll("\\", "/");
 
         context.options.entries.push({
-            cjs: emitCJS,
+            cjs: isEmitCJS,
             declaration: context.options.declaration,
-            esm: emitESM,
+            esm: isEmitESM,
             input: file,
             name,
         });
@@ -185,11 +185,11 @@ const prepareUnbundleEntries = (context: BuildContext<InternalBuildOptions>): vo
 
     const tags: string[] = [];
 
-    if (emitESM) {
+    if (isEmitESM) {
         tags.push("[esm]");
     }
 
-    if (emitCJS) {
+    if (isEmitCJS) {
         tags.push("[cjs]");
     }
 
@@ -266,30 +266,30 @@ const autoPreset: BuildConfig = {
 
             if (context.options.entries.length === 0) {
                 throw new Error("No entries detected. Please provide entries manually.");
-            } else {
-                logger.info(
-                    "Automatically detected entries:",
-                    cyan(
-                        context.options.entries
-                            .map((buildEntry) => {
-                                if (buildEntry.fileAlias) {
-                                    return `${bold(buildEntry.fileAlias)} => ${bold(
-                                        buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(TRAILING_SLASH_REGEXP, "/*"),
-                                    )}`;
-                                }
-
-                                return bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(TRAILING_SLASH_REGEXP, "/*"));
-                            })
-                            .join(", "),
-                    ),
-                    gray(
-                        [context.options.emitESM && "esm", context.options.emitCJS && "cjs", context.options.declaration && "dts"]
-                            .filter(Boolean)
-                            .map((tag) => `[${tag}]`)
-                            .join(" "),
-                    ),
-                );
             }
+
+            logger.info(
+                "Automatically detected entries:",
+                cyan(
+                    context.options.entries
+                        .map((buildEntry) => {
+                            if (buildEntry.fileAlias) {
+                                return `${bold(buildEntry.fileAlias)} => ${bold(
+                                    buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(TRAILING_SLASH_REGEXP, "/*"),
+                                )}`;
+                            }
+
+                            return bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(TRAILING_SLASH_REGEXP, "/*"));
+                        })
+                        .join(", "),
+                ),
+                gray(
+                    [context.options.emitESM && "esm", context.options.emitCJS && "cjs", context.options.declaration && "dts"]
+                        .filter(Boolean)
+                        .map((tag) => `[${tag}]`)
+                        .join(" "),
+                ),
+            );
         },
     },
 };

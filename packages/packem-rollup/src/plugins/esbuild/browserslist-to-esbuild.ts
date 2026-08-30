@@ -21,7 +21,7 @@ const VALID_VERSION_RE = /^\d+(?:\.\d+)*$/;
 const browserslistToEsbuild = (browserList: string[]): string[] => {
     let listOfBrowsers: [string, string][] = browserList
         // filter out the unsupported ones
-        .filter((browser) => !UNSUPPORTED.some((unsupportedBrowser) => browser.startsWith(unsupportedBrowser)))
+        .filter((browser) => UNSUPPORTED.every((unsupportedBrowser) => !browser.startsWith(unsupportedBrowser)))
         // transform into ['chrome', '88']
         .map((browser): [string, string] => {
             const parts = browser.split(separator);

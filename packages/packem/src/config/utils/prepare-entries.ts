@@ -223,17 +223,19 @@ const applyFileAliasNames = (context: BuildContext<InternalBuildOptions>): void 
     // Convert fileAlias to name BEFORE extendEntry to ensure unique entry names.
     // This ensures entries with different fileAlias get separate builds for rollup input.
     for (const entry of context.options.entries) {
-        if (entry.fileAlias) {
-            // Sanitize the name by removing path prefixes (./, ../) as Rollup's [name]
-            // placeholder doesn't accept absolute or relative paths.
-            let sanitizedName = entry.fileAlias;
-
-            while (sanitizedName.startsWith("./") || sanitizedName.startsWith("../")) {
-                sanitizedName = sanitizedName.replace(LEADING_RELATIVE_SEGMENT_REGEXP, "");
-            }
-
-            entry.name = sanitizedName;
+        if (!entry.fileAlias) {
+            continue;
         }
+
+        // Sanitize the name by removing path prefixes (./, ../) as Rollup's [name]
+        // placeholder doesn't accept absolute or relative paths.
+        let sanitizedName = entry.fileAlias;
+
+        while (sanitizedName.startsWith("./") || sanitizedName.startsWith("../")) {
+            sanitizedName = sanitizedName.replace(LEADING_RELATIVE_SEGMENT_REGEXP, "");
+        }
+
+        entry.name = sanitizedName;
     }
 };
 

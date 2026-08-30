@@ -84,7 +84,7 @@
         "clean": "rimraf node_modules dist"
     },
     "devDependencies": {
-        "@types/node": "26.1.1",
+        "@types/node": "26.4.0",
         "@visulima/packem": "workspace:*",
         "esbuild": "catalog:build",
         "rimraf": "^6.1.3",

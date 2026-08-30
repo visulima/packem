@@ -103,7 +103,7 @@ export const extractExportFilenames: (
                     file: packageExport,
                     key: "exports",
                     type: inferExportType(exportKey, conditions, packageType, packageExport),
-                    ...isIgnored && { ignored: true },
+                    ...(isIgnored && { ignored: true }),
                 });
             } else if (typeof packageExport === "object" && packageExport !== null) {
                 for (const [condition, entryExport] of Object.entries(packageExport as Record<string, string[] | string | null>)) {
@@ -118,19 +118,17 @@ export const extractExportFilenames: (
                             exportKey: key.replace("./", ""),
                             file: entryExport,
                             key: "exports",
-                            ...runtimeExportConventions.has(condition)
-                                ? {
-                                    subKey: condition,
-                                }
-                                : {},
+                            ...(runtimeExportConventions.has(condition) && {
+                                subKey: condition,
+                            }),
                             type: inferExportType(condition, conditions, packageType, entryExport),
-                            ...isIgnored && { ignored: true },
+                            ...(isIgnored && { ignored: true }),
                         });
                     } else {
                         // For nested exports, we need to check if the parent export key should be ignored
                         const nestedKey = key.replace("./", "");
-                        const isNestedIgnored
-                            = isIgnored || ignoreExportKeys.some((ignoredKey) => nestedKey === ignoredKey || nestedKey.startsWith(`${ignoredKey}/`));
+                        const isNestedIgnored =
+                            isIgnored || ignoreExportKeys.some((ignoredKey) => nestedKey === ignoredKey || nestedKey.startsWith(`${ignoredKey}/`));
 
                         const nestedResults = extractExportFilenames(
                             // type-fest@0.20.2's `Exports` union is too narrow:

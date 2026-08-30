@@ -104,7 +104,7 @@ describe("dts plugin", () => {
                 dts({ emitDtsOnly: true, oxc: false, tsconfig: path.resolve(root, "tsconfig.infer.json") }),
             ]);
 
-            expect(snapshot).toContain("import(\"design-system\").InnerType");
+            expect(snapshot).toContain('import("design-system").InnerType');
             expect(snapshot).not.toContain("inner-lib");
         });
     });
@@ -137,12 +137,7 @@ describe("dts plugin", () => {
     it("fixed-string entryFileNames keeps the .d extension (#208)", async () => {
         expect.assertions(1);
 
-        const { chunks } = await rollupBuild(
-            path.resolve(dirname, "fixtures/basic.ts"),
-            [dts({ emitDtsOnly: true })],
-            {},
-            { entryFileNames: "index.mjs" },
-        );
+        const { chunks } = await rollupBuild(path.resolve(dirname, "fixtures/basic.ts"), [dts({ emitDtsOnly: true })], {}, { entryFileNames: "index.mjs" });
         const fileNames = chunks.map((chunk) => chunk.fileName);
 
         expect(fileNames.some((name) => name.endsWith(".d.mts"))).toBe(true);
@@ -187,8 +182,7 @@ describe("dts plugin", () => {
                 {
                     name: "external-node",
                     resolveId(id) {
-                        if (id.startsWith("node:"))
-                            return { external: true, id, moduleSideEffects: false };
+                        if (id.startsWith("node:")) return { external: true, id, moduleSideEffects: false };
 
                         return undefined;
                     },
@@ -614,8 +608,7 @@ describe("dts plugin", () => {
             {},
             {
                 manualChunks(id) {
-                    if (id.includes("shared1"))
-                        return "shared1-chunk.d";
+                    if (id.includes("shared1")) return "shared1-chunk.d";
 
                     return undefined;
                 },
@@ -637,8 +630,7 @@ describe("dts plugin", () => {
             {},
             {
                 manualChunks(id: string) {
-                    if (id.includes("shared1"))
-                        return "shared1-chunk.d";
+                    if (id.includes("shared1")) return "shared1-chunk.d";
 
                     return undefined;
                 },
@@ -919,7 +911,7 @@ describe("dts plugin", () => {
         // must be tracked as a dependency so it survives tree-shaking. Without the
         // fix, `b` would be dropped and the `[b]()` key would dangle.
         expect(snapshot).toContain("[b](): string");
-        expect(snapshot).toContain("declare const b = \"bb\"");
+        expect(snapshot).toContain('declare const b = "bb"');
     });
 
     it("warns for CommonJS dts input syntax", async () => {
@@ -1140,7 +1132,7 @@ describe("dts plugin", () => {
 
         expect(snapshot).toMatchSnapshot();
         // Directive should appear in the output
-        expect(snapshot).toContain("/// <reference types=\"node\" />");
+        expect(snapshot).toContain('/// <reference types="node" />');
 
         // Should be deduplicated — only one occurrence despite both input.d.ts and types-input.d.ts having it
         const matches = snapshot.match(TRIPLE_SLASH_NODE_RE);

@@ -13,17 +13,17 @@
         "d3": "^7.9.0",
         "lodash": "^4.18.1",
         "moment": "^2.30.1",
-        "react": "^19.2.7",
-        "react-dom": "^19.2.7",
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8",
         "rxjs": "^7.8.2",
         "three": "^0.185.1"
     },
     "devDependencies": {
         "@types/d3": "^7.4.3",
-        "@types/lodash": "^4.17.24",
-        "@types/react": "^19.2.17",
-        "@types/react-dom": "^19.2.3",
-        "@types/three": "^0.185.1",
+        "@types/lodash": "^4.17.25",
+        "@types/react": "^19.2.18",
+        "@types/react-dom": "^19.2.5",
+        "@types/three": "^0.185.4",
         "typescript": "^7.0.2"
     }
 }

@@ -28,7 +28,7 @@ describe(validatePackageFields, () => {
         vi.resetAllMocks();
     });
 
-    it("should not warn if \"files\" field is missing in package.json when validation is enabled", () => {
+    it('should not warn if "files" field is missing in package.json when validation is enabled', () => {
         expect.assertions(1);
 
         const context = {
@@ -46,7 +46,7 @@ describe(validatePackageFields, () => {
         expect(mockedWarn).not.toHaveBeenCalledWith(context, "The 'files' field is missing in your package.json. Add the files to be included in the package.");
     });
 
-    it("should warn if \"main\" field is missing in package.json for CJS packages", () => {
+    it('should warn if "main" field is missing in package.json for CJS packages', () => {
         expect.assertions(3);
 
         const context = {
@@ -68,7 +68,7 @@ describe(validatePackageFields, () => {
         );
     });
 
-    it("should warn if \"exports\" field is missing in package.json for ESM packages when emitCJS is false", () => {
+    it('should warn if "exports" field is missing in package.json for ESM packages when emitCJS is false', () => {
         expect.assertions(3);
 
         const context = {
@@ -89,7 +89,7 @@ describe(validatePackageFields, () => {
         expect(mockedWarn).toHaveBeenNthCalledWith(2, context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
     });
 
-    it("should warn if \"types\" field is missing in package.json when declaration is enabled", () => {
+    it('should warn if "types" field is missing in package.json when declaration is enabled', () => {
         expect.assertions(3);
 
         const context = {
@@ -121,7 +121,7 @@ describe(validatePackageFields, () => {
         );
     });
 
-    it("should handle empty \"files\" array in package.json", () => {
+    it('should handle empty "files" array in package.json', () => {
         expect.assertions(4);
 
         const context = {
@@ -151,7 +151,7 @@ describe(validatePackageFields, () => {
         );
     });
 
-    it("should handle \"bin\" field as both string and object in package.json", () => {
+    it('should handle "bin" field as both string and object in package.json', () => {
         expect.assertions(14);
 
         const contextStringBin = {
@@ -363,7 +363,7 @@ describe(validatePackageFields, () => {
                 context,
                 "The 'main' field is missing in your package.json. This field should point to your main entry file.",
             );
-            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, "Invalid exports path \"dist/index.js\" at exports. Export paths must start with \"./\"");
+            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, 'Invalid exports path "dist/index.js" at exports. Export paths must start with "./"');
         });
 
         it("should warn on exports path containing '../'", () => {
@@ -389,7 +389,7 @@ describe(validatePackageFields, () => {
             expect(mockedWarn).toHaveBeenNthCalledWith(
                 3,
                 context,
-                "Invalid exports path \"./../unsafe/path.js\" at exports. Export paths should not contain \"../\" for security reasons",
+                'Invalid exports path "./../unsafe/path.js" at exports. Export paths should not contain "../" for security reasons',
             );
         });
 
@@ -416,7 +416,7 @@ describe(validatePackageFields, () => {
             expect(mockedWarn).toHaveBeenNthCalledWith(
                 3,
                 context,
-                "Export path \"./dist/index.xyz\" at exports should have a valid file extension (.js, .mjs, .cjs, .ts, .mts, .cts, .d.ts, .d.mts, .d.cts, .jsx, .tsx, .json, .node)",
+                'Export path "./dist/index.xyz" at exports should have a valid file extension (.js, .mjs, .cjs, .ts, .mts, .cts, .d.ts, .d.mts, .d.cts, .jsx, .tsx, .json, .node)',
             );
         });
 
@@ -780,7 +780,7 @@ describe(validatePackageFields, () => {
             expect(mockedWarn).toHaveBeenNthCalledWith(
                 3,
                 context,
-                "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both",
+                'Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with ".") or conditions, not both',
             );
         });
 
@@ -806,7 +806,7 @@ describe(validatePackageFields, () => {
                 context,
                 "The 'main' field is missing in your package.json. This field should point to your main entry file.",
             );
-            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, "Missing main export \".\". Subpaths exports should include a main export entry");
+            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, 'Missing main export ".". Subpaths exports should include a main export entry');
         });
 
         it("should warn on invalid subpath format", () => {
@@ -831,8 +831,8 @@ describe(validatePackageFields, () => {
                 context,
                 "The 'main' field is missing in your package.json. This field should point to your main entry file.",
             );
-            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, "Missing main export \".\". Subpaths exports should include a main export entry");
-            expect(mockedWarn).toHaveBeenNthCalledWith(4, context, "Invalid subpath \".invalid\". Subpaths should start with \"./\" or be exactly \".\"");
+            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, 'Missing main export ".". Subpaths exports should include a main export entry');
+            expect(mockedWarn).toHaveBeenNthCalledWith(4, context, 'Invalid subpath ".invalid". Subpaths should start with "./" or be exactly "."');
         });
 
         it("should warn on multiple wildcards in subpath pattern", () => {
@@ -858,7 +858,7 @@ describe(validatePackageFields, () => {
                 context,
                 "The 'main' field is missing in your package.json. This field should point to your main entry file.",
             );
-            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, "Invalid subpath pattern \"./*/*.js\". Only one \"*\" wildcard is allowed per subpath");
+            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, 'Invalid subpath pattern "./*/*.js". Only one "*" wildcard is allowed per subpath');
         });
 
         it("should warn on unknown export conditions", () => {
@@ -937,7 +937,7 @@ describe(validatePackageFields, () => {
                 pkg: {
                     exports: {
                         ".": "./dist/index.js",
-                        // eslint-disable-next-line unicorn/no-null
+
                         "./internal": null,
                     },
                     sideEffects: false,
@@ -998,7 +998,7 @@ describe(validatePackageFields, () => {
 
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
                 context,
-                "Empty fallback array at exports[\".\"]. Fallback arrays should contain at least one entry",
+                'Empty fallback array at exports["."]. Fallback arrays should contain at least one entry',
             );
         });
 
@@ -1027,7 +1027,7 @@ describe(validatePackageFields, () => {
 
             expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
                 context,
-                "Empty conditions object at exports[\".\"]. Conditional exports should define at least one condition",
+                'Empty conditions object at exports["."]. Conditional exports should define at least one condition',
             );
         });
 
@@ -1054,7 +1054,7 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext<InternalBuildOptions>);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "Invalid exports value type at exports[\".\"]. Expected string, array, object, or null");
+            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, 'Invalid exports value type at exports["."]. Expected string, array, object, or null');
         });
 
         it("should accept all standard Node.js conditions", () => {

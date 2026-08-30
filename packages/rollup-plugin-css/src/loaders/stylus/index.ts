@@ -214,8 +214,8 @@ const loader: Loader<StylusLoaderOptions> = {
         });
 
         // Track file dependencies for watch mode
-        for (const dep of style.deps()) {
-            this.deps.add(normalize(dep));
+        for (const dependency of style.deps()) {
+            this.deps.add(normalize(dependency));
         }
 
         // Populate sourcesContent since Stylus doesn't generate it

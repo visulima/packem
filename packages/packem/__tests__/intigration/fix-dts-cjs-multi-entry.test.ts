@@ -33,8 +33,14 @@ describe("packem fix-dts cjs multi-entry", () => {
         // `index` re-exports the sibling entries (which are themselves exports), so the
         // bundled `index.d.cts` carries `export * from "./..."` star re-exports.
         await writeFile(`${temporaryDirectoryPath}/src/index.ts`, `export * from "./types";\nexport * from "./drizzle";\nexport const version = "1.0.0";\n`);
-        await writeFile(`${temporaryDirectoryPath}/src/types.ts`, `export interface Config {\n    name: string;\n}\nexport const defaultConfig: Config = { name: "default" };\n`);
-        await writeFile(`${temporaryDirectoryPath}/src/drizzle.ts`, `export interface Schema {\n    id: number;\n}\nexport const schema: Schema = { id: 1 };\n`);
+        await writeFile(
+            `${temporaryDirectoryPath}/src/types.ts`,
+            `export interface Config {\n    name: string;\n}\nexport const defaultConfig: Config = { name: "default" };\n`,
+        );
+        await writeFile(
+            `${temporaryDirectoryPath}/src/drizzle.ts`,
+            `export interface Schema {\n    id: number;\n}\nexport const schema: Schema = { id: 1 };\n`,
+        );
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {

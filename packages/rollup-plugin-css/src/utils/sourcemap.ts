@@ -137,9 +137,9 @@ export const getMap = (code: string, id?: string): string | undefined => {
     }
 
     const mapFileName = resolve(dirname(id), data);
-    const exists = isAccessibleSync(mapFileName);
+    const isExists = isAccessibleSync(mapFileName);
 
-    if (!exists) {
+    if (!isExists) {
         return undefined;
     }
 

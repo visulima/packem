@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 
 import { readFileSync, readJson, writeJson } from "@visulima/fs";
 import { dirname } from "@visulima/path";
-import { expect } from "vitest";
 // eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
+import { expect } from "vitest";
 
 import { createPackemConfig, createTsConfig, execPackem, installPackage } from "./index";
 
@@ -179,9 +179,7 @@ export const normalizeRolldownOutput = (content: string): string => {
         return content;
     }
 
-    return content
-        .replaceAll(ROLLDOWN_PNPM_STORE_PATH_REGEX, "<root>/node_modules/.pnpm/")
-        .replaceAll(ROLLDOWN_SHARED_CHUNK_HASH_REGEX, "$1[HASH]$2");
+    return content.replaceAll(ROLLDOWN_PNPM_STORE_PATH_REGEX, "<root>/node_modules/.pnpm/").replaceAll(ROLLDOWN_SHARED_CHUNK_HASH_REGEX, "$1[HASH]$2");
 };
 
 // Advisory packem emits to stderr when a fixture imports a dependency it does not declare,
@@ -195,7 +193,7 @@ export const UNDECLARED_DEPENDENCY_WARNING_REGEX = /but not declared in package\
  * conflicts). Pass those as `allow` regexes; every other line containing "WARNING" fails.
  */
 export const expectNoUnexpectedStderrWarnings = (stderr: string, allow: RegExp[] = []): void => {
-    const unexpected = stderr.split("\n").filter((line) => line.includes("WARNING") && !allow.some((regex) => regex.test(line)));
+    const unexpected = stderr.split("\n").filter((line) => line.includes("WARNING") && allow.every((regex) => !regex.test(line)));
 
     expect(unexpected).toStrictEqual([]);
 };

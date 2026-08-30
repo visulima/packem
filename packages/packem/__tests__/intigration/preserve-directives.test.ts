@@ -316,10 +316,7 @@ console.log("Hello, cli!");
     it("should preserve entry directives under both bundlers", async () => {
         expect.assertions(5);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `"use client";\n"use sukka";\n\nexport const widget = (): number => 1;\n`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `"use client";\n"use sukka";\n\nexport const widget = (): number => 1;\n`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createPackageJson(temporaryDirectoryPath, {
@@ -349,7 +346,7 @@ console.log("Hello, cli!");
         // The second directive of the multi-directive module is preserved too.
         expect(USE_SUKKA_DIRECTIVE_RE.test(mjsContent)).toBe(true);
         // The implementation survives (sanity check that we did not corrupt the module).
-        expect(mjsContent.includes("widget")).toBe(true);
+        expect(mjsContent).toContain("widget");
     });
 
     // Rolldown chunks differ from rollup: it emits `import { foo } from './X';`

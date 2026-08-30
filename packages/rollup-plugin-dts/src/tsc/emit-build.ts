@@ -78,18 +78,15 @@ const collectProjectGraph = (rootTsconfigPath: string, fsSystem: ts.System, forc
     while (true) {
         const tsconfigPath = stack.pop();
 
-        if (!tsconfigPath)
-            break;
+        if (!tsconfigPath) break;
 
-        if (seen.has(tsconfigPath))
-            continue;
+        if (seen.has(tsconfigPath)) continue;
 
         seen.add(tsconfigPath);
 
         const parsedConfig = parseTsconfig(tsconfigPath, fsSystem);
 
-        if (!parsedConfig)
-            continue;
+        if (!parsedConfig) continue;
 
         parsedConfig.options = patchCompilerOptions(parsedConfig.options, {
             force,
@@ -137,13 +134,13 @@ const patchCompilerOptions = (
         tsconfigPath: string;
     } | null,
 ): ts.CompilerOptions => {
-    const noEmit: boolean = options.noEmit ?? false;
-    const declaration: boolean = options.declaration ?? !!options.composite;
-    const declarationMap: boolean = options.declarationMap ?? false;
+    const isNoEmit: boolean = options.noEmit ?? false;
+    const isDeclaration: boolean = options.declaration ?? !!options.composite;
+    const isDeclarationMap: boolean = options.declarationMap ?? false;
 
     const shouldPrintWarning = extraOptions?.tsconfigPath && !extraOptions.force;
 
-    if (noEmit) {
+    if (isNoEmit) {
         options = { ...options, noEmit: false };
 
         if (shouldPrintWarning) {
@@ -151,7 +148,7 @@ const patchCompilerOptions = (
         }
     }
 
-    if (!declaration) {
+    if (!isDeclaration) {
         options = { ...options, declaration: true };
 
         if (shouldPrintWarning) {
@@ -161,7 +158,7 @@ const patchCompilerOptions = (
         }
     }
 
-    if (!declarationMap && extraOptions?.sourcemap) {
+    if (!isDeclarationMap && extraOptions?.sourcemap) {
         options = { ...options, declarationMap: true };
 
         if (shouldPrintWarning) {
@@ -181,9 +178,14 @@ const patchCompilerOptions = (
 // flag, otherwise tsc emits `.d.ts` but not `.d.ts.map` and the final sourcemap
 // chains back to the intermediate `.d.ts` instead of the original `.ts`
 // (sxzz/rolldown-plugin-dts#255).
-const createProgramFactory = (sourcemap: boolean): ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram> =>
+const createProgramFactory =
+    (sourcemap: boolean): ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram> =>
     (rootNames, options, ...arguments_) =>
-        ts.createEmitAndSemanticDiagnosticsBuilderProgram(rootNames, patchCompilerOptions(options ?? {}, { force: true, sourcemap, tsconfigPath: "" }), ...arguments_);
+        ts.createEmitAndSemanticDiagnosticsBuilderProgram(
+            rootNames,
+            patchCompilerOptions(options ?? {}, { force: true, sourcemap, tsconfigPath: "" }),
+            ...arguments_,
+        );
 
 // Emit file using `tsc --build` mode.
 const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
@@ -220,8 +222,8 @@ const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
 
     debug(`loaded project ${project.tsconfigPath} for ${id}`);
 
-    const ignoreCase = !fsSystem.useCaseSensitiveFileNames;
-    const outputFiles = ts.getOutputFileNames(project.parsedConfig, resolvedId, ignoreCase);
+    const isIgnoreCase = !fsSystem.useCaseSensitiveFileNames;
+    const outputFiles = ts.getOutputFileNames(project.parsedConfig, resolvedId, isIgnoreCase);
 
     let code: string | undefined;
     let map: ExistingRawSourceMap | undefined;

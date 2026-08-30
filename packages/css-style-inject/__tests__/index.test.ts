@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/no-null */
-/* eslint-disable vitest/require-mock-type-parameters */
 import type { Mock } from "vitest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -321,6 +319,7 @@ describe(cssStyleInject, () => {
             // The fast path uses document.head directly and must NOT fall back to
             // the querySelectorAll("head") lookup.
             expect(mockDocument.querySelectorAll).not.toHaveBeenCalledWith("head");
+            // eslint-disable-next-line vitest/prefer-called-with -- append receives the style tag; `toHaveBeenCalledWith()` would assert it is called with no arguments
             expect(mockElement.append).toHaveBeenCalled();
         });
 

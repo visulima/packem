@@ -232,11 +232,11 @@ describe("integration - shared-module-cross-boundary", () => {
 
         // Both client chunks should import from the client-only-shared chunk
         // (or one could have it inlined, but both importing is also valid)
-        const clientImportsShared = clientChunkContent.includes("client-only-shared");
-        const client2ImportsShared = client2ChunkContent.includes("client-only-shared");
+        const isClientImportsShared = clientChunkContent.includes("client-only-shared");
+        const isClient2ImportsShared = client2ChunkContent.includes("client-only-shared");
 
         // At least one should import from the shared chunk (or have it inlined)
-        expect(clientImportsShared || client2ImportsShared).toBe(true);
+        expect(isClientImportsShared || isClient2ImportsShared).toBe(true);
 
         // Both chunks should reference the shared code (either via import or inline)
         // This ensures the client-only-shared module is accessible to both client chunks

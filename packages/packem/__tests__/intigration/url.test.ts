@@ -114,7 +114,7 @@ describe("url", () => {
         await build("svg", { limit: 10 * 1024 }, [join(temporaryDirectoryPath, "/dist/svg.cjs"), join(temporaryDirectoryPath, "/dist/svg.mjs")]);
     });
 
-    it("inline \"large\" files", async () => {
+    it('inline "large" files', async () => {
         expect.assertions(5);
 
         await build("svg", { limit: 10 }, [
@@ -143,7 +143,7 @@ describe("url", () => {
         ]);
     });
 
-    it("copy \"large\" binary files, limit: 10", async () => {
+    it('copy "large" binary files, limit: 10', async () => {
         expect.assertions(5);
 
         await build("svg", { emitFiles: true, limit: 10 }, [
@@ -360,6 +360,7 @@ export default svg;`,
         // packem advises it will bundle the undeclared dep. That advisory is expected here;
         // assert no OTHER warnings reached stderr.
         expectNoUnexpectedStderrWarnings(binProcess.stderr as string, [/but not declared in package\.json/]);
+
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));

@@ -75,14 +75,14 @@ const collectReferencedSpecifiers = (code: string): Map<string, Set<string>> => 
     RE_INLINE_IMPORT.lastIndex = 0;
 
     // eslint-disable-next-line no-cond-assign -- standard regex exec loop
-    while (match = RE_INLINE_IMPORT.exec(code)) {
+    while ((match = RE_INLINE_IMPORT.exec(code))) {
         add(match[1], match[2]);
     }
 
     RE_IMPORT_STATEMENT.lastIndex = 0;
 
     // eslint-disable-next-line no-cond-assign -- standard regex exec loop
-    while (match = RE_IMPORT_STATEMENT.exec(code)) {
+    while ((match = RE_IMPORT_STATEMENT.exec(code))) {
         const clause = match[1];
         const specifier = match[2];
         const braced = RE_BRACED.exec(clause);
@@ -124,14 +124,14 @@ const parseReexports = (code: string): Map<string, ReexportInfo> => {
     RE_EXPORT_STAR.lastIndex = 0;
 
     // eslint-disable-next-line no-cond-assign -- standard regex exec loop
-    while (match = RE_EXPORT_STAR.exec(code)) {
+    while ((match = RE_EXPORT_STAR.exec(code))) {
         get(match[1]).all = true;
     }
 
     RE_EXPORT_NAMED.lastIndex = 0;
 
     // eslint-disable-next-line no-cond-assign -- standard regex exec loop
-    while (match = RE_EXPORT_NAMED.exec(code)) {
+    while ((match = RE_EXPORT_NAMED.exec(code))) {
         const info = get(match[2]);
 
         for (const part of match[1].split(",")) {
@@ -257,9 +257,9 @@ export const createReexportSpecifierRewriter = (tsconfig?: string): ReexportSpec
                 // the same name (or it re-exports everything). An inline reference
                 // with no captured name (a plain top-level import) only needs the
                 // origin link to exist.
-                const forwardsAll = reexports.all || [...referencedNames].every((name) => reexports.names.has(name));
+                const isForwardsAll = reexports.all || [...referencedNames].every((name) => reexports.names.has(name));
 
-                if (forwardsAll) {
+                if (isForwardsAll) {
                     candidates.push(dependency);
                 }
             }

@@ -60,7 +60,7 @@ describe(findAlternatives, () => {
     it("should return an empty array when the input string contains only whitespace characters", () => {
         expect.assertions(1);
 
-        const string = "   ";
+        const string = " ".repeat(3);
         const array = ["banana", "orange", "pineapple", "grape"];
 
         const result = findAlternatives(string, array);

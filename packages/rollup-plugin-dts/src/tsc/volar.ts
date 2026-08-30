@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports, global-require, import/no-dynamic-require, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, unicorn/prevent-abbreviations, @typescript-eslint/no-shadow, @typescript-eslint/unbound-method, @typescript-eslint/prefer-nullish-coalescing, preserve-caught-error, no-secrets/no-secrets -- this module intentionally uses dynamic require() to optionally load vue-tsc / @ts-macro/tsc; the variables prefixed with `$` are TypeScript-internal field names that ts.parseJsonConfigFileContent assigns to compilerOptions */
+/* eslint-disable @typescript-eslint/no-require-imports, global-require, import/no-dynamic-require, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-shadow, @typescript-eslint/unbound-method, @typescript-eslint/prefer-nullish-coalescing, preserve-caught-error, no-secrets/no-secrets -- this module intentionally uses dynamic require() to optionally load vue-tsc / @ts-macro/tsc; the variables prefixed with `$` are TypeScript-internal field names that ts.parseJsonConfigFileContent assigns to compilerOptions */
 import { createDebug } from "obug";
 import type Ts from "typescript";
 
@@ -27,8 +27,7 @@ const loadVueLanguageTools = (): {
         const getLanguagePlugin = (ts: typeof Ts, options: Ts.CreateProgramOptions) => {
             const $rootDir = options.options.$rootDir as string;
             const $configRaw = options.options.$configRaw as
-                | (Ts.TsConfigSourceFile & { vueCompilerOptions?: import("@vue/language-core").RawVueCompilerOptions })
-                | undefined;
+                (Ts.TsConfigSourceFile & { vueCompilerOptions?: import("@vue/language-core").RawVueCompilerOptions }) | undefined;
 
             const resolver = new vue.CompilerOptionsResolver(ts, ts.sys.readFile);
 
@@ -87,8 +86,7 @@ const createProgramFactory = (ts: typeof Ts, options: Pick<TscOptions, "vue" | "
     const tsMacroLanguageTools = options.tsMacro ? loadTsMacro() : undefined;
     const proxyCreateProgram = vueLanguageTools?.proxyCreateProgram || tsMacroLanguageTools?.proxyCreateProgram;
 
-    if (!proxyCreateProgram)
-        return ts.createProgram;
+    if (!proxyCreateProgram) return ts.createProgram;
 
     return proxyCreateProgram(ts, ts.createProgram, (ts, options) => {
         const languagePlugins = [];

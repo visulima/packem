@@ -16,8 +16,7 @@ export type SassLoaderContext = {
 };
 
 export type SassLoaderOptions = (
-    | Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax">
-    | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">
+    Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax"> | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">
 ) & {
     additionalData:
         | string

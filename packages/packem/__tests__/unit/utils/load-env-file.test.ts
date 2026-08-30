@@ -31,9 +31,9 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", temporaryDirectoryPath, "PACKEM_");
 
         expect(result).toStrictEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
             // eslint-disable-next-line no-secrets/no-secrets -- test fixture: .env file body / process.env.* define key, not a real secret
-            "process.env.PACKEM_VERSION": "\"1.0.0\"",
+            "process.env.PACKEM_VERSION": '"1.0.0"',
         });
     });
 
@@ -48,9 +48,9 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", temporaryDirectoryPath, "PACKEM_");
 
         expect(result).toStrictEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
             // eslint-disable-next-line no-secrets/no-secrets -- test fixture: .env file body / process.env.* define key, not a real secret
-            "process.env.PACKEM_VERSION": "\"1.0.0\"",
+            "process.env.PACKEM_VERSION": '"1.0.0"',
         });
     });
 
@@ -64,8 +64,8 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", temporaryDirectoryPath, "");
 
         expect(result).toStrictEqual({
-            "process.env.API_URL": "\"https://api.example.com\"",
-            "process.env.VERSION": "\"1.0.0\"",
+            "process.env.API_URL": '"https://api.example.com"',
+            "process.env.VERSION": '"1.0.0"',
         });
     });
 
@@ -80,8 +80,8 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", temporaryDirectoryPath, "PACKEM_");
 
         expect(result).toStrictEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
-            "process.env.PACKEM_MESSAGE": "\"Hello World\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
+            "process.env.PACKEM_MESSAGE": '"Hello World"',
         });
     });
 
@@ -95,9 +95,9 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", temporaryDirectoryPath, "PACKEM_");
 
         expect(result).toStrictEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
             // eslint-disable-next-line no-secrets/no-secrets -- test fixture: .env file body / process.env.* define key, not a real secret
-            "process.env.PACKEM_VERSION": "\"1.0.0\"",
+            "process.env.PACKEM_VERSION": '"1.0.0"',
         });
     });
 
@@ -122,7 +122,7 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile("config/.env", temporaryDirectoryPath, "PACKEM_");
 
         expect(result).toStrictEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
         });
     });
 
@@ -136,7 +136,7 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(envFile, temporaryDirectoryPath, "PACKEM_");
 
         expect(result).toStrictEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
         });
     });
 
@@ -151,7 +151,7 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", temporaryDirectoryPath);
 
         expect(result).toStrictEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
         });
     });
 
@@ -167,8 +167,8 @@ describe(loadEnvFile, () => {
 
         expect(result).toStrictEqual({
             // eslint-disable-next-line no-secrets/no-secrets -- test fixture: .env file body / process.env.* define key, not a real secret
-            "process.env.PACKEM_CONFIG": "\"key=value\"",
-            "process.env.PACKEM_QUERY": "\"param1=val1&param2=val2\"",
+            "process.env.PACKEM_CONFIG": '"key=value"',
+            "process.env.PACKEM_QUERY": '"param1=val1&param2=val2"',
         });
     });
 

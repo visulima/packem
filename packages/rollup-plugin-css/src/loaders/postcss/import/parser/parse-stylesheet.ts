@@ -52,7 +52,7 @@ const parseImport = (result: Result, atRule: AtRule, importingNode: AtRule | und
         });
     }
 
-    const stmt: ImportStatement = {
+    const statement: ImportStatement = {
         conditions: [...conditions],
         from,
         fullUri: parsed.fullUri,
@@ -63,7 +63,7 @@ const parseImport = (result: Result, atRule: AtRule, importingNode: AtRule | und
     };
 
     if (parsed.layer !== undefined || parsed.media !== undefined || parsed.supports !== undefined || parsed.scope !== undefined) {
-        stmt.conditions.push({
+        statement.conditions.push({
             layer: parsed.layer,
             media: parsed.media,
             scope: parsed.scope,
@@ -71,7 +71,7 @@ const parseImport = (result: Result, atRule: AtRule, importingNode: AtRule | und
         });
     }
 
-    return stmt;
+    return statement;
 };
 
 const consumeImports = (
@@ -93,9 +93,9 @@ const consumeImports = (
         const node = nodes[index] as ChildNode;
 
         if (node.type === "comment") {
-            const [consumeIndex, commentsStmt] = consumeComments(nodes, index, importingNode, from);
+            const [consumeIndex, commentsStatement] = consumeComments(nodes, index, importingNode, from);
 
-            statements.push(commentsStmt);
+            statements.push(commentsStatement);
 
             // eslint-disable-next-line sonarjs/updated-loop-counter
             index = consumeIndex;
@@ -166,9 +166,9 @@ const consumeBeforeImports = (
         const node = nodes[index] as ChildNode;
 
         if (node.type === "comment") {
-            const [consumeIndex, commentsStmt] = consumeComments(nodes, index, importingNode, from);
+            const [consumeIndex, commentsStatement] = consumeComments(nodes, index, importingNode, from);
 
-            statements.push(commentsStmt);
+            statements.push(commentsStatement);
 
             // eslint-disable-next-line sonarjs/updated-loop-counter
             index = consumeIndex;
@@ -185,18 +185,16 @@ const consumeBeforeImports = (
                     node,
                     type: "pre-import",
                 });
-
-                continue;
             } else {
-                const [consumeIndex, layerStmt] = consumeLayers(nodes, conditions, index, importingNode, from);
+                const [consumeIndex, layerStatement] = consumeLayers(nodes, conditions, index, importingNode, from);
 
-                statements.push(layerStmt);
+                statements.push(layerStatement);
 
                 // eslint-disable-next-line sonarjs/updated-loop-counter
                 index = consumeIndex;
-
-                continue;
             }
+
+            continue;
         }
 
         break;
@@ -217,10 +215,12 @@ const parseStylesheet = (result: Result, styles: Document | Root, importingNode:
             if (stylesheet.charset && subStylesheet.charset && stylesheet.charset.params.toLowerCase() !== subStylesheet.charset.params.toLowerCase()) {
                 throw subStylesheet.charset.error(
                     "Incompatible @charset statements:\n"
-                    + `  ${subStylesheet.charset.params} specified in ${subStylesheet.charset.source?.input.file ?? "<unknown>"}\n`
-                    + `  ${stylesheet.charset.params} specified in ${stylesheet.charset.source?.input.file ?? "<unknown>"}`,
+                        + `  ${subStylesheet.charset.params} specified in ${subStylesheet.charset.source?.input.file ?? "<unknown>"}\n`
+                        + `  ${stylesheet.charset.params} specified in ${stylesheet.charset.source?.input.file ?? "<unknown>"}`,
                 );
-            } else if (!stylesheet.charset && subStylesheet.charset) {
+            }
+
+            if (!stylesheet.charset && subStylesheet.charset) {
                 stylesheet.charset = subStylesheet.charset;
             }
 

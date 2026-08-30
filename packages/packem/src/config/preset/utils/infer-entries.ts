@@ -392,7 +392,7 @@ const createOrUpdateEntry = (
     // Check if input file matches the alias (if not, we need fileAlias)
     const inputBase = input.replace(extensionPattern, "").split("/").pop() ?? "";
     const aliasBase = aliasName.split("/").pop() ?? "";
-    const needsFileAlias = !input.includes(aliasName) && inputBase !== aliasBase;
+    const isNeedsFileAlias = !input.includes(aliasName) && inputBase !== aliasBase;
 
     // Include fileAlias in uniqueness check to ensure separate entries for same input with different outputs
     let entry: BuildEntry | undefined = entries.find(
@@ -400,20 +400,19 @@ const createOrUpdateEntry = (
             index.input === input
             && index.environment === entryEnvironment
             && index.runtime === runtime
-            && index.fileAlias === (needsFileAlias ? aliasName : undefined),
+            && index.fileAlias === (isNeedsFileAlias ? aliasName : undefined),
     );
 
     if (entry === undefined) {
-        entry
-            = entries[
-                entries.push({
-                    environment: entryEnvironment,
-                    exportKey: new Set([output.exportKey].filter(Boolean)),
-                    fileAlias: needsFileAlias ? aliasName : undefined,
-                    input,
-                    runtime,
-                }) - 1
-            ];
+        entry = {
+            environment: entryEnvironment,
+            exportKey: new Set([output.exportKey].filter(Boolean)),
+            fileAlias: isNeedsFileAlias ? aliasName : undefined,
+            input,
+            runtime,
+        };
+
+        entries.push(entry);
     } else if (entry.exportKey && output.exportKey) {
         entry.exportKey.add(output.exportKey);
     }
@@ -510,8 +509,8 @@ const createOrUpdateEntry = (
                 const allDeclarationOutputs = outputs.filter((o) => DECLARATION_FILE_REGEXP.test(o.file));
 
                 // Check which declaration formats are needed across all declaration outputs
-                const hasImportConditionDecl = allDeclarationOutputs.some((o) => DECLARATION_MTS_REGEXP.test(o.file));
-                const hasRequireConditionDecl = allDeclarationOutputs.some((o) => DECLARATION_CTS_REGEXP.test(o.file));
+                const hasImportConditionDeclaration = allDeclarationOutputs.some((o) => DECLARATION_MTS_REGEXP.test(o.file));
+                const hasRequireConditionDeclaration = allDeclarationOutputs.some((o) => DECLARATION_CTS_REGEXP.test(o.file));
 
                 // Determine whether declaration is under a format condition or a types condition:
                 // - All original outputs for this export key have subKey === "types":
@@ -520,24 +519,24 @@ const createOrUpdateEntry = (
                 //   (e.g., { types: { import: "*.d.mts" } }) → declaration-only, use declarationCjs/declarationEsm
                 // Note: the wildcard path overrides subKey to "types" on specificOutput, so we check
                 // the original outputs from `allOutputsForExportKey` (filtered from `outputs`)
-                const allHaveTypesSubKey = allOutputsForExportKey.every((o) => !o.subKey || o.subKey === "types");
+                const isAllHaveTypesSubKey = allOutputsForExportKey.every((o) => !o.subKey || o.subKey === "types");
 
-                if (allHaveTypesSubKey) {
+                if (isAllHaveTypesSubKey) {
                     // Declaration under format conditions - JS will also be generated
-                    if (hasRequireConditionDecl) {
+                    if (hasRequireConditionDeclaration) {
                         entry.cjs = true;
                     }
 
-                    if (hasImportConditionDecl) {
+                    if (hasImportConditionDeclaration) {
                         entry.esm = true;
                     }
                 } else {
                     // Declaration under types parent - only declaration files, no JS
-                    if (hasRequireConditionDecl) {
+                    if (hasRequireConditionDeclaration) {
                         entry.declarationCjs = true;
                     }
 
-                    if (hasImportConditionDecl) {
+                    if (hasImportConditionDeclaration) {
                         entry.declarationEsm = true;
                     }
                 }
@@ -557,12 +556,12 @@ const createOrUpdateEntry = (
 
     // Set fileAlias if needed (for any export condition producing different output filename)
     // This includes SPECIAL_EXPORT_CONVENTIONS and pattern-based outputs (e.g., .browser, .server)
-    if (needsFileAlias && !entry.fileAlias) {
+    if (isNeedsFileAlias && !entry.fileAlias) {
         entry.fileAlias = aliasName;
     }
 };
 
-let privateSubfolderWarningShown = false;
+let isPrivateSubfolderWarningShown = false;
 
 const validateIfTypescriptIsInstalled = (context: BuildContext<InternalBuildOptions>): void => {
     if (context.pkg.dependencies?.typescript === undefined && context.pkg.devDependencies?.typescript === undefined) {
@@ -596,7 +595,7 @@ const inferEntries = async (
     // Reset the private-subfolder warning latch per call so that, in a long-lived
     // process building multiple packages (monorepo orchestration, watch mode),
     // every package can emit the debug message instead of only the first one.
-    privateSubfolderWarningShown = false;
+    isPrivateSubfolderWarningShown = false;
 
     const warnings: string[] = [];
 
@@ -871,10 +870,12 @@ const inferEntries = async (
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if ((output.file.includes("/*") || outputSlug.includes("*")) && output.key === "exports") {
-            if (!privateSubfolderWarningShown) {
-                (context.logger as InferEntriesLogger | undefined)?.debug("Private subfolders are not supported, if you need this feature please open an issue on GitHub.");
+            if (!isPrivateSubfolderWarningShown) {
+                (context.logger as InferEntriesLogger | undefined)?.debug(
+                    "Private subfolders are not supported, if you need this feature please open an issue on GitHub.",
+                );
 
-                privateSubfolderWarningShown = true;
+                isPrivateSubfolderWarningShown = true;
             }
 
             // Determine input pattern from export key or file
@@ -1036,7 +1037,7 @@ const inferEntries = async (
                     if (inputWildcardCount > 0 && inputWildcardCount < outputWildcardCount && outputWildcardCount > 1 && wildcardMatch.length > 1) {
                         const firstCapture = wildcardMatch[0];
 
-                        if (!wildcardMatch.every((capture) => capture === firstCapture)) {
+                        if (wildcardMatch.some((capture) => capture !== firstCapture)) {
                             // Not all wildcards match the same value, skip this match
                             continue;
                         }
@@ -1147,7 +1148,7 @@ const inferEntries = async (
                             if (inputWildcardCount > 0 && inputWildcardCount < outputWildcardCount && outputWildcardCount > 1 && wildcardMatch.length > 1) {
                                 const firstCapture = wildcardMatch[0];
 
-                                if (!wildcardMatch.every((capture) => capture === firstCapture)) {
+                                if (wildcardMatch.some((capture) => capture !== firstCapture)) {
                                     // Not all wildcards match the same value, skip this match
                                     continue;
                                 }
@@ -1227,16 +1228,16 @@ const inferEntries = async (
                 // Skip if we've already processed this export key (check if entry already exists)
                 const dtsOutput = allOutputsForExportKey.find((o) => o.file.endsWith(".d.ts"));
                 // If no .d.ts, use .d.mts or .d.cts as fallback
-                const baseOutput
-                    = dtsOutput
-                        ?? allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts"))
-                        ?? allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts"))
-                        ?? output;
+                const baseOutput =
+                    dtsOutput
+                    ?? allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts"))
+                    ?? allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts"))
+                    ?? output;
 
                 // Only process if this is the .d.ts output (or the first one if no .d.ts)
                 // This ensures we only create ONE entry per export key
-                const isBaseOutput
-                    = baseOutput === output || (dtsOutput !== undefined && output === dtsOutput) || (dtsOutput === undefined && baseOutput === output);
+                const isBaseOutput =
+                    baseOutput === output || (dtsOutput !== undefined && output === dtsOutput) || (dtsOutput === undefined && baseOutput === output);
 
                 if (!isBaseOutput) {
                     // Skip other declaration outputs for this export key - we'll handle them in the base output
@@ -1305,7 +1306,7 @@ const inferEntries = async (
                         ...output,
                         file: outputPath,
                         // Don't set type for declaration files - they should not trigger JS builds
-                        ...!isOutputDeclarationFilePath && derivedInferredType && { type: derivedInferredType },
+                        ...(!isOutputDeclarationFilePath && derivedInferredType && { type: derivedInferredType }),
                     };
 
                     createOrUpdateEntry(entries, input, false, outputSlug, specificOutput, context, true, outputs);
@@ -1417,20 +1418,20 @@ const inferEntries = async (
             const ctsPath = `${inputWithoutExtension}.cts`;
             const mtsPath = `${inputWithoutExtension}.mts`;
 
-            const ctsExists = isAccessibleSync(ctsPath);
-            const mtsExists = isAccessibleSync(mtsPath);
+            const isCtsExists = isAccessibleSync(ctsPath);
+            const isMtsExists = isAccessibleSync(mtsPath);
             // When the output has a format-specific extension (.mjs/.d.mts or .cjs/.d.cts), only
             // emit an entry for the matching source. Without this, the CJS DTS build would emit
             // a `.d.mts` from the `.cts` source (and vice-versa), and the second build to write
             // would clobber the correct file with the wrong-source content.
-            const wantsMts = output.file.endsWith(".d.mts") || output.file.endsWith(".mjs");
-            const wantsCts = output.file.endsWith(".d.cts") || output.file.endsWith(".cjs");
+            const isWantsMts = output.file.endsWith(".d.mts") || output.file.endsWith(".mjs");
+            const isWantsCts = output.file.endsWith(".d.cts") || output.file.endsWith(".cjs");
 
-            if (wantsMts && mtsExists) {
+            if (isWantsMts && isMtsExists) {
                 createOrUpdateEntry(entries, mtsPath, isDirectory, outputSlug, { ...output, type: "esm" }, context, false, outputs);
-            } else if (wantsCts && ctsExists) {
+            } else if (isWantsCts && isCtsExists) {
                 createOrUpdateEntry(entries, ctsPath, isDirectory, outputSlug, { ...output, type: "cjs" }, context, false, outputs);
-            } else if (ctsExists && mtsExists) {
+            } else if (isCtsExists && isMtsExists) {
                 createOrUpdateEntry(entries, ctsPath, isDirectory, outputSlug, { ...output, type: "cjs" }, context, false, outputs);
                 createOrUpdateEntry(entries, mtsPath, isDirectory, outputSlug, { ...output, type: "esm" }, context, false, outputs);
             } else {

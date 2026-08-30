@@ -10,6 +10,8 @@ on: # yamllint disable-line rule:truthy
 # superseded pull request runs.
 concurrency:
     group: "${{ github.workflow }}-${{ github.ref }}"
+    # Quoting the expression would hand GitHub the literal string instead of the boolean.
+    # yamllint disable-line rule:quoted-strings
     cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions: {}
@@ -19,7 +21,7 @@ jobs:
             security-events: "write"
             actions: "read"
             contents: "read"
-        uses: "anolilab/workflows/.github/workflows/codeql.yml@ea8d9012e452bfa5a85447527ba0db24698cafac" # v20.2.7
+        uses: "anolilab/workflows/.github/workflows/codeql.yml@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
         with:
             languages: "[\"javascript-typescript\"]"
             branches: "[\"main\", \"alpha\"]"

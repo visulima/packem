@@ -7,8 +7,12 @@
  */
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
+// rollup 4.63 types its own `SourceMap.sourcesContent` as `(string | null)[]` while
+// `SourceMapInput` still demands `string[]`, so rollup's map type no longer satisfies
+// the hooks that return it. magic-string's map is what we actually produce here.
+import type { SourceMap } from "magic-string";
 import MagicString from "magic-string";
-import type { Plugin, SourceMap } from "rollup";
+import type { Plugin } from "rollup";
 
 type PreserveDirectivesPluginOptions = {
     directiveRegex: RegExp;
@@ -28,9 +32,9 @@ interface ScannedDirective {
 
 // Spelled with explicit escapes (not raw characters) so the set is reviewable
 // by eye: space, tab, form-feed, vertical-tab, no-break space, BOM.
-const WHITESPACE = new Set([" ", "\t", "\f", "\v", "\u00A0", "\uFEFF"]);
+const WHITESPACE = new Set([" ", "\t", "\f", "\v", "\u{A0}", "\u{FEFF}"]);
 // Line feed, carriage return, line separator (U+2028), paragraph separator (U+2029).
-const LINE_TERMINATORS = new Set(["\n", "\r", "\u2028", "\u2029"]);
+const LINE_TERMINATORS = new Set(["\n", "\r", "\u{2028}", "\u{2029}"]);
 
 // Extracts the first quoted token from a rollup MODULE_LEVEL_DIRECTIVE warning
 // message (the offending directive, e.g. `"use client"`). Module-scoped to avoid
@@ -107,7 +111,7 @@ const scanLeadingDirectives = (code: string): ScannedDirective[] => {
 
         const quote = code[index];
 
-        if (quote !== "\"" && quote !== "'") {
+        if (quote !== '"' && quote !== "'") {
             break; // first non-string statement ends the prologue
         }
 
@@ -115,7 +119,7 @@ const scanLeadingDirectives = (code: string): ScannedDirective[] => {
 
         index += 1;
 
-        let closed = false;
+        let isClosed = false;
 
         while (index < length) {
             const char = code[index] as string;
@@ -127,7 +131,7 @@ const scanLeadingDirectives = (code: string): ScannedDirective[] => {
 
             if (char === quote) {
                 index += 1;
-                closed = true;
+                isClosed = true;
                 break;
             }
 
@@ -138,7 +142,7 @@ const scanLeadingDirectives = (code: string): ScannedDirective[] => {
             index += 1;
         }
 
-        if (!closed) {
+        if (!isClosed) {
             break;
         }
 
@@ -211,7 +215,8 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 // incremental, cache-hit rebuilds (otherwise an unchanged module
                 // silently loses its `"use client"`/`"use server"` banner).
                 const directivesForId = (id: string): Set<string> | undefined => {
-                    const metaDirectives = (this.getModuleInfo(id)?.meta as { preserveDirectives?: { directives?: string[] } } | undefined)?.preserveDirectives?.directives;
+                    const metaDirectives = (this.getModuleInfo(id)?.meta as { preserveDirectives?: { directives?: string[] } } | undefined)?.preserveDirectives
+                        ?.directives;
 
                     if (metaDirectives && metaDirectives.length > 0) {
                         return new Set<string>(metaDirectives);
@@ -265,8 +270,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                     // Same cache-hit concern as directives above: prefer the
                     // persisted `meta` shebang, fall back to the side-channel.
                     const metaShebang = (this.getModuleInfo(chunk.facadeModuleId)?.meta as { preserveDirectives?: { shebang?: string } } | undefined)
-                        ?.preserveDirectives
-                        ?.shebang;
+                        ?.preserveDirectives?.shebang;
 
                     if (typeof metaShebang === "string") {
                         shebang = metaShebang;
@@ -417,7 +421,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 map: magicString.generateMap({ hires: true }),
                 meta: {
                     preserveDirectives: {
-                        directives: [...directives[id] ?? []],
+                        directives: [...(directives[id] ?? [])],
 
                         shebang: shebangs[id] ?? undefined,
                     },

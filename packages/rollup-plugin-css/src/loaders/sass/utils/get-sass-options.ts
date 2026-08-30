@@ -30,7 +30,7 @@ const getSassOptions = async (
     };
 
     if (!(sassOptions as StringOptions<"async">).logger) {
-        const needEmitWarning = warnRuleAsWarning !== false;
+        const isNeedEmitWarning = warnRuleAsWarning !== false;
         const formatSpan = (span: SourceSpan) => {
             const line = String(span.start.line);
             const column = String(span.start.column);
@@ -74,7 +74,7 @@ const getSassOptions = async (
                     builtMessage += `\n\n${loggerOptions.stack}`;
                 }
 
-                if (needEmitWarning) {
+                if (isNeedEmitWarning) {
                     logger.warn({ message: builtMessage, name: "SassWarning" });
                 } else {
                     logger.info({ message: builtMessage });
@@ -110,7 +110,7 @@ const getSassOptions = async (
         ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map((includePath) =>
             normalizeIncludePath(includePath),
         ),
-        ...process.env.SASS_PATH ? process.env.SASS_PATH.split(separator) : [],
+        ...(process.env.SASS_PATH ? process.env.SASS_PATH.split(separator) : []),
     ];
 
     if ((sassOptions as StringOptions<"async">).importers) {

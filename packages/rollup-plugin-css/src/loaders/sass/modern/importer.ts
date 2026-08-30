@@ -40,7 +40,7 @@ const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
         load(canonicalUrl: URL): ImporterResult | null {
             const extension = extname(canonicalUrl.pathname);
 
-            const syntax: Syntax = extension ? resolveSyntax(extension.toLowerCase()) ?? "scss" : "scss"; // Default syntax
+            const syntax: Syntax = extension ? (resolveSyntax(extension.toLowerCase()) ?? "scss") : "scss"; // Default syntax
 
             try {
                 let contents = readFileSync(canonicalUrl);

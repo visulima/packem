@@ -9,7 +9,7 @@ import generateName from "./generate";
 import inlineFile from "./inline";
 import type { UrlFile, UrlResolve } from "./url-resolve";
 import { urlResolve } from "./url-resolve";
-import { isDeclWithUrl, walkUrls } from "./utils";
+import { isDeclWithUrl as isDeclarationWithUrl, walkUrls } from "./utils";
 
 const name = "packem-css-url";
 const placeholderHashDefault = "assets/[name]-[hash][extname]";
@@ -66,12 +66,12 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
             const imported = new Set(result.messages.filter((message) => message.type === "dependency").map((message) => message.file as string));
 
-            css.walkDecls((decl) => {
-                if (!isDeclWithUrl(decl)) {
+            css.walkDecls((declaration) => {
+                if (!isDeclarationWithUrl(declaration)) {
                     return;
                 }
 
-                const parsed = valueParser(decl.value);
+                const parsed = valueParser(declaration.value);
 
                 walkUrls(parsed, (url, node) => {
                     // Resolve aliases
@@ -86,7 +86,7 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
                     // Empty URL
                     if (!node || url.length === 0) {
-                        decl.warn(result, `Empty URL in \`${decl.toString()}\``);
+                        declaration.warn(result, `Empty URL in \`${declaration.toString()}\``);
 
                         return;
                     }
@@ -104,13 +104,13 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
                     const baseDirectories = new Set<string>();
 
                     // Use PostCSS imports
-                    if (decl.source?.input.file && imported.has(decl.source.input.file)) {
-                        baseDirectories.add(dirname(decl.source.input.file));
+                    if (declaration.source?.input.file && imported.has(declaration.source.input.file)) {
+                        baseDirectories.add(dirname(declaration.source.input.file));
                     }
 
                     // Use SourceMap
-                    if (decl.source?.start) {
-                        const pos = decl.source.start;
+                    if (declaration.source?.start) {
+                        const pos = declaration.source.start;
                         const realPos = map?.originalPositionFor(pos);
                         const basedir = realPos?.source && dirname(realPos.source);
 
@@ -122,7 +122,7 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
                     // Use current file
                     baseDirectories.add(dirname(file));
 
-                    urlList.push({ baseDirs: baseDirectories, decl, node, parsed, url });
+                    urlList.push({ baseDirs: baseDirectories, decl: declaration, node, parsed, url });
                 });
             });
 
@@ -177,8 +177,8 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
                     usedNames.set(to, from);
 
                     const publicPathSuffix = typeof options.publicPath === "string" && !TRAILING_SLASH_REGEXP.test(options.publicPath) ? "/" : "";
-                    const resolvedPublicPath
-                        = typeof options.publicPath === "string" ? options.publicPath + publicPathSuffix + basename(to) : `${defaultPublicPath}${basename(to)}`;
+                    const resolvedPublicPath =
+                        typeof options.publicPath === "string" ? options.publicPath + publicPathSuffix + basename(to) : `${defaultPublicPath}${basename(to)}`;
 
                     node.type = "string";
                     node.value = typeof options.publicPath === "function" ? options.publicPath(node.value, resolvedPublicPath, file) : resolvedPublicPath;

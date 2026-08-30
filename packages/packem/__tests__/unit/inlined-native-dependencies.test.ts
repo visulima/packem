@@ -30,7 +30,7 @@ const readInstalledManifest = (name: string): PackageJson => {
         return {};
     }
 
-    for (let current = directory; ; ) {
+    for (let current = directory; ;) {
         const manifestPath = join(current, "package.json");
 
         if (existsSync(manifestPath)) {

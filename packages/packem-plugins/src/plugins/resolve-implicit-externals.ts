@@ -137,7 +137,7 @@ const resolveImplicitExternalsPlugin = <T = unknown>(context: BuildContext<T>): 
             },
 
             async handler(code: string, id: string): Promise<TransformResult> {
-            // Only process source files (not node_modules or virtual modules)
+                // Only process source files (not node_modules or virtual modules)
                 if (id.includes("/node_modules/") || id.startsWith("\0")) {
                     return undefined;
                 }

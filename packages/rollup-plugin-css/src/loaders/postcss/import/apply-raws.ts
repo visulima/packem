@@ -4,26 +4,26 @@ import type { ImportStatement, NodesStatement, PreImportStatement, Stylesheet } 
 import { isNodesStatement } from "./utils/statement";
 
 const applyRaws = (stylesheet: Stylesheet): void => {
-    stylesheet.statements.forEach((stmt, index) => {
+    stylesheet.statements.forEach((statement, index) => {
         if (index === 0) {
             return;
         }
 
-        if ((stmt as ImportStatement | NodesStatement | PreImportStatement).parent !== undefined) {
-            const parent = (stmt as ImportStatement | PreImportStatement).parent as ImportStatement | PreImportStatement;
+        if ((statement as ImportStatement | NodesStatement | PreImportStatement).parent !== undefined) {
+            const parent = (statement as ImportStatement | PreImportStatement).parent as ImportStatement | PreImportStatement;
             const { raws: parentRaws } = parent.node as { raws: { before?: string } };
             const { before } = parentRaws;
 
-            if (isNodesStatement(stmt)) {
+            if (isNodesStatement(statement)) {
                 // eslint-disable-next-line no-param-reassign
-                (stmt.nodes[0] as ChildNode).raws.before = before;
+                (statement.nodes[0] as ChildNode).raws.before = before;
             } else {
                 // eslint-disable-next-line no-param-reassign
-                (stmt.node.raws as { before?: string }).before = before;
+                (statement.node.raws as { before?: string }).before = before;
             }
-        } else if (isNodesStatement(stmt)) {
+        } else if (isNodesStatement(statement)) {
             // eslint-disable-next-line no-param-reassign
-            (stmt.nodes[0] as ChildNode).raws.before = (stmt.nodes[0] as ChildNode).raws.before ?? "\n";
+            (statement.nodes[0] as ChildNode).raws.before = (statement.nodes[0] as ChildNode).raws.before ?? "\n";
         }
     });
 };

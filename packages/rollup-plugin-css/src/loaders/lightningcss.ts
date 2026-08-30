@@ -84,12 +84,12 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
     name: "lightningcss",
 
     process({ code, map }) {
-        const supportModules = detectCssModules(this.options.modules, this.autoModules, this.id);
+        const isSupportModules = detectCssModules(this.options.modules, this.autoModules, this.id);
 
         const result = transform({
             ...this.options,
             code: Buffer.from(code),
-            cssModules: this.options.modules ?? supportModules,
+            cssModules: this.options.modules ?? isSupportModules,
             filename: this.id,
             inputSourceMap: map,
             minify: false,
@@ -122,7 +122,7 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
             map: resultMap,
             modulesExports,
             namedExports: this.namedExports,
-            supportModules,
+            supportModules: isSupportModules,
         });
 
         if (this.extract) {

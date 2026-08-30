@@ -7,6 +7,7 @@ import type { TscOptions, TscResult } from "./types.js";
 
 const debug = createDebug("rollup-plugin-dts:tsc");
 
+// eslint-disable-next-line unicorn/no-top-level-side-effects -- records the compiler version once per process, which is the point of the line
 debug(`loaded typescript: ${ts.version}`);
 
 export const tscEmit = (tscOptions: TscOptions): TscResult => {

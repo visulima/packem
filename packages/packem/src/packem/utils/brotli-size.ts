@@ -20,8 +20,8 @@ const brotliSize = async (path: string): Promise<number> =>
 
         readStream.on("error", reject);
         pipe.on("error", reject);
-        pipe.on("data", (buf: Buffer) => {
-            size += buf.length;
+        pipe.on("data", (buffer: Buffer) => {
+            size += buffer.length;
         });
         pipe.on("end", () => {
             resolve(size);

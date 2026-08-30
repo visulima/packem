@@ -20,10 +20,7 @@ const VIRTUAL_ID_RE = /^\0/;
  * field is declared, matching rollup's / `@rollup/plugin-node-resolve`'s convention:
  * only an explicit `sideEffects: false` opts a package into aggressive tree-shaking.
  */
-const buildSideEffectsPredicate = (
-    packageSideEffects: boolean | string[] | undefined,
-    packageRoot: string,
-): (location: string) => boolean => {
+const buildSideEffectsPredicate = (packageSideEffects: boolean | string[] | undefined, packageRoot: string): ((location: string) => boolean) => {
     if (typeof packageSideEffects === "boolean") {
         return () => packageSideEffects;
     }
@@ -61,7 +58,7 @@ const oxcResolvePlugin = (options: OXCResolveOptions, rootDirectory: string, log
 
     const resolver = new ResolverFactory({
         ...userOptions,
-        roots: [...userOptions.roots ?? [], rootDirectory],
+        roots: [...(userOptions.roots ?? []), rootDirectory],
         tsconfig: tsconfigPath ? { configFile: tsconfigPath, references: "auto" } : undefined,
     });
 

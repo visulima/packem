@@ -3,7 +3,7 @@ import type { PackageJson } from "@visulima/package";
 
 const createFilter = _createFilter;
 
-const getPackageSideEffect = (cwd: string, packageJson: PackageJson): (id: string) => boolean | undefined => {
+const getPackageSideEffect = (cwd: string, packageJson: PackageJson): ((id: string) => boolean | undefined) => {
     const { sideEffects } = packageJson;
 
     let hasSideEffects: (id: string) => boolean | undefined;
@@ -11,7 +11,7 @@ const getPackageSideEffect = (cwd: string, packageJson: PackageJson): (id: strin
     if (typeof sideEffects === "boolean") {
         hasSideEffects = () => sideEffects;
     } else if (Array.isArray(sideEffects)) {
-        if (sideEffects.length <= 0) {
+        if (sideEffects.length === 0) {
             // createFilter always returns true if `includes` is an empty array
             // but here we want it to always return false
             hasSideEffects = () => false;

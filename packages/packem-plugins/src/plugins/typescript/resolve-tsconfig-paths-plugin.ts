@@ -24,18 +24,20 @@ interface Pattern {
 const asterisk = 0x2a;
 
 const hasZeroOrOneAsteriskCharacter = (string_: string): boolean => {
-    let seenAsterisk = false;
+    let isSeenAsterisk = false;
 
     // eslint-disable-next-line no-plusplus
     for (let index = 0; index < string_.length; index++) {
-        if (string_.codePointAt(index) === asterisk) {
-            if (seenAsterisk) {
-                // have already seen asterisk
-                return false;
-            }
-
-            seenAsterisk = true;
+        if (string_.codePointAt(index) !== asterisk) {
+            continue;
         }
+
+        if (isSeenAsterisk) {
+            // have already seen asterisk
+            return false;
+        }
+
+        isSeenAsterisk = true;
     }
 
     return true;
@@ -48,9 +50,9 @@ const tryParsePattern = (pattern: string): Pattern | undefined => {
     return indexOfStar === -1
         ? undefined
         : {
-            prefix: pattern.slice(0, indexOfStar),
-            suffix: pattern.slice(indexOfStar + 1),
-        };
+              prefix: pattern.slice(0, indexOfStar),
+              suffix: pattern.slice(indexOfStar + 1),
+          };
 };
 
 const isPatternMatch = ({ prefix, suffix }: Pattern, candidate: string) =>

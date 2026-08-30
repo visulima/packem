@@ -274,10 +274,10 @@ export async function minifyHTMLLiterals(source: string, options: Options = {}):
     const ms = new options.MagicString(source);
 
     for (const template of templates) {
-        const minifyHTML = shouldMinify(template);
-        const minifyCSS = !!strategy.minifyCSS && shouldMinifyCSS(template);
+        const isMinifyHTML = shouldMinify(template);
+        const isMinifyCSS = !!strategy.minifyCSS && shouldMinifyCSS(template);
 
-        if (minifyHTML || minifyCSS) {
+        if (isMinifyHTML || isMinifyCSS) {
             const placeholder = strategy.getPlaceholder(template.parts);
 
             if (validate) {
@@ -287,7 +287,7 @@ export async function minifyHTMLLiterals(source: string, options: Options = {}):
             const combined = strategy.combineHTMLStrings(template.parts, placeholder);
             let min: string;
 
-            if (minifyCSS) {
+            if (isMinifyCSS) {
                 const allMinifyOptions = options.minifyOptions as Record<string, unknown> | undefined;
                 const minifyCSSOptions = allMinifyOptions?.minifyCSS;
 

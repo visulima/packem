@@ -38,7 +38,7 @@ export { a };
 //# sourceMappingURL=index.js.map
 
 // index.js.map
-{"version":3,"file":"index.js","sources":[],"sourcesContent":[],"names":[],"mappings":";;;;"}"
+{"version":3,"file":"index.js","sources":[],"sourcesContent":[],"names":[],"mappings":";;"}"
 `;
 
 exports[`tsc > compiler project sourcemap (build: true) 2`] = `
@@ -56,7 +56,7 @@ export { a };
 //# sourceMappingURL=index.js.map
 
 // index.js.map
-{"version":3,"file":"index.js","sources":[],"sourcesContent":[],"names":[],"mappings":";;;;"}"
+{"version":3,"file":"index.js","sources":[],"sourcesContent":[],"names":[],"mappings":";;"}"
 `;
 
 exports[`tsc > composite references 1`] = `

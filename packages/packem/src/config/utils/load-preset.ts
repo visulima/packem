@@ -56,7 +56,7 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
                 // without a default export resolves to undefined at runtime even
                 // though the generic types it as BuildConfig.
                 // eslint-disable-next-line no-param-reassign, @typescript-eslint/no-unnecessary-condition -- see above: jiti.import can resolve undefined at runtime.
-                preset = await jiti.import<BuildConfig>(preset, { default: true }) || {};
+                preset = (await jiti.import<BuildConfig>(preset, { default: true })) || {};
             }
         }
     }
