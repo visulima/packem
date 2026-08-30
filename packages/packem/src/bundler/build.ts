@@ -1,5 +1,6 @@
 import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
+import { pruneStaleRollupCache } from "@visulima/packem-share/utils";
 import type { OutputOptions, RollupBuild, RollupCache, RollupOptions } from "rollup";
 
 import { getRolldownBuild } from "../rolldown/get-rolldown";
@@ -68,7 +69,7 @@ const buildWithRollup = async (
     if (isLoadCache) {
         effectiveOptions = {
             ...rollupOptions,
-            cache: fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory),
+            cache: pruneStaleRollupCache(fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory)),
         };
 
         if (hasCachedDependencies) {
