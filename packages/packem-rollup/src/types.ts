@@ -3,7 +3,6 @@ import type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 import type { RollupDynamicImportVariablesOptions } from "@rollup/plugin-dynamic-import-vars";
 import type { RollupJsonOptions } from "@rollup/plugin-json";
 import type { RollupReplaceOptions } from "@rollup/plugin-replace";
-import type { RollupWasmOptions } from "@rollup/plugin-wasm";
 import type { FilterPattern } from "@rollup/pluginutils";
 import type { BabelPluginConfig } from "@visulima/packem-plugins/babel";
 import type { OXCResolveOptions, OXCTransformPluginConfig } from "@visulima/packem-plugins/oxc";
@@ -21,6 +20,7 @@ import type { Options as RequireCJSPluginOptions } from "@visulima/packem-plugin
 import type { ShebangOptions } from "@visulima/packem-plugins/plugin/shebang";
 import type { SourcemapsPluginOptions } from "@visulima/packem-plugins/plugin/source-maps";
 import type { UrlOptions } from "@visulima/packem-plugins/plugin/url";
+import type { WasmPluginOptions } from "@visulima/packem-plugins/plugin/wasm";
 import type { PatchTypesOptions, TsconfigPathsPluginOptions } from "@visulima/packem-plugins/typescript";
 import type { Options as RollupDtsOptions } from "@visulima/rollup-plugin-dts";
 import type { OutputOptions, Plugin, RollupOptions } from "rollup";
@@ -123,7 +123,7 @@ export interface PackemRollupOptions {
     tsconfigPaths?: TsconfigPathsPluginOptions | false;
     url?: UrlOptions | false;
     visualizer?: PluginVisualizerOptions | false;
-    wasm?: RollupWasmOptions | false;
+    wasm?: WasmPluginOptions | false;
     watch?: NonNullable<RollupOptions["watch"]>;
 }
 

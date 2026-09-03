@@ -466,7 +466,7 @@
             {
               "title": "WebAssembly",
               "href": "/docs/examples/advanced/webassembly",
-              "description": "Bundle and use WebAssembly modules"
+              "description": "Import .wasm as ES modules, in the source phase, or preserved"
             },
             {
               "title": "Custom Plugins",

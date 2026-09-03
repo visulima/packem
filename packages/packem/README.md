@@ -59,7 +59,7 @@ Rollup is the default and full-featured backend. An experimental [Rolldown](http
 - ✅ ESM ⇄ CJS interoperability
 - ✅ Supports isolated declaration types (experimental) (Typescript version 5.5 or higher)
 - ✅ Selectable bundler backend: Rollup (default) or [Rolldown](https://rolldown.rs) (experimental)
-- ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
+- ✅ Supports [WebAssembly](https://webassembly.org) — [ESM integration](https://github.com/WebAssembly/esm-integration) (`import { add } from "./add.wasm"`), [source phase imports](https://github.com/tc39/proposal-source-phase-imports) (`import source mod from "./add.wasm"`), inline/asset/preserve delivery
 - ✅ Supports css, [sass](https://github.com/sass/sass), [less](https://github.com/less/less.js), [stylus](https://github.com/stylus/stylus) and Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) (experimental)
 - ✅ [TypeDoc](https://github.com/TypeStrong/TypeDoc) documentation generation
 
