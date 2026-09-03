@@ -171,7 +171,7 @@ catalogs:
     fastest-levenshtein: 1.0.16
     get-tsconfig: 4.14.3
     gpt-tokenizer: ^4.0.0
-    happy-dom: 20.11.12
+    happy-dom: 20.12.0
     hookable: 6.1.1
     html-minifier-next: 8.3.0
     is-ci: ^4.1.0
@@ -484,7 +484,7 @@ overrides:
   form-data@>=4.0.0 <4.0.6: ">=4.0.6"
   glob@>=10.0.0 <10.5.0: ">=10.5.0"
   handlebars@>=4.0.0 <4.7.9: ">=4.7.9"
-  happy-dom@>=15.0.0 <20.8.8: ">=20.8.9"
+  happy-dom@>=15.0.0 <20.8.8: ">=20.12.0"
   hono@<4.12.34: ">=4.12.34 <5"
   immutable@>=5.0.0 <5.1.8: ">=5.1.9"
   ip-address@<10.3.1: ">=10.3.1 <11"
