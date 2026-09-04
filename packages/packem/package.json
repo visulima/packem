@@ -322,7 +322,7 @@
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
         "@visulima/packem-rollup": "1.0.0",
-        "cssnano": ">=8.0.5",
+        "cssnano": ">=9.0.2",
         "esbuild": ">=0.28.2",
         "icss-utils": ">=5.1.0",
         "less": ">=4.6.7",
