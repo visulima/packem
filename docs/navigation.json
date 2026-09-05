@@ -128,7 +128,7 @@
         {
           "title": "Output Format",
           "href": "/docs/options/output-format",
-          "description": "Control output formats (ESM, CJS, IIFE)"
+          "description": "How ESM and CJS output is derived from package.json"
         },
         {
           "title": "Output Directory",
