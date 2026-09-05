@@ -1,239 +1,34 @@
 ---
 title: Output Format
-description: Configure output formats (ESM, CJS, IIFE) for your Packem builds
+description: How Packem derives ESM and CJS output from your package.json
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout'
 
 # Output Format
 
-Packem supports multiple output formats to ensure your library works across different JavaScript environments. The output format determines how your bundled code is structured and how it can be consumed by other applications.
+Packem produces two module formats: **ESM** and **CJS**. You do not select them with a
+config option — Packem derives them from your `package.json`, along with the entry points
+and file names that go with them.
 
-## Supported Formats
+<Callout type="warn">
+Browser global formats (IIFE, UMD) are **not supported**. See
+[Browser globals](#browser-globals) below for what happens if you try, and what to use
+instead.
+</Callout>
 
-### ESM (ES Modules)
-Modern standard for JavaScript modules with `import`/`export` syntax.
+## How formats are derived
 
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'esm',
-      file: 'dist/index.mjs'
-    }
-  }
-})
-```
+### From export conditions
 
-### CJS (CommonJS)
-Traditional Node.js module format with `require`/`module.exports`.
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'cjs',
-      file: 'dist/index.cjs'
-    }
-  }
-})
-```
-
-### IIFE (Immediately Invoked Function Expression)
-Browser-compatible format that creates a global variable.
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'iife',
-      file: 'dist/index.global.js',
-      name: 'MyLibrary' // Global variable name
-    }
-  }
-})
-```
-
-### UMD (Universal Module Definition)
-Works in both browser and Node.js environments.
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'umd',
-      file: 'dist/index.umd.js',
-      name: 'MyLibrary'
-    }
-  }
-})
-```
-
-## Automatic Format Detection
-
-Packem automatically determines output formats based on your `package.json`:
-
-### From Package Type
-
-```json
-{
-  "type": "module",
-  "main": "./dist/index.js"
-}
-```
-→ Generates ESM format
-
-```json
-{
-  "type": "commonjs",
-  "main": "./dist/index.js"
-}
-```
-→ Generates CJS format
-
-### From Export Conditions
+The `exports` field is the primary signal. Each condition Packem recognises produces the
+matching format:
 
 ```json
 {
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    }
-  }
-}
-```
-→ Generates both ESM and CJS formats
-
-## Multiple Output Formats
-
-Generate multiple formats in a single build:
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: [
-      // ESM build
-      {
-        format: 'esm',
-        file: 'dist/index.mjs'
-      },
-      // CJS build
-      {
-        format: 'cjs',
-        file: 'dist/index.cjs'
-      },
-      // Browser build
-      {
-        format: 'iife',
-        file: 'dist/index.global.js',
-        name: 'MyLibrary'
-      }
-    ]
-  }
-})
-```
-
-## Format-Specific Configuration
-
-### ESM Configuration
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'esm',
-      file: 'dist/index.mjs',
-      // ESM-specific options
-      exports: 'named', // or 'default', 'auto'
-      generatedCode: {
-        preset: 'es2015'
-      }
-    }
-  }
-})
-```
-
-### CJS Configuration
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'cjs',
-      file: 'dist/index.cjs',
-      // CJS-specific options
-      exports: 'auto',
-      esModule: false,
-      interop: 'auto'
-    }
-  }
-})
-```
-
-### IIFE Configuration
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'iife',
-      file: 'dist/index.global.js',
-      name: 'MyLibrary',
-      // IIFE-specific options
-      globals: {
-        'react': 'React',
-        'react-dom': 'ReactDOM'
-      },
-      extend: true // Extend existing global
-    }
-  }
-})
-```
-
-## File Extensions
-
-Packem uses appropriate file extensions based on format:
-
-### Automatic Extensions
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: [
-      { format: 'esm', dir: 'dist' }, // → .mjs
-      { format: 'cjs', dir: 'dist' }, // → .cjs
-      { format: 'iife', dir: 'dist' } // → .js
-    ]
-  }
-})
-```
-
-### Custom Extensions
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'esm',
-      dir: 'dist',
-      entryFileNames: '[name].esm.js' // Custom extension
-    }
-  }
-})
-```
-
-## Package.json Integration
-
-### Dual Package Setup
-
-```json
-{
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "exports": {
-    ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     }
@@ -241,364 +36,168 @@ export default defineConfig({
 }
 ```
 
-```typescript
-export default defineConfig({
-  rollup: {
-    output: [
-      { format: 'esm', file: 'dist/index.mjs' },
-      { format: 'cjs', file: 'dist/index.cjs' }
-    ]
-  }
-})
-```
+→ ESM **and** CJS, written to exactly the paths named above.
 
-### Conditional Exports
+An ESM-only package simply omits the `require` condition:
 
 ```json
 {
+  "type": "module",
   "exports": {
     ".": {
-      "development": "./dist/index.development.js",
-      "production": "./dist/index.production.js",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   }
 }
 ```
 
-## Runtime-Specific Formats
+→ ESM only.
 
-### Node.js Optimized
+### From `type`, `main` and `module`
 
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'cjs',
-      file: 'dist/index.node.js',
-      // Node.js optimizations
-      preferConst: true,
-      compact: true
+For packages without an `exports` field, Packem falls back to the legacy fields, resolving
+ambiguous extensions through `type`:
+
+| package.json                              | Output |
+| ----------------------------------------- | ------ |
+| `"type": "module"`, `"main": "./dist/index.js"`   | ESM    |
+| `"type": "commonjs"`, `"main": "./dist/index.js"` | CJS    |
+| `"module": "./dist/index.mjs"`            | ESM    |
+| `"main": "./dist/index.cjs"`              | CJS    |
+
+Because the format follows the file that will actually be published, the output does not
+drift from what consumers resolve. The one way to break that correspondence is to override
+`rollup.output.format` yourself — see [Browser globals](#browser-globals).
+
+## File extensions
+
+Extensions come from the paths in `package.json`. Packem warns when an extension
+contradicts the format it implies — a `.mjs` file in `main` for a CommonJS package, or a
+`.cjs` file in `module`.
+
+| Extension | Format | Notes                                       |
+| --------- | ------ | ------------------------------------------- |
+| `.mjs`    | ESM    | Always ESM, regardless of `type`            |
+| `.cjs`    | CJS    | Always CJS, regardless of `type`            |
+| `.js`     | Either | Resolved through `type`                     |
+
+To override the mapping, use [`outputExtensionMap`](/docs/options/output-extension-map).
+
+## Dual package setup
+
+Shipping both formats is the `exports` example above. Point each condition at a distinct
+extension so Node never has to guess:
+
+```json
+{
+  "name": "my-library",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
     }
-  }
-})
-```
-
-### Browser Optimized
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'iife',
-      file: 'dist/index.browser.js',
-      name: 'MyLibrary',
-      // Browser optimizations
-      sourcemap: true,
-      compact: true
-    }
-  }
-})
-```
-
-### Edge Runtime
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'esm',
-      file: 'dist/index.edge.mjs',
-      // Edge runtime optimizations
-      generatedCode: {
-        preset: 'es2022'
-      }
-    }
-  }
-})
-```
-
-## Advanced Configuration
-
-### Code Splitting
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'esm',
-      dir: 'dist',
-      // Enable code splitting
-      manualChunks: {
-        vendor: ['react', 'react-dom'],
-        utils: ['lodash', 'date-fns']
-      }
-    }
-  }
-})
-```
-
-### Dynamic Imports
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'esm',
-      dir: 'dist',
-      // Configure dynamic import format
-      chunkFileNames: 'chunks/[name]-[hash].js',
-      dynamicImportFunction: 'import'
-    }
-  }
-})
-```
-
-### Tree Shaking
-
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'esm',
-      file: 'dist/index.mjs',
-      // Preserve modules for better tree shaking
-      preserveModules: true,
-      preserveModulesRoot: 'src'
-    }
-  }
-})
-```
-
-## Format Validation
-
-Packem validates that your `package.json` `exports` map matches the formats it
-produces. This runs automatically; configure it through the `validation` option
-rather than a manual hook:
-
-```typescript
-import { defineConfig } from '@visulima/packem/config'
-import transformer from '@visulima/packem/transformer/esbuild'
-
-export default defineConfig({
-  transformer,
-  validation: {
-    packageJson: {
-      exports: true,
-    },
   },
-})
+  "files": ["dist"]
+}
 ```
 
-See the [validation docs](/docs/guide/package-json) for the full set of checks.
+Packem's validator checks that every path referenced here is actually produced by the
+build, and reports the closest match when one is missing. See
+[Package Validation](/docs/examples/configuration/package-validation).
 
-## Interoperability
-
-### ESM/CJS Interop
-
-```typescript
-export default defineConfig({
-  cjsInterop: true, // Enable automatic interop
-  
-  rollup: {
-    output: [
-      {
-        format: 'esm',
-        file: 'dist/index.mjs',
-        exports: 'named'
-      },
-      {
-        format: 'cjs',
-        file: 'dist/index.cjs',
-        exports: 'auto',
-        interop: 'auto'
-      }
-    ]
-  }
-})
-```
-
-### Default Export Handling
-
-```typescript
-// For libraries with default exports
-export default defineConfig({
-  rollup: {
-    output: [
-      {
-        format: 'esm',
-        file: 'dist/index.mjs',
-        exports: 'default'
-      },
-      {
-        format: 'cjs',
-        file: 'dist/index.cjs',
-        exports: 'default'
-      }
-    ]
-  }
-})
-```
-
-## Framework-Specific Formats
-
-### React Library
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['react', 'react-dom'],
-    output: [
-      {
-        format: 'esm',
-        file: 'dist/index.mjs',
-        globals: {
-          'react': 'React',
-          'react-dom': 'ReactDOM'
-        }
-      },
-      {
-        format: 'cjs',
-        file: 'dist/index.cjs'
-      }
-    ]
-  }
-})
-```
-
-### Vue Library
-
-```typescript
-export default defineConfig({
-  rollup: {
-    external: ['vue'],
-    output: [
-      {
-        format: 'esm',
-        file: 'dist/index.mjs'
-      },
-      {
-        format: 'umd',
-        file: 'dist/index.umd.js',
-        name: 'MyVueLibrary',
-        globals: {
-          'vue': 'Vue'
-        }
-      }
-    ]
-  }
-})
-```
-
-## Troubleshooting
-
-### Format Mismatch
-
-<Callout type="warning">
-Ensure your package.json exports match your actual output formats.
+<Callout type="info">
+When a CommonJS consumer needs both a default and named exports from the same entry, see
+[`cjsInterop`](/docs/options/package-exports).
 </Callout>
+
+## Multiple entry points
+
+Additional entries are additional `exports` subpaths — there is no separate entry list:
 
 ```json
 {
   "exports": {
     ".": {
-      "import": "./dist/index.mjs", // Must be ESM
-      "require": "./dist/index.cjs"  // Must be CJS
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./utils": {
+      "import": "./dist/utils.mjs",
+      "require": "./dist/utils.cjs"
     }
   }
 }
 ```
 
-### Global Name Conflicts
+Both entries are built in both formats. See [Multi Exports](/docs/examples/multi-exports).
 
-For IIFE/UMD builds, ensure unique global names:
+## Runtime-specific output
 
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'iife',
-      name: 'MyUniqueLibraryName', // Avoid conflicts
-      extend: false // Don't extend existing globals
+Runtime conditions (`node`, `browser`, `edge-light`, `react-server`) select a build
+*environment*, not a module format — each still emits ESM or CJS:
+
+```json
+{
+  "exports": {
+    ".": {
+      "browser": "./dist/index.browser.mjs",
+      "node": "./dist/index.node.mjs",
+      "default": "./dist/index.mjs"
     }
   }
-})
+}
 ```
 
-### External Dependencies
+See [Multi Runtime](/docs/guide/multi-runtime).
 
-`dependencies`, `peerDependencies`, and Node built-ins are externalized by
-default. Use the top-level `externals` array to force-externalize extra
-packages, and `rollup.resolveExternals` to change classification:
+## Browser globals \{#browser-globals}
 
-```typescript
-import { defineConfig } from '@visulima/packem/config'
-import transformer from '@visulima/packem/transformer/esbuild'
+Packem has no IIFE or UMD output. Its `Format` type is `"cjs" | "esm"`, and the module
+format of every emitted chunk follows the entry it belongs to.
 
+`rollup.output` is passed through to the underlying bundler, so setting `format` there
+does change the shape of the generated code — but **nothing else moves with it**:
+
+```ts
+// Does not do what it looks like.
 export default defineConfig({
   transformer,
-  externals: ['react', 'react-dom'],
+  rollup: { output: { format: 'iife', name: 'MyLib' } },
 })
 ```
 
-See the [externals option](/docs/options/externals) for the full classification
-controls (`deps`, `peerDeps`, `exclude`, …).
+The result is IIFE code written to `dist/index.mjs`, the path `package.json#module`
+points at. Node reads `.mjs` as ESM, the IIFE exposes no ESM exports, and the package is
+broken for every consumer. The override also applies to *both* outputs of a dual build,
+so the ESM and CJS files end up byte-identical.
 
-## Performance Considerations
+`rollup.output` is a single object, not an array, so a list of per-format outputs is not
+expressible either — it is spread into each output Packem generates.
 
-### Format-Specific Optimizations
+If you need a `<script>`-loadable bundle, build it with a tool that targets that use case
+and publish it alongside your Packem output.
 
-```typescript
-export default defineConfig({
-  rollup: {
-    output: [
-      // Development build
-      {
-        format: 'esm',
-        file: 'dist/index.development.mjs',
-        sourcemap: true,
-        compact: false
-      },
-      // Production build
-      {
-        format: 'esm',
-        file: 'dist/index.production.mjs',
-        sourcemap: false,
-        compact: true
-      }
-    ]
-  }
-})
-```
+## Troubleshooting
 
-### Bundle Size Optimization
+**Wrong format at runtime.** `require()` failing with `ERR_REQUIRE_ESM`, or an
+`import` resolving to CommonJS, almost always means an extension and a condition
+disagree. Check that `require` points at `.cjs` (or a `.js` under
+`"type": "commonjs"`), and `import` at `.mjs` (or a `.js` under `"type": "module"`).
 
-```typescript
-export default defineConfig({
-  rollup: {
-    output: {
-      format: 'esm',
-      file: 'dist/index.mjs',
-      // Optimize for size
-      compact: true,
-      generatedCode: {
-        preset: 'es2015',
-        arrowFunctions: true,
-        constBindings: true,
-        objectShorthand: true
-      }
-    }
-  }
-})
-```
+**A path in `exports` has no output.** The build only produces what `package.json`
+asks for. If a condition names a file Packem never generated, the validator lists it
+with the nearest actual output — usually a typo or a stale path from a previous setup.
 
----
+**Types resolve differently from code.** Run
+[`are-the-types-wrong`](/docs/options/declaration-files) to check declarations against
+each module resolution mode.
 
-## Related Options
+## Related
 
-- [Output Directory](/docs/options/output-directory) - Configure where files are written
-- [Entry](/docs/options/entry) - Configure entry points for different formats
-- [Package Exports](/docs/options/package-exports) - Automatic package.json exports
-- [Target](/docs/options/target) - JavaScript compilation targets
+- [Package Exports](/docs/options/package-exports)
+- [Output Extension Map](/docs/options/output-extension-map)
+- [Declaration Files](/docs/options/declaration-files)
+- [Dual Package](/docs/examples/dual-package)

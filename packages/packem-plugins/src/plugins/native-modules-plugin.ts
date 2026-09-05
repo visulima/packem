@@ -6,11 +6,21 @@ import type { NormalizedOutputOptions, Plugin } from "rollup";
 
 const NODE_EXT_RE = /\.node$/;
 
-// Counter-based virtual ID prefix — rolldown 1.0 treats `\0name:path`-style IDs
-// as relative paths and prepends cwd, breaking the round-trip. A counter avoids
-// embedding any path segments inside the virtual ID, so the bundler keeps the
-// ID opaque under both rollup and rolldown.
+// Virtual ID prefix. rolldown 1.0 treats `\0name:path`-style IDs as relative paths and
+// prepends cwd, breaking the round-trip, so the source path is base64url-encoded into the
+// ID: that alphabet contains no `/` or `.`, leaving the ID as opaque to the bundler as a
+// counter was under both rollup and rolldown.
+//
+// Encoding it (rather than holding it in a Map keyed by a counter) is what makes a
+// rebuild work. `resolveId` does not re-run for modules restored from rollup's build
+// cache, but `load` does — so an ID that only means something to the process that minted
+// it names a module the next build cannot load.
 const PREFIX = "\0packem-natives/";
+
+const encodeNativeId = (sourcePath: string): string => `${PREFIX}${Buffer.from(sourcePath, "utf8").toString("base64url")}`;
+
+const decodeNativeId = (id: string): string | undefined =>
+    id.startsWith(PREFIX) ? Buffer.from(id.slice(PREFIX.length), "base64url").toString("utf8") : undefined;
 
 export interface NativeModulesOptions {
     /**
@@ -27,18 +37,46 @@ export interface NativeModulesOptions {
  */
 export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin => {
     const { nativesDirectory = "natives" } = config;
-    // Map<virtual_id, { source_path, output_name }>
-    const virtualEntries = new Map<string, { outputName: string; sourcePath: string }>();
-    let counter = 0;
+    // Map<source_path, output_name>, populated by `load` (which runs on every build,
+    // cached or not) and consumed by `generateBundle` to copy the files.
+    const stagedNatives = new Map<string, string>();
+
+    /**
+     * Picks the name a `.node` file is copied out under, keeping the plain basename and
+     * falling back to a numeric suffix when two different sources share one.
+     */
+    const stageNative = (sourcePath: string): string => {
+        const existing = stagedNatives.get(sourcePath);
+
+        if (existing !== undefined) {
+            return existing;
+        }
+
+        const resolvedPathBasename = basename(sourcePath);
+        const taken = new Set(stagedNatives.values());
+        let outputName = resolvedPathBasename;
+        let suffix = 1;
+
+        while (taken.has(outputName)) {
+            const extension = extname(resolvedPathBasename);
+            const name = basename(resolvedPathBasename, extension);
+
+            outputName = `${name}_${String(suffix)}${extension}`;
+            suffix += 1;
+        }
+
+        stagedNatives.set(sourcePath, outputName);
+
+        return outputName;
+    };
 
     return {
         buildStart() {
-            virtualEntries.clear();
-            counter = 0;
+            stagedNatives.clear();
         },
 
         generateBundle: async (options: NormalizedOutputOptions) => {
-            if (virtualEntries.size === 0) {
+            if (stagedNatives.size === 0) {
                 return;
             }
 
@@ -61,31 +99,20 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
             await ensureDir(nativeLibsDirectory);
 
-            // Deduplicate by source path — multiple imports of the same file share an outputName.
-            const seenSources = new Set<string>();
-            const copies: Promise<void>[] = [];
-
-            for (const { outputName, sourcePath } of virtualEntries.values()) {
-                if (seenSources.has(sourcePath)) {
-                    continue;
-                }
-
-                seenSources.add(sourcePath);
-
-                copies.push(copyFile(sourcePath, join(nativeLibsDirectory, outputName)));
-            }
+            // Keyed by source path, so repeated imports of the same file copy once.
+            const copies = Array.from(stagedNatives, ([sourcePath, outputName]) => copyFile(sourcePath, join(nativeLibsDirectory, outputName)));
 
             await Promise.all(copies);
         },
 
         load(id) {
-            const entry = virtualEntries.get(id);
+            const sourcePath = decodeNativeId(id);
 
-            if (!entry) {
+            if (sourcePath === undefined) {
                 return undefined;
             }
 
-            const { outputName } = entry;
+            const outputName = stageNative(sourcePath);
 
             // The require path is always relative to the final bundle directory; the
             // `.node` file is copied into `<output>/<nativesDirectory>/` during
@@ -123,34 +150,9 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
                     return undefined;
                 }
 
-                // Reuse a virtual ID if we've already staged this exact source path.
-                for (const [existingId, entry] of virtualEntries) {
-                    if (entry.sourcePath === resolvedPath) {
-                        return existingId;
-                    }
-                }
-
-                const resolvedPathBasename = basename(resolvedPath);
-                let outputName = resolvedPathBasename;
-                let suffix = 1;
-
-                // Handle name collisions by checking already staged output names.
-                const stagedOutputNames = new Set(Array.from(virtualEntries.values(), (entry) => entry.outputName));
-
-                while (stagedOutputNames.has(outputName)) {
-                    const extension = extname(resolvedPathBasename);
-                    const name = basename(resolvedPathBasename, extension);
-
-                    outputName = `${name}_${String(suffix)}${extension}`;
-                    suffix += 1;
-                }
-
-                const virtualId = `${PREFIX}${String(counter)}`;
-
-                counter += 1;
-                virtualEntries.set(virtualId, { outputName, sourcePath: resolvedPath });
-
-                return virtualId;
+                // The ID is a pure function of the source path, so the same file always
+                // resolves to the same module and a rebuild recovers it without this hook.
+                return encodeNativeId(resolvedPath);
             },
         },
     };

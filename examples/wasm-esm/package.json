@@ -1,0 +1,29 @@
+{
+    "name": "examples_packem_wasm_esm",
+    "version": "1.0.0",
+    "private": true,
+    "sideEffects": false,
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "files": [
+        "./dist"
+    ],
+    "scripts": {
+        "build": "packem build",
+        "clean": "rimraf node_modules dist"
+    },
+    "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "esbuild": "catalog:build",
+        "rimraf": "^6.1.3",
+        "typescript": "^7.0.2"
+    },
+    "engines": {
+        "node": ">=20"
+    }
+}

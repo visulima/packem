@@ -33,18 +33,21 @@ export default defineConfig({
 })
 ```
 
-### Multiple Directories
+### Separate directories per format
 
-```typescript
-export default defineConfig({
-  rollup: {
-    output: [
-      { format: 'esm', dir: 'dist/esm' },
-      { format: 'cjs', dir: 'dist/cjs' },
-      { format: 'iife', dir: 'dist/browser' }
-    ]
+`rollup.output` is a single object that Packem spreads into every output it generates, so
+it cannot describe one directory per format. Point each `exports` condition at the
+directory you want instead — the build follows the published paths:
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs"
+    }
   }
-})
+}
 ```
 
 ## Directory Structure

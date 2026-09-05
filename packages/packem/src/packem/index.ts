@@ -459,6 +459,10 @@ const generateOptions = (
                 limit: 14 * 1024,
             },
             visualizer: {},
+            // On by default: without it a `.wasm` import has no loader at all and the
+            // build fails on an unknown extension. The defaults inline small modules and
+            // emit larger ones as assets, so neither case needs configuring up front.
+            wasm: {},
             watch: {
                 chokidar: {
                     ignoreInitial: true,

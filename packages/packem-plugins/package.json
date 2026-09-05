@@ -76,6 +76,10 @@
             "types": "./dist/plugins/detect-duplicated/index.d.ts",
             "default": "./dist/plugins/detect-duplicated/index.js"
         },
+        "./plugin/wasm": {
+            "types": "./dist/plugins/wasm/index.d.ts",
+            "default": "./dist/plugins/wasm/index.js"
+        },
         "./plugin/debarrel": {
             "types": "./dist/plugins/debarrel.d.ts",
             "default": "./dist/plugins/debarrel.js"
