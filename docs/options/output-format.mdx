@@ -66,8 +66,9 @@ ambiguous extensions through `type`:
 | `"module": "./dist/index.mjs"`            | ESM    |
 | `"main": "./dist/index.cjs"`              | CJS    |
 
-Because the format follows the file that will actually be published, the output cannot
-drift from what consumers resolve.
+Because the format follows the file that will actually be published, the output does not
+drift from what consumers resolve. The one way to break that correspondence is to override
+`rollup.output.format` yourself — see [Browser globals](#browser-globals).
 
 ## File extensions
 
@@ -155,7 +156,7 @@ See [Multi Runtime](/docs/guide/multi-runtime).
 ## Browser globals \{#browser-globals}
 
 Packem has no IIFE or UMD output. Its `Format` type is `"cjs" | "esm"`, and the module
-format of every emitted chunk is fixed by the entry it belongs to.
+format of every emitted chunk follows the entry it belongs to.
 
 `rollup.output` is passed through to the underlying bundler, so setting `format` there
 does change the shape of the generated code — but **nothing else moves with it**:

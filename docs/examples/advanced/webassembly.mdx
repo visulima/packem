@@ -43,7 +43,7 @@ export const log = (value) => console.log(value)
 There is no import object to construct by hand, and `./host.js` is bundled like any
 other dependency.
 
-### Source phase
+### Source phase \{#source-phase}
 
 [Source phase imports](https://github.com/tc39/proposal-source-phase-imports) bind the
 compiled module rather than an instance, so you can instantiate it more than once — each
@@ -125,6 +125,13 @@ export default defineConfig({
 
 The specifier survives into the output exactly as written, so the consumer resolves it
 the same way your source did.
+
+<Callout type="warn">
+`preserve` cannot be combined with a [source phase import](#source-phase). Preserving the
+specifier would leave `import source` in the output, and nothing downstream can parse it
+yet — so Packem fails the build with an explanatory error rather than quietly falling back
+to inlining the module. Use another mode for that entry, or import the module normally.
+</Callout>
 
 ## Instantiation
 

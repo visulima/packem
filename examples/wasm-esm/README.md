@@ -7,7 +7,7 @@ compiled-but-uninstantiated `WebAssembly.Module`.
 
 ## Structure
 
-```
+```text
 src/
   index.ts            # ESM integration
   source-phase.js     # Source phase import (see the note below)

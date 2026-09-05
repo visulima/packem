@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { basename, dirname, extname, resolve } from "@visulima/path";
-import type { Plugin } from "rollup";
+import type { Plugin, PluginContext } from "rollup";
 
 import type { Delivery, Form } from "./codegen";
 import { generateWasmModule } from "./codegen";
@@ -15,8 +15,17 @@ import { parseWasmModuleShape, WasmParseError } from "./parse";
  */
 const BROWSER_SYNC_LIMIT = 4096;
 
-/** Matches `import source &lt;binding> from "&lt;specifier>"`, the static source-phase form. */
-const SOURCE_PHASE_IMPORT = /\bimport\s+source\s+([$A-Z_a-z][\w$]*)\s+from\s*(["'])([^"']+)\2/g;
+/**
+ * Matches `import source &lt;binding> from "&lt;specifier>"`, the static source-phase form.
+ *
+ * Anchored to the start of a line (leading whitespace allowed) because the rewrite runs
+ * on raw text — the syntax is unparseable, so there is no AST to consult. An import
+ * declaration may only appear at statement position, so this keeps the rewrite off the
+ * same text appearing inside a string, a template, or a trailing comment. The one case
+ * it cannot distinguish is a multi-line template literal whose own line begins with
+ * `import source ...`.
+ */
+const SOURCE_PHASE_IMPORT = /^[\t ]*import\s+source\s+([$A-Z_a-z][\w$]*)\s+from\s*(["'])([^"']+)\2/gm;
 
 const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
 
@@ -165,7 +174,7 @@ const wasmPlugin = (options: WasmPluginOptions = {}): Plugin => {
      * Decides whether a module is inlined or emitted beside the chunk, registering the
      * emission in the latter case.
      */
-    const resolveDelivery = async (filePath: string, bytes: Uint8Array): Promise<Delivery> => {
+    const resolveDelivery = async (context: PluginContext, filePath: string, bytes: Uint8Array): Promise<Delivery> => {
         if (mode === "inline" || (mode === "auto" && bytes.byteLength <= maxFileSize)) {
             return { base64: Buffer.from(bytes).toString("base64"), kind: "inline" };
         }
@@ -175,13 +184,19 @@ const wasmPlugin = (options: WasmPluginOptions = {}): Plugin => {
             .replaceAll("[hash]", await hashBytes(bytes))
             .replaceAll("[extname]", extname(filePath));
 
-        emissions.set(filePath, { fileName: name, source: bytes });
+        // `publicPath` pins the location, so the URL is fixed and needs no reference.
+        if (publicPath !== undefined) {
+            emissions.set(filePath, { fileName: name, source: bytes });
 
-        if (publicPath === undefined) {
-            return { kind: "asset", url: `./${name}` };
+            return { kind: "asset", url: `${publicPath.endsWith("/") ? publicPath : `${publicPath}/`}${name}` };
         }
 
-        return { kind: "asset", url: `${publicPath.endsWith("/") ? publicPath : `${publicPath}/`}${name}` };
+        // Otherwise let the bundler place the file and resolve the URL. Only it knows
+        // where the importing chunk lands, and a chunk-relative literal breaks the
+        // moment that chunk is nested in a subdirectory.
+        const referenceId = context.emitFile({ name, source: bytes, type: "asset" });
+
+        return { kind: "asset-reference", urlExpression: `import.meta.ROLLUP_FILE_URL_${referenceId}` };
     };
 
     /**
@@ -221,6 +236,8 @@ const wasmPlugin = (options: WasmPluginOptions = {}): Plugin => {
         },
 
         generateBundle() {
+            // Only `publicPath` deliveries land here; the rest are emitted during `load`
+            // so the bundler can resolve their URLs per importing chunk.
             for (const { fileName: name, source } of emissions.values()) {
                 this.emitFile({ fileName: name, source, type: "asset" });
             }
@@ -260,7 +277,7 @@ const wasmPlugin = (options: WasmPluginOptions = {}): Plugin => {
                 }
             }
 
-            const delivery = await resolveDelivery(filePath, bytes);
+            const delivery = await resolveDelivery(this, filePath, bytes);
 
             const blocker = topLevelAwaitBlocker(filePath, bytes, delivery);
 
@@ -333,6 +350,16 @@ const wasmPlugin = (options: WasmPluginOptions = {}): Plugin => {
 
                 if (!specifier.endsWith(".wasm")) {
                     continue;
+                }
+
+                if (mode === "preserve") {
+                    // The specifier cannot be preserved here: `import source` is
+                    // unparseable by every transformer packem drives, so it has to be
+                    // rewritten away — exactly what preserve mode forbids. Failing
+                    // loudly beats silently inlining the module instead.
+                    this.error(
+                        `[packem:wasm] \`mode: "preserve"\` cannot be combined with the source phase import of "${specifier}". Preserving the specifier would leave \`import source\` in the output, which no current transformer or bundler can parse. Use another mode, or import the module normally.`,
+                    );
                 }
 
                 rewrites.push(

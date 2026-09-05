@@ -118,6 +118,38 @@ describe(parseWasmModuleShape, () => {
         expect(() => parseWasmModuleShape(truncated)).toThrow(WasmParseError);
     });
 
+    it("should reject a LEB128 integer that exceeds the u32 range", () => {
+        expect.assertions(1);
+
+        // Five continuation-free payload bits in the terminal byte encodes > 2^32-1,
+        // which no length or index in the format may be.
+        const overflow = Uint8Array.from([...ADD.subarray(0, 8), 0x07, 0xff, 0xff, 0xff, 0xff, 0x10]);
+
+        expect(() => parseWasmModuleShape(overflow)).toThrow("exceeds the u32 range");
+    });
+
+    it("should keep a leading BOM in an export name rather than stripping it", () => {
+        expect.assertions(2);
+
+        // A name is an arbitrary UTF-8 string, so U+FEFF is data, not an encoding marker.
+        const bom = [0xef, 0xbb, 0xbf];
+        const exportSection = [0x07, 0x0a, 0x01, 0x06, ...bom, 0x61, 0x64, 0x64, 0x00, 0x00];
+        const withBom = Uint8Array.from([...ADD.subarray(0, 21), ...exportSection, ...ADD.subarray(30)]);
+
+        expect(() => new WebAssembly.Module(withBom)).not.toThrow();
+        expect(parseWasmModuleShape(withBom).exports).toStrictEqual([{ kind: "function", name: "\uFEFFadd" }]);
+    });
+
+    it("should reject a name that is not valid UTF-8", () => {
+        expect.assertions(1);
+
+        // 0xff never appears in well-formed UTF-8.
+        const exportSection = [0x07, 0x07, 0x01, 0x03, 0xff, 0x64, 0x64, 0x00, 0x00];
+        const malformed = Uint8Array.from([...ADD.subarray(0, 21), ...exportSection, ...ADD.subarray(30)]);
+
+        expect(() => parseWasmModuleShape(malformed)).toThrow("malformed UTF-8 name");
+    });
+
     it("should reject a malformed LEB128 integer rather than scanning to the end", () => {
         expect.assertions(1);
 

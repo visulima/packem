@@ -94,6 +94,12 @@ class Reader {
 
             // eslint-disable-next-line no-bitwise -- see above
             if ((byte & LEB_CONTINUATION) === 0) {
+                // The fifth byte of a u32 carries only four payload bits. Anything above
+                // that encodes a value past 2^32-1, which no index or length may be.
+                if (shift === 28 && byte > 0x0f) {
+                    throw new WasmParseError(`LEB128 integer exceeds the u32 range at offset ${String(this.#offset)}`);
+                }
+
                 break;
             }
 
@@ -125,7 +131,16 @@ class Reader {
             throw new WasmParseError(`name of length ${String(length)} runs past the end of the binary at offset ${String(this.#offset)}`);
         }
 
-        const value = new TextDecoder("utf-8").decode(this.#bytes.subarray(this.#offset, this.#offset + length));
+        // `fatal` turns malformed UTF-8 into an error rather than U+FFFD, and `ignoreBOM`
+        // keeps a leading U+FEFF: the binary format treats a name as an arbitrary UTF-8
+        // string, so a BOM there is part of the name, not an encoding marker.
+        let value: string;
+
+        try {
+            value = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(this.#bytes.subarray(this.#offset, this.#offset + length));
+        } catch {
+            throw new WasmParseError(`malformed UTF-8 name at offset ${String(this.#offset)}`);
+        }
 
         this.#offset += length;
 

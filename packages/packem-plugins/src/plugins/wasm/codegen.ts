@@ -1,7 +1,17 @@
 import type { WasmModuleShape } from "./parse";
 
 /** How the wrapper obtains the module bytes at runtime. */
-type Delivery = { base64: string; kind: "inline" } | { kind: "asset"; url: string };
+type Delivery =
+    | { base64: string; kind: "inline" }
+    /** A literal URL, relative to the chunk, used when `publicPath` pins the location. */
+    | { kind: "asset"; url: string }
+
+    /**
+     * An expression the bundler rewrites into the emitted file's URL. Preferred over a
+     * literal, because only the bundler knows where the importing chunk ends up: a
+     * chunk-relative `./name.wasm` breaks as soon as that chunk is nested.
+     */
+    | { kind: "asset-reference"; urlExpression: string };
 
 /** Which shape of module the importer asked for. */
 type Form = "instance" | "source";
@@ -111,13 +121,21 @@ const emitBytes = (delivery: Delivery, useAwait: boolean): string => {
 })();`;
     }
 
+    // A literal URL is resolved against the chunk; a reference is already an absolute
+    // URL expression the bundler substitutes.
+    const url = delivery.kind === "asset-reference" ? delivery.urlExpression : `new URL(${JSON.stringify(delivery.url)}, import.meta.url)`;
+
     if (useAwait) {
-        return `const __packem_wasm_bytes = new Uint8Array(await (await fetch(new URL(${JSON.stringify(delivery.url)}, import.meta.url))).arrayBuffer());`;
+        // `fetch` accepts a URL or its string form, so either delivery works as-is.
+        return `const __packem_wasm_bytes = new Uint8Array(await (await fetch(${url})).arrayBuffer());`;
     }
 
+    // `readFileSync` accepts a path or a URL object, but not a `file://` string — and the
+    // bundler expands a file reference to exactly that. Normalising through `new URL`
+    // covers both deliveries.
     return `import { readFileSync as __packem_wasm_read } from "node:fs";
 
-const __packem_wasm_bytes = __packem_wasm_read(new URL(${JSON.stringify(delivery.url)}, import.meta.url));`;
+const __packem_wasm_bytes = __packem_wasm_read(new URL(${url}));`;
 };
 
 /**

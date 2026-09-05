@@ -100,8 +100,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
             await ensureDir(nativeLibsDirectory);
 
             // Keyed by source path, so repeated imports of the same file copy once.
-            const copies = Array.from(stagedNatives, ([sourcePath, outputName]) =>
-                copyFile(sourcePath, join(nativeLibsDirectory, outputName)));
+            const copies = Array.from(stagedNatives, ([sourcePath, outputName]) => copyFile(sourcePath, join(nativeLibsDirectory, outputName)));
 
             await Promise.all(copies);
         },

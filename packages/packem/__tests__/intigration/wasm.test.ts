@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
@@ -136,6 +137,63 @@ export const sum = add(8, 8);`);
         const { sum } = (await import(output)) as { sum: number };
 
         expect(sum).toBe(16);
+    });
+
+    it("should resolve an emitted asset from a nested chunk", async () => {
+        expect.assertions(4);
+
+        await createPackemConfig(temporaryDirectoryPath, { config: { rollup: { wasm: { maxFileSize: 0 } } } });
+
+        writeFileSync(`${temporaryDirectoryPath}/src/add.wasm`, ADD_WASM);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/nested/deep.ts`,
+            `import { add } from "../add.wasm";
+
+export const sum = add(2, 3);`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: { typescript: "*" },
+            exports: { "./nested/deep": { import: "./dist/nested/deep.mjs" } },
+            type: "module",
+        });
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const output = `${temporaryDirectoryPath}/dist/nested/deep.mjs`;
+
+        expect(existsSync(output)).toBe(true);
+
+        // The chunk sits in dist/nested/ while the asset lands at the dist root, so a
+        // chunk-relative "./name.wasm" would resolve to a file that is not there.
+        const { sum } = (await import(output)) as { sum: number };
+
+        expect(sum).toBe(5);
+    });
+
+    it("should reject a source phase import in preserve mode", async () => {
+        expect.assertions(3);
+
+        await createPackemConfig(temporaryDirectoryPath, { config: { rollup: { wasm: { mode: "preserve" } } } });
+
+        const output = await scaffold(`import source addModule from "./add.wasm";
+
+export const isModule = addModule instanceof WebAssembly.Module;`);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+
+        // Preserving the specifier would leave `import source` in the output, which
+        // nothing downstream can parse — so this combination fails loudly rather than
+        // quietly falling back to inlining the module.
+        expect(binProcess.exitCode).not.toBe(0);
+        expect(binProcess.stderr).toContain("cannot be combined with the source phase import");
+
+        expect(existsSync(output)).toBe(false);
     });
 
     it("should survive a second build served from the file cache", async () => {

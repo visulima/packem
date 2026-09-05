@@ -36,8 +36,7 @@ const VIRTUAL_PREFIX = "\0packem-import-attribute/";
 
 type AttributeType = "bytes" | "text";
 
-const encodeAttributeId = (type: AttributeType, filePath: string): string =>
-    `${VIRTUAL_PREFIX}${type}/${Buffer.from(filePath, "utf8").toString("base64url")}`;
+const encodeAttributeId = (type: AttributeType, filePath: string): string => `${VIRTUAL_PREFIX}${type}/${Buffer.from(filePath, "utf8").toString("base64url")}`;
 
 const decodeAttributeId = (id: string): { filePath: string; type: AttributeType } | undefined => {
     if (!id.startsWith(VIRTUAL_PREFIX)) {
