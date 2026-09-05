@@ -137,7 +137,7 @@ describe(parseWasmModuleShape, () => {
         const withBom = Uint8Array.from([...ADD.subarray(0, 21), ...exportSection, ...ADD.subarray(30)]);
 
         expect(() => new WebAssembly.Module(withBom)).not.toThrow();
-        expect(parseWasmModuleShape(withBom).exports).toStrictEqual([{ kind: "function", name: "\uFEFFadd" }]);
+        expect(parseWasmModuleShape(withBom).exports).toStrictEqual([{ kind: "function", name: "\u{FEFF}add" }]);
     });
 
     it("should reject a name that is not valid UTF-8", () => {
