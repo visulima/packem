@@ -120,6 +120,45 @@ export const content = text;`,
         });
     });
 
+    describe("build cache", () => {
+        it("should survive a second build served from the file cache", async () => {
+            expect.assertions(5);
+
+            writeFileSync(`${temporaryDirectoryPath}/src/page.html`, `<h1>Hello World</h1>`);
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import html from "./page.html" with { type: "text" };
+
+export const content = html;`,
+            );
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                module: "./dist/index.mjs",
+            });
+
+            const first = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+
+            expect(first.stderr).toBe("");
+            expect(first.exitCode).toBe(0);
+
+            // The attribute import is rewritten to a virtual module id. That id has to be
+            // a pure function of the file it stands for: the second build replays this
+            // module's transform from the cache, so nothing re-registers it, and an id
+            // carrying per-build state would name a module the process never created.
+            const second = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+
+            expect(second.stderr).toBe("");
+            expect(second.exitCode).toBe(0);
+
+            expect(readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toContain("<h1>Hello World</h1>");
+        });
+    });
+
     describe('type: "bytes"', () => {
         it("should inline file content as Uint8Array in ESM output", async () => {
             expect.assertions(3);
