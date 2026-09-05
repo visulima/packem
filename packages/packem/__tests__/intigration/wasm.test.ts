@@ -93,6 +93,38 @@ export const result = new WebAssembly.Instance(addModule).exports.add(20, 22);`)
         expect(result).toBe(42);
     });
 
+    it("should leave source phase syntax inside comments and template literals alone", async () => {
+        expect.assertions(4);
+
+        await createPackemConfig(temporaryDirectoryPath);
+
+        // The rewrite works on raw text, so the scanner has to tell a real declaration
+        // apart from the same characters appearing as data.
+        const output = await scaffold(`/**
+ * Documented like this:
+import source documented from "./missing.wasm";
+ */
+import source addModule from "./add.wasm";
+
+export const snippet = \`
+import source templated from "./missing.wasm";
+\`;
+
+export const result = new WebAssembly.Instance(addModule).exports.add(20, 22);`);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const { result, snippet } = (await import(output)) as { result: number; snippet: string };
+
+        expect(result).toBe(42);
+        // Both decoys name a file that does not exist: had either been rewritten, the
+        // build would have failed outright, and the template must still read as written.
+        expect(snippet).toContain('import source templated from "./missing.wasm"');
+    });
+
     it("should keep the @rollup/plugin-wasm default import working", async () => {
         expect.assertions(3);
 

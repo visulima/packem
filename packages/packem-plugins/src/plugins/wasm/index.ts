@@ -8,24 +8,13 @@ import type { Plugin, PluginContext } from "rollup";
 import type { Delivery, Form } from "./codegen";
 import { generateWasmModule } from "./codegen";
 import { parseWasmModuleShape, WasmParseError } from "./parse";
+import { findSourcePhaseImports } from "./scan";
 
 /**
  * Synchronous compilation on a browser main thread is capped at 4 KB by the WebAssembly
  * JS API, so anything larger has to go through the asynchronous path there.
  */
 const BROWSER_SYNC_LIMIT = 4096;
-
-/**
- * Matches `import source &lt;binding> from "&lt;specifier>"`, the static source-phase form.
- *
- * Anchored to the start of a line (leading whitespace allowed) because the rewrite runs
- * on raw text — the syntax is unparseable, so there is no AST to consult. An import
- * declaration may only appear at statement position, so this keeps the rewrite off the
- * same text appearing inside a string, a template, or a trailing comment. The one case
- * it cannot distinguish is a multi-line template literal whose own line begins with
- * `import source ...`.
- */
-const SOURCE_PHASE_IMPORT = /^[\t ]*import\s+source\s+([$A-Z_a-z][\w$]*)\s+from\s*(["'])([^"']+)\2/gm;
 
 const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
 
@@ -128,6 +117,13 @@ interface WasmPluginOptions {
 interface Emission {
     fileName: string;
     source: Uint8Array;
+}
+
+/** A rewritten declaration, addressed by offset rather than by its text. */
+interface Splice {
+    end: number;
+    start: number;
+    text: string;
 }
 
 const hashBytes = async (bytes: Uint8Array): Promise<string> => {
@@ -342,12 +338,9 @@ const wasmPlugin = (options: WasmPluginOptions = {}): Plugin => {
                 return null;
             }
 
-            const rewrites: Promise<void>[] = [];
-            const replacements = new Map<string, string>();
+            const rewrites: Promise<Splice>[] = [];
 
-            for (const match of code.matchAll(SOURCE_PHASE_IMPORT)) {
-                const specifier = match[3] as string;
-
+            for (const { binding, index: start, specifier, statement } of findSourcePhaseImports(code)) {
                 if (!specifier.endsWith(".wasm")) {
                     continue;
                 }
@@ -366,7 +359,8 @@ const wasmPlugin = (options: WasmPluginOptions = {}): Plugin => {
                     (async () => {
                         const resolved = await this.resolve(specifier, id, { skipSelf: true });
                         const filePath = resolved?.id ?? resolve(dirname(id), specifier);
-                        replacements.set(match[0], `import ${match[1] as string} from ${JSON.stringify(encodeSourceId(filePath))}`);
+
+                        return { end: start + statement.length, start, text: `import ${binding} from ${JSON.stringify(encodeSourceId(filePath))}` };
                     })(),
                 );
             }
@@ -376,12 +370,16 @@ const wasmPlugin = (options: WasmPluginOptions = {}): Plugin => {
                 return null;
             }
 
-            await Promise.all(rewrites);
+            const splices = await Promise.all(rewrites);
 
             let rewritten = code;
 
-            for (const [from, to] of replacements) {
-                rewritten = rewritten.replaceAll(from, to);
+            // The scanner returns declarations in source order, so applying them back to
+            // front keeps every offset ahead of the cursor valid. Splicing by offset also
+            // means two identical declarations in one file are rewritten independently,
+            // and an identical run of text elsewhere is left alone.
+            for (const { end, start, text } of splices.toReversed()) {
+                rewritten = rewritten.slice(0, start) + text + rewritten.slice(end);
             }
 
             // eslint-disable-next-line unicorn/no-null
