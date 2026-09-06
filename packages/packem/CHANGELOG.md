@@ -1,3 +1,24 @@
+## @visulima/packem [2.1.0](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0...@visulima/packem@2.1.0) (2026-09-06)
+
+### Features
+
+* WebAssembly ESM integration and source phase imports, plus two build-cache fixes ([#295](https://github.com/visulima/packem/issues/295)) ([e0c9c4a](https://github.com/visulima/packem/commit/e0c9c4a5242bd28877c3419e3815cc020b169e18))
+
+### Bug Fixes
+
+* **deps:** update all dependencies to their latest versions ([#283](https://github.com/visulima/packem/issues/283)) ([958b1bc](https://github.com/visulima/packem/commit/958b1bc9258abc1877735c0a12fb9de76b722b8e)), closes [#284](https://github.com/visulima/packem/issues/284)
+* **deps:** update patch updates ([#186](https://github.com/visulima/packem/issues/186)) ([48480f8](https://github.com/visulima/packem/commit/48480f891e1eb9b506f6ec8024c3b79d8bfe9e6c))
+* **deps:** update swc monorepo ([#187](https://github.com/visulima/packem/issues/187)) ([5d28861](https://github.com/visulima/packem/commit/5d28861bb28f644df3e01515d4dc3b83abb4aba0))
+* **packem:** drop cached modules whose files moved before restoring rollup's cache ([#285](https://github.com/visulima/packem/issues/285)) ([1920825](https://github.com/visulima/packem/commit/1920825cc8afb1b8fb9e1114ae82b4139f61cf04)), closes [#282](https://github.com/visulima/packem/issues/282)
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.1
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.1
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.1
+* **@visulima/packem-rollup:** upgraded to 1.1.0
+
 ## @visulima/packem [2.0.0](https://github.com/visulima/packem/compare/%40visulima%2Fpackem%401.28.3...%40visulima%2Fpackem%402.0.0) (2026-08-10)
 
 
