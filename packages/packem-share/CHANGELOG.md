@@ -1,3 +1,10 @@
+## @visulima/packem-share [1.0.1](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0...@visulima/packem-share@1.0.1) (2026-09-06)
+
+### Bug Fixes
+
+* **deps:** update all dependencies to their latest versions ([#283](https://github.com/visulima/packem/issues/283)) ([958b1bc](https://github.com/visulima/packem/commit/958b1bc9258abc1877735c0a12fb9de76b722b8e)), closes [#284](https://github.com/visulima/packem/issues/284)
+* **packem:** drop cached modules whose files moved before restoring rollup's cache ([#285](https://github.com/visulima/packem/issues/285)) ([1920825](https://github.com/visulima/packem/commit/1920825cc8afb1b8fb9e1114ae82b4139f61cf04)), closes [#282](https://github.com/visulima/packem/issues/282)
+
 ## @visulima/packem-share 1.0.0 (2026-08-10)
 
 ## @visulima/packem-share [1.0.0-alpha.59](https://github.com/visulima/packem/compare/%40visulima%2Fpackem-share%401.0.0-alpha.58...%40visulima%2Fpackem-share%401.0.0-alpha.59) (2026-08-10)
