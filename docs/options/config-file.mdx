@@ -779,8 +779,11 @@ export default defineConfig({
 
   rollup: {
     output: {
-      // TypeScript autocompletes Rollup options here
-      format: '|' // Shows: 'es' | 'cjs' | 'iife' | 'umd' | 'system'
+      // TypeScript autocompletes Rollup's own options here. Note that these are
+      // passed straight through: Packem itself only produces ESM and CJS, and
+      // overriding `format` does not change output file names — see
+      // /docs/options/output-format#browser-globals
+      sourcemap: true
     }
   }
 })

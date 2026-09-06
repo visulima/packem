@@ -238,7 +238,6 @@
         "@rollup/plugin-inject": "catalog:build",
         "@rollup/plugin-json": "catalog:build",
         "@rollup/plugin-replace": "catalog:build",
-        "@rollup/plugin-wasm": "catalog:build",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@svgr/core": "catalog:dev",
         "@swc/core": "catalog:dev",

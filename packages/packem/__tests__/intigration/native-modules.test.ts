@@ -169,6 +169,45 @@ describe("native modules", () => {
         expect(content).toMatch("./custom-natives");
     });
 
+    it("survives a second build served from the file cache", async () => {
+        expect.assertions(6);
+
+        await createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                ".": "./dist/index.js",
+            },
+            type: "module",
+        });
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                cjsInterop: true,
+            },
+        });
+
+        await writeFile(join(temporaryDirectoryPath, "src", "index.js"), SINGLE_NATIVE_SOURCE);
+        await writeFile(join(temporaryDirectoryPath, "src", "native.node"), Buffer.from("dummy native module"));
+
+        const first = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+
+        expect(first.stderr).toBe("");
+        expect(first.exitCode).toBe(0);
+
+        // `resolveId` does not run again for modules rollup restores from its build
+        // cache, but `load` does. A virtual id that only means something to the process
+        // that minted it therefore names a module the second build cannot load, and the
+        // `.node` file never gets copied.
+        const second = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+
+        expect(second.stderr).toBe("");
+        expect(second.exitCode).toBe(0);
+
+        const files = readdirSync(join(temporaryDirectoryPath, "dist", "natives"));
+
+        expect(files.filter((file) => file.endsWith(".node"))).toHaveLength(1);
+        expect(readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), { encoding: "utf8" })).toMatch("./natives");
+    });
+
     it("handles name collisions by adding suffixes", async () => {
         expect.assertions(8);
 

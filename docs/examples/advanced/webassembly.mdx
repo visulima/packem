@@ -1,67 +1,94 @@
 ---
 title: WebAssembly
-description: Bundle and use WebAssembly modules
+description: Import .wasm modules as ES modules, in the source phase, or preserved for downstream tooling
 ---
+
+import { Callout } from 'fumadocs-ui/components/callout'
 
 # WebAssembly
 
-Packem can import and bundle `.wasm` modules. WebAssembly support is provided through the `rollup.wasm` option, which is backed by `@rollup/plugin-wasm` and accepts its full option set.
+Packem brings `.wasm` files into the ES module graph. A WebAssembly module's exports
+become named ES exports, its imports are resolved as ES imports, and the same file can
+also be imported in the *source phase* as a compiled but uninstantiated
+`WebAssembly.Module`.
 
-## Overview
+Handling is enabled by default — importing a `.wasm` file needs no configuration.
 
-When enabled, `.wasm` files imported from your source are inlined or copied as part of the build, letting you instantiate compiled WebAssembly directly from JavaScript/TypeScript.
+## Import forms
 
-:::note
-WebAssembly modules are a supported feature of Packem (see the feature list in the package README). Support is configured via `rollup.wasm`.
-:::
+### ESM integration
 
-## Project Structure
+Following the [WebAssembly ESM integration proposal](https://github.com/WebAssembly/esm-integration),
+each of the module's WebAssembly exports is available as a named import:
 
-```
-wasm-example/
-├── src/
-│   ├── index.ts
-│   └── add.wasm
-├── package.json
-├── packem.config.ts
-└── tsconfig.json
-```
-
-## Source Files
-
-**src/index.ts**
 ```typescript
-// Import the compiled WebAssembly module
-import addModule from './add.wasm'
+import { add, memory } from './add.wasm'
 
-export async function add(a: number, b: number): Promise<number> {
-  const instance = await addModule()
-  return (instance.exports.add as (a: number, b: number) => number)(a, b)
-}
+export const sum = add(2, 3)
+export const pages = memory.buffer.byteLength / 65_536
 ```
 
-## Configuration
+Exports of every kind are bound — functions, memories, tables and globals — so
+`memory` above is a real `WebAssembly.Memory`.
 
-Enable WebAssembly handling through the `rollup.wasm` option. Passing an empty object turns it on with defaults; you can pass any `@rollup/plugin-wasm` option (such as `sync` or `maxFileSize`).
+If the module declares imports of its own, their module names are treated as ES module
+specifiers. Given a module containing `(import "./host.js" "log" ...)`, Packem reads the
+binary's import section and emits the corresponding `import * as ... from './host.js'`,
+then passes that namespace to the instance:
 
-**packem.config.ts**
+```javascript title="src/host.js"
+export const log = (value) => console.log(value)
+```
+
+There is no import object to construct by hand, and `./host.js` is bundled like any
+other dependency.
+
+### Source phase \{#source-phase}
+
+[Source phase imports](https://github.com/tc39/proposal-source-phase-imports) bind the
+compiled module rather than an instance, so you can instantiate it more than once — each
+time against different imports:
+
 ```typescript
-import { defineConfig } from '@visulima/packem/config'
-import transformer from '@visulima/packem/transformer/esbuild'
+import source addModule from './add.wasm'
 
-export default defineConfig({
-  transformer,
-  declaration: true,
-  rollup: {
-    // Enable .wasm bundling (backed by @rollup/plugin-wasm)
-    wasm: {}
-  }
+const instance = new WebAssembly.Instance(addModule, {
+  './host.js': { log: console.log },
 })
 ```
 
-### Inlining Smaller Modules
+<Callout type="warn">
+`import source` is a stage 3 proposal, and **TypeScript cannot parse it yet** — nor can
+prettier, or the transformers Packem drives (esbuild, swc, oxc, sucrase). Packem rewrites
+it before any of them see the file, so the *build* works with any transformer, but `tsc`
+will still report a syntax error on a `.ts` file containing it.
+
+Until TypeScript catches up, keep source-phase imports in a `.js` file and describe it
+with a hand-written `.d.ts`. The [example](https://github.com/visulima/packem/tree/main/examples/wasm-esm)
+is laid out this way.
+</Callout>
+
+### Default import
+
+The default export is a init function resolving to a `WebAssembly.Instance`, matching the
+shape `@rollup/plugin-wasm` produced. Existing code keeps working:
 
 ```typescript
+import init from './add.wasm'
+
+const instance = await init()
+
+instance.exports.add(1, 1)
+```
+
+Calling it with an import object instantiates a fresh instance; calling it bare returns
+the instance the named exports come from.
+
+## Delivery modes
+
+`mode` controls how the module's bytes reach the output.
+
+```typescript title="packem.config.ts"
 import { defineConfig } from '@visulima/packem/config'
 import transformer from '@visulima/packem/transformer/esbuild'
 
@@ -69,56 +96,107 @@ export default defineConfig({
   transformer,
   rollup: {
     wasm: {
-      // Inline modules under this size; emit larger ones as separate files
-      maxFileSize: 10_000,
-      // Synchronously instantiate (Node-only, no async wrapper)
-      sync: ['src/add.wasm']
-    }
-  }
+      mode: 'auto',
+      maxFileSize: 14_336,
+    },
+  },
 })
 ```
 
-To disable WebAssembly handling explicitly, set `rollup.wasm` to `false`.
+| Mode         | Behaviour                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------- |
+| `auto`       | Default. Inlines modules up to `maxFileSize`, emits anything larger as an asset.                 |
+| `inline`     | Always embeds the bytes as base64, keeping the output a single self-contained file.              |
+| `asset`      | Always writes the `.wasm` next to the chunk and loads it at runtime.                             |
+| `preserve`   | Leaves the import untouched for a downstream bundler, or a runtime with native `.wasm` support.  |
 
-**package.json**
-```json
-{
-  "name": "@myorg/wasm-example",
-  "version": "1.0.0",
-  "type": "module",
-  "files": ["dist"],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs"
-    }
+`preserve` is the mode to reach for when you publish a library that a consuming
+application will bundle itself, or when you target a runtime that resolves WebAssembly
+imports natively:
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    wasm: { mode: 'preserve' },
   },
-  "scripts": {
-    "build": "packem build"
-  },
-  "devDependencies": {
-    "@visulima/packem": "^2"
-  }
+})
+```
+
+The specifier survives into the output exactly as written, so the consumer resolves it
+the same way your source did.
+
+<Callout type="warn">
+`preserve` cannot be combined with a [source phase import](#source-phase). Preserving the
+specifier would leave `import source` in the output, and nothing downstream can parse it
+yet — so Packem fails the build with an explanatory error rather than quietly falling back
+to inlining the module. Use another mode for that entry, or import the module normally.
+</Callout>
+
+## Instantiation
+
+Named exports have to exist by the time the module finishes evaluating, so the wrapper
+instantiates the module up front. `instantiation` chooses how:
+
+| Value    | Behaviour                                                                                                          |
+| -------- | ------------------------------------------------------------------------------------------------------------------ |
+| `auto`   | Default. Uses top-level `await` only where it is both needed and available.                                         |
+| `sync`   | Uses the `WebAssembly.Module` / `WebAssembly.Instance` constructors. Works in CJS output.                            |
+| `await`  | Uses top-level `await`. Lifts the browser size limit below, but is ESM-only.                                        |
+
+<Callout type="warn">
+A browser main thread refuses to compile more than 4 KB synchronously. Packem therefore
+switches to top-level `await` for larger browser builds — but top-level `await` cannot be
+represented in CommonJS, so a build that also emits CJS fails with an explanatory error.
+Emit ESM only, or use `mode: 'preserve'`, for large browser-targeted modules.
+</Callout>
+
+## Options
+
+| Option          | Type                                                | Default                     | Description                                                        |
+| --------------- | --------------------------------------------------- | --------------------------- | ------------------------------------------------------------------ |
+| `mode`          | `'auto' \| 'inline' \| 'asset' \| 'preserve'`       | `'auto'`                    | How the bytes reach the output.                                    |
+| `instantiation` | `'auto' \| 'sync' \| 'await'`                       | `'auto'`                    | How the module is compiled and instantiated.                       |
+| `maxFileSize`   | `number`                                            | `14336`                     | Inline threshold for `mode: 'auto'`.                               |
+| `fileName`      | `string`                                            | `'[name]-[hash][extname]'`  | Name template for emitted assets.                                  |
+| `publicPath`    | `string`                                            | —                           | Prefix for the emitted asset's URL.                                |
+| `targetEnv`     | `'node' \| 'browser'`                               | `'node'`                    | Chooses `node:fs` or `fetch` for asset loading.                    |
+| `include`       | `FilterPattern`                                     | `/\.wasm$/`                 | Files the plugin handles.                                          |
+| `exclude`       | `FilterPattern`                                     | —                           | Files the plugin ignores.                                          |
+
+Set `rollup.wasm` to `false` to turn WebAssembly handling off entirely.
+
+## TypeScript
+
+TypeScript does not know the shape of a `.wasm` import, so declare it:
+
+```typescript title="src/add.wasm.d.ts"
+declare module '*.wasm' {
+  export const add: (a: number, b: number) => number
+
+  const init: (imports?: WebAssembly.Imports) => Promise<WebAssembly.Instance>
+
+  export default init
 }
 ```
 
-## Build Output
+## Migrating from `@rollup/plugin-wasm`
 
-```bash
-$ packem build
+Earlier versions passed `rollup.wasm` straight to `@rollup/plugin-wasm`. Packem now
+handles `.wasm` itself, on both the rollup and rolldown backends.
 
-dist/index.mjs        # JS entry, instantiates the wasm module
-dist/index.d.ts       # type declarations
-```
+- `maxFileSize`, `fileName`, `publicPath` and `targetEnv` keep their meaning.
+- `sync` is replaced by `instantiation`. `instantiation: 'sync'` applies to every module
+  rather than to a list of paths.
+- The default export is unchanged, so existing `import init from './x.wasm'` code needs
+  no edits.
 
-## Notes
+## Example
 
-- `rollup.wasm` accepts the full `RollupWasmOptions` shape from `@rollup/plugin-wasm`; the most common options are `sync`, `maxFileSize`, `targetEnv`, and `publicPath`.
-- Small modules can be inlined as base64 (via `maxFileSize`) to avoid a separate fetch; larger ones are emitted as standalone `.wasm` files.
-- Combine with [Bundle Analysis](/docs/examples/advanced/bundle-analysis) to see how WebAssembly assets contribute to your output size.
+A runnable version of everything above, including a module that imports a JavaScript
+function, lives in [`examples/wasm-esm`](https://github.com/visulima/packem/tree/main/examples/wasm-esm).
 
 ## Related
 
 - [Bundle Analysis](/docs/examples/advanced/bundle-analysis)
-- [@visulima/packem-rollup API](/docs/api/packem-rollup)
 - [Plugins](/docs/options/plugins)

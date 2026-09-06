@@ -5,7 +5,7 @@ description: What Packem is, how it works, and when to use it
 
 # Introduction
 
-Packem is a bundler for Node.js and TypeScript libraries. It reads your `package.json` exports, picks the right entry points, and produces optimized ESM, CJS, or IIFE bundles — with TypeScript declarations, CSS processing, and tree shaking included.
+Packem is a bundler for Node.js and TypeScript libraries. It reads your `package.json` exports, picks the right entry points, and produces the ESM and CJS output your `package.json` declares — with TypeScript declarations, CSS processing, and tree shaking included.
 
 Under the hood it uses Rollup for bundling and lets you swap in the compiler that fits your project: esbuild, swc, OXC, sucrase, or the official TypeScript compiler. An experimental [Rolldown](https://rolldown.rs) backend is also selectable via the [`bundler`](/docs/options/bundler) option.
 
@@ -25,7 +25,7 @@ Packem handles everything a modern library needs:
 
 - **TypeScript and JavaScript** — `.ts`, `.tsx`, `.js`, and `.jsx` files with modern syntax support.
 - **Type declarations** — `.d.ts` generation with isolated declaration support.
-- **Multiple output formats** — ESM, CJS, and IIFE in a single build.
+- **Multiple output formats** — ESM and CJS in a single build.
 - **CSS and preprocessors** — CSS, Sass, Less, Stylus, PostCSS, and CSS Modules.
 - **React components** — Server Components, Client Components, and server actions.
 - **Assets** — JSON, WASM, text files, and Node.js native addons.

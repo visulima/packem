@@ -149,9 +149,10 @@ export default defineConfig({
 
 `exclude` overrides all other rules — `deps`, `peerDeps`, `optDeps`, and `builtins` — so a matched specifier is always bundled.
 
-### Bundle everything (for IIFE / standalone output)
+### Bundle everything (standalone output)
 
-When producing a self-contained bundle (such as an IIFE for the browser), turn off every classification so nothing is left external:
+When producing a self-contained bundle — a CLI shipped without its `node_modules`, for
+example — turn off every classification so nothing is left external:
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'

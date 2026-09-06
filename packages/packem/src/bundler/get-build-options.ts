@@ -17,6 +17,7 @@ import type { ShebangOptions } from "@visulima/packem-plugins/plugin/shebang";
 import { shebangPlugin } from "@visulima/packem-plugins/plugin/shebang";
 import { sourcemapsPlugin } from "@visulima/packem-plugins/plugin/source-maps";
 import { urlPlugin } from "@visulima/packem-plugins/plugin/url";
+import { wasmPlugin } from "@visulima/packem-plugins/plugin/wasm";
 import { resolveTsconfigPathsPlugin, resolveTsconfigRootDirectoriesPlugin, resolveTypescriptMjsCtsPlugin } from "@visulima/packem-plugins/typescript";
 import type { RollupReplaceOptions } from "@visulima/packem-rollup";
 import {
@@ -29,7 +30,6 @@ import {
     preserveDirectivesPlugin,
     replace as replacePlugin,
     visualizer as visualizerPlugin,
-    wasm as wasmPlugin,
 } from "@visulima/packem-rollup";
 import { cjsInteropPlugin } from "@visulima/packem-rollup/plugin/cjs-interop";
 import { JsonPlugin } from "@visulima/packem-rollup/plugin/json";
@@ -236,6 +236,18 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
 
             importAttributesPlugin(),
 
+            // Registered ahead of the transformer adapter: the source-phase form
+            // (`import source m from "./m.wasm"`) is not parseable by esbuild/swc/oxc/
+            // sucrase or by either bundler backend, so the plugin has to rewrite it away
+            // first. `topLevelAwait` is off whenever CJS is emitted, because one module
+            // graph renders to both outputs and TLA cannot survive the CJS one.
+            context.options.rollup.wasm
+                && wasmPlugin({
+                    targetEnv: context.options.runtime === "browser" ? "browser" : "node",
+                    topLevelAwait: !context.options.emitCJS,
+                    ...context.options.rollup.wasm,
+                }),
+
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
 
             externalsPlugin(context),
@@ -297,8 +309,6 @@ export const createJsBuildOptions = async (context: BuildContext<InternalBuildOp
             // `lang` to context.parse and falls back to "leave inlined" on any
             // parse failure — see chunk-splitter/parse. Runs under both backends.
             chunkSplitter(),
-
-            context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
 
             context.options.rollup.url && urlPlugin(context.options.rollup.url),
 
