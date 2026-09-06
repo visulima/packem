@@ -1,3 +1,19 @@
+## @visulima/packem-rollup [1.1.0](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0...@visulima/packem-rollup@1.1.0) (2026-09-06)
+
+### Features
+
+* WebAssembly ESM integration and source phase imports, plus two build-cache fixes ([#295](https://github.com/visulima/packem/issues/295)) ([e0c9c4a](https://github.com/visulima/packem/commit/e0c9c4a5242bd28877c3419e3815cc020b169e18))
+
+### Bug Fixes
+
+* **deps:** update all dependencies to their latest versions ([#283](https://github.com/visulima/packem/issues/283)) ([958b1bc](https://github.com/visulima/packem/commit/958b1bc9258abc1877735c0a12fb9de76b722b8e)), closes [#284](https://github.com/visulima/packem/issues/284)
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.1
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.1
+
 ## @visulima/packem-rollup 1.0.0 (2026-08-10)
 
 
