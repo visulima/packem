@@ -107,8 +107,8 @@ catalogs:
     preact: 10.29.8
     react: 19.2.7
     react-dom: 19.2.7
-    svelte: 5.56.9
-    vue: 3.5.40
+    svelte: 5.56.8
+    vue: 3.5.41
   icons:
     lucide-static: 1.41.0
   lint:
