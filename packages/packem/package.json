@@ -320,7 +320,7 @@
         "@swc/core": ">=1.16.1",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
-        "@visulima/packem-rollup": "1.1.0",
+        "@visulima/packem-rollup": "1.0.0",
         "cssnano": ">=8.0.5",
         "esbuild": ">=0.28.2",
         "icss-utils": ">=5.1.0",
@@ -342,7 +342,7 @@
         "stylus": ">=0.64.0",
         "sucrase": ">=3.35.1",
         "typedoc": ">=0.28.20",
-        "typedoc-plugin-markdown": ">=4.12.0",
+        "typedoc-plugin-markdown": ">=4.13.0",
         "typedoc-plugin-rename-defaults": ">=0.7.3",
         "typescript": ">=6.0.3",
         "unplugin-vue": ">=7.2.0"
