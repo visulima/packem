@@ -59,7 +59,7 @@
         "bunchee": "^7.0.1",
         "cross-env": "^10.1.0",
         "esbuild": "^0.28.2",
-        "esbuild-loader": "^4.5.0",
+        "esbuild-loader": "^4.4.3",
         "jiti": "catalog:script",
         "prettier": "3.8.5",
         "rolldown": "catalog:build",
