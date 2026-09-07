@@ -171,7 +171,7 @@ catalogs:
     fastest-levenshtein: 1.0.16
     get-tsconfig: 4.14.3
     gpt-tokenizer: ^4.0.0
-    happy-dom: 20.11.12
+    happy-dom: 20.11.15
     hookable: 6.1.1
     html-minifier-next: 8.3.0
     is-ci: ^4.1.0
