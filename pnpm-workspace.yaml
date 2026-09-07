@@ -114,7 +114,7 @@ catalogs:
     svelte: 5.56.10
     vue: 3.5.42
   icons:
-    lucide-static: 1.34.0
+    lucide-static: 1.39.0
   lint:
     "@anolilab/commitlint-config": 10.1.2
     # eslint-config 29/30 turn on a large batch of new unicorn and
