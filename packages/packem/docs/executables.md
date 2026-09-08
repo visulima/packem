@@ -118,11 +118,23 @@ exe: {
 Tokens: `[name]` (the entry's base name), `[platform]`, `[arch]`, `[node]` (the exact Node.js
 version), `[version]` (your `package.json` version). `.exe` is appended for Windows targets.
 
-Without a `fileName`, packem uses `[name]` for a single executable and
-`[name]-[platform]-[arch]` when a build produces several, so files never overwrite each other. A
-literal name (no tokens) still gets a platform suffix in a multi-target build.
+Without a `fileName`, packem uses `[name]` for a single target and `[name]-[platform]-[arch]` when
+several are built. A literal name (no tokens) still gets a platform suffix in a multi-target build.
 
 `fileName` can also be a function, receiving the tokens plus the chunk `path`.
+
+Names are resolved for the whole build before anything is written, and two executables that would
+land on the same file fail the build naming both, rather than letting one silently overwrite the
+other. That catches a token-free `fileName` shared by several entries, a `fileName` function that
+ignores the chunk, and two targets that differ only by Node.js version — for the last one, add
+`[node]` to the template:
+
+```ts
+exe: {
+    targets: ["node25.7.0-linux-x64", "node26.0.0-linux-x64"],
+    fileName: "[name]-[platform]-[arch]-node[node]",
+}
+```
 
 ## Windows icon and version information
 

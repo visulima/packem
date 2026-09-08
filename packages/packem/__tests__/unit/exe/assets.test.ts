@@ -118,6 +118,31 @@ describe(resolveAssets, () => {
         await expect(resolveAssets("does-not-exist/**", rootDir)).rejects.toThrow("did not match any file");
     });
 
+    it.each([["__packem_sea_manifest__"], ["__packem_sea_bytecode__"], ["__packem_sea_native__/addon.node"]])(
+        "should reject the reserved key %s, which packem's own payload uses",
+        async (key) => {
+            expect.assertions(1);
+
+            await expect(resolveAssets({ [key]: "./locales/en.json" }, rootDir)).rejects.toThrow("is reserved by packem");
+        },
+    );
+
+    it("should reject a globbed file whose path collides with a reserved key", async () => {
+        expect.assertions(1);
+
+        await writeFile(join(rootDir, "__packem_sea_manifest__"), "{}");
+
+        await expect(resolveAssets("__packem_sea_*", rootDir)).rejects.toThrow("is reserved by packem");
+    });
+
+    it("should allow a key that merely looks similar", async () => {
+        expect.assertions(1);
+
+        const { map } = await resolveAssets({ packem_sea_manifest: "./locales/en.json" }, rootDir);
+
+        expect(Object.keys(map)).toStrictEqual(["packem_sea_manifest"]);
+    });
+
     it("should return an empty map for an empty pattern list", async () => {
         expect.assertions(1);
 

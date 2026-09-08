@@ -1,5 +1,6 @@
 import { Buffer } from "node:buffer";
 import { createRequire } from "node:module";
+import { join } from "node:path";
 import { cwd as processCwd, env as processEnv } from "node:process";
 
 import type { SeaManifest } from "./decode";
@@ -114,7 +115,10 @@ const setAssetRoot = (root: string): void => {
  */
 const getAssetRoot = (): string => assetRoot ?? processEnv.PACKEM_SEA_ASSET_ROOT ?? processCwd();
 
-const toDiskPath = (key: string): URL => new URL(key, `file://${getAssetRoot().replaceAll("\\", "/")}/`);
+// Joined as a path, not parsed as a URL: an asset key is a plain relative path, and URL
+// parsing would treat `#`, `?` and `%` in a file name as syntax, so the development
+// fallback would disagree with the embedded lookup.
+const toDiskPath = (key: string): string => join(getAssetRoot(), key);
 
 /**
  * Reads an embedded asset as raw bytes.

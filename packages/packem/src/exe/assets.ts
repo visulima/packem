@@ -3,7 +3,9 @@ import { stat } from "node:fs/promises";
 import { glob, isAccessible } from "@visulima/fs";
 import { isAbsolute, join, normalize, relative, resolve, toNamespacedPath } from "@visulima/path";
 
+import { BYTECODE_ASSET_KEY, MANIFEST_ASSET_KEY } from "./compress";
 import { createDebug } from "./debug";
+import { NATIVE_ASSET_PREFIX } from "./native-modules";
 import type { ExeAssets } from "./options";
 
 const debug = createDebug();
@@ -30,6 +32,23 @@ const toPosix = (value: string): string => value.replaceAll(BACKSLASH, "/");
  * @param filePath The absolute candidate path.
  * @returns `true` when `filePath` is not inside `rootDir`.
  */
+
+/**
+ * Rejects asset keys packem reserves for its own payloads.
+ *
+ * The compression manifest, the bytecode cache and the embedded addons are merged into the
+ * same map as the user's assets. A colliding key would either be silently replaced, or —
+ * for the manifest — be read back as configuration and make every other asset fail to
+ * decode, so it is refused up front instead.
+ * @param key The normalized asset key.
+ * @throws If the key is one packem reserves.
+ */
+const assertNotReserved = (key: string): void => {
+    if (key === MANIFEST_ASSET_KEY || key === BYTECODE_ASSET_KEY || key.startsWith(NATIVE_ASSET_PREFIX)) {
+        throw new Error(`The \`exe.assets\` key "${key}" is reserved by packem. Choose a key that does not start with "__packem_sea".`);
+    }
+};
+
 const isOutsideRoot = (rootDir: string, filePath: string): boolean => {
     const relativePath = relative(rootDir, filePath);
 
@@ -97,7 +116,11 @@ const resolveAssets = async (assets: ExeAssets | undefined, rootDir: string): Pr
             // eslint-disable-next-line no-await-in-loop -- surfacing the first broken asset with its own key is more useful than a merged rejection.
             totalBytes += await assertReadable(sourcePath, `"${key}"`);
 
-            map[toPosix(key)] = sourcePath;
+            const normalizedKey = toPosix(key);
+
+            assertNotReserved(normalizedKey);
+
+            map[normalizedKey] = sourcePath;
         }
 
         debug("Resolved %d explicit assets", Object.keys(map).length);
@@ -135,6 +158,8 @@ const resolveAssets = async (assets: ExeAssets | undefined, rootDir: string): Pr
         }
 
         const key = toPosix(relative(rootDir, sourcePath));
+
+        assertNotReserved(key);
 
         // eslint-disable-next-line no-await-in-loop -- keeps the failing asset identifiable and the memory profile flat for large asset trees.
         totalBytes += await assertReadable(sourcePath, `"${key}"`);

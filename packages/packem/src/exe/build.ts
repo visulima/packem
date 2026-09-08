@@ -156,10 +156,10 @@ interface BuildOneOptions {
     compression: CompressionAlgorithm | undefined;
     exe: ExeOptions;
     input: ExeBuildInput;
-    /** Whether this build produces more than one executable, which affects default naming. */
-    multiple: boolean;
     /** Native addons found in the build output, to embed and materialize at runtime. */
     natives: NativeModule[];
+    /** File name this executable is written under, resolved and collision-checked up front. */
+    outputFileName: string;
     target: ResolvedExeTarget;
 }
 
@@ -208,28 +208,35 @@ const compressEmbeddedAssets = async (
     return { ...Object.fromEntries(compressed), [MANIFEST_ASSET_KEY]: manifestPath };
 };
 
+interface OutputNameOptions {
+    chunk: ExeChunk;
+    exe: ExeOptions;
+    /** Whether several targets are built, which decides whether a suffix is added. */
+    multiple: boolean;
+    packageVersion: string;
+    target: ResolvedExeTarget;
+}
+
 /**
- * Resolves where one executable is written, creating the output directory.
+ * Resolves the file name one executable is written under.
+ *
+ * Pure, so the whole build's names can be computed up front and checked for collisions
+ * before anything slow happens.
  * @param options The chunk, target and naming configuration for this executable.
- * @returns The final file name and its absolute path.
+ * @returns The final file name, including any extension.
  */
-const resolveOutputPath = async (options: BuildOneOptions): Promise<{ outputFileName: string; outputPath: string }> => {
-    const { bundledFile, chunk, exe, input, multiple, target } = options;
-    const exeOutDirectory = resolve(input.options.rootDir, exe.outDir ?? "build");
-
-    await mkdir(exeOutDirectory, { recursive: true });
-
+const resolveOutputFileName = (options: OutputNameOptions): string => {
+    const { chunk, exe, multiple, packageVersion, target } = options;
     const tokens = {
         arch: target.arch,
-        name: basename(bundledFile, extname(bundledFile)),
+        name: basename(chunk.path, extname(chunk.path)),
         node: target.nodeVersion,
         platform: target.platform,
-        version: input.packageJson.version ?? "",
+        version: packageVersion,
     };
     const template = typeof exe.fileName === "function" ? exe.fileName({ ...tokens, path: chunk.path }) : exe.fileName;
-    const outputFileName = buildFileName({ multiple, template, tokens });
 
-    return { outputFileName, outputPath: join(exeOutDirectory, outputFileName) };
+    return buildFileName({ multiple, template, tokens });
 };
 
 /**
@@ -435,10 +442,14 @@ interface BuiltExecutable {
  * @returns Details of the produced executable, for the build summary.
  */
 const buildSingleExe = async (options: BuildOneOptions): Promise<BuiltExecutable> => {
-    const { assets, bundledFile, chunk, compression, exe, input, natives, target } = options;
+    const { assets, bundledFile, chunk, compression, exe, input, natives, outputFileName, target } = options;
     const { logger, options: buildOptions, packageJson } = input;
 
-    const { outputFileName, outputPath } = await resolveOutputPath(options);
+    const exeOutDirectory = resolve(buildOptions.rootDir, exe.outDir ?? "build");
+
+    await mkdir(exeOutDirectory, { recursive: true });
+
+    const outputPath = join(exeOutDirectory, outputFileName);
 
     debug("Building SEA executable: %s -> %s (%O)", bundledFile, outputPath, target);
 
@@ -527,6 +538,55 @@ const buildSingleExe = async (options: BuildOneOptions): Promise<BuiltExecutable
     };
 };
 
+interface PlannedOutput {
+    chunk: ExeChunk;
+    outputFileName: string;
+    target: ResolvedExeTarget;
+}
+
+/**
+ * Works out what every executable will be called, and refuses plans that collide.
+ *
+ * Names are resolved before anything slow runs, because two outputs sharing a name means
+ * the second silently overwrites the first — the build would report two executables while
+ * one file exists. A token-free `exe.fileName`, or a `fileName` function that ignores the
+ * chunk, both produce that, as do two targets that differ only by Node.js version.
+ * @param chunks The entry chunks to build.
+ * @param targets The resolved targets.
+ * @param exe The resolved `exe` options.
+ * @param packageVersion The `version` field of package.json, for the `[version]` token.
+ * @returns One entry per executable to build.
+ * @throws If two executables would be written to the same file, naming what collided.
+ */
+const planOutputs = (chunks: ReadonlyArray<ExeChunk>, targets: ReadonlyArray<ResolvedExeTarget>, exe: ExeOptions, packageVersion: string): PlannedOutput[] => {
+    // Only several targets force the default suffix: distinct entries already differ by
+    // `[name]`, so a single-target multi-entry build keeps its plain names.
+    const multiple = targets.length > 1;
+    const plan: PlannedOutput[] = [];
+    const seen = new Map<string, PlannedOutput>();
+
+    for (const chunk of chunks) {
+        for (const target of targets) {
+            const outputFileName = resolveOutputFileName({ chunk, exe, multiple, packageVersion, target });
+            const clash = seen.get(outputFileName);
+
+            if (clash) {
+                throw new Error(
+                    `Two executables would both be written to "${outputFileName}":\n`
+                        + `- ${clash.chunk.path} for ${clash.target.platform}-${clash.target.arch} (Node.js ${clash.target.nodeVersion})\n`
+                        + `- ${chunk.path} for ${target.platform}-${target.arch} (Node.js ${target.nodeVersion})\n`
+                        + 'Give `exe.fileName` a template that tells them apart, such as "[name]-[platform]-[arch]-node[node]".',
+                );
+            }
+
+            seen.set(outputFileName, { chunk, outputFileName, target });
+            plan.push({ chunk, outputFileName, target });
+        }
+    }
+
+    return plan;
+};
+
 /**
  * Prints one line per produced executable, plus a total.
  * @param built The executables produced by this build.
@@ -608,20 +668,17 @@ const buildExe = async (context: unknown): Promise<void> => {
         logger.info(`Embedding ${String(assetCount)} asset${assetCount === 1 ? "" : "s"} ${dim(`(${formatBytes(assetBytes, { decimals: 2 })})`)}`);
     }
 
-    // Only several targets force a suffix: distinct entries already have distinct names.
-    const multiple = targets.length > 1;
+    const plan = planOutputs(chunks, targets, exe, input.packageJson.version ?? "");
     const built: BuiltExecutable[] = [];
 
-    for (const chunk of chunks) {
+    for (const { chunk, outputFileName, target } of plan) {
         const bundledFile = join(options.rootDir, options.outDir, chunk.path);
 
-        for (const target of targets) {
-            // eslint-disable-next-line no-await-in-loop -- each build spawns `node --build-sea` and may download a runtime; running them concurrently only contends for disk and network.
-            built.push(await buildSingleExe({ assets, bundledFile, chunk, compression, exe, input, multiple, natives, target }));
-        }
+        // eslint-disable-next-line no-await-in-loop -- each build spawns `node --build-sea` and may download a runtime; running them concurrently only contends for disk and network.
+        built.push(await buildSingleExe({ assets, bundledFile, chunk, compression, exe, input, natives, outputFileName, target }));
     }
 
     reportBuiltExecutables(built, logger, options.rootDir);
 };
 
-export { buildExe, selectEntryChunks, validateSea };
+export { buildExe, planOutputs, resolveOutputFileName, selectEntryChunks, validateSea };

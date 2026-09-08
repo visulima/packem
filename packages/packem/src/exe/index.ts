@@ -1,5 +1,5 @@
 export { assetKeyToPath, resolveAssets } from "./assets";
-export { buildExe, selectEntryChunks, validateSea } from "./build";
+export { buildExe, planOutputs, resolveOutputFileName, selectEntryChunks, validateSea } from "./build";
 export type { CompileBytecodeOptions, CompiledBytecode } from "./bytecode";
 export { assertBytecodeSupported, compileBytecode, createLoaderSource, getCompilerBinary, wrapSource } from "./bytecode";
 export { getCachedBinaryPath, getCacheDirectory } from "./cache";

@@ -39,8 +39,12 @@ const DECOMPRESSORS: Record<CompressionAlgorithm, string> = {
     zstd: "zstdDecompressSync",
 };
 
+// A `bin` bundle starts with `#!/usr/bin/env node`, which V8 only tolerates at offset 0.
+// The wrapper moves it, so it is stripped first; the executable does not need it anyway.
+const SHEBANG = /^#![^\n]*/;
+
 /** Wraps a CommonJS bundle so V8 sees a single function expression. */
-const wrapSource = (source: string): string => `${WRAPPER_PREFIX}${source}${WRAPPER_SUFFIX}`;
+const wrapSource = (source: string): string => `${WRAPPER_PREFIX}${source.replace(SHEBANG, "")}${WRAPPER_SUFFIX}`;
 
 /**
  * The script run inside the target Node.js binary to emit a code cache.

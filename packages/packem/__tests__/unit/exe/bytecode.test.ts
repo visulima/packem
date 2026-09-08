@@ -23,6 +23,21 @@ describe("exe bytecode", () => {
             expect(wrapped.startsWith("(function (exports, require, module, __filename, __dirname) {")).toBe(true);
             expect(wrapped.endsWith("\n});")).toBe(true);
         });
+
+        it("should strip a leading shebang, which V8 only accepts at offset 0", () => {
+            expect.assertions(2);
+
+            const wrapped = wrapSource("#!/usr/bin/env node\nmodule.exports = 1;");
+
+            expect(wrapped).not.toContain("#!");
+            expect(wrapped).toContain("module.exports = 1;");
+        });
+
+        it("should leave a `#!` that is not at the start alone", () => {
+            expect.assertions(1);
+
+            expect(wrapSource('const x = "#!/usr/bin/env node";')).toContain('"#!/usr/bin/env node"');
+        });
     });
 
     describe(assertBytecodeSupported, () => {
@@ -246,6 +261,16 @@ describe("exe bytecode", () => {
             const compiled = await compileBytecode({ compression: undefined, entryPath, nodePath: processExecPath, temporaryDirectory: directory });
 
             expect(compiled.sourceLength).toBe(wrapSource(bundle).length);
+        });
+
+        it("should compile a bin bundle that starts with a shebang", async () => {
+            expect.assertions(1);
+
+            // A `bin` entry keeps its shebang, and V8 only tolerates one at offset 0 —
+            // inside the wrapper it would be a syntax error.
+            const exported = await runFromBytecode("#!/usr/bin/env node\nmodule.exports = { ok: 7 };");
+
+            expect(exported.ok).toBe(7);
         });
 
         it("should surface a compile failure instead of emitting a broken cache", async () => {
