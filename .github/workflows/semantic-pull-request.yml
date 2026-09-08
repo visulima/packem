@@ -9,6 +9,11 @@ on: # yamllint disable-line rule:truthy
             - "synchronize"
     merge_group: # yamllint disable-line rule:empty-values
 
+permissions:
+    contents: "read" # to read the repository
+    pull-requests: "write" # for the shared workflow to comment on and label pull requests
+    statuses: "write" # to mark the status of the analysed pull request
+
 jobs:
     stale-issues:
         uses: "anolilab/workflows/.github/workflows/semantic-pull-request.yml@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
