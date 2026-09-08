@@ -295,6 +295,7 @@
         "react-dom": "catalog:frontend",
         "rimraf": "catalog:node",
         "rolldown": "catalog:build",
+        "rollup": "catalog:build",
         "rollup-plugin-dts": "catalog:build",
         "rollup-plugin-lit-css": "catalog:build",
         "rollup-plugin-polyfill-node": "catalog:build",
