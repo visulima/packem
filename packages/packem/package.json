@@ -150,6 +150,10 @@
             "types": "./dist/rollup/plugins/oxc/oxc-transformer.d.ts",
             "default": "./dist/rollup/plugins/oxc/oxc-transformer.js"
         },
+        "./sea": {
+            "types": "./dist/sea/index.d.ts",
+            "default": "./dist/sea/index.js"
+        },
         "./builder/typedoc": {
             "types": "./dist/builder/typedoc/index.d.ts",
             "default": "./dist/builder/typedoc/index.js"

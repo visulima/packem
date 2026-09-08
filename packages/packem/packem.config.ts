@@ -28,6 +28,14 @@ export default defineConfig({
         "workerpool",
     ],
     rollup: {
+        // `semver` is CommonJS and is reachable from more than one of our entries
+        // (the CLI and the `sea` runtime helper live in separate chunks). Without
+        // strict requires, @rollup/plugin-commonjs emits a `?commonjs-proxy` module
+        // that imports `__moduleExports` from a file that never exports it, and the
+        // build fails. Wrapping CJS modules in functions keeps them chunk-local.
+        commonjs: {
+            strictRequires: true,
+        },
         // The parallel babel transform spawns a worker thread, which workerpool can
         // only load from a real on-disk file. packem-plugins is otherwise inlined, so
         // we copy its built babel worker (and the transform-code chunk it imports) into

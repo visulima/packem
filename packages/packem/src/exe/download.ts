@@ -9,8 +9,8 @@ import { x } from "tinyexec";
 
 import { getCachedBinaryPath } from "./cache";
 import { createDebug } from "./debug";
-import type { ExeTarget } from "./platform";
-import { getArchiveExtension, getBinaryPathInArchive, getDownloadUrl, resolveNodeVersion } from "./platform";
+import type { ResolvedExeTarget } from "./platform";
+import { getArchiveExtension, getBinaryPathInArchive, getDownloadUrl } from "./platform";
 
 const debug = createDebug();
 
@@ -50,7 +50,7 @@ const fetchExpectedChecksum = async (nodeVersion: string, archiveFileName: strin
     throw new Error(`No checksum entry for "${archiveFileName}" found in ${shasumsUrl}.`);
 };
 
-const extractBinary = async (archivePath: string, targetBinaryPath: string, target: ExeTarget): Promise<void> => {
+const extractBinary = async (archivePath: string, targetBinaryPath: string, target: ResolvedExeTarget): Promise<void> => {
     const binaryInArchive = getBinaryPathInArchive(target);
     const outDirectory = dirname(targetBinaryPath);
 
@@ -79,28 +79,24 @@ const extractBinary = async (archivePath: string, targetBinaryPath: string, targ
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export const resolveNodeBinary = async (target: ExeTarget, logger: Pail): Promise<string> => {
+export const resolveNodeBinary = async (target: ResolvedExeTarget, logger: Pail): Promise<string> => {
     debug("Resolving Node.js binary for target: %O", target);
 
-    const resolvedTarget: ExeTarget = {
-        ...target,
-        nodeVersion: await resolveNodeVersion(target.nodeVersion),
-    };
-    const cachedPath = getCachedBinaryPath(resolvedTarget);
+    const cachedPath = getCachedBinaryPath(target);
 
     debug("Cache path: %s", cachedPath);
 
     if (await isAccessible(cachedPath)) {
         debug("Cache hit: %s", cachedPath);
-        logger.info(`Using cached Node.js ${resolvedTarget.nodeVersion} for ${resolvedTarget.platform}-${resolvedTarget.arch}`);
+        logger.info(`Using cached Node.js ${target.nodeVersion} for ${target.platform}-${target.arch}`);
 
         return cachedPath;
     }
 
-    const url = getDownloadUrl(resolvedTarget);
+    const url = getDownloadUrl(target);
 
     debug("Cache miss, downloading from: %s", url);
-    logger.info(`Downloading Node.js ${resolvedTarget.nodeVersion} for ${resolvedTarget.platform}-${resolvedTarget.arch}...`);
+    logger.info(`Downloading Node.js ${target.nodeVersion} for ${target.platform}-${target.arch}...`);
     logger.info(`  ${url}`);
 
     await mkdir(dirname(cachedPath), { recursive: true });
@@ -111,13 +107,13 @@ export const resolveNodeBinary = async (target: ExeTarget, logger: Pail): Promis
         throw new Error(`Failed to download Node.js binary: HTTP ${String(response.status)} from ${url}`);
     }
 
-    const extension = getArchiveExtension(resolvedTarget.platform);
+    const extension = getArchiveExtension(target.platform);
     const buffer = Buffer.from(await response.arrayBuffer());
 
     // Verify integrity against the official SHASUMS256.txt before trusting the
     // bytes — these get embedded into user executables and cached.
     const archiveFileName = basename(url);
-    const expectedChecksum = await fetchExpectedChecksum(resolvedTarget.nodeVersion, archiveFileName);
+    const expectedChecksum = await fetchExpectedChecksum(target.nodeVersion, archiveFileName);
     const actualChecksum = createHash("sha256").update(buffer).digest("hex");
 
     if (actualChecksum !== expectedChecksum) {
@@ -136,9 +132,9 @@ export const resolveNodeBinary = async (target: ExeTarget, logger: Pail): Promis
     await writeFile(archivePath, buffer);
 
     try {
-        await extractBinary(archivePath, cachedPath, resolvedTarget);
+        await extractBinary(archivePath, cachedPath, target);
 
-        if (resolvedTarget.platform !== "win") {
+        if (target.platform !== "win") {
             await chmod(cachedPath, 0o755);
         }
 

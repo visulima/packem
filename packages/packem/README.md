@@ -310,6 +310,59 @@ This will match the `bin` field in package.json as:
 }
 ```
 
+#### Standalone Executables
+
+`packem` can ship your bundle as a single file that runs on machines without Node.js installed — the
+same job [`pkg`](https://github.com/yao-pkg/pkg) does, built on Node.js'
+[Single Executable Applications](https://nodejs.org/api/single-executable-applications.html) support.
+
+> [!IMPORTANT]
+> Requires **Node.js >= 25.7.0 on the build machine**. Not supported under Bun or Deno. Experimental.
+
+```ts
+// packem.config.ts
+export default defineConfig({
+    exe: true,
+    runtime: "node",
+});
+```
+
+```bash
+packem build       # -> build/cli
+packem build --exe # or without touching the config
+```
+
+Cross-compile with `pkg`-style target strings; anything you leave out falls back to the build host.
+Non-host targets download, checksum-verify and cache the matching official Node.js binary.
+
+```ts
+export default defineConfig({
+    exe: {
+        assets: ["templates/**/*.hbs", "locales/*.json"],
+        checksum: true,
+        targets: ["host", "linux-x64", "linux-arm64", "darwin-arm64", "win-x64"],
+        windows: { icon: "./assets/app.ico", versionInfo: true },
+    },
+});
+```
+
+Embedded assets are read back with a helper that also works during ordinary `node dist/cli.js`
+development, so no `isSea()` branching is needed:
+
+```ts
+import { getAssetText } from "@visulima/packem/sea";
+
+const template = await getAssetText("templates/mail.hbs");
+```
+
+Also supported: output name templating (`[name]`, `[platform]`, `[arch]`, `[node]`, `[version]`),
+macOS code signing (ad-hoc by default, since injection invalidates Node's own signature), baked-in
+Node.js flags via `execArgv`, V8 `codeCache` and `snapshot`, and per-entry selection.
+
+See [docs/executables.md](./docs/executables.md) for the full reference, the CLI flags, and an
+honest comparison with `pkg` — notably that SEA offers no bytecode-only mode and no payload
+compression.
+
 #### Server Components
 
 `packem` supports to build server components and server actions with library directives like `"use client"` or `"use server"`. It will generate the corresponding chunks for client and server that scope the client and server boundaries properly.

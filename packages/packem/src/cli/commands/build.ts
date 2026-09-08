@@ -11,6 +11,7 @@ import autoPreset from "../../config/preset/auto";
 import loadEnvFile from "../../config/utils/load-env-file";
 import loadPackemConfig from "../../config/utils/load-packem-config";
 import loadPreset from "../../config/utils/load-preset";
+import type { ExeOptions } from "../../exe";
 import packem from "../../packem";
 import type { BuildConfig, Environment, KillSignal, Mode, Runtime } from "../../types";
 import { createDefuWithHooksMerger } from "../../utils/create-defu-with-hooks-merger";
@@ -35,6 +36,14 @@ interface BuildCommandOptions {
     envFile?: string;
     envPrefix?: string;
     exe?: boolean;
+    exeAsset?: string[];
+    exeChecksum?: string;
+    exeCodeCache?: boolean;
+    exeIcon?: string;
+    exeName?: string;
+    exeNodeVersion?: string;
+    exeOutDir?: string;
+    exeTarget?: string[];
     external?: string[];
     jit?: boolean;
     killSignal?: KillSignal;
@@ -122,6 +131,37 @@ const collectExternals = (options: BuildCommandOptions): string[] => {
     }
 
     return externals;
+};
+
+/**
+ * Builds the `exe` option object from the `--exe-*` flags.
+ *
+ * Returns `true` rather than an object when only `--exe` was passed, so a project that
+ * configures `exe` in `packem.config.ts` keeps its configuration instead of having it
+ * replaced by an empty object.
+ * @param options The parsed CLI options.
+ * @returns `undefined` when `--exe` was not passed, `true` for a bare `--exe`, otherwise the overrides.
+ */
+const collectExeOptions = (options: BuildCommandOptions): ExeOptions | boolean | undefined => {
+    if (!options.exe) {
+        return undefined;
+    }
+
+    const assets = options.exeAsset?.flatMap((value) => value.split(","));
+    const targets = options.exeTarget?.flatMap((value) => value.split(","));
+
+    const exe: ExeOptions = {
+        ...(assets?.length && { assets }),
+        ...(options.exeChecksum && { checksum: options.exeChecksum === "true" ? true : (options.exeChecksum as "sha256" | "sha512") }),
+        ...(options.exeCodeCache && { codeCache: true }),
+        ...(options.exeIcon && { windows: { icon: options.exeIcon } }),
+        ...(options.exeName && { fileName: options.exeName }),
+        ...(options.exeNodeVersion && { nodeVersion: options.exeNodeVersion }),
+        ...(options.exeOutDir && { outDir: options.exeOutDir }),
+        ...(targets?.length && { targets }),
+    };
+
+    return Object.keys(exe).length === 0 ? true : exe;
 };
 
 /**
@@ -252,7 +292,7 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                     unbundle: options.unbundle,
                     // validation will take the default values
                     validation: options.validation === false ? false : {},
-                    ...(options.exe && { exe: true }),
+                    ...(options.exe && { exe: collectExeOptions(options) }),
                     ...(options.typedoc && {
                         typedoc: {
                             format: "html",
@@ -479,9 +519,51 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                 type: Boolean,
             },
             {
-                description: "Bundle the output into a standalone executable via Node.js SEA (requires Node.js >= 25.7.0, single entry)",
+                description: "Bundle the output into standalone executables via Node.js SEA (requires Node.js >= 25.7.0)",
                 name: "exe",
                 type: Boolean,
+            },
+            {
+                description: "Executable target, separate by comma (eg. --exe-target host,linux-x64,node25-win-x64)",
+                multiple: true,
+                name: "exe-target",
+                typeLabel: "string[]",
+            },
+            {
+                description: "Output directory for the executables (default: build)",
+                name: "exe-out-dir",
+                typeLabel: "string",
+            },
+            {
+                description: "Executable file name template, supports [name], [platform], [arch], [node] and [version]",
+                name: "exe-name",
+                typeLabel: "string",
+            },
+            {
+                description: "Glob of files to embed into the executable, separate by comma (eg. --exe-asset 'templates/**/*.hbs')",
+                multiple: true,
+                name: "exe-asset",
+                typeLabel: "string[]",
+            },
+            {
+                description: "Node.js version used for targets that do not name one (eg. --exe-node-version latest-lts)",
+                name: "exe-node-version",
+                typeLabel: "string",
+            },
+            {
+                description: "Write a digest file next to every executable (sha256 or sha512)",
+                name: "exe-checksum",
+                typeLabel: "string",
+            },
+            {
+                description: "Embed a V8 code cache to speed up executable startup",
+                name: "exe-code-cache",
+                type: Boolean,
+            },
+            {
+                description: "Path to a .ico file used as the Windows executable icon (needs the optional resedit package)",
+                name: "exe-icon",
+                typeLabel: "string",
             },
         ],
     });
