@@ -5,6 +5,12 @@ on: # yamllint disable-line rule:truthy
         - cron: "0 * * * *"
     workflow_dispatch: # yamllint disable-line rule:empty-values
 
+permissions:
+    contents: "read" # to read the repository
+    discussions: "write" # for dessant/lock-threads to lock inactive discussions
+    issues: "write" # for the shared workflow to comment on and label issues
+    pull-requests: "write" # for the shared workflow to comment on and label pull requests
+
 jobs:
     lock-closed:
         uses: "anolilab/workflows/.github/workflows/lock-closed.yml@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
