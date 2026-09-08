@@ -83,6 +83,8 @@ jobs:
               with:
                   node-version: "22.x"
                   cache-prefix: "codspeed-discover"
+                  run-npm-audit: "false"
+                  run-signatures-audit: "false"
 
             # On a pull request only the benches whose project (or an upstream dependency)
             # changed; on push every bench, so each branch head keeps a complete baseline
@@ -150,6 +152,8 @@ jobs:
                   node-version: "22.x"
                   cache-prefix: "codspeed"
                   install-node-gyp: "true"
+                  run-npm-audit: "false"
+                  run-signatures-audit: "false"
 
             # Benches import their package's siblings through the built `dist/`, which is
             # gitignored, so they cannot resolve until the workspace is built.
