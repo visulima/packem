@@ -15,7 +15,7 @@ export const filenameToDts = (id: string): string =>
 export const filenameDtsTo = (id: string, extension: "js" | "ts"): string => id.replace(RE_DTS, `.$1${extension}`);
 
 export const resolveTemplateFunction = (function_: ((chunk: PreRenderedChunk) => string) | string, chunk: PreRenderedChunk): string =>
-    typeof function_ === "function" ? function_(chunk) : function_;
+    (typeof function_ === "function" ? function_(chunk) : function_);
 
 export const replaceTemplateName = (template: string, name: string): string => template.replaceAll("[name]", name);
 

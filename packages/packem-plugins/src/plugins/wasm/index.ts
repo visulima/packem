@@ -37,7 +37,7 @@ const VIRTUAL_SOURCE_PREFIX = "\0packem-wasm-source/";
 const encodeSourceId = (filePath: string): string => `${VIRTUAL_SOURCE_PREFIX}${Buffer.from(filePath, "utf8").toString("base64url")}`;
 
 const decodeSourceId = (id: string): string | undefined =>
-    id.startsWith(VIRTUAL_SOURCE_PREFIX) ? Buffer.from(id.slice(VIRTUAL_SOURCE_PREFIX.length), "base64url").toString("utf8") : undefined;
+    (id.startsWith(VIRTUAL_SOURCE_PREFIX) ? Buffer.from(id.slice(VIRTUAL_SOURCE_PREFIX.length), "base64url").toString("utf8") : undefined);
 
 type WasmDeliveryMode = "asset" | "auto" | "inline" | "preserve";
 
