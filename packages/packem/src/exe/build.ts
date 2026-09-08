@@ -74,7 +74,7 @@ const validateSea = (input: ExeBuildInput): void => {
     }
 
     if (!isAtLeast(processVersions.node, MIN_SEA_NODE_VERSION)) {
-        throw new Error(`Node.js v${processVersions.node} does not support the \`exe\` option. Please upgrade to Node.js ${MIN_SEA_NODE_VERSION} or later.`);
+        throw new Error(`Node.js v${processVersions.node} does not support \`exe\` option. Please upgrade to Node.js ${MIN_SEA_NODE_VERSION} or later.`);
     }
 
     if (options.declaration) {
