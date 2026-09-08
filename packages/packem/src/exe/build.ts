@@ -18,6 +18,8 @@ import { BYTECODE_ASSET_KEY, compressBuffer, MANIFEST_ASSET_KEY, resolveCompress
 import { createDebug } from "./debug";
 import { resolveNodeBinary } from "./download";
 import { buildFileName } from "./file-name";
+import type { NativeModule } from "./native-modules";
+import { assertNativeModulesSupported, computeNativeBuildId, createNativePreludeSource, findNativeModules } from "./native-modules";
 import type { ExeChunk, ExeOptions, SeaConfig } from "./options";
 import type { ResolvedExeTarget } from "./platform";
 import { MIN_SEA_NODE_VERSION, resolveNodeVersion } from "./platform";
@@ -84,6 +86,17 @@ const validateSea = (input: ExeBuildInput): void => {
     logger.info("`exe` option is experimental and may change in future releases.");
 };
 
+/**
+ * Reads the subdirectory the `native-modules` plugin copies `.node` files into.
+ * @param options The resolved build options.
+ * @returns The configured directory name, defaulting to `natives`.
+ */
+const getNativesDirectory = (options: InternalBuildOptions): string => {
+    const nativeModules = (options as { rollup?: { nativeModules?: false | { nativesDirectory?: string } } }).rollup?.nativeModules;
+
+    return (nativeModules === false ? undefined : nativeModules?.nativesDirectory) ?? "natives";
+};
+
 const pickMainFormat = (fileName: string, packageType: string | undefined): "commonjs" | "module" => {
     if (fileName.endsWith(".cjs")) {
         return "commonjs";
@@ -145,6 +158,8 @@ interface BuildOneOptions {
     input: ExeBuildInput;
     /** Whether this build produces more than one executable, which affects default naming. */
     multiple: boolean;
+    /** Native addons found in the build output, to embed and materialize at runtime. */
+    natives: NativeModule[];
     target: ResolvedExeTarget;
 }
 
@@ -215,6 +230,107 @@ const resolveOutputPath = async (options: BuildOneOptions): Promise<{ outputFile
     const outputFileName = buildFileName({ multiple, template, tokens });
 
     return { outputFileName, outputPath: join(exeOutDirectory, outputFileName) };
+};
+
+/**
+ * Finds the native addons to embed, and reports what will happen to them.
+ * @param exe The resolved `exe` options.
+ * @param options The build options, which say where the output and its natives directory are.
+ * @param logger The build logger.
+ * @returns The addons to embed, empty when embedding is disabled or none were produced.
+ */
+const collectNativeModules = async (exe: ExeOptions, options: InternalBuildOptions, logger: Logger): Promise<NativeModule[]> => {
+    if (exe.nativeModules === false) {
+        logger.warn("`exe.nativeModules` is disabled: any `.node` addon has to be shipped next to the executable, which is no longer a single file.");
+
+        return [];
+    }
+
+    const natives = await findNativeModules(join(options.rootDir, options.outDir), getNativesDirectory(options));
+
+    if (natives.length > 0) {
+        logger.info(`Embedding ${String(natives.length)} native addon${natives.length === 1 ? "" : "s"}: ${natives.map((native) => native.name).join(", ")}`);
+    }
+
+    return natives;
+};
+
+interface NativePreludeApplication {
+    bundledFile: string;
+    compression: CompressionAlgorithm | undefined;
+    mainFormat: "commonjs" | "module";
+    natives: NativeModule[];
+    temporaryDirectory: string;
+}
+
+/**
+ * Writes a copy of the bundle prefixed with the native-addon prelude.
+ *
+ * Returns the original path untouched when there are no addons, so a build without them
+ * embeds exactly the bundle the bundler produced.
+ * @param options The bundle, the addons, and a scratch directory.
+ * @returns Path of the entry to embed, prefixed when addons are present.
+ */
+const applyNativePrelude = async (options: NativePreludeApplication): Promise<string> => {
+    const { bundledFile, compression, mainFormat, natives, temporaryDirectory } = options;
+
+    if (natives.length === 0) {
+        return bundledFile;
+    }
+
+    const prelude = createNativePreludeSource({
+        buildId: await computeNativeBuildId(natives),
+        compression,
+        mainFormat,
+        modules: natives,
+    });
+    const entryPath = join(temporaryDirectory, `entry${extname(bundledFile)}`);
+
+    await writeFile(entryPath, `${prelude}\n${await readFile(bundledFile, "utf8")}`);
+
+    debug("Prefixed the entry with a prelude for %d native addon(s)", natives.length);
+
+    return entryPath;
+};
+
+/**
+ * Maps each native addon to the file that gets embedded for it.
+ *
+ * Addons are compressed like any other payload when compression is on; the prelude
+ * decompresses each one as it writes it out.
+ * @param natives The addons found in the build output.
+ * @param compression The algorithm to apply, or `undefined` to embed them verbatim.
+ * @param temporaryDirectory Scratch directory for the compressed copies.
+ * @returns Asset key to source-path entries, ready to merge into the SEA asset map.
+ */
+const buildNativeAssetMap = async (
+    natives: ReadonlyArray<NativeModule>,
+    compression: CompressionAlgorithm | undefined,
+    temporaryDirectory: string,
+): Promise<Record<string, string>> => {
+    if (natives.length === 0) {
+        return {};
+    }
+
+    if (compression === undefined) {
+        return Object.fromEntries(natives.map((native) => [native.assetKey, native.filePath]));
+    }
+
+    const nativesDirectory = join(temporaryDirectory, "natives");
+
+    await mkdir(nativesDirectory, { recursive: true });
+
+    const entries = await Promise.all(
+        natives.map(async (native) => {
+            const compressedPath = join(nativesDirectory, `${native.name}.bin`);
+
+            await writeFile(compressedPath, await compressBuffer(await readFile(native.filePath), compression));
+
+            return [native.assetKey, compressedPath] as const;
+        }),
+    );
+
+    return Object.fromEntries(entries);
 };
 
 interface BytecodePayloadOptions {
@@ -319,7 +435,7 @@ interface BuiltExecutable {
  * @returns Details of the produced executable, for the build summary.
  */
 const buildSingleExe = async (options: BuildOneOptions): Promise<BuiltExecutable> => {
-    const { assets, bundledFile, chunk, compression, exe, input, target } = options;
+    const { assets, bundledFile, chunk, compression, exe, input, natives, target } = options;
     const { logger, options: buildOptions, packageJson } = input;
 
     const { outputFileName, outputPath } = await resolveOutputPath(options);
@@ -335,6 +451,12 @@ const buildSingleExe = async (options: BuildOneOptions): Promise<BuiltExecutable
         let executable = isHostTarget(target) ? undefined : await resolveNodeBinary(target, logger);
 
         const mainFormat = pickMainFormat(chunk.path, packageJson.type);
+        // A native addon has to exist as a real file for the dynamic linker, so the entry
+        // is prefixed with code that writes the embedded copies out on first use. This has
+        // to happen before bytecode compilation, so the prelude is compiled along with it.
+        const entryPath = await applyNativePrelude({ bundledFile, compression, mainFormat, natives, temporaryDirectory });
+        assertNativeModulesSupported(natives, isHostTarget(target));
+
         const bytecode = exe.bytecode
             ? await buildBytecodePayload({
                   bundledFile,
@@ -351,9 +473,10 @@ const buildSingleExe = async (options: BuildOneOptions): Promise<BuiltExecutable
         const embeddedAssets: Record<string, string> = {
             ...(compression === undefined ? assets : await compressEmbeddedAssets(assets, compression, temporaryDirectory)),
             ...(bytecode && { [BYTECODE_ASSET_KEY]: bytecode.payloadPath }),
+            ...(await buildNativeAssetMap(natives, compression, temporaryDirectory)),
         };
         // The bundle itself is the main script, unless bytecode replaced it with a loader.
-        const mainPath = bytecode?.loaderPath ?? bundledFile;
+        const mainPath = bytecode?.loaderPath ?? entryPath;
 
         if (target.platform === "win" && (exe.windows?.icon || exe.windows?.versionInfo)) {
             executable = await patchWindowsBinary({
@@ -476,6 +599,8 @@ const buildExe = async (context: unknown): Promise<void> => {
         );
     }
 
+    const natives = await collectNativeModules(exe, options, logger);
+
     const { map: assets, totalBytes: assetBytes } = await resolveAssets(exe.assets, options.rootDir);
     const assetCount = Object.keys(assets).length;
 
@@ -492,7 +617,7 @@ const buildExe = async (context: unknown): Promise<void> => {
 
         for (const target of targets) {
             // eslint-disable-next-line no-await-in-loop -- each build spawns `node --build-sea` and may download a runtime; running them concurrently only contends for disk and network.
-            built.push(await buildSingleExe({ assets, bundledFile, chunk, compression, exe, input, multiple, target }));
+            built.push(await buildSingleExe({ assets, bundledFile, chunk, compression, exe, input, multiple, natives, target }));
         }
     }
 

@@ -186,6 +186,24 @@ export interface ExeOptions extends ExeExtensionOptions {
     macos?: ExeMacosOptions;
 
     /**
+     * Embed the `.node` addons the build produced and write them out at runtime.
+     *
+     * A native addon is a compiled shared library that the dynamic linker has to load from
+     * a real path, so an embedded copy cannot be loaded in place. packem prefixes the entry
+     * with code that materializes each addon on first use into a content-hashed directory
+     * under the system temporary directory, overridable at runtime with
+     * `PACKEM_SEA_NATIVES_DIR`.
+     *
+     * Because an addon is built for one platform and architecture, this only works for a
+     * target the build machine matches; other targets are rejected.
+     *
+     * Set to `false` to leave the addons in the output directory instead, which means
+     * shipping them next to the executable rather than a single file.
+     * @default true
+     */
+    nativeModules?: boolean;
+
+    /**
      * Node.js version used for targets that do not name one themselves.
      * Accepts an exact version (`"25.7.0"`), a major or minor (`"25"`, `"25.7"`), or
      * `"latest"` / `"latest-lts"`.

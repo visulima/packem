@@ -44,6 +44,7 @@ interface BuildCommandOptions {
     exeIcon?: string;
     exeName?: string;
     exeNodeVersion?: string;
+    exeNoNativeModules?: boolean;
     exeOutDir?: string;
     exeTarget?: string[];
     external?: string[];
@@ -160,6 +161,7 @@ const collectExeOptions = (options: BuildCommandOptions): ExeOptions | boolean |
         ...(options.exeCompress && { compress: options.exeCompress === "true" ? true : (options.exeCompress as "brotli" | "gzip" | "zstd") }),
         ...(options.exeIcon && { windows: { icon: options.exeIcon } }),
         ...(options.exeName && { fileName: options.exeName }),
+        ...(options.exeNoNativeModules && { nativeModules: false }),
         ...(options.exeNodeVersion && { nodeVersion: options.exeNodeVersion }),
         ...(options.exeOutDir && { outDir: options.exeOutDir }),
         ...(targets?.length && { targets }),
@@ -573,6 +575,11 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                 description: "Compress the embedded payload (brotli, gzip or zstd)",
                 name: "exe-compress",
                 typeLabel: "string",
+            },
+            {
+                description: "Do not embed .node addons; ship them next to the executable instead",
+                name: "exe-no-native-modules",
+                type: Boolean,
             },
             {
                 description: "Path to a .ico file used as the Windows executable icon (needs the optional resedit package)",

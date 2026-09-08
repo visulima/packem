@@ -360,6 +360,11 @@ source ships in the binary, and `compress: "brotli"` (or `"gzip"` / `"zstd"`) sh
 payload. Bytecode needs a CommonJS entry and a target this machine can run, and keeps function
 names and string literals visible — it raises the cost of reading your code rather than encrypting it.
 
+Native `.node` addons — a JavaScript and Rust project built with napi-rs, for example — are
+embedded and written back out on first use, since the dynamic linker can only load a shared
+library from a real path. This happens automatically; `PACKEM_SEA_NATIVES_DIR` overrides where
+they land.
+
 Also supported: output name templating (`[name]`, `[platform]`, `[arch]`, `[node]`, `[version]`),
 macOS code signing (ad-hoc by default, since injection invalidates Node's own signature), baked-in
 Node.js flags via `execArgv`, V8 `codeCache` and `snapshot`, and per-entry selection.

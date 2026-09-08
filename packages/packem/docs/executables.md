@@ -173,6 +173,49 @@ re-sign it on a macOS machine before distributing.
 Windows Authenticode signing is not built in; sign the produced `.exe` with `signtool` or
 `AzureSignTool` in CI.
 
+## Native addons (`.node`)
+
+A project that mixes JavaScript and Rust or C++ — anything built with napi-rs or node-gyp —
+produces a compiled `.node` addon. packem's `native-modules` plugin copies those into
+`dist/natives/` and rewrites the import to `require("./natives/addon.node")`.
+
+That path does not exist inside an executable, and the `require` a single executable injects
+can only load built-in modules, so the addon has to be embedded and written back out at
+runtime. packem does this automatically — there is nothing to configure.
+
+```ts
+exe: {
+    targets: ["host"];
+} // .node addons in the output are embedded automatically
+```
+
+On first use, each addon is written to a directory named after a hash of its contents under
+the system temporary directory, and the bundle's `require` is redirected there. Subsequent
+runs reuse the extracted copy, and a rebuilt addon lands in a new directory rather than
+racing the old one. Two processes starting at once cannot observe a half-written file.
+
+Override the location with `PACKEM_SEA_NATIVES_DIR` when the temporary directory is
+unsuitable — mounted `noexec`, for example, which makes the dynamic linker refuse the file:
+
+```sh
+PACKEM_SEA_NATIVES_DIR=/opt/myapp/natives ./build/myapp
+```
+
+An addon is compiled for one platform and architecture, so it can only be embedded into an
+executable for a target the build machine matches. Cross-platform targets are rejected with
+an error naming the addons — build each target on a matching machine, such as a CI matrix
+job. Compression applies to addons too, which usually shrinks them severalfold.
+
+Set `nativeModules: false` to opt out and keep the addons in the output directory, in which
+case they have to be distributed next to the executable and the result is no longer a single
+file.
+
+> [!NOTE]
+> The addon is written to disk on first use, so an executable using native addons is not
+> completely self-contained at runtime — it needs one writable directory. `pkg` has the same
+> constraint, for the same reason: shared libraries are loaded by the operating system, which
+> only reads them from a real path.
+
 ## Shipping bytecode instead of source
 
 By default the executable carries your bundled JavaScript as readable text. `bytecode`
@@ -320,5 +363,5 @@ directory around for inspection.
 | Payload compression     | `compress: "brotli" \| "gzip" \| "zstd"`               | `--compress GZip\|Brotli\|Zstd`            |
 | Native addons (`.node`) | Must stay external, next to the executable             | Extracted at runtime                       |
 
-The remaining gaps are the Node.js version floor, cross-platform bytecode, and native
-addon handling. Everything else has an equivalent.
+The remaining gaps are the Node.js version floor, and that bytecode and native addons both
+need a build machine matching the target. Everything else has an equivalent.

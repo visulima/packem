@@ -10,6 +10,8 @@ export { BYTECODE_ASSET_KEY, compressBuffer, MANIFEST_ASSET_KEY, resolveCompress
 export { resolveNodeBinary } from "./download";
 export type { BuildFileNameOptions, FileNameTokens } from "./file-name";
 export { applyTokens, buildFileName, getTargetSuffix, hasTokens } from "./file-name";
+export type { NativeModule, NativePreludeOptions } from "./native-modules";
+export { assertNativeModulesSupported, computeNativeBuildId, createNativePreludeSource, findNativeModules, NATIVE_ASSET_PREFIX } from "./native-modules";
 export type { ExeAssets, ExeChunk, ExeMacosOptions, ExeOptions, ExeSignOptions, ExeVersionInfo, ExeWindowsOptions, SeaConfig } from "./options";
 export type { ExeArch, ExeExtensionOptions, ExePlatform, ExeTarget, ResolvedExeTarget } from "./platform";
 export { MIN_SEA_NODE_VERSION, resolveNodeVersion } from "./platform";
