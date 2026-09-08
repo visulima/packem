@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { execPath as processExecPath, versions as processVersions } from "node:process";
 
@@ -11,7 +11,10 @@ import { x } from "tinyexec";
 
 import type { InternalBuildOptions } from "../types";
 import { resolveAssets } from "./assets";
+import { assertBytecodeSupported, compileBytecode, createLoaderSource, getCompilerBinary } from "./bytecode";
 import { resolveChecksumAlgorithm, writeChecksum } from "./checksum";
+import type { CompressionAlgorithm, SeaManifest } from "./compress";
+import { BYTECODE_ASSET_KEY, compressBuffer, MANIFEST_ASSET_KEY, resolveCompression } from "./compress";
 import { createDebug } from "./debug";
 import { resolveNodeBinary } from "./download";
 import { buildFileName } from "./file-name";
@@ -136,12 +139,167 @@ interface BuildOneOptions {
     /** Absolute path of the bundled JS entry that becomes the executable's main module. */
     bundledFile: string;
     chunk: ExeChunk;
+    /** Algorithm applied to the embedded payload, or `undefined` to embed it verbatim. */
+    compression: CompressionAlgorithm | undefined;
     exe: ExeOptions;
     input: ExeBuildInput;
     /** Whether this build produces more than one executable, which affects default naming. */
     multiple: boolean;
     target: ResolvedExeTarget;
 }
+
+/**
+ * Rewrites an embedded asset map so every entry points at a compressed copy, and adds the
+ * manifest the runtime reads to know how to decode them.
+ *
+ * The compressed copies live in the build's scratch directory: the project's own files are
+ * never touched, and the executable is the only thing that carries compressed bytes.
+ * @param sourceAssets The original key to source-path map.
+ * @param compression The algorithm to apply.
+ * @param temporaryDirectory Scratch directory for the compressed copies.
+ * @returns Entries pointing at the compressed copies, plus the manifest entry.
+ */
+const compressEmbeddedAssets = async (
+    sourceAssets: Record<string, string>,
+    compression: CompressionAlgorithm,
+    temporaryDirectory: string,
+): Promise<Record<string, string>> => {
+    const assetsDirectory = join(temporaryDirectory, "assets");
+
+    await mkdir(assetsDirectory, { recursive: true });
+
+    const entries = Object.entries(sourceAssets);
+
+    const compressed = await Promise.all(
+        entries.map(async ([key, sourcePath], index) => {
+            const bytes = await compressBuffer(await readFile(sourcePath), compression);
+            // Index-based names keep the scratch layout flat and collision-free, whatever
+            // the asset keys look like.
+            const compressedPath = join(assetsDirectory, `asset-${String(index)}.bin`);
+
+            await writeFile(compressedPath, bytes);
+
+            return [key, compressedPath] as const;
+        }),
+    );
+
+    const manifest: SeaManifest = { compression };
+    const manifestPath = join(temporaryDirectory, "manifest.json");
+
+    await writeFile(manifestPath, JSON.stringify(manifest));
+
+    debug("Compressed %d assets with %s", entries.length, compression);
+
+    return { ...Object.fromEntries(compressed), [MANIFEST_ASSET_KEY]: manifestPath };
+};
+
+/**
+ * Resolves where one executable is written, creating the output directory.
+ * @param options The chunk, target and naming configuration for this executable.
+ * @returns The final file name and its absolute path.
+ */
+const resolveOutputPath = async (options: BuildOneOptions): Promise<{ outputFileName: string; outputPath: string }> => {
+    const { bundledFile, chunk, exe, input, multiple, target } = options;
+    const exeOutDirectory = resolve(input.options.rootDir, exe.outDir ?? "build");
+
+    await mkdir(exeOutDirectory, { recursive: true });
+
+    const tokens = {
+        arch: target.arch,
+        name: basename(bundledFile, extname(bundledFile)),
+        node: target.nodeVersion,
+        platform: target.platform,
+        version: input.packageJson.version ?? "",
+    };
+    const template = typeof exe.fileName === "function" ? exe.fileName({ ...tokens, path: chunk.path }) : exe.fileName;
+    const outputFileName = buildFileName({ multiple, template, tokens });
+
+    return { outputFileName, outputPath: join(exeOutDirectory, outputFileName) };
+};
+
+interface BytecodePayloadOptions {
+    bundledFile: string;
+    chunk: ExeChunk;
+    compression: CompressionAlgorithm | undefined;
+    logger: Logger;
+    mainFormat: "commonjs" | "module";
+    /** Node.js binary that must produce the cache — the target's own build. */
+    nodePath: string;
+    target: ResolvedExeTarget;
+    temporaryDirectory: string;
+}
+
+interface BytecodePayload {
+    /** Loader that becomes the executable's main script in place of the bundle. */
+    loaderPath: string;
+    /** The embedded code cache, compressed when compression is enabled. */
+    payloadPath: string;
+}
+
+/**
+ * Compiles the entry to a V8 code cache and writes the loader that runs it.
+ *
+ * The bundle's source is left behind entirely: only the cache is embedded, and the loader
+ * reconstructs the script from it at startup.
+ * @param options The entry, target, and scratch directory for this executable.
+ * @returns Paths of the loader and of the embedded cache.
+ * @throws If the target or entry format cannot support bytecode, or compilation fails.
+ */
+const buildBytecodePayload = async (options: BytecodePayloadOptions): Promise<BytecodePayload> => {
+    const { bundledFile, chunk, compression, logger, mainFormat, nodePath, target, temporaryDirectory } = options;
+
+    assertBytecodeSupported(target, mainFormat);
+
+    const compiled = await compileBytecode({ compression, entryPath: bundledFile, nodePath, temporaryDirectory });
+    const payload = compression === undefined ? compiled.cachedData : await compressBuffer(compiled.cachedData, compression);
+
+    const payloadPath = join(temporaryDirectory, "bytecode.bin");
+    const loaderPath = join(temporaryDirectory, "bytecode-loader.cjs");
+
+    await Promise.all([writeFile(payloadPath, payload), writeFile(loaderPath, createLoaderSource(compiled.sourceLength, basename(chunk.path), compression))]);
+
+    logger.info(
+        `Compiled ${bold(chunk.path)} to bytecode ${dim(`(${formatBytes(compiled.sourceBytes, { decimals: 2 })} source -> ${formatBytes(payload.length, { decimals: 2 })} cache)`)}`,
+    );
+
+    return { loaderPath, payloadPath };
+};
+
+interface SeaConfigOptions {
+    embeddedAssets: Record<string, string>;
+    exe: ExeOptions;
+    /** Base binary to inject into, or `undefined` to use the running Node.js. */
+    executable: string | undefined;
+    mainFormat: "commonjs" | "module";
+    mainPath: string;
+    outputPath: string;
+}
+
+/**
+ * Assembles the configuration handed to `node --build-sea`.
+ *
+ * `seaConfig` is spread first so the dedicated options take precedence over the raw
+ * passthrough, and `main`/`output` are fixed by packem rather than the user.
+ * @param options The resolved inputs for this executable.
+ * @returns The SEA configuration to serialize.
+ */
+const createSeaConfig = (options: SeaConfigOptions): SeaConfig => {
+    const { embeddedAssets, exe, executable, mainFormat, mainPath, outputPath } = options;
+
+    return {
+        disableExperimentalSEAWarning: true,
+        ...exe.seaConfig,
+        ...(Object.keys(embeddedAssets).length > 0 && { assets: embeddedAssets }),
+        ...(exe.execArgv && { execArgv: exe.execArgv }),
+        ...(exe.codeCache !== undefined && { useCodeCache: exe.codeCache }),
+        ...(exe.snapshot !== undefined && { useSnapshot: exe.snapshot }),
+        main: mainPath,
+        // The bytecode loader is always CommonJS, whatever the bundle it replaces was.
+        mainFormat: exe.bytecode ? "commonjs" : mainFormat,
+        output: outputPath,
+        ...(executable && { executable }),
+    };
+};
 
 interface BuiltExecutable {
     checksum?: string;
@@ -161,24 +319,10 @@ interface BuiltExecutable {
  * @returns Details of the produced executable, for the build summary.
  */
 const buildSingleExe = async (options: BuildOneOptions): Promise<BuiltExecutable> => {
-    const { assets, bundledFile, chunk, exe, input, multiple, target } = options;
+    const { assets, bundledFile, chunk, compression, exe, input, target } = options;
     const { logger, options: buildOptions, packageJson } = input;
 
-    const exeOutDirectory = resolve(buildOptions.rootDir, exe.outDir ?? "build");
-
-    await mkdir(exeOutDirectory, { recursive: true });
-
-    const entryName = basename(bundledFile, extname(bundledFile));
-    const tokens = {
-        arch: target.arch,
-        name: entryName,
-        node: target.nodeVersion,
-        platform: target.platform,
-        version: packageJson.version ?? "",
-    };
-    const template = typeof exe.fileName === "function" ? exe.fileName({ ...tokens, path: chunk.path }) : exe.fileName;
-    const outputFileName = buildFileName({ multiple, template, tokens });
-    const outputPath = join(exeOutDirectory, outputFileName);
+    const { outputFileName, outputPath } = await resolveOutputPath(options);
 
     debug("Building SEA executable: %s -> %s (%O)", bundledFile, outputPath, target);
 
@@ -189,6 +333,27 @@ const buildSingleExe = async (options: BuildOneOptions): Promise<BuiltExecutable
         // A non-host target needs the matching official Node.js binary; the host can
         // reuse the running one and skip the download entirely.
         let executable = isHostTarget(target) ? undefined : await resolveNodeBinary(target, logger);
+
+        const mainFormat = pickMainFormat(chunk.path, packageJson.type);
+        const bytecode = exe.bytecode
+            ? await buildBytecodePayload({
+                  bundledFile,
+                  chunk,
+                  compression,
+                  logger,
+                  mainFormat,
+                  nodePath: getCompilerBinary(target, executable),
+                  target,
+                  temporaryDirectory,
+              })
+            : undefined;
+
+        const embeddedAssets: Record<string, string> = {
+            ...(compression === undefined ? assets : await compressEmbeddedAssets(assets, compression, temporaryDirectory)),
+            ...(bytecode && { [BYTECODE_ASSET_KEY]: bytecode.payloadPath }),
+        };
+        // The bundle itself is the main script, unless bytecode replaced it with a loader.
+        const mainPath = bytecode?.loaderPath ?? bundledFile;
 
         if (target.platform === "win" && (exe.windows?.icon || exe.windows?.versionInfo)) {
             executable = await patchWindowsBinary({
@@ -201,18 +366,7 @@ const buildSingleExe = async (options: BuildOneOptions): Promise<BuiltExecutable
             });
         }
 
-        const seaConfig: SeaConfig = {
-            disableExperimentalSEAWarning: true,
-            ...exe.seaConfig,
-            ...(Object.keys(assets).length > 0 && { assets }),
-            ...(exe.execArgv && { execArgv: exe.execArgv }),
-            ...(exe.codeCache !== undefined && { useCodeCache: exe.codeCache }),
-            ...(exe.snapshot !== undefined && { useSnapshot: exe.snapshot }),
-            main: bundledFile,
-            mainFormat: pickMainFormat(chunk.path, packageJson.type),
-            output: outputPath,
-            ...(executable && { executable }),
-        };
+        const seaConfig = createSeaConfig({ embeddedAssets, exe, executable, mainFormat, mainPath, outputPath });
 
         const seaConfigPath = join(temporaryDirectory, "sea-config.json");
 
@@ -314,6 +468,14 @@ const buildExe = async (context: unknown): Promise<void> => {
         logger.warn("`seaConfig.executable` is ignored when `targets` is specified.");
     }
 
+    const compression = resolveCompression(exe.compress);
+
+    if (exe.bytecode && exe.snapshot) {
+        throw new Error(
+            "`exe.bytecode` and `exe.snapshot` cannot be combined: a startup snapshot needs the entry's source, which bytecode mode does not ship.",
+        );
+    }
+
     const { map: assets, totalBytes: assetBytes } = await resolveAssets(exe.assets, options.rootDir);
     const assetCount = Object.keys(assets).length;
 
@@ -330,7 +492,7 @@ const buildExe = async (context: unknown): Promise<void> => {
 
         for (const target of targets) {
             // eslint-disable-next-line no-await-in-loop -- each build spawns `node --build-sea` and may download a runtime; running them concurrently only contends for disk and network.
-            built.push(await buildSingleExe({ assets, bundledFile, chunk, exe, input, multiple, target }));
+            built.push(await buildSingleExe({ assets, bundledFile, chunk, compression, exe, input, multiple, target }));
         }
     }
 

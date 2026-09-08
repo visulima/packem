@@ -37,8 +37,10 @@ interface BuildCommandOptions {
     envPrefix?: string;
     exe?: boolean;
     exeAsset?: string[];
+    exeBytecode?: boolean;
     exeChecksum?: string;
     exeCodeCache?: boolean;
+    exeCompress?: string;
     exeIcon?: string;
     exeName?: string;
     exeNodeVersion?: string;
@@ -152,8 +154,10 @@ const collectExeOptions = (options: BuildCommandOptions): ExeOptions | boolean |
 
     const exe: ExeOptions = {
         ...(assets?.length && { assets }),
+        ...(options.exeBytecode && { bytecode: true }),
         ...(options.exeChecksum && { checksum: options.exeChecksum === "true" ? true : (options.exeChecksum as "sha256" | "sha512") }),
         ...(options.exeCodeCache && { codeCache: true }),
+        ...(options.exeCompress && { compress: options.exeCompress === "true" ? true : (options.exeCompress as "brotli" | "gzip" | "zstd") }),
         ...(options.exeIcon && { windows: { icon: options.exeIcon } }),
         ...(options.exeName && { fileName: options.exeName }),
         ...(options.exeNodeVersion && { nodeVersion: options.exeNodeVersion }),
@@ -559,6 +563,16 @@ const createBuildCommand = (cli: Cli<Pail>): void => {
                 description: "Embed a V8 code cache to speed up executable startup",
                 name: "exe-code-cache",
                 type: Boolean,
+            },
+            {
+                description: "Ship the entry as V8 bytecode instead of readable source (CommonJS entry, host-runnable target)",
+                name: "exe-bytecode",
+                type: Boolean,
+            },
+            {
+                description: "Compress the embedded payload (brotli, gzip or zstd)",
+                name: "exe-compress",
+                typeLabel: "string",
             },
             {
                 description: "Path to a .ico file used as the Windows executable icon (needs the optional resedit package)",

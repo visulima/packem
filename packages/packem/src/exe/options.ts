@@ -1,4 +1,5 @@
 import type { ChecksumAlgorithm } from "./checksum";
+import type { CompressionAlgorithm } from "./compress";
 import type { FileNameTokens } from "./file-name";
 import type { ExeExtensionOptions } from "./platform";
 
@@ -113,6 +114,25 @@ export interface ExeOptions extends ExeExtensionOptions {
     assets?: ExeAssets;
 
     /**
+     * Ship the entry as a V8 code cache instead of readable JavaScript.
+     *
+     * The bundle is compiled ahead of time and only the resulting bytecode is embedded,
+     * so the executable carries no source text. This is `pkg`'s bytecode mode.
+     *
+     * Two constraints come from V8 itself:
+     *
+     * - The entry must be CommonJS, since the code cache is reached through `vm.Script`.
+     * - A code cache is only valid for the exact Node.js build that produced it, so the
+     * target has to be one this machine can run. Cross-platform targets are rejected, and
+     * have to be built on a matching machine.
+     *
+     * Function names and string literals survive in the cache, so treat this as raising
+     * the cost of reading your code, not as encryption.
+     * @default false
+     */
+    bytecode?: boolean;
+
+    /**
      * Write a `&lt;file>.sha256` (or `.sha512`) digest next to every executable, in the
      * `coreutils` format so `sha256sum -c` can verify it.
      * @default false
@@ -125,6 +145,15 @@ export interface ExeOptions extends ExeExtensionOptions {
      * @default false
      */
     codeCache?: boolean;
+
+    /**
+     * Compress the embedded payload — assets, and the bytecode when `bytecode` is on.
+     *
+     * `true` selects brotli. The base Node.js runtime cannot be compressed, so this
+     * shrinks your payload rather than the whole executable.
+     * @default false
+     */
+    compress?: CompressionAlgorithm | boolean;
 
     /**
      * Restrict which build entries become executables, matched against the entry's

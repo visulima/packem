@@ -355,13 +355,17 @@ import { getAssetText } from "@visulima/packem/sea";
 const template = await getAssetText("templates/mail.hbs");
 ```
 
+`bytecode: true` compiles the entry to a V8 code cache and embeds only that, so no readable
+source ships in the binary, and `compress: "brotli"` (or `"gzip"` / `"zstd"`) shrinks the embedded
+payload. Bytecode needs a CommonJS entry and a target this machine can run, and keeps function
+names and string literals visible — it raises the cost of reading your code rather than encrypting it.
+
 Also supported: output name templating (`[name]`, `[platform]`, `[arch]`, `[node]`, `[version]`),
 macOS code signing (ad-hoc by default, since injection invalidates Node's own signature), baked-in
 Node.js flags via `execArgv`, V8 `codeCache` and `snapshot`, and per-entry selection.
 
-See [docs/executables.md](./docs/executables.md) for the full reference, the CLI flags, and an
-honest comparison with `pkg` — notably that SEA offers no bytecode-only mode and no payload
-compression.
+See [docs/executables.md](./docs/executables.md) for the full reference, the CLI flags, and a
+comparison with `pkg`.
 
 #### Server Components
 

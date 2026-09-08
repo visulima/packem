@@ -173,6 +173,54 @@ re-sign it on a macOS machine before distributing.
 Windows Authenticode signing is not built in; sign the produced `.exe` with `signtool` or
 `AzureSignTool` in CI.
 
+## Shipping bytecode instead of source
+
+By default the executable carries your bundled JavaScript as readable text. `bytecode`
+compiles it to a V8 code cache ahead of time and embeds only that, so the source never
+reaches the binary — the same idea as `pkg`'s bytecode mode.
+
+```ts
+exe: {
+    bytecode: true,
+}
+```
+
+Two constraints come from V8, and packem fails the build rather than producing something
+that breaks later:
+
+- **The entry must be CommonJS.** The code cache is reached through `vm.Script`, which
+  compiles classic scripts, not ES modules. Point the executable entry at a `.cjs` output.
+- **The target must be one this machine can run.** A code cache is only valid for the exact
+  Node.js build that produced it, and the only way to produce one for a target is to execute
+  that target's own binary. Cross-platform targets are rejected; build them on a matching
+  machine, such as a CI matrix job.
+
+If a code cache is ever rejected at startup, the executable throws a clear error instead of
+silently running nothing.
+
+> [!WARNING]
+> This raises the cost of reading your code; it is not encryption. The source _text_ is
+> gone, but V8 keeps **function names and string literals** in the cache, so identifiers and
+> any embedded URLs, keys or messages remain readable with `strings`. Never ship a secret
+> inside an executable, bytecode or not.
+
+Bytecode cannot be combined with `snapshot`, which needs the entry's source.
+
+## Compressing the payload
+
+```ts
+exe: {
+    compress: "brotli", // or "gzip", "zstd", or `true` for brotli
+}
+```
+
+Compresses the embedded assets, and the bytecode when `bytecode` is also on. Assets are
+decompressed transparently by `@visulima/packem/sea`, so application code does not change.
+
+All three algorithms ship with Node.js, so nothing extra is needed at build or run time.
+Note this shrinks _your payload_, not the whole file: most of an executable's size is the
+Node.js runtime itself, which cannot be compressed.
+
 ## Startup performance
 
 ```ts
@@ -262,16 +310,15 @@ directory around for inspection.
 
 ## Differences from `pkg`
 
-|                          | packem `exe`                               | `pkg`                                |
-| ------------------------ | ------------------------------------------ | ------------------------------------ |
-| Runtime                  | Official Node.js builds + SEA              | Patched Node.js builds               |
-| Build host               | Node.js >= 25.7.0                          | Node.js >= 16                        |
-| Target Node.js           | >= 25.7.0                                  | 12 – 24                              |
-| Assets                   | `assets` globs + `@visulima/packem/sea`    | `assets` globs + snapshot filesystem |
-| Bytecode / source hiding | Not available                              | `--no-bytecode` / `--public`         |
-| Payload compression      | Not available                              | `--compress GZip\|Brotli\|Zstd`      |
-| Native addons (`.node`)  | Must stay external, next to the executable | Extracted at runtime                 |
+|                         | packem `exe`                                           | `pkg`                                      |
+| ----------------------- | ------------------------------------------------------ | ------------------------------------------ |
+| Runtime                 | Official Node.js builds + SEA                          | Patched Node.js builds                     |
+| Build host              | Node.js >= 25.7.0                                      | Node.js >= 16                              |
+| Target Node.js          | >= 25.7.0                                              | 12 – 24                                    |
+| Assets                  | `assets` globs + `@visulima/packem/sea`                | `assets` globs + snapshot filesystem       |
+| Bytecode                | `bytecode: true`, CommonJS entry, host-runnable target | `--no-bytecode` to opt out; cross-compiles |
+| Payload compression     | `compress: "brotli" \| "gzip" \| "zstd"`               | `--compress GZip\|Brotli\|Zstd`            |
+| Native addons (`.node`) | Must stay external, next to the executable             | Extracted at runtime                       |
 
-The last three rows are the real gaps. SEA has no bytecode-only mode, so your bundled source is
-readable inside the binary — do not rely on it to hide code. It also has no payload compression, so
-executables are roughly `node` plus your bundle plus your assets.
+The remaining gaps are the Node.js version floor, cross-platform bytecode, and native
+addon handling. Everything else has an equivalent.

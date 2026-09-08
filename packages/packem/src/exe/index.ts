@@ -1,8 +1,12 @@
 export { assetKeyToPath, resolveAssets } from "./assets";
 export { buildExe, selectEntryChunks, validateSea } from "./build";
+export type { CompileBytecodeOptions, CompiledBytecode } from "./bytecode";
+export { assertBytecodeSupported, compileBytecode, createLoaderSource, getCompilerBinary, wrapSource } from "./bytecode";
 export { getCachedBinaryPath, getCacheDirectory } from "./cache";
 export type { ChecksumAlgorithm } from "./checksum";
 export { hashFile, resolveChecksumAlgorithm, writeChecksum } from "./checksum";
+export type { CompressionAlgorithm, SeaManifest } from "./compress";
+export { BYTECODE_ASSET_KEY, compressBuffer, MANIFEST_ASSET_KEY, resolveCompression } from "./compress";
 export { resolveNodeBinary } from "./download";
 export type { BuildFileNameOptions, FileNameTokens } from "./file-name";
 export { applyTokens, buildFileName, getTargetSuffix, hasTokens } from "./file-name";

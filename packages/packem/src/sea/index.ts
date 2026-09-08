@@ -2,6 +2,9 @@ import { Buffer } from "node:buffer";
 import { createRequire } from "node:module";
 import { cwd as processCwd, env as processEnv } from "node:process";
 
+import type { SeaManifest } from "./decode";
+import { decodeAsset } from "./decode";
+
 /**
  * Runtime helpers for reading the assets embedded by packem's `exe` option.
  *
@@ -57,6 +60,41 @@ const loadSea = (): NodeSeaModule | undefined => {
  */
 const isSea = (): boolean => loadSea()?.isSea() ?? false;
 
+/** Asset key holding the manifest packem writes when the payload is encoded. */
+const MANIFEST_ASSET_KEY = "__packem_sea_manifest__";
+
+let manifest: SeaManifest | undefined;
+
+/**
+ * Reads the manifest packem embeds alongside the assets, once.
+ *
+ * An executable built without compression has no manifest, so a miss is the normal case
+ * and simply means the assets are stored verbatim.
+ * @returns The manifest, or an empty object when there is none.
+ */
+const getManifest = (): SeaManifest => {
+    if (manifest !== undefined) {
+        return manifest;
+    }
+
+    const sea = loadSea();
+
+    try {
+        manifest = JSON.parse(sea?.getAsset(MANIFEST_ASSET_KEY, "utf8") ?? "{}") as SeaManifest;
+    } catch {
+        manifest = {};
+    }
+
+    return manifest;
+};
+
+/**
+ * Reverses the compression packem applied to an embedded asset.
+ * @param data The bytes as embedded.
+ * @returns The original bytes, or `data` unchanged when the payload is not compressed.
+ */
+const decode = async (data: ArrayBuffer): Promise<ArrayBuffer> => await decodeAsset(data, getManifest().compression);
+
 let assetRoot: string | undefined;
 
 /**
@@ -88,7 +126,7 @@ const getAsset = async (key: string): Promise<ArrayBuffer> => {
     const sea = loadSea();
 
     if (sea?.isSea()) {
-        return sea.getAsset(key);
+        return await decode(sea.getAsset(key));
     }
 
     const { readFile } = await import("node:fs/promises");
@@ -108,7 +146,9 @@ const getAssetText = async (key: string, encoding: BufferEncoding = "utf8"): Pro
     const sea = loadSea();
 
     if (sea?.isSea()) {
-        return sea.getAsset(key, encoding);
+        // Decoding goes through the byte path so a compressed asset is decompressed
+        // before it is interpreted as text.
+        return Buffer.from(await decode(sea.getAsset(key))).toString(encoding);
     }
 
     const { readFile } = await import("node:fs/promises");
@@ -135,7 +175,7 @@ const getAssetJson = async <T = unknown>(key: string): Promise<T> => JSON.parse(
 const getAssetBlob = async (key: string, options?: { type?: string }): Promise<Blob> => {
     const sea = loadSea();
 
-    if (sea?.isSea()) {
+    if (sea?.isSea() && getManifest().compression === undefined) {
         return sea.getAssetAsBlob(key, options);
     }
 
@@ -152,3 +192,5 @@ const getAssetBuffer = async (key: string): Promise<Buffer> => Buffer.from(await
 
 export type { NodeSeaModule };
 export { getAsset, getAssetBlob, getAssetBuffer, getAssetJson, getAssetRoot, getAssetText, isSea, setAssetRoot };
+
+export { type SeaCompression, type SeaManifest } from "./decode";
