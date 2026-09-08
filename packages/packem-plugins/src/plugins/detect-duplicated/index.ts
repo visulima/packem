@@ -3,6 +3,7 @@ import { bold, cyan, green, magenta, yellow } from "@visulima/colorize";
 import type { Memoized } from "@visulima/packem-share";
 import { memoizeByKey } from "@visulima/packem-share";
 import type { Plugin } from "rollup";
+// eslint-disable-next-line e18e/ban-dependencies -- semver compares real package versions here; verkit is 0.x, so the migration is tracked separately
 import { compare } from "semver";
 
 import { destroyPackageInfoCache, getPackageInfo, packagePathRegex } from "./utils/get-package-info";

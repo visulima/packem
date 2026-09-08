@@ -20,7 +20,7 @@ const PREFIX = "\0packem-natives/";
 const encodeNativeId = (sourcePath: string): string => `${PREFIX}${Buffer.from(sourcePath, "utf8").toString("base64url")}`;
 
 const decodeNativeId = (id: string): string | undefined =>
-    id.startsWith(PREFIX) ? Buffer.from(id.slice(PREFIX.length), "base64url").toString("utf8") : undefined;
+    (id.startsWith(PREFIX) ? Buffer.from(id.slice(PREFIX.length), "base64url").toString("utf8") : undefined);
 
 export interface NativeModulesOptions {
     /**

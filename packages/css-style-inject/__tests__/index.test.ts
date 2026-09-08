@@ -86,6 +86,7 @@ describe(cssStyleInject, () => {
             expect.assertions(1);
 
             // @ts-expect-error - test null/undefined
+            // eslint-disable-next-line unicorn/no-null -- passing null is the case under test.
             cssStyleInject(null);
             // @ts-expect-error - test null/undefined
             cssStyleInject(undefined);
@@ -166,6 +167,7 @@ describe(cssStyleInject, () => {
 
             const id = "test-style";
 
+            // eslint-disable-next-line unicorn/no-null -- getElementById returns null, not undefined, when nothing matches.
             mockDocument.getElementById.mockReturnValue(null);
 
             cssStyleInject("body { margin: 0; }", { id });
@@ -267,6 +269,7 @@ describe(cssStyleInject, () => {
         it("should fallback to append if target element not found", () => {
             expect.assertions(2);
 
+            // eslint-disable-next-line unicorn/no-null -- querySelector returns null, not undefined, when nothing matches.
             mockElement.querySelector.mockReturnValue(null);
 
             cssStyleInject("body { margin: 0; }", { insertAt: { before: "title" } });
@@ -304,6 +307,7 @@ describe(cssStyleInject, () => {
         it("should throw error if custom container not found", () => {
             expect.assertions(1);
 
+            // eslint-disable-next-line unicorn/no-null -- querySelector returns null, not undefined, when nothing matches.
             mockDocument.querySelector.mockReturnValue(null);
 
             expect(() => {
@@ -515,6 +519,7 @@ describe(cssStyleInject, () => {
 
             // ID dedup uses getElementById (no existing element); querySelector is used
             // only for the custom container selection.
+            // eslint-disable-next-line unicorn/no-null -- getElementById returns null, not undefined, when nothing matches.
             mockDocument.getElementById.mockReturnValue(null);
             mockDocument.querySelector.mockReturnValue(customContainer);
 

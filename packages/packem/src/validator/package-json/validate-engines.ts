@@ -1,5 +1,6 @@
 import type { BuildContext } from "@visulima/packem-share/types";
 import { warn } from "@visulima/packem-share/utils";
+// eslint-disable-next-line e18e/ban-dependencies -- semver resolves user-supplied ranges (`engines.node`, `typeScriptVersion`); verkit is 0.x, so the migration is tracked separately
 import { satisfies, validRange } from "semver";
 
 import type { InternalBuildOptions, ValidationOptions } from "../../types";

@@ -35,6 +35,7 @@ import { getChunkFilename, getDtsExtension, getEntryFileNames, getOutputExtensio
 import { relative, resolve } from "@visulima/path";
 import type { Options as DtsOptions } from "@visulima/rollup-plugin-dts";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
+// eslint-disable-next-line e18e/ban-dependencies -- semver resolves user-supplied ranges (`engines.node`, `typeScriptVersion`); verkit is 0.x, so the migration is tracked separately
 import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";

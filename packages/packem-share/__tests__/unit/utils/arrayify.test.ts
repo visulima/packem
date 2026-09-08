@@ -23,6 +23,7 @@ describe(arrayify, () => {
     it("should return an empty array if the input is null", () => {
         expect.assertions(1);
 
+        // eslint-disable-next-line unicorn/no-null -- passing null is the whole point of this test.
         const result = arrayify(null);
 
         expect(result).toStrictEqual([]);
@@ -84,11 +85,10 @@ describe(arrayify, () => {
     it("should handle input that is a function", () => {
         expect.assertions(1);
 
-        // eslint-disable-next-line no-underscore-dangle
-        const function_ = () => {};
-        const result = arrayify(function_);
+        const callback = () => {};
+        const result = arrayify(callback);
 
-        expect(result).toStrictEqual([function_]);
+        expect(result).toStrictEqual([callback]);
     });
 
     it("should handle input that is a string", () => {

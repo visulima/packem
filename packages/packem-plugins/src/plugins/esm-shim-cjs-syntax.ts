@@ -6,6 +6,7 @@ import type { PackageJson } from "@visulima/package";
 import MagicString from "magic-string";
 import { findStaticImports } from "mlly";
 import type { Plugin } from "rollup";
+// eslint-disable-next-line e18e/ban-dependencies -- semver compares real package versions here; verkit is 0.x, so the migration is tracked separately
 import { minVersion } from "semver";
 
 const GLOBAL_REQUIRE_REGEX: RegExp = /(?:^|[^.\w'"`])require(\.resolve)?\(\s*([\w'"`])/;

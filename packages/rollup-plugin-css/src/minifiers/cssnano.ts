@@ -1,9 +1,15 @@
 import type { Options } from "cssnano";
 import cssnano from "cssnano";
+import type { Processor } from "postcss";
 
 import type { LoaderContext } from "../loaders/types";
 import type { ExtractedData } from "../types";
 import type { Minifier } from "./types";
+
+// cssnano 8's generated `.d.ts` types its own return as `any`, even though its JSDoc promises a
+// postcss `Processor` — v9 declares it correctly. Pinning the real signature here keeps the `any`
+// from spreading through `process()` and everything it returns.
+const createMinifier = cssnano as unknown as (options?: Options) => Processor;
 
 /**
  * CSSNano minifier implementation for optimizing CSS content.
@@ -48,8 +54,7 @@ const cssnanoMinifier: Minifier<Options> = {
      * @throws Error with detailed context if minification fails.
      */
     async handler(data: ExtractedData, sourceMap: LoaderContext["sourceMap"], options: Options): Promise<ExtractedData> {
-        // Create CSSNano processor with user options
-        const minifier = cssnano(options);
+        const minifier = createMinifier(options);
 
         try {
             const cssNanoMap = sourceMap

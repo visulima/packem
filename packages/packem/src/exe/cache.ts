@@ -3,7 +3,7 @@ import { platform as processPlatform } from "node:process";
 
 import { join } from "@visulima/path";
 
-import type { ExeTarget } from "./platform";
+import type { ResolvedExeTarget } from "./platform";
 
 const getCacheDirectory = (): string => {
     const home = homedir();
@@ -31,7 +31,7 @@ const getCacheDirectory = (): string => {
     return join(home, ".cache/packem");
 };
 
-const getCachedBinaryPath = (target: ExeTarget): string => {
+const getCachedBinaryPath = (target: ResolvedExeTarget): string => {
     const cacheDirectory = getCacheDirectory();
     const binaryName = target.platform === "win" ? "node.exe" : "node";
 

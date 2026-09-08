@@ -212,12 +212,22 @@ export interface BuildOptions {
     entries: BuildEntry[];
 
     /**
-     * Bundle the build output into a single standalone executable via Node.js SEA.
-     * Set to `true` to build for the current platform, or pass an options object
-     * for fine-grained control (cross-platform targets, SEA config, custom output name).
+     * Bundle the build output into standalone executables via Node.js SEA.
+     *
+     * Set to `true` to build one executable per entry for the current platform, or pass
+     * an options object for cross-platform targets, embedded assets, Windows icon and
+     * version information, macOS code signing, checksums and V8 code caching.
      *
      * Requires Node.js >= 25.7.0 at build time. Not supported in Bun or Deno.
-     * Automatically enforces a single entry point.
+     * @example
+     * ```ts
+     * exe: {
+     *   targets: ["host", "linux-x64", "darwin-arm64", "win-x64"],
+     *   assets: ["templates/**\/*.hbs"],
+     *   checksum: true,
+     *   windows: { icon: "./assets/app.ico", versionInfo: true },
+     * }
+     * ```
      */
     exe?: boolean | ExeOptions;
 

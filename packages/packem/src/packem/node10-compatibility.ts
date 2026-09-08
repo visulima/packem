@@ -2,6 +2,7 @@ import { readJson, writeJson } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { dirname, join } from "@visulima/path";
+// eslint-disable-next-line e18e/ban-dependencies -- semver resolves user-supplied ranges (`engines.node`, `typeScriptVersion`); verkit is 0.x, so the migration is tracked separately
 import { coerce, valid } from "semver";
 
 import type { InternalBuildOptions } from "../types";

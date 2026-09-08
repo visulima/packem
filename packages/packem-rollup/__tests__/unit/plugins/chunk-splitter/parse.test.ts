@@ -94,6 +94,7 @@ describe("chunk-splitter parseExports", () => {
     it("should throw when module.code is null", () => {
         expect.assertions(1);
 
+        // eslint-disable-next-line unicorn/no-null -- rollup types ModuleInfo.code as `string | null`, so null is the shape under test.
         const moduleInfo = { code: null, id: "/a.js" } as unknown as ModuleInfo;
 
         expect(() => [...parseExports(buildContext(), moduleInfo)]).toThrow(NO_CODE_REGEX);

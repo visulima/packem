@@ -1,8 +1,10 @@
+import { statSync } from "node:fs";
 import { createRequire } from "node:module";
 
 import { readFile } from "@visulima/fs";
 import type { FindPackageJsonCache } from "@visulima/package";
 import { findPackageJson } from "@visulima/package/package-json";
+import { join } from "@visulima/path";
 import { init, parse } from "cjs-module-lexer";
 import type { ResolvedId } from "rollup";
 
@@ -11,6 +13,24 @@ let isInitted = false;
 // Shared package.json cache so the require-cjs-transformer renderChunk pass doesn't
 // re-walk and re-read package.json for every module classification.
 const packageJsonCache: FindPackageJsonCache = new Map();
+
+/**
+ * Anchors `createRequire` inside a directory.
+ *
+ * `createRequire` treats its argument as the *file* doing the requiring and resolves from that
+ * file's parent directory, so handing it a bare directory searches one level too high and throws
+ * `MODULE_NOT_FOUND`. Callers pass either a real module path or a directory — the plugin passes
+ * its `cwd` — so only the directory case needs a file name appended.
+ * @param importer A module path, or a directory to resolve from.
+ * @returns A path `createRequire` resolves relative to the intended directory.
+ */
+const anchorRequirePath = (importer: string): string => {
+    try {
+        return statSync(importer).isDirectory() ? join(importer, "noop.js") : importer;
+    } catch {
+        return importer;
+    }
+};
 
 /**
  * Clears the shared package.json classification cache. Call this on a watch
@@ -65,7 +85,7 @@ export const isPureCJS = async (
         // Fall back to require.resolve if we have a valid importer path
         if (!resolvedPath && importer && !importer.includes("!~{")) {
             try {
-                const requireFunction = createRequire(importer);
+                const requireFunction = createRequire(anchorRequirePath(importer));
 
                 resolvedPath = requireFunction.resolve(id);
             } catch {
