@@ -470,7 +470,10 @@ const buildSingleExe = async (options: BuildOneOptions): Promise<BuiltExecutable
 
         const bytecode = exe.bytecode
             ? await buildBytecodePayload({
-                  bundledFile,
+                  // `entryPath`, not `bundledFile`: when both options are on, the bytecode
+                  // loader replaces the main script, so a prelude left out here would never
+                  // run and `.node` requires would fail at the first call.
+                  bundledFile: entryPath,
                   chunk,
                   compression,
                   logger,

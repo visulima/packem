@@ -373,7 +373,7 @@ directory around for inspection.
 | Assets                  | `assets` globs + `@visulima/packem/sea`                | `assets` globs + snapshot filesystem       |
 | Bytecode                | `bytecode: true`, CommonJS entry, host-runnable target | `--no-bytecode` to opt out; cross-compiles |
 | Payload compression     | `compress: "brotli" \| "gzip" \| "zstd"`               | `--compress GZip\|Brotli\|Zstd`            |
-| Native addons (`.node`) | Must stay external, next to the executable             | Extracted at runtime                       |
+| Native addons (`.node`) | Embedded and extracted at runtime                      | Extracted at runtime                       |
 
 The remaining gaps are the Node.js version floor, and that bytecode and native addons both
 need a build machine matching the target. Everything else has an equivalent.

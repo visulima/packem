@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -70,6 +70,9 @@ afterAll(() => {
     rmSync(addonDirectory, { force: true, recursive: true });
 });
 
+// Both sides of a collision must be named, so the build error can be acted on.
+const BOTH_ADDONS = /left[/\\]addon\.node[\s\S]*right[/\\]addon\.node/;
+
 describe("exe native modules", () => {
     let directory: string;
 
@@ -128,6 +131,55 @@ describe("exe native modules", () => {
             const found = await findNativeModules(outDirectory);
 
             expect(found.map((native) => native.name)).toStrictEqual(["a.node", "m.node", "z.node"]);
+
+            await rm(outDirectory, { force: true, recursive: true });
+        });
+
+        // The asset map and the runtime resolver are both keyed by base name, so nested
+        // addons sharing one would collapse into a single entry and the executable would
+        // load whichever survived.
+        it("should reject two addons in different directories that share a file name", async () => {
+            expect.assertions(1);
+
+            const outDirectory = await mkdtemp(join(tmpdir(), "packem-out-"));
+
+            await mkdir(join(outDirectory, "natives/left"), { recursive: true });
+            await mkdir(join(outDirectory, "natives/right"), { recursive: true });
+            await writeFile(join(outDirectory, "natives/left/addon.node"), "left");
+            await writeFile(join(outDirectory, "natives/right/addon.node"), "right");
+
+            await expect(findNativeModules(outDirectory)).rejects.toThrow('Two native addons in the build output are both named "addon.node"');
+
+            await rm(outDirectory, { force: true, recursive: true });
+        });
+
+        it("should name both colliding addons so the build can be fixed", async () => {
+            expect.assertions(1);
+
+            const outDirectory = await mkdtemp(join(tmpdir(), "packem-out-"));
+
+            await mkdir(join(outDirectory, "natives/left"), { recursive: true });
+            await mkdir(join(outDirectory, "natives/right"), { recursive: true });
+            await writeFile(join(outDirectory, "natives/left/addon.node"), "left");
+            await writeFile(join(outDirectory, "natives/right/addon.node"), "right");
+
+            await expect(findNativeModules(outDirectory)).rejects.toThrow(BOTH_ADDONS);
+
+            await rm(outDirectory, { force: true, recursive: true });
+        });
+
+        it("should still accept distinct names in nested directories", async () => {
+            expect.assertions(1);
+
+            const outDirectory = await mkdtemp(join(tmpdir(), "packem-out-"));
+
+            await mkdir(join(outDirectory, "natives/nested"), { recursive: true });
+            await writeFile(join(outDirectory, "natives/top.node"), "top");
+            await writeFile(join(outDirectory, "natives/nested/deep.node"), "deep");
+
+            const found = await findNativeModules(outDirectory);
+
+            expect(found.map((native) => native.name)).toStrictEqual(["deep.node", "top.node"]);
 
             await rm(outDirectory, { force: true, recursive: true });
         });
@@ -234,10 +286,10 @@ describe("exe native modules", () => {
     // The behaviour that actually matters: a compiled addon, embedded as an asset, has to
     // end up loadable by the dynamic linker inside the executable.
     describe("loading a real addon from an embedded asset", () => {
-        const runPrelude = async (compression: "brotli" | undefined): Promise<Record<string, unknown>> => {
+        const runPrelude = async (compression: "brotli" | undefined, overrideDirectory?: string): Promise<Record<string, unknown>> => {
             const modules: NativeModule[] = [{ assetKey: `${NATIVE_ASSET_PREFIX}addon.node`, filePath: addonPath as string, name: "addon.node" }];
             const buildId = await computeNativeBuildId(modules);
-            const extractionDirectory = join(directory, `extract-${String(compression)}`);
+            const extractionDirectory = overrideDirectory ?? join(directory, `extract-${String(compression)}`);
 
             const bytes = readFileSync(addonPath as string);
             const payload = compression === undefined ? bytes : await compressBuffer(bytes, compression);
@@ -246,6 +298,19 @@ describe("exe native modules", () => {
             // Exactly what packem's native-modules plugin emits into a bundle today.
             const bundle = 'module.exports = { answer: require("./natives/addon.node").answer() };';
             const realRequire = createRequire(import.meta.url);
+
+            // Node memoizes a relative specifier against its parent, so after one successful
+            // `require("./natives/addon.node")` every later call in this process returns the
+            // loaded module without consulting `Module._resolveFilename` at all. Dropping the
+            // module invalidates that memo, so each run exercises the prelude's resolver the
+            // way a freshly started executable does.
+            for (const key of Object.keys(realRequire.cache)) {
+                if (key.endsWith(".node")) {
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- clearing the module cache is the point.
+                    delete realRequire.cache[key];
+                }
+            }
+
             // The require a real executable injects: built-in modules only.
             const seaRequire = (id: string): unknown => {
                 if (id === "node:sea") {
@@ -297,6 +362,35 @@ describe("exe native modules", () => {
             const exported = await runPrelude("brotli");
 
             expect(exported.answer).toBe(4242);
+        });
+
+        // The build id is a digest of addons that ship inside the executable, so the
+        // extraction path is computable by anyone holding the binary. In a shared
+        // temporary directory that turns "reuse whatever is already there" into
+        // "load whatever another user left there".
+        it.runIf(addonPath !== undefined && processPlatform !== "win32")(
+            "should refuse an extraction directory other users can write to",
+            async () => {
+                expect.assertions(1);
+
+                const hostile = join(directory, "world-writable");
+
+                mkdirSync(hostile, { recursive: true });
+                chmodSync(hostile, 0o777);
+
+                await expect(runPrelude(undefined, hostile)).rejects.toThrow("writable by other users");
+            },
+        );
+
+        it.runIf(addonPath !== undefined && processPlatform !== "win32")("should refuse a symlink planted where the addon is cached", async () => {
+            expect.assertions(1);
+
+            const planted = join(directory, "planted");
+
+            mkdirSync(planted, { mode: 0o700, recursive: true });
+            symlinkSync(addonPath as string, join(planted, "addon.node"));
+
+            await expect(runPrelude(undefined, planted)).rejects.toThrow("is not a regular file");
         });
     });
 });
