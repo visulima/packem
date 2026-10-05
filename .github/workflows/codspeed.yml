@@ -40,6 +40,8 @@ jobs:
 
             - name: "Git checkout"
               uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+              with:
+                  persist-credentials: false
 
             - name: "Check for file changes"
               uses: "dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d" # v4.0.3
@@ -73,6 +75,7 @@ jobs:
               with:
                   # Full history so `nx affected` can resolve the PR base ref.
                   fetch-depth: 0
+                  persist-credentials: false
 
             - name: "Derive appropriate SHAs for base and head for `nx affected` commands"
               id: "setSHAs"
@@ -145,6 +148,7 @@ jobs:
               with:
                   # Full history so `nx affected` can resolve the PR base ref.
                   fetch-depth: 0
+                  persist-credentials: false
 
             - name: "Setup resources and environment"
               uses: "anolilab/workflows/step/setup@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
