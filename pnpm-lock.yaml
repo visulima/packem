@@ -210,11 +210,11 @@ catalogs:
       specifier: 13.0.6
       version: 13.0.6
     '@commitlint/cli':
-      specifier: 21.2.2
-      version: 21.2.2
+      specifier: 21.2.3
+      version: 21.2.3
     '@commitlint/config-conventional':
-      specifier: 21.2.2
-      version: 21.2.2
+      specifier: 21.2.3
+      version: 21.2.3
     '@eslint/css':
       specifier: 1.4.0
       version: 1.4.0
@@ -646,8 +646,6 @@ overrides:
 
 packageExtensionsChecksum: sha256-L9KhIfnXaxDFXUmdggJzY477kU1a1a59wPrKicWJzD8=
 
-pnpmfileChecksum: sha256-Wzgu78gay+v6MunApP3nY8NLqA2rjoJktL31h20yv5I=
-
 patchedDependencies:
   oxc-parser: 464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76
 
@@ -657,7 +655,7 @@ importers:
     dependencies:
       '@anolilab/commitlint-config':
         specifier: catalog:lint
-        version: 10.1.2(@commitlint/cli@21.2.2(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3))(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)
+        version: 10.1.2(@commitlint/cli@21.2.3(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3))(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)
       '@anolilab/lint-staged-config':
         specifier: catalog:lint
         version: 12.0.1(husky@9.1.7)(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(lint-staged@17.4.1)(prettier@3.9.6)(secretlint@13.0.5(supports-color@7.2.0))(smol-toml@1.9.0)(vitest@4.1.11)(yaml@2.9.0)
@@ -675,10 +673,10 @@ importers:
         version: 5.7.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)(tinybench@2.9.0)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(sass-embedded@1.105.1)(sass@1.105.1)(stylus@0.64.0(supports-color@7.2.0))(sugarss@5.0.1(postcss@8.5.28))(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(vitest@4.1.11)
       '@commitlint/cli':
         specifier: catalog:lint
-        version: 21.2.2(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)
+        version: 21.2.3(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)
       '@commitlint/config-conventional':
         specifier: catalog:lint
-        version: 21.2.2
+        version: 21.2.3
       '@secretlint/secretlint-rule-preset-recommend':
         specifier: catalog:lint
         version: 13.0.5
@@ -4169,13 +4167,17 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@commitlint/cli@21.2.2':
-    resolution: {integrity: sha512-a+6hQxIxnpdvSvS2apvttPNbEliYsVC3PqFYDiiB2kjbwIsQsj1urvQ4Tkf70pKYozPalKAuRQmm/GHwndduqA==}
+  '@commitlint/cli@21.2.3':
+    resolution: {integrity: sha512-5yOX6IRjcrIReCxpyAd04hgI/yhUMpVBJ/ouwFV0wk9yx5+fYRDWZWJ5h55Tbedgfol+5m2mU5nqzbB8g3v0vQ==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
   '@commitlint/config-conventional@21.2.2':
     resolution: {integrity: sha512-NxA37SZviusFUEYOQZ5hNnZ1h7O/KiemPkxjOlpzKJNnWxThiwc6/SaZhaPa8fyLvfRBAywhQhJJk8XESHWlpQ==}
+    engines: {node: '>=22.12.0'}
+
+  '@commitlint/config-conventional@21.2.3':
+    resolution: {integrity: sha512-EP2n5DN2GwRWNVrLX0Jx3mpQlW5PfFi9HnD9OJ8hN/H0xFqpCFyHeGDhg+0P8/21iMMcdkcQgbNqmVklebqYsQ==}
     engines: {node: '>=22.12.0'}
 
   '@commitlint/config-validator@21.2.3':
@@ -9193,7 +9195,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       next: '>=14.0'
       rotating-file-stream: '>=3.2.9'
     peerDependenciesMeta:
@@ -12389,7 +12391,7 @@ packages:
       graphile-config: ^1.1.1
       graphql: ^16.9.0
       h3: ^1.13.0
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       ws: '>=8.21.3'
     peerDependenciesMeta:
       '@envelop/core':
@@ -18266,9 +18268,9 @@ snapshots:
 
   '@andrewbranch/untar.js@1.0.4': {}
 
-  '@anolilab/commitlint-config@10.1.2(@commitlint/cli@21.2.2(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3))(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)':
+  '@anolilab/commitlint-config@10.1.2(@commitlint/cli@21.2.3(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3))(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)':
     dependencies:
-      '@commitlint/cli': 21.2.2(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)
+      '@commitlint/cli': 21.2.3(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)
       '@commitlint/config-conventional': 21.2.2
       '@commitlint/core': 21.2.2(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)
       commitizen: 4.3.2(@types/node@26.4.0)(typescript@6.0.3)
@@ -19672,9 +19674,9 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@commitlint/cli@21.2.2(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)':
+  '@commitlint/cli@21.2.3(@types/node@26.4.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)':
     dependencies:
-      '@commitlint/config-conventional': 21.2.2
+      '@commitlint/config-conventional': 21.2.3
       '@commitlint/format': 21.2.3
       '@commitlint/lint': 21.2.3
       '@commitlint/load': 21.2.3(@types/node@26.4.0)(typescript@6.0.3)
@@ -19689,6 +19691,11 @@ snapshots:
       - typescript
 
   '@commitlint/config-conventional@21.2.2':
+    dependencies:
+      '@commitlint/types': 21.2.3
+      conventional-changelog-conventionalcommits: 10.4.0
+
+  '@commitlint/config-conventional@21.2.3':
     dependencies:
       '@commitlint/types': 21.2.3
       conventional-changelog-conventionalcommits: 10.4.0
