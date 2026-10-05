@@ -459,12 +459,23 @@ packageExtensions:
   "@anolilab/lint-staged-config":
     dependencies:
       "@visulima/yaml": 1.0.0
+auditConfig:
+  ignoreGhsas:
+    # GHSA-vfj7-8cjw-p6xm (braces stack exhaustion) has no fix: the advisory covers <=3.0.3
+    # and 3.0.3 is the latest published version. Reached only through dev-only micromatch,
+    # whose patterns come from our own config.
+    - GHSA-vfj7-8cjw-p6xm
+
 overrides:
   '@hono/node-server@<2.0.10': ">=2.1.1"
   ajv@>=7.0.0 <8.18.0: ">=8.20.0"
   axios@>=1.0.0 <1.18.0: ">=1.20.0"
+  # nx pins axios@1.18.1 exactly, so this range has to cover it too.
+  axios@>=1.0.0 <1.20.0: ">=1.20.0"
   body-parser@>=2.0.0 <2.3.0: ">=2.3.0"
-  brace-expansion@<5.0.9: ">=5.0.9 <6"
+  brace-expansion@<5.0.12: ">=5.0.12 <6"
+  # nx pins smol-toml@1.6.1 exactly; GHSA-7w5x-hrqm-74c2 is fixed in 1.7.1.
+  smol-toml@<1.7.1: ">=1.7.1 <2"
   browserslist@<4.28.7: ">=4.28.7"
   chrono-node@<2.2.4: ">=2.10.1"
   defu@<6.1.5: ">=6.1.7"
@@ -475,6 +486,7 @@ overrides:
   fast-uri@<3.1.6: ">=3.1.6 <4"
   flatted@<3.4.2: ">=3.4.4"
   follow-redirects@<1.16.0: ">=1.16.0"
+  http-cache-semantics@<=4.2.0: ">=4.3.0 <5"
   form-data@>=4.0.0 <4.0.6: ">=4.0.6"
   glob@>=10.0.0 <10.5.0: ">=10.5.0"
   handlebars@>=4.0.0 <4.7.9: ">=4.7.9"
