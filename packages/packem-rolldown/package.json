@@ -89,7 +89,7 @@
         "vitest": "catalog:test"
     },
     "peerDependencies": {
-        "rolldown": ">=1.2.7"
+        "rolldown": ">=1.2.12"
     },
     "optionalDependencies": {},
     "engines": {
