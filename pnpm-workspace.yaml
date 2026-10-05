@@ -63,8 +63,8 @@ catalogs:
     semantic-release: 25.0.9
   dev:
     "@arethetypeswrong/cli": ^0.18.5
-    "@babel/core": 8.0.1
-    "@babel/parser": 8.0.4
+    "@babel/core": 8.0.6
+    "@babel/parser": 8.0.6
     "@mozilla/readability": ^0.6.0
     "@oxc-parser/binding-linux-x64-gnu": 0.148.0
     "@oxc-project/types": 0.148.0
@@ -140,7 +140,7 @@ catalogs:
     browserslist-config-anolilab: 9.0.1
   node:
     "@antfu/install-pkg": 2.0.1
-    "@babel/preset-env": 8.0.2
+    "@babel/preset-env": 8.0.6
     "@clack/prompts": 1.7.0
     cac: 7.0.0
     cross-env: ^10.1.0
@@ -156,7 +156,7 @@ catalogs:
     package-manager-detector: ^1.8.0
   prod:
     "@arethetypeswrong/core": ^0.18.5
-    "@babel/parser": 8.0.4
+    "@babel/parser": 8.0.6
     "@visulima/packem-share": 1.0.0-alpha.46
     audit-ci: ^7.1.0
     cjs-module-lexer: 2.2.1

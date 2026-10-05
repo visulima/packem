@@ -81,8 +81,8 @@ catalogs:
       specifier: ^0.18.5
       version: 0.18.5
     '@babel/core':
-      specifier: 8.0.1
-      version: 8.0.1
+      specifier: 8.0.6
+      version: 8.0.6
     '@mozilla/readability':
       specifier: ^0.6.0
       version: 0.6.0
@@ -646,8 +646,6 @@ overrides:
 
 packageExtensionsChecksum: sha256-L9KhIfnXaxDFXUmdggJzY477kU1a1a59wPrKicWJzD8=
 
-pnpmfileChecksum: sha256-Wzgu78gay+v6MunApP3nY8NLqA2rjoJktL31h20yv5I=
-
 patchedDependencies:
   oxc-parser: 464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76
 
@@ -752,10 +750,10 @@ importers:
   benchmarks:
     devDependencies:
       '@babel/core':
-        specifier: ^8.0.1
+        specifier: ^8.0.6
         version: 8.0.6
       '@babel/plugin-transform-runtime':
-        specifier: ^8.0.1
+        specifier: ^8.0.6
         version: 8.0.6(@babel/core@8.0.6)
       '@babel/preset-react':
         specifier: ^8.0.1
@@ -1951,7 +1949,7 @@ importers:
         version: 0.18.5
       '@babel/core':
         specifier: catalog:dev
-        version: 8.0.1
+        version: 8.0.6
       '@clack/prompts':
         specifier: catalog:node
         version: 1.7.0
@@ -2057,7 +2055,7 @@ importers:
         version: 0.18.5
       '@babel/preset-react':
         specifier: catalog:frontend
-        version: 8.0.1(@babel/core@8.0.1)
+        version: 8.0.1(@babel/core@8.0.6)
       '@codspeed/vitest-plugin':
         specifier: catalog:test
         version: 5.7.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)(tinybench@2.9.0)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(sass-embedded@1.105.1)(sass@1.105.1)(stylus@0.64.0(supports-color@7.2.0))(sugarss@5.0.1(postcss@8.5.28))(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(vitest@4.1.11)
@@ -2162,7 +2160,7 @@ importers:
         version: 4.1.11(vitest@4.1.11)
       babel-plugin-transform-hook-names:
         specifier: catalog:dev
-        version: 1.0.2(@babel/core@8.0.1)
+        version: 1.0.2(@babel/core@8.0.6)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
         version: 10.4.0
@@ -2327,7 +2325,7 @@ importers:
     dependencies:
       '@babel/core':
         specifier: catalog:dev
-        version: 8.0.1
+        version: 8.0.6
       '@rollup/plugin-alias':
         specifier: catalog:build
         version: 6.0.0(rollup@4.63.1)
@@ -2451,7 +2449,7 @@ importers:
         version: 7.8.0
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.94(28cf3896444b38b31bc245fd16c76ce5)
+        version: 2.0.0-alpha.94(47129d416435ee8624916cf50c782a8f)
       '@visulima/pail':
         specifier: catalog:visulima
         version: 4.1.1(express@5.2.1(supports-color@10.2.2))(hono@4.13.12)
@@ -2580,7 +2578,7 @@ importers:
     dependencies:
       '@babel/core':
         specifier: catalog:dev
-        version: 8.0.1
+        version: 8.0.6
       '@rollup/plugin-alias':
         specifier: catalog:build
         version: 6.0.0(rollup@4.63.1)
@@ -9193,7 +9191,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       next: '>=14.0'
       rotating-file-stream: '>=3.2.9'
     peerDependenciesMeta:
@@ -12389,7 +12387,7 @@ packages:
       graphile-config: ^1.1.1
       graphql: ^16.9.0
       h3: ^1.13.0
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       ws: '>=8.21.3'
     peerDependenciesMeta:
       '@envelop/core':
@@ -18937,10 +18935,6 @@ snapshots:
 
   '@babel/helper-plugin-utils@7.29.7': {}
 
-  '@babel/helper-plugin-utils@8.0.1(@babel/core@8.0.1)':
-    dependencies:
-      '@babel/core': 8.0.1
-
   '@babel/helper-plugin-utils@8.0.1(@babel/core@8.0.6)':
     dependencies:
       '@babel/core': 8.0.6
@@ -19037,11 +19031,6 @@ snapshots:
     dependencies:
       '@babel/core': 8.0.6
       '@babel/helper-plugin-utils': 7.29.7
-
-  '@babel/plugin-syntax-jsx@8.0.1(@babel/core@8.0.1)':
-    dependencies:
-      '@babel/core': 8.0.1
-      '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
 
   '@babel/plugin-syntax-jsx@8.0.1(@babel/core@8.0.6)':
     dependencies:
@@ -19278,34 +19267,15 @@ snapshots:
       '@babel/core': 8.0.6
       '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.6)
 
-  '@babel/plugin-transform-react-display-name@8.0.1(@babel/core@8.0.1)':
-    dependencies:
-      '@babel/core': 8.0.1
-      '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
-
   '@babel/plugin-transform-react-display-name@8.0.1(@babel/core@8.0.6)':
     dependencies:
       '@babel/core': 8.0.6
       '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.6)
 
-  '@babel/plugin-transform-react-jsx-development@8.0.1(@babel/core@8.0.1)':
-    dependencies:
-      '@babel/core': 8.0.1
-      '@babel/plugin-transform-react-jsx': 8.0.1(@babel/core@8.0.1)
-
   '@babel/plugin-transform-react-jsx-development@8.0.1(@babel/core@8.0.6)':
     dependencies:
       '@babel/core': 8.0.6
       '@babel/plugin-transform-react-jsx': 8.0.1(@babel/core@8.0.6)
-
-  '@babel/plugin-transform-react-jsx@8.0.1(@babel/core@8.0.1)':
-    dependencies:
-      '@babel/core': 8.0.1
-      '@babel/helper-annotate-as-pure': 8.0.0
-      '@babel/helper-module-imports': 8.0.0
-      '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
-      '@babel/plugin-syntax-jsx': 8.0.1(@babel/core@8.0.1)
-      '@babel/types': 8.0.6
 
   '@babel/plugin-transform-react-jsx@8.0.1(@babel/core@8.0.6)':
     dependencies:
@@ -19315,12 +19285,6 @@ snapshots:
       '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.6)
       '@babel/plugin-syntax-jsx': 8.0.1(@babel/core@8.0.6)
       '@babel/types': 8.0.6
-
-  '@babel/plugin-transform-react-pure-annotations@8.0.1(@babel/core@8.0.1)':
-    dependencies:
-      '@babel/core': 8.0.1
-      '@babel/helper-annotate-as-pure': 8.0.0
-      '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
 
   '@babel/plugin-transform-react-pure-annotations@8.0.1(@babel/core@8.0.6)':
     dependencies:
@@ -19485,16 +19449,6 @@ snapshots:
       '@babel/plugin-transform-unicode-property-regex': 8.0.1(@babel/core@8.0.6)
       '@babel/types': 8.0.6
       esutils: 2.0.3
-
-  '@babel/preset-react@8.0.1(@babel/core@8.0.1)':
-    dependencies:
-      '@babel/core': 8.0.1
-      '@babel/helper-plugin-utils': 8.0.1(@babel/core@8.0.1)
-      '@babel/helper-validator-option': 8.0.0
-      '@babel/plugin-transform-react-display-name': 8.0.1(@babel/core@8.0.1)
-      '@babel/plugin-transform-react-jsx': 8.0.1(@babel/core@8.0.1)
-      '@babel/plugin-transform-react-jsx-development': 8.0.1(@babel/core@8.0.1)
-      '@babel/plugin-transform-react-pure-annotations': 8.0.1(@babel/core@8.0.1)
 
   '@babel/preset-react@8.0.1(@babel/core@8.0.6)':
     dependencies:
@@ -24924,7 +24878,7 @@ snapshots:
       - smol-toml
       - yaml
 
-  '@visulima/packem@2.0.0-alpha.94(28cf3896444b38b31bc245fd16c76ce5)':
+  '@visulima/packem@2.0.0-alpha.94(47129d416435ee8624916cf50c782a8f)':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 1.7.0
@@ -24957,7 +24911,7 @@ snapshots:
       workerpool: 10.0.3
     optionalDependencies:
       '@arethetypeswrong/core': 0.18.5
-      '@babel/core': 8.0.1
+      '@babel/core': 8.0.6
       '@swc/core': 1.16.13(@swc/helpers@0.5.23)
       cssnano: 9.0.0(postcss@8.5.28)
       esbuild: 0.28.2
@@ -26264,10 +26218,6 @@ snapshots:
   babel-plugin-react-compiler@1.0.0:
     dependencies:
       '@babel/types': 7.29.8
-
-  babel-plugin-transform-hook-names@1.0.2(@babel/core@8.0.1):
-    dependencies:
-      '@babel/core': 8.0.1
 
   babel-plugin-transform-hook-names@1.0.2(@babel/core@8.0.6):
     dependencies:
