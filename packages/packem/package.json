@@ -322,7 +322,7 @@
     },
     "peerDependencies": {
         "@arethetypeswrong/core": ">=0.18.5",
-        "@swc/core": ">=1.16.1",
+        "@swc/core": ">=1.16.13",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
         "@visulima/packem-rollup": "1.1.0",
