@@ -102,7 +102,7 @@ catalogs:
   frontend:
     "@babel/preset-react": ^8.0.1
     "@radix-ui/react-tooltip": ^1.2.16
-    "@vue/language-core": 3.3.11
+    "@vue/language-core": 3.3.12
     babel-plugin-react-compiler: 1.0.0
     preact: 10.29.8
     react: 19.2.8
@@ -235,7 +235,7 @@ catalogs:
     # the workspace `typescript`. TS 7 support is exercised through `@typescript/native-preview`
     # (the tsgo binary) instead — see rollup-plugin-dts's tsgo path and test lane.
     typescript: 6.0.3
-    vue-tsc: 3.3.11
+    vue-tsc: 3.3.12
   types:
     "@types/babel__core": ^7.20.5
     "@types/babel__generator": ^7.27.0
