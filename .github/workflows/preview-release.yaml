@@ -111,7 +111,7 @@ jobs:
 
             - name: "Prepare nx cache"
               shell: "bash"
-              run: "tar -cf - .nx/cache | lz4 > /tmp/nx_cache.tar.lz4" # compress nx cache
+              run: "if [ -d .nx/cache ]; then tar -cf - .nx/cache | lz4 > /tmp/nx_cache.tar.lz4; else echo 'No nx cache to package.'; fi" # compress nx cache
 
             - name: "Preview Release"
               shell: "bash"

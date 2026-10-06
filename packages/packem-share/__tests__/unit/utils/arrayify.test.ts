@@ -23,7 +23,6 @@ describe(arrayify, () => {
     it("should return an empty array if the input is null", () => {
         expect.assertions(1);
 
-        // eslint-disable-next-line unicorn/no-null -- passing null is the whole point of this test.
         const result = arrayify(null);
 
         expect(result).toStrictEqual([]);

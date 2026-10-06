@@ -2,7 +2,6 @@ import { Buffer } from "node:buffer";
 import { promisify } from "node:util";
 // `exe` builds require Node.js >= 25.7, where zstd is stable; the rule checks the wider
 // engines range declared by the package.
-// eslint-disable-next-line n/no-unsupported-features/node-builtins -- see above
 import { brotliDecompress, gunzip, zstdDecompress } from "node:zlib";
 
 import { describe, expect, it } from "vitest";
