@@ -166,7 +166,7 @@ catalogs:
     gpt-tokenizer: ^4.0.0
     happy-dom: 20.14.5
     hookable: 6.1.2
-    html-minifier-next: 8.10.1
+    html-minifier-next: 8.10.2
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.2
@@ -486,7 +486,7 @@ overrides:
   # nx pins smol-toml@1.6.1 exactly; GHSA-7w5x-hrqm-74c2 is fixed in 1.7.1.
   smol-toml@<1.7.1: ">=1.7.1 <2"
   browserslist@<4.28.7: ">=4.28.9"
-  chrono-node@<2.2.4: ">=2.10.1"
+  chrono-node@<2.2.4: ">=2.10.2"
   defu@<6.1.5: ">=6.1.7"
   devalue@>=5.0.0 <5.8.1: ">=5.9.4"
   diff@>=5.0.0 <5.2.2: ">=5.2.2"
@@ -522,7 +522,7 @@ overrides:
   # GHSA-p6vx-979v-rg4c (critical) and GHSA-jp82-f5mq-hwhp (high) are both fixed in
   # seroval 1.6.3. solid-js pins ~1.5.4, so force the patched release rather than
   # hiding the advisories from `pnpm audit` workspace-wide.
-  seroval@<1.6.3: ">=1.6.3"
+  seroval@<1.6.3: ">=1.6.8"
   svelte@<5.55.7: ">=5.57.1"
   svgo@>=4.0.0 <4.0.2: ">=4.1.0"
   tmp@<0.2.7: ">=0.2.7"
