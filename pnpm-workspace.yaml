@@ -183,9 +183,9 @@ catalogs:
     source-map-js: ^1.2.2
     tailwind-merge: 3.7.0
     workerpool: 10.0.3
-    yuku-ast: ^0.15.1
-    yuku-codegen: ^0.15.1
-    yuku-parser: ^0.15.1
+    yuku-ast: ^0.17.0
+    yuku-codegen: ^0.17.0
+    yuku-parser: ^0.17.0
   script:
     jiti: 2.7.0
     tsx: 4.23.15
@@ -200,7 +200,7 @@ catalogs:
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.0-alpha.15
     clean-css: ^5.3.3
-    cssnano: 9.1.2
+    cssnano: 9.2.1
     icss-utils: ^5.1.0
     less: 4.9.0
     lightningcss: 1.33.0
@@ -485,7 +485,7 @@ overrides:
   brace-expansion@<5.0.12: ">=5.0.12 <6"
   # nx pins smol-toml@1.6.1 exactly; GHSA-7w5x-hrqm-74c2 is fixed in 1.7.1.
   smol-toml@<1.7.1: ">=1.7.1 <2"
-  browserslist@<4.28.7: ">=4.28.9"
+  browserslist@<4.28.7: ">=4.29.3"
   chrono-node@<2.2.4: ">=2.10.2"
   defu@<6.1.5: ">=6.1.7"
   devalue@>=5.0.0 <5.8.1: ">=5.9.4"
@@ -518,7 +518,7 @@ overrides:
   picomatch@>=4.0.0 <4.0.4: ">=4.0.7"
   postcss@<8.5.23: ">=8.5.23 <9"
   qs@<6.16.0: ">=6.16.0"
-  shell-quote@<1.8.5: ">=1.10.0"
+  shell-quote@<1.8.5: ">=1.12.0"
   # GHSA-p6vx-979v-rg4c (critical) and GHSA-jp82-f5mq-hwhp (high) are both fixed in
   # seroval 1.6.3. solid-js pins ~1.5.4, so force the patched release rather than
   # hiding the advisories from `pnpm audit` workspace-wide.
@@ -528,7 +528,7 @@ overrides:
   tmp@<0.2.7: ">=0.2.7"
   undici@<8.9.0: ">=8.9.0 <9"
   vite@>=8.0.0 <8.0.5: ">=8.0.5"
-  ws@>=8.0.0 <8.21.0: ">=8.21.3"
+  ws@>=8.0.0 <8.21.0: ">=8.22.0"
   yaml@>=2.0.0 <2.8.3: ">=2.9.1"
 
 patchedDependencies:
