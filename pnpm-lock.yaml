@@ -216,8 +216,8 @@ catalogs:
       specifier: 21.2.2
       version: 21.2.2
     '@eslint/css':
-      specifier: 1.4.0
-      version: 1.4.0
+      specifier: 2.0.0
+      version: 2.0.0
     '@secretlint/secretlint-rule-preset-recommend':
       specifier: 13.0.7
       version: 13.0.7
@@ -2046,7 +2046,7 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 30.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.67.0(@typescript-eslint/parser@8.67.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/utils@8.71.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@visulima/yaml@1.0.0)(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.9.0)(supports-color@10.2.2)(tailwind-csstree@0.4.1(@eslint/css@1.4.0))(typescript@6.0.3)(vitest@4.1.11)(yaml@2.9.1)
+        version: 30.0.2(@eslint/css@2.0.0)(@typescript-eslint/eslint-plugin@8.67.0(@typescript-eslint/parser@8.67.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/utils@8.71.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@visulima/yaml@1.0.0)(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.9.0)(supports-color@10.2.2)(tailwind-csstree@0.4.1(@eslint/css@2.0.0))(typescript@6.0.3)(vitest@4.1.11)(yaml@2.9.1)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
         version: 8.1.31(@visulima/yaml@1.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.9.0)(supports-color@10.2.2)(yaml@2.9.1)
@@ -2073,7 +2073,7 @@ importers:
         version: 3.0.0(postcss@8.5.26)
       '@eslint/css':
         specifier: catalog:lint
-        version: 1.4.0
+        version: 2.0.0
       '@rollup/plugin-alias':
         specifier: catalog:build
         version: 6.0.0(rollup@4.63.1)
@@ -2298,7 +2298,7 @@ importers:
         version: 5.0.1(postcss@8.5.26)
       tailwind-csstree:
         specifier: catalog:lint
-        version: 0.4.1(@eslint/css@1.4.0)
+        version: 0.4.1(@eslint/css@2.0.0)
       tailwindcss:
         specifier: catalog:style
         version: 4.3.3
@@ -2994,7 +2994,7 @@ importers:
     devDependencies:
       '@anolilab/eslint-config':
         specifier: catalog:lint
-        version: 30.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.67.0(@typescript-eslint/parser@8.67.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/utils@8.71.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@visulima/yaml@1.0.0)(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.9.0)(supports-color@10.2.2)(tailwind-csstree@0.4.1(@eslint/css@1.4.0))(typescript@6.0.3)(vitest@4.1.11)(yaml@2.9.1)
+        version: 30.0.2(@eslint/css@2.0.0)(@typescript-eslint/eslint-plugin@8.67.0(@typescript-eslint/parser@8.67.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/utils@8.71.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@visulima/yaml@1.0.0)(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.9.0)(supports-color@10.2.2)(tailwind-csstree@0.4.1(@eslint/css@2.0.0))(typescript@6.0.3)(vitest@4.1.11)(yaml@2.9.1)
       '@anolilab/semantic-release-pnpm':
         specifier: catalog:cli
         version: 8.1.31(@visulima/yaml@1.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.9.0)(supports-color@10.2.2)(yaml@2.9.1)
@@ -3018,7 +3018,7 @@ importers:
         version: 3.0.0(postcss@8.5.26)
       '@eslint/css':
         specifier: catalog:lint
-        version: 1.4.0
+        version: 2.0.0
       '@rollup/plugin-inject':
         specifier: catalog:build
         version: 5.0.5(rollup@4.63.1)
@@ -3135,7 +3135,7 @@ importers:
         version: 5.0.1(postcss@8.5.26)
       tailwind-csstree:
         specifier: catalog:lint
-        version: 0.4.1(@eslint/css@1.4.0)
+        version: 0.4.1(@eslint/css@2.0.0)
       typescript:
         specifier: catalog:tsc
         version: 6.0.3
@@ -4638,6 +4638,10 @@ packages:
 
   '@eslint/css@1.4.0':
     resolution: {integrity: sha512-OnRNKgnbX+tufPuZc2kOJS+v1iIARvfJHRNEAVwN77DBpojl+rGjEP8NKTL6pEZ7BR+HtwIuSSdrymEFlANGxg==}
+    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+
+  '@eslint/css@2.0.0':
+    resolution: {integrity: sha512-lODVRbtxOXgcSOWNvv3gE4A8oRTSUHefA0tX9zrWUD57F+5RTLGDX9I8bnHQROO8nWb0hrmke0uO23pTlNfZ0A==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
   '@eslint/js@10.0.1':
@@ -18496,7 +18500,7 @@ snapshots:
       - vitest
       - yaml
 
-  '@anolilab/eslint-config@30.0.2(@eslint/css@1.4.0)(@typescript-eslint/eslint-plugin@8.67.0(@typescript-eslint/parser@8.67.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/utils@8.71.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@visulima/yaml@1.0.0)(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.9.0)(supports-color@10.2.2)(tailwind-csstree@0.4.1(@eslint/css@1.4.0))(typescript@6.0.3)(vitest@4.1.11)(yaml@2.9.1)':
+  '@anolilab/eslint-config@30.0.2(@eslint/css@2.0.0)(@typescript-eslint/eslint-plugin@8.67.0(@typescript-eslint/parser@8.67.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/utils@8.71.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@visulima/yaml@1.0.0)(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(ini@7.0.0)(json5@2.2.3)(jsonc-parser@3.3.1)(smol-toml@1.9.0)(supports-color@10.2.2)(tailwind-csstree@0.4.1(@eslint/css@2.0.0))(typescript@6.0.3)(vitest@4.1.11)(yaml@2.9.1)':
     dependencies:
       '@e18e/eslint-plugin': 0.8.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))
       '@eslint-community/eslint-plugin-eslint-comments': 4.7.2(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))
@@ -18553,8 +18557,8 @@ snapshots:
       typescript-eslint: 8.67.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       yaml-eslint-parser: 2.1.0
     optionalDependencies:
-      '@eslint/css': 1.4.0
-      tailwind-csstree: 0.4.1(@eslint/css@1.4.0)
+      '@eslint/css': 2.0.0
+      tailwind-csstree: 0.4.1(@eslint/css@2.0.0)
       typescript: 6.0.3
     transitivePeerDependencies:
       - '@eslint/json'
@@ -20161,6 +20165,13 @@ snapshots:
       source-map-js: 1.2.2
 
   '@eslint/css@1.4.0':
+    dependencies:
+      '@eslint/core': 1.2.1
+      '@eslint/css-tree': 4.1.1
+      '@eslint/plugin-kit': 0.7.3
+    optional: true
+
+  '@eslint/css@2.0.0':
     dependencies:
       '@eslint/core': 1.2.1
       '@eslint/css-tree': 4.1.1
@@ -34903,9 +34914,9 @@ snapshots:
       '@eslint/css': 1.4.0
     optional: true
 
-  tailwind-csstree@0.4.1(@eslint/css@1.4.0):
+  tailwind-csstree@0.4.1(@eslint/css@2.0.0):
     optionalDependencies:
-      '@eslint/css': 1.4.0
+      '@eslint/css': 2.0.0
 
   tailwind-merge@3.7.0: {}
 
