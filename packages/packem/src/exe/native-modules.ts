@@ -47,7 +47,7 @@ const findNativeModules = async (outDirectory: string, nativesDirectory = "nativ
 
             return { assetKey: `${NATIVE_ASSET_PREFIX}${name}`, filePath, name };
         })
-        .toSorted((left, right) => left.name.localeCompare(right.name, "en"));
+        .toSorted((left, right) => left.name.localeCompare(right.name, "en") || left.filePath.localeCompare(right.filePath, "en"));
 
     // The glob is recursive, but both the asset map and the runtime resolver are keyed by
     // base name, so two addons called the same thing in different directories would
