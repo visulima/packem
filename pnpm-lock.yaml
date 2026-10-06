@@ -318,8 +318,8 @@ catalogs:
       specifier: 6.1.2
       version: 6.1.2
     html-minifier-next:
-      specifier: 8.10.1
-      version: 8.10.1
+      specifier: 8.10.2
+      version: 8.10.2
     is-ci:
       specifier: ^4.1.0
       version: 4.1.0
@@ -604,7 +604,7 @@ overrides:
   brace-expansion@<5.0.12: '>=5.0.12 <6'
   smol-toml@<1.7.1: '>=1.7.1 <2'
   browserslist@<4.28.7: '>=4.28.9'
-  chrono-node@<2.2.4: '>=2.10.1'
+  chrono-node@<2.2.4: '>=2.10.2'
   defu@<6.1.5: '>=6.1.7'
   devalue@>=5.0.0 <5.8.1: '>=5.9.4'
   diff@>=5.0.0 <5.2.2: '>=5.2.2'
@@ -636,7 +636,7 @@ overrides:
   postcss@<8.5.23: '>=8.5.23 <9'
   qs@<6.16.0: '>=6.16.0'
   shell-quote@<1.8.5: '>=1.10.0'
-  seroval@<1.6.3: '>=1.6.3'
+  seroval@<1.6.3: '>=1.6.8'
   svelte@<5.55.7: '>=5.57.1'
   svgo@>=4.0.0 <4.0.2: '>=4.1.0'
   tmp@<0.2.7: '>=0.2.7'
@@ -1998,7 +1998,7 @@ importers:
         version: 6.1.2
       html-minifier-next:
         specifier: catalog:prod
-        version: 8.10.1(@swc/core@1.16.1(@swc/helpers@0.5.23))
+        version: 8.10.2(@swc/core@1.16.1(@swc/helpers@0.5.23))
       jiti:
         specifier: catalog:script
         version: 2.7.0
@@ -2362,7 +2362,7 @@ importers:
         version: 3.0.3
       html-minifier-next:
         specifier: catalog:prod
-        version: 8.10.1(@swc/core@1.16.13(@swc/helpers@0.5.23))
+        version: 8.10.2(@swc/core@1.16.13(@swc/helpers@0.5.23))
       magic-string:
         specifier: catalog:utils
         version: 0.30.21
@@ -2630,7 +2630,7 @@ importers:
         version: 5.3.3
       html-minifier-next:
         specifier: catalog:prod
-        version: 8.10.1(@swc/core@1.16.1(@swc/helpers@0.5.23))
+        version: 8.10.2(@swc/core@1.16.1(@swc/helpers@0.5.23))
       magic-string:
         specifier: catalog:utils
         version: 0.30.21
@@ -10583,8 +10583,8 @@ packages:
     resolution: {integrity: sha512-rNjApaLzuwaOTjCiT8lSDdGN1APCiqkChLMJxJPWLunPAt5fy8xgU9/jNOchV84wfIxrA0lRQB7oCT8jrn/wrQ==}
     engines: {node: '>=6.0'}
 
-  chrono-node@2.10.1:
-    resolution: {integrity: sha512-tPOsBzYVAK5zth+CiHCgp5NGeqRc4mMD8FPthQ5IxkgjPWWxIFdM5odnmfw//IRAzl6C++Xy8olQW7wn5qBR1g==}
+  chrono-node@2.10.2:
+    resolution: {integrity: sha512-xBCwGGmodF2YVtzE7/8ewNDajbCg72jgZHyOXvhkuQiYhIQ1KbqyXJJJw2fLaQ603LL4oMVhOyjckEBve45S4w==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   ci-info@3.9.0:
@@ -12593,8 +12593,8 @@ packages:
       '@swc/core':
         optional: true
 
-  html-minifier-next@8.10.1:
-    resolution: {integrity: sha512-jBdiHotiLCrcpxvA2mRbTkO4ql15UfEe2sU3n9gF+M28w+EJoIadwJ1SshYZOt0V/8l8In59lflqXplAv96neg==}
+  html-minifier-next@8.10.2:
+    resolution: {integrity: sha512-5kG7QRuIzB5kxSxnKGowqDp5HAHXR+Mqtayt/l7IBbATVfpTMLX81k8cJVHgLRYuNmnY7P2Po5f2BLpjTFCb/g==}
     engines: {node: '>=22.13'}
     hasBin: true
     peerDependencies:
@@ -16487,7 +16487,7 @@ packages:
     resolution: {integrity: sha512-HXuLAX2pu/UByPpaeo/TaMfvMIi+1QqIoPJYCcAtU8QkVNwgR6MPlGuCQTErV1JwraaMbYaWVIBX7mppzGLATQ==}
     engines: {node: '>=10'}
     peerDependencies:
-      seroval: '>=1.6.3'
+      seroval: '>=1.6.8'
 
   seroval@1.6.8:
     resolution: {integrity: sha512-HlSgSAkTk4EqHcje1ptJjfZi1YDv5KbhVJ/d3P7T/nAXua2VmDu+AKDX5VTdFfZf48nDkWB2TKYt0DrCSa+3wg==}
@@ -23974,13 +23974,13 @@ snapshots:
 
   '@types/html-minifier-next@4.1.0(@swc/core@1.16.1(@swc/helpers@0.5.23))':
     dependencies:
-      html-minifier-next: 8.10.1(@swc/core@1.16.1(@swc/helpers@0.5.23))
+      html-minifier-next: 8.10.2(@swc/core@1.16.1(@swc/helpers@0.5.23))
     transitivePeerDependencies:
       - '@swc/core'
 
   '@types/html-minifier-next@4.1.0(@swc/core@1.16.13(@swc/helpers@0.5.23))':
     dependencies:
-      html-minifier-next: 8.10.1(@swc/core@1.16.13(@swc/helpers@0.5.23))
+      html-minifier-next: 8.10.2(@swc/core@1.16.13(@swc/helpers@0.5.23))
     transitivePeerDependencies:
       - '@swc/core'
 
@@ -26568,7 +26568,7 @@ snapshots:
 
   chrome-trace-event@1.0.4: {}
 
-  chrono-node@2.10.1: {}
+  chrono-node@2.10.2: {}
 
   ci-info@3.9.0: {}
 
@@ -29002,7 +29002,7 @@ snapshots:
     optionalDependencies:
       '@swc/core': 1.16.13(@swc/helpers@0.5.23)
 
-  html-minifier-next@8.10.1(@swc/core@1.16.1(@swc/helpers@0.5.23)):
+  html-minifier-next@8.10.2(@swc/core@1.16.1(@swc/helpers@0.5.23)):
     dependencies:
       commander: 15.0.0
       entities: 8.1.0
@@ -29012,7 +29012,7 @@ snapshots:
     optionalDependencies:
       '@swc/core': 1.16.1(@swc/helpers@0.5.23)
 
-  html-minifier-next@8.10.1(@swc/core@1.16.13(@swc/helpers@0.5.23)):
+  html-minifier-next@8.10.2(@swc/core@1.16.13(@swc/helpers@0.5.23)):
     dependencies:
       commander: 15.0.0
       entities: 8.1.0
@@ -34720,7 +34720,7 @@ snapshots:
 
   textlint-rule-date-weekday-mismatch@1.1.1(supports-color@7.2.0):
     dependencies:
-      chrono-node: 2.10.1
+      chrono-node: 2.10.2
       moment: 2.31.0
       textlint-tester: 12.6.1(supports-color@7.2.0)
     transitivePeerDependencies:
