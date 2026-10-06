@@ -125,7 +125,10 @@ jobs:
         needs: "discover"
         if: "${{ needs.discover.outputs.has-benches == 'true' }}"
         runs-on: "ubuntu-latest"
-        timeout-minutes: 30
+        # rollup-plugin-dts runs the slowest suite: its "before" cases are O(n^2) /
+        # per-resolve tsconfig parses and CodSpeed's simulation mode adds overhead, so
+        # the job needs materially more than the old 30 minutes on hosted runners.
+        timeout-minutes: 75
         strategy:
             # One project failing should not cancel the rest: a partial set of
             # measurements is still worth uploading.
