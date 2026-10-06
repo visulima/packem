@@ -5,10 +5,15 @@
  *
  * Adopting any of these is a code change of its own — delete the entry, run
  * `pnpm run lint:eslint:fix`, and fix what is left by hand.
+ *
+ * A few entries are set to `"warn"` rather than `"off"`: the rule has real value but
+ * the workspace is nowhere near clean, so the finding stays visible without failing
+ * the lint gate. Those are called out inline.
  * @type {import("eslint").Linter.Config}
  */
 const houseRules = {
     name: "packem/house-rules",
+    files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
     rules: {
         // Formatting the shared config's `stylistic: false` switch does not reach. prettier
         // owns line breaks here, and these rules undo what it does (and vice versa).
@@ -78,6 +83,17 @@ const houseRules = {
         // These flag `String#replace` with a string pattern. Every hit here replaces a marker
         // that occurs once by construction, and the transforms rely on that.
         "unicorn/no-unsafe-string-replacement": "off",
+
+        // Type-assertion strictness. The workspace leans on `as` throughout the plugin
+        // adapters and cross-backend bridges (~900 sites) and has never been green under
+        // these rules. They are kept as warnings so the signal is visible without failing
+        // the lint gate; tighten package by package.
+        "@typescript-eslint/no-unsafe-type-assertion": "warn",
+        "@typescript-eslint/no-restricted-types": "warn",
+
+        // `no-restricted-syntax` here is the "don't mock modules" opinion; the suites
+        // deliberately mock to exercise the real wiring.
+        "no-restricted-syntax": "warn",
     },
 };
 

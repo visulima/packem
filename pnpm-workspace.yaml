@@ -465,13 +465,6 @@ auditConfig:
     # and 3.0.3 is the latest published version. Reached only through dev-only micromatch,
     # whose patterns come from our own config.
     - GHSA-vfj7-8cjw-p6xm
-    # seroval is reached only from the dev-only examples/solid-babel build (via solid-js).
-    # No patched version is available: solid-js@1.9.15 (latest) pins seroval ~1.5.4, while
-    # the fixes land in >=1.6.3. Nothing here deserializes untrusted input, so the
-    # fromJSON/thenable (critical) and TypedArray-length (high) issues are not reachable.
-    # Drop these once solid-js widens its seroval range.
-    - GHSA-p6vx-979v-rg4c
-    - GHSA-jp82-f5mq-hwhp
     # postcss-selector-parser is reached only from the dev-only
     # packages/packem/__fixtures__/ecosystem/advanced-tailwind fixture, via
     # @tailwindcss/typography, which pins 6.0.10 exactly (latest typography still does).
@@ -526,6 +519,10 @@ overrides:
   postcss@<8.5.23: ">=8.5.23 <9"
   qs@<6.16.0: ">=6.16.0"
   shell-quote@<1.8.5: ">=1.10.0"
+  # GHSA-p6vx-979v-rg4c (critical) and GHSA-jp82-f5mq-hwhp (high) are both fixed in
+  # seroval 1.6.3. solid-js pins ~1.5.4, so force the patched release rather than
+  # hiding the advisories from `pnpm audit` workspace-wide.
+  seroval@<1.6.3: ">=1.6.3"
   svelte@<5.55.7: ">=5.57.1"
   svgo@>=4.0.0 <4.0.2: ">=4.1.0"
   tmp@<0.2.7: ">=0.2.7"
