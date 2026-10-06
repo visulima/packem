@@ -28,7 +28,7 @@ export { mod_d as Mod, Ns, Obj, a, b, fn };
 ## index.d.ts.map
 
 ```map
-{"version":3,"file":"index.d.ts","sources":["../../fixtures/source-map/mod.ts","../../fixtures/source-map/index.ts"],"names":[],"mappings":"AAAA,cAAa;cCAA;cAEA;KAIR;iBACW,GAAG,OAAO;UAIT;EACf;IACE;;EAEF;EACA;;kBAGe;OACH;OACA,IAAI,KAAK;OACT;IACV;;;"}
+{"version":3,"file":"index.d.ts","sources":["../../fixtures/source-map/mod.ts","../../fixtures/source-map/index.ts"],"names":[],"mappings":"AAAA,IAAA,CAAA,GAAO,CAAA,GAAA,CAAA,CAAM,EAAA,MAAK,EAAA,EAAW,EAAA,CAAA;;;;;;;ACA7B,IAAA,CAAA,CAAA,CAAA,GAAO,CAAA,CAAA,EAAM,MAAG,EAAA,EAAW,EAAA;AAE3B,IAAA,CAAA,CAAA,CAAA,GAAO,CAAA,CAAA,EAAM,MAAG,EAAA,EAAW,EAAA;AAI3B,IAAA,CAAK,GAAG,CAAA,GAAG,CAAA,CAAA,EAAA,MAAM,EAAA,EAAA,EAAA,CAAA;AACjB,IAAA,CAAA,EAAA,CAAA,GAAA,CAAA,CAAA,EAAA,MAAmB,CAAA,GAAK,GAAE,CAAA,EAAG,EAAG;YAIf,CAAG,CAAA,EAAA,MAAA,EAAA,EAAA,CAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,CAAA;AACZ,IAAA,CAAE,EAAA,CAAA,GAAA,CAAA,CAAA,EAAA,CAAA,CAAA,KAAA,CAAA,CAAA,CAAA,EAAA,CAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,CAAA;;"}
 ```
 
 ## index.js.map

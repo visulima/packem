@@ -30,7 +30,7 @@ export { a };
 //# sourceMappingURL=index.d.ts.map
 
 // index.d.ts.map
-{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,cAAa;"}
+{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,IAAA,CAAA,CAAA,CAAA,GAAO,CAAA,CAAA,EAAM,MAAM,EAAA,EAAA,EAAA;;"}
 // index.js
 const a = 1;
 
@@ -48,7 +48,7 @@ export { a };
 //# sourceMappingURL=index.d.ts.map
 
 // index.d.ts.map
-{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,cAAa;"}
+{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,IAAA,CAAA,CAAA,CAAA,GAAO,CAAA,CAAA,EAAM,MAAM,EAAA,EAAA,EAAA;;"}
 // index.js
 const a = 1;
 
@@ -121,7 +121,7 @@ export { Cls, Enum, fn, foo };
 //# sourceMappingURL=basic.d.ts.map
 
 // basic.d.ts.map
-{"version":3,"file":"basic.d.ts","sources":["__tests__/fixtures/basic.ts"],"names":[],"mappings":"AAAA,cAAa;KAER,SAAS,KAAK;KACd;UACK;iBAEM,GAAG,WAAW,SAAS,UAAU,KAAK;aAE1C;EACR;EACA;EACA;;cAGS;EACT;EAEA,GAAG,GAAG;;"}
+{"version":3,"file":"basic.d.ts","sources":["__tests__/fixtures/basic.ts"],"names":[],"mappings":"AAAA,IAAA,CAAA,GAAO,CAAA,GAAA,CAAA,CAAM,EAAA,MAAK,EAAA,EAAY,EAAA;AAE9B,IAAA,CAAK,QAAQ,CAAC,GAAC,CAAA,CAAI,EAAE,CAAA,CAAA,KAAA,CAAA,CAAA,CAAA,EAAA,CAAA,EAAA,EAAA,EAAA,CAAA,CAAA;AACrB,IAAA,CAAK,OAAO,CAAA,GAAG,CAAA,CAAA,EAAA,MAAO,EAAA,EAAA,EAAA,CAAA;AACtB,IAAA,CAAA,SAAU,CAAA,GAAA,CAAS,CAAA,EAAA,MAAA,EAAA,EAAA,EAAA,CAAA;AAAG,IAAA,CAAA,EAAA,CAAA,GAAA,CAAA,CAAA,EAAA,MAAA,CAAA,OAAA,EAAA,QAAA,EAAA,SAAA,CAAA,EAAA,CAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,CAAA;AAEtB,IAAA,CAAA,IAAA,CAAA,GAAA,CAAA,CAAA,EAAgB,MAAG,EAAA,EAAA,CAAA,EAAS,SAAU;AAEtC,IAAA,CAAA,GAAA,CAAA,GAAA,CAAY,CAAA,EAAA,MAAI,CAAA,IAAA,CAAA,EAAA,CAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,CAAA;;"}
 // basic.js.map
 {"version":3,"file":"basic.js","sources":[],"sourcesContent":[],"names":[],"mappings":""}"
 `;
