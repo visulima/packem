@@ -66,8 +66,8 @@ catalogs:
     "@babel/core": 8.0.1
     "@babel/parser": 8.0.4
     "@mozilla/readability": ^0.6.0
-    "@oxc-parser/binding-linux-x64-gnu": 0.152.0
-    "@oxc-project/types": 0.152.0
+    "@oxc-parser/binding-linux-x64-gnu": 0.153.0
+    "@oxc-project/types": 0.153.0
     "@svgr/core": ^8.1.0
     "@swc/core": 1.16.1
     "@swc/helpers": 0.5.23
@@ -83,10 +83,10 @@ catalogs:
     lit: 3.3.3
     mime: ^4.1.0
     nodehun: ^3.0.2
-    oxc-parser: 0.152.0
-    oxc-transform: 0.152.0
+    oxc-parser: 0.153.0
+    oxc-transform: 0.153.0
     p-queue: 9.3.3
-    package-manager-detector: ^1.8.0
+    package-manager-detector: ^1.9.0
     picocolors: ^1.1.1
     postgraphile: 5.1.5
     rs-module-lexer: 2.9.0
@@ -153,13 +153,13 @@ catalogs:
     tinyexec: 1.3.1
     tinyglobby: 0.2.17
   peer:
-    package-manager-detector: ^1.8.0
+    package-manager-detector: ^1.9.0
   prod:
     "@arethetypeswrong/core": ^0.18.5
     "@babel/parser": 8.0.4
     "@visulima/packem-share": 1.0.0-alpha.46
     audit-ci: ^7.1.0
-    cjs-module-lexer: 2.2.1
+    cjs-module-lexer: 2.3.0
     clsx: ^2.1.1
     fastest-levenshtein: 1.0.16
     get-tsconfig: 4.14.3
@@ -171,7 +171,7 @@ catalogs:
     micromatch: ^4.0.8
     mlly: 1.8.2
     obug: 2.2.1
-    oxc-parser: 0.152.0
+    oxc-parser: 0.153.0
     p-queue: 9.3.3
     picomatch: 4.0.7
     plop: 4.0.5
@@ -200,7 +200,7 @@ catalogs:
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.0-alpha.15
     clean-css: ^5.3.3
-    cssnano: 9.2.1
+    cssnano: 9.3.2
     icss-utils: ^5.1.0
     less: 4.9.0
     lightningcss: 1.33.0
