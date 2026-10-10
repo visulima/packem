@@ -187,7 +187,7 @@
         "icss-utils": ">=5.1.0",
         "less": ">=4.6.7",
         "lightningcss": ">=1.33.0",
-        "postcss": ">=8.5.26",
+        "postcss": ">=8.5.29",
         "postcss-load-config": ">=6.0.1",
         "postcss-modules-extract-imports": ">=3.1.0",
         "postcss-modules-local-by-default": ">=4.2.0",
