@@ -110,7 +110,7 @@ catalogs:
     svelte: 5.57.2
     vue: 3.5.42
   icons:
-    lucide-static: 1.51.0
+    lucide-static: 1.54.0
   lint:
     "@anolilab/commitlint-config": 10.1.5
     "@anolilab/eslint-config": 30.0.4

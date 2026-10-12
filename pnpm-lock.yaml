@@ -191,8 +191,8 @@ catalogs:
       version: 3.5.42
   icons:
     lucide-static:
-      specifier: 1.51.0
-      version: 1.51.0
+      specifier: 1.54.0
+      version: 1.54.0
   lint:
     '@anolilab/commitlint-config':
       specifier: 10.1.5
@@ -2200,7 +2200,7 @@ importers:
         version: 3.3.3
       lucide-static:
         specifier: catalog:icons
-        version: 1.51.0
+        version: 1.54.0
       minireset.css:
         specifier: catalog:style
         version: 0.0.7
@@ -13542,8 +13542,8 @@ packages:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
 
-  lucide-static@1.51.0:
-    resolution: {integrity: sha512-ts58ApMc5w5SHHUJBtGO+mgf9lo79FApQ1LttKQoJiMrWNZt8zxWA7R6owK6DoGA3XLjJXc/7rDJh1feonl79g==}
+  lucide-static@1.54.0:
+    resolution: {integrity: sha512-Y0NVQ7uX17m+Jee/coLs7uxGF3bEyWHXiXFBXxmE7BnjjMa5o0s1gR4zQHBQHN19RYaQWVG2cx4GdrW/WroyrA==}
 
   lunr@2.3.9:
     resolution: {integrity: sha512-zTU3DaZaF3Rt9rhN3uBMGQD3dD2/vFQqnvZCDv4dl5iOzq2IZQqTxu90r4E5J+nP70J3ilqVCrbho2eWaeW8Ow==}
@@ -29683,7 +29683,7 @@ snapshots:
 
   lru-cache@7.18.3: {}
 
-  lucide-static@1.51.0: {}
+  lucide-static@1.54.0: {}
 
   lunr@2.3.9: {}
 
