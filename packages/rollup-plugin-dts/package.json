@@ -105,7 +105,7 @@
         "eslint": "catalog:lint",
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
-        "rolldown": "catalog:build",
+        "rolldown": ">=1.2.13",
         "rollup": "catalog:build",
         "rollup-plugin-dts": "catalog:build",
         "tsx": "catalog:script",

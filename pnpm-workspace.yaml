@@ -44,7 +44,7 @@ catalogs:
     "@visulima/rollup-plugin-css": 1.0.0-alpha.45
     esbuild: 0.28.2
     rolldown: 1.2.13
-    rollup: 4.63.1
+    rollup: 4.63.6
     rollup-plugin-dts: 6.4.1
     rollup-plugin-import-trace: 1.0.1
     rollup-plugin-license: 3.7.1
@@ -200,7 +200,7 @@ catalogs:
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.0-alpha.15
     clean-css: ^5.3.3
-    cssnano: 9.2.2
+    cssnano: 9.4.0
     icss-utils: ^5.1.0
     less: 4.9.1
     lightningcss: 1.33.0
@@ -489,7 +489,7 @@ overrides:
   chrono-node@<2.2.4: ">=2.10.2"
   defu@<6.1.5: ">=6.1.7"
   devalue@>=5.0.0 <5.8.1: ">=6.0.2"
-  diff@>=5.0.0 <5.2.2: ">=6.0.0"
+  diff@>=5.0.0 <5.2.2: ">=9.0.0"
   esbuild@>=0.0.0 <0.28.1: ">=0.28.2"
   eslint-plugin-sonarjs@<4.2.0: ">=4.2.0"
   fast-uri@<3.1.6: ">=3.1.6 <4"
