@@ -82,14 +82,14 @@
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
         "rimraf": "catalog:node",
-        "rolldown": "catalog:build",
+        "rolldown": ">=1.2.13",
         "secretlint": "catalog:lint",
         "semantic-release": "catalog:cli",
         "typescript": "catalog:tsc",
         "vitest": "catalog:test"
     },
     "peerDependencies": {
-        "rolldown": ">=1.2.12"
+        "rolldown": ">=1.2.13"
     },
     "optionalDependencies": {},
     "engines": {

@@ -105,7 +105,7 @@
         "eslint": "catalog:lint",
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
-        "rolldown": "catalog:build",
+        "rolldown": ">=1.2.13",
         "rollup": "catalog:build",
         "rollup-plugin-dts": "catalog:build",
         "tsx": "catalog:script",
@@ -117,7 +117,7 @@
     "peerDependencies": {
         "@ts-macro/tsc": "catalog:tsc",
         "@typescript/native-preview": ">=7.0.0-dev.20260707.2",
-        "rolldown": ">=1.2.12",
+        "rolldown": ">=1.2.13",
         "rollup": ">=4.61.1",
         "typescript": "^6.0.3 || ~7.0.0",
         "vue-tsc": "catalog:tsc"
