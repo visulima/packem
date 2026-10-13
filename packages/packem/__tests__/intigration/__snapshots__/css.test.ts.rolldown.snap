@@ -3055,6 +3055,11 @@ export { a, b };
 `;
 
 exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 7`] = `
+"export { t as a } from "./a-BbTGSOLI.mjs";
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 8`] = `
 "//#region src/a.module.css
 var modules_bdb828b9 = { "treeshake-module-a": "a_treeshakeModuleA_a9b36f2f" };
 //#endregion
@@ -3064,12 +3069,6 @@ function a() {
 }
 //#endregion
 export { a as t };
-"
-`;
-
-exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 8`] = `
-"import { t as a } from "./a-BbTGSOLI.mjs";
-export { a };
 "
 `;
 
@@ -3087,8 +3086,7 @@ export { b as t };
 `;
 
 exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 10`] = `
-"import { t as b } from "./b-DJVdoX-9.mjs";
-export { b };
+"export { t as b } from "./b-DJVdoX-9.mjs";
 "
 `;
 
@@ -3449,12 +3447,6 @@ export { a, b };
 `;
 
 exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 7`] = `
-"import { t as a } from "./a-Ce4245Au.mjs";
-export { a };
-"
-`;
-
-exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 8`] = `
 "import { cssStyleInject } from "@visulima/css-style-inject";
 //#region src/a.module.css
 var css = ".a_treeshakeModuleA_a9b36f2f {\\n    color: red;\\n}\\n";
@@ -3481,6 +3473,11 @@ function a() {
 }
 //#endregion
 export { a as t };
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 8`] = `
+"export { t as a } from "./a-Ce4245Au.mjs";
 "
 `;
 
@@ -3515,8 +3512,7 @@ export { b as t };
 `;
 
 exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 10`] = `
-"import { t as b } from "./b-DLrMza9s.mjs";
-export { b };
+"export { t as b } from "./b-DLrMza9s.mjs";
 "
 `;
 
