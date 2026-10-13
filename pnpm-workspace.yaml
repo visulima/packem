@@ -124,7 +124,7 @@ catalogs:
     eslint: 10.9.1
     husky: ^9.1.7
     lint-staged: 17.6.0
-    prettier: 3.9.6
+    prettier: 3.9.10
     publint: 0.3.25
     secretlint: 13.0.7
     tailwind-csstree: 0.4.1
