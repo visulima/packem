@@ -221,7 +221,7 @@ catalogs:
     "@codspeed/vitest-plugin": ^5.7.1
     "@jridgewell/source-map": ^0.3.11
     "@sxzz/test-utils": 0.5.19
-    "@vitest/coverage-v8": 5.0.3
+    "@vitest/coverage-v8": 4.1.11
     "@vitest/ui": 4.1.11
     vitest: 4.1.11
   tsc:

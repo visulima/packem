@@ -164,8 +164,7 @@ exports.packageA = require_package.packageA;
 `;
 
 exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > index.mjs output 1`] = `
-"import { packageA } from './package.mjs';
-export { packageA };
+"export { packageA } from './package.mjs';
 "
 `;
 

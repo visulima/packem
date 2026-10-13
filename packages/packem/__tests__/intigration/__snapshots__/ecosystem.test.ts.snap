@@ -1450,23 +1450,23 @@ function findAllBrackets(v) {
 }
 function getMriOptions(options) {
   const result = {
-    alias: {},
+    alias: /* @__PURE__ */ Object.create(null),
     boolean: []
   };
   for (const [index, option] of options.entries()) {
     if (option.names.length > 1) result.alias[option.names[0]] = option.names.slice(1);
-    if (option.isBoolean) if (option.negated) {
-      if (!options.some((o, i) => {
-        return i !== index && o.names.some((name) => option.names.includes(name)) && typeof o.required === "boolean";
-      })) result.boolean.push(option.names[0]);
-    } else result.boolean.push(option.names[0]);
+    if (option.isBoolean) {
+      if (option.negated) {
+        if (!options.some((o, i) => {
+          return i !== index && o.names.some((name) => option.names.includes(name)) && typeof o.required === "boolean";
+        })) result.boolean.push(option.names[0]);
+      } else result.boolean.push(option.names[0]);
+    }
   }
   return result;
 }
 function findLongest(arr) {
-  return arr.sort((a, b) => {
-    return a.length > b.length ? -1 : 1;
-  })[0];
+  return arr.sort((a, b) => b.length - a.length)[0];
 }
 function padRight(str, length) {
   return str.length >= length ? str : \`\${str}\${" ".repeat(length - str.length)}\`;
@@ -1476,7 +1476,13 @@ function camelcase(input) {
     return p1 + p2.toUpperCase();
   });
 }
+const UNSAFE_KEYS = /* @__PURE__ */ new Set([
+  "__proto__",
+  "constructor",
+  "prototype"
+]);
 function setDotProp(obj, keys, val) {
+  if (keys.some((key) => UNSAFE_KEYS.has(key))) return;
   let current = obj;
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -1492,12 +1498,9 @@ function setDotProp(obj, keys, val) {
   }
 }
 function setByType(obj, transforms) {
-  for (const key of Object.keys(transforms)) {
-    const transform = transforms[key];
-    if (transform.shouldTransform) {
-      obj[key] = [obj[key]].flat();
-      if (typeof transform.transformFunction === "function") obj[key] = obj[key].map(transform.transformFunction);
-    }
+  for (const [key, transform] of Object.entries(transforms)) if (transform.shouldTransform) {
+    obj[key] = [obj[key]].flat();
+    if (typeof transform.transformFunction === "function") obj[key] = obj[key].map(transform.transformFunction);
   }
 }
 function getFileName(input) {
@@ -1540,7 +1543,7 @@ var Option = class {
         name = name.replace(/^no-/, "");
       }
       return camelcaseOptionName(name);
-    }).sort((a, b) => a.length > b.length ? 1 : -1);
+    }).sort((a, b) => a.length - b.length);
     this.name = this.names.at(-1);
     if (this.negated && this.config.default == null) this.config.default = true;
     if (rawName.includes("<")) this.required = true;
@@ -1642,7 +1645,7 @@ var Command = class {
   * @param name Option name
   */
   hasOption(name) {
-    name = name.split(".")[0];
+    name = name.split(".", 1)[0];
     return this.options.find((option) => {
       return option.names.includes(name);
     });
@@ -1718,7 +1721,7 @@ var Command = class {
     const { options: parsedOptions, globalCommand } = this.cli;
     const options = [...globalCommand.options, ...this.options];
     for (const option of options) {
-      const value = parsedOptions[option.name.split(".")[0]];
+      const value = parsedOptions[option.name.split(".", 1)[0]];
       if (option.required) {
         const hasNegated = options.some((o) => o.negated && o.names.includes(option.name));
         if (value === true || value === false && !hasNegated) throw new CACError(\`option \\\`\${option.rawName}\\\` value is missing\`);
@@ -1937,8 +1940,8 @@ var CAC = class extends EventTarget {
         transforms[cliOption.name].transformFunction = cliOption.config.type[0];
       }
     }
-    for (const key of Object.keys(parsed)) if (key !== "_") {
-      setDotProp(options, key.split("."), parsed[key]);
+    for (const [key, value] of Object.entries(parsed)) if (key !== "_") {
+      setDotProp(options, key.split("."), value);
       setByType(options, transforms);
     }
     return {
