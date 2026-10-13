@@ -21,7 +21,7 @@ const defaultCompilerOptions: ts.CompilerOptions = {
     noEmitOnError: true,
     resolveJsonModule: true,
     skipLibCheck: true,
-    target: 99 satisfies ts.ScriptTarget.ESNext,
+    target: ts.ScriptTarget.ESNext,
 };
 
 const createTsProgramFromParsedConfig = ({
