@@ -105,8 +105,8 @@ catalogs:
       specifier: ^1.0.2
       version: 1.0.2
     conventional-changelog-conventionalcommits:
-      specifier: 10.4.0
-      version: 10.4.0
+      specifier: 10.4.1
+      version: 10.4.1
     deeks:
       specifier: ^3.2.1
       version: 3.2.1
@@ -1907,7 +1907,7 @@ importers:
         version: 4.1.11(vitest@4.1.11)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.0
+        version: 10.4.1
       eslint:
         specifier: catalog:lint
         version: 10.9.1(jiti@2.7.0)(supports-color@10.2.2)
@@ -2160,7 +2160,7 @@ importers:
         version: 1.0.2(@babel/core@8.0.7)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.0
+        version: 10.4.1
       cross-env:
         specifier: catalog:node
         version: 10.1.0
@@ -2461,7 +2461,7 @@ importers:
         version: 4.1.11(vitest@4.1.11)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.0
+        version: 10.4.1
       esbuild:
         specifier: catalog:build
         version: 0.28.2
@@ -2542,7 +2542,7 @@ importers:
         version: 4.1.11(vitest@4.1.11)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.0
+        version: 10.4.1
       eslint:
         specifier: catalog:lint
         version: 10.9.1(jiti@2.7.0)(supports-color@10.2.2)
@@ -2723,7 +2723,7 @@ importers:
         version: 4.29.3
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.0
+        version: 10.4.1
       esbuild:
         specifier: catalog:build
         version: 0.28.2
@@ -2835,7 +2835,7 @@ importers:
         version: 4.1.11(vitest@4.1.11)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.0
+        version: 10.4.1
       esbuild:
         specifier: catalog:build
         version: 0.28.2
@@ -3060,7 +3060,7 @@ importers:
         version: 4.1.11(vitest@4.1.11)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.0
+        version: 10.4.1
       cssnano:
         specifier: '>=9.4.0'
         version: 9.6.0(postcss@8.5.29)
@@ -3231,7 +3231,7 @@ importers:
         version: 3.3.12
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.0
+        version: 10.4.1
       diff:
         specifier: catalog:dev
         version: 9.0.0
@@ -10481,8 +10481,8 @@ packages:
     resolution: {integrity: sha512-HdxRxuS8bBXVIuo4V82gvSwAXT0vYQUizrjs/izmPg5JdDstr8v8I5hduGL3iQbG+o310dUDxC4+LetuS5hu9w==}
     engines: {node: '>=22'}
 
-  conventional-changelog-conventionalcommits@10.4.0:
-    resolution: {integrity: sha512-Rriac6ZrAlVm6cy9Bz4NSp+WMHpwNXoPIYex+HjCgduAVUSbnew29DQjQw0C4g9u3HtSYzGiGY+pdBXAZo+4aA==}
+  conventional-changelog-conventionalcommits@10.4.1:
+    resolution: {integrity: sha512-jS1LRFSbRoAr6JbhhRy1JYfNNUj5LM3+v49hRE03CgccsiYqgdVj/RTmrw4J1rylrqijHwdOlJWiJa61JHOgHg==}
     engines: {node: '>=22'}
 
   conventional-changelog-conventionalcommits@9.3.1:
@@ -18887,7 +18887,7 @@ snapshots:
   '@commitlint/config-conventional@21.2.2':
     dependencies:
       '@commitlint/types': 21.2.3
-      conventional-changelog-conventionalcommits: 10.4.0
+      conventional-changelog-conventionalcommits: 10.4.1
 
   '@commitlint/config-validator@21.2.3':
     dependencies:
@@ -25553,7 +25553,7 @@ snapshots:
     dependencies:
       '@conventional-changelog/template': 1.4.0
 
-  conventional-changelog-conventionalcommits@10.4.0:
+  conventional-changelog-conventionalcommits@10.4.1:
     dependencies:
       '@conventional-changelog/template': 1.4.0
 
