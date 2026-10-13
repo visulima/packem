@@ -14,6 +14,10 @@ import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 import type { ExeOptions } from "./exe";
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
 
+// A recursive partial: every object member is optional. The mapped type is
+// intentional, so silence no-generated-empty-object-type (it sees `{}` for the
+// unresolved generic member).
+// eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
 export interface AttwOptions extends CheckPackageOptions {
