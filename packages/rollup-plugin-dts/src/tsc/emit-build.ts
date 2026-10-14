@@ -15,6 +15,10 @@ const debug = createDebug("rollup-plugin-dts:tsc-build");
 // are stored beside the cached map so a later `check` build that reuses the cache still sees them.
 const buildErrors = new WeakMap<SourceFileToProjectMap, string[]>();
 
+// Errors of the projects the solution build skipped, found by checking their builder programs
+// (no emit), keyed like `buildErrors`.
+const checkErrors = new WeakMap<SourceFileToProjectMap, string[]>();
+
 const getOrBuildProjects = (context: TscContext, fsSystem: ts.System, tsconfig: string, force: boolean, sourcemap: boolean): SourceFileToProjectMap => {
     let projectMap = context.projects.get(tsconfig);
 
@@ -84,6 +88,50 @@ const buildProjects = (fsSystem: ts.System, tsconfig: string, force: boolean, so
     buildErrors.set(sourceFileToProjectMap, errors);
 
     return sourceFileToProjectMap;
+};
+
+/**
+ * Type-checks each project of an incremental solution from its build info, without emitting.
+ *
+ * The solution builder skips a project whose sources look older than its build info, so an edit that
+ * leaves them older (e.g. a restored cache) reports nothing. A builder program re-checks every file
+ * whose content differs from the build info, so it still finds those errors.
+ */
+const checkProjects = (fsSystem: ts.System, sourceFileToProjectMap: SourceFileToProjectMap): string[] => {
+    let errors = checkErrors.get(sourceFileToProjectMap);
+
+    if (errors) {
+        return errors;
+    }
+
+    errors = [];
+
+    for (const { parsedConfig } of new Set(sourceFileToProjectMap.values())) {
+        if (parsedConfig.fileNames.length === 0) {
+            continue;
+        }
+
+        const program = ts.createIncrementalProgram({
+            host: ts.createIncrementalCompilerHost(parsedConfig.options, fsSystem),
+            options: parsedConfig.options,
+            projectReferences: parsedConfig.projectReferences,
+            rootNames: parsedConfig.fileNames,
+        });
+        const diagnostics = [
+            ...program.getOptionsDiagnostics(),
+            ...program.getGlobalDiagnostics(),
+            ...program.getSyntacticDiagnostics(),
+            ...program.getSemanticDiagnostics(),
+        ].filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
+
+        if (diagnostics.length > 0) {
+            errors.push(ts.formatDiagnostics(diagnostics, formatHost));
+        }
+    }
+
+    checkErrors.set(sourceFileToProjectMap, errors);
+
+    return errors;
 };
 
 /**
@@ -239,6 +287,15 @@ const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
 
         if (errors.length > 0) {
             return { error: errors.join("") };
+        }
+
+        // An up-to-date project is not built, so it reports nothing; check it from the build info instead.
+        if (incremental) {
+            const checked = checkProjects(fsSystem, sourceFileToProjectMap);
+
+            if (checked.length > 0) {
+                return { error: checked.join("") };
+            }
         }
     }
 

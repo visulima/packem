@@ -129,6 +129,21 @@ describe("chunk file names with a shared chunk named like an entry", () => {
         expect(fileNames).toContain("index2.d.ts");
     });
 
+    it.each([
+        ["array inputs", [path.resolve(namingFixtures, "index.ts"), path.resolve(namingFixtures, "index2.ts")]],
+        ["aliased inputs", { index: path.resolve(namingFixtures, "index.ts"), index2: path.resolve(namingFixtures, "index2.ts") }],
+    ])("names the shared chunk apart from the entry without a hash (%s)", async (_name, input) => {
+        expect.assertions(4);
+
+        const { chunks } = await rollupBuild(input, [dts({ emitDtsOnly: true })], {}, { chunkFileNames: "[name].js", entryFileNames: "[name].js" });
+        const fileNames = chunks.map((chunk) => chunk.fileName);
+
+        expect(fileNames).toContain("index.d.ts");
+        expect(fileNames).toContain("index2.d.ts");
+        expect(fileNames).toContain("index2-shared.d.ts");
+        expect(fileNames).not.toContain("index22.d.ts");
+    });
+
     it("keeps entry names with dtsInput", async () => {
         expect.assertions(2);
 

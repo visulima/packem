@@ -1,3 +1,5 @@
+import { mkdtemp, realpath, rm, utimes, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -76,6 +78,49 @@ describe("check option", () => {
             await expect(
                 buildDeclarations(validEntry, { check: true, emitDtsOnly: true, generator: "tsc", tsconfig: validTsconfig }),
             ).resolves.toMatch(DECLARATION_RE);
+        });
+
+        it("fails a second build-mode check when the edited source looks older than the build info", async () => {
+            expect.assertions(2);
+
+            const root = await realpath(await mkdtemp(path.join(tmpdir(), "rollup-plugin-dts-check-")));
+
+            try {
+                const tsconfig = path.join(root, "tsconfig.json");
+                const entry = path.join(root, "index.ts");
+                const options: Options = { build: true, check: true, emitDtsOnly: true, generator: "tsc", newContext: true, tsconfig };
+
+                await writeFile(
+                    tsconfig,
+                    JSON.stringify({
+                        compilerOptions: {
+                            declaration: true,
+                            incremental: true,
+                            module: "esnext",
+                            moduleResolution: "bundler",
+                            outDir: "./dist",
+                            skipLibCheck: true,
+                            strict: true,
+                            target: "esnext",
+                            types: [],
+                        },
+                        include: ["index.ts"],
+                    }),
+                );
+                await writeFile(entry, "export const value: number = 1;\n");
+
+                await expect(buildDeclarations(entry, options)).resolves.toMatch(DECLARATION_RE);
+
+                // The solution builder decides up-to-dateness from modification times. An edit that
+                // leaves the source older than the build info (e.g. a restored cache) is skipped by it.
+                await writeFile(entry, 'export const value: number = "not a number";\n');
+                const past = new Date(2000, 0, 1);
+                await utimes(entry, past, past);
+
+                await expect(buildDeclarations(entry, options)).rejects.toThrow(TS2322_RE);
+            } finally {
+                await rm(root, { force: true, recursive: true });
+            }
         });
     });
 

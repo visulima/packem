@@ -13,3 +13,12 @@ declare const foo: string;
 export { foo };
 "
 `;
+
+exports[`custom languages > customLanguages > builds an Astro file through Volar 1`] = `
+"// main.d.ts
+interface Props {
+  name: string;
+}
+declare function Foo(_props: Props): any;
+"
+`;

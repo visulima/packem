@@ -39,6 +39,9 @@ const loadVueLanguageTools = (): {
     }
 };
 
+/** Identity of the vue language for the given options: builds with equal options share one program cache. */
+export const vueLanguageId = (userOptions: VueLanguageOptions): string => `vue:${JSON.stringify(userOptions)}`;
+
 /**
  * Creates the Volar-based language definition for `.vue` single-file components.
  * The `vue` option of the plugin is a shortcut for `customLanguages: [createVueLanguage()]`.
@@ -58,6 +61,7 @@ export const createVueLanguage = (userOptions: VueLanguageOptions = {}): CustomL
             return [vue.createVueLanguagePlugin<string>(ts, options.options, resolver.build(), (id) => id)];
         },
         extensionPatterns: [RE_VUE],
+        id: vueLanguageId(userOptions),
         toTsFilename: (id: string): string => id.replace(RE_VUE, ".vue.ts"),
         tsFileExtensionInfos: [
             {

@@ -4,6 +4,9 @@ import type ts from "typescript";
 
 const debug = createDebug("rollup-plugin-dts:tsc-context");
 
+// The program caches of the builds that use languages, keyed by their language fingerprint (see `getLanguageFingerprint`).
+const sharedContexts = new Map<string, TscContext>();
+
 // A parsed tsconfig file with its path.
 export interface ParsedProject {
     parsedConfig: ts.ParsedCommandLine;
@@ -40,3 +43,26 @@ export const invalidateContextFile = (context: TscContext, file: string): void =
 };
 
 export const globalContext: TscContext = createContext();
+
+// A build that uses `vue` or a custom language must not reuse a program created for another language set, so each
+// language set gets a cache of its own. The empty fingerprint (no languages) keeps `globalContext`.
+export const getSharedContext = (fingerprint: string): TscContext => {
+    if (fingerprint === "") {
+        return globalContext;
+    }
+
+    let context = sharedContexts.get(fingerprint);
+
+    if (!context) {
+        context = createContext();
+        sharedContexts.set(fingerprint, context);
+    }
+
+    return context;
+};
+
+export const invalidateSharedContextFile = (file: string): void => {
+    for (const context of [globalContext, ...sharedContexts.values()]) {
+        invalidateContextFile(context, file);
+    }
+};

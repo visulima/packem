@@ -1,13 +1,24 @@
+import { mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { rollupBuild } from "@sxzz/test-utils";
-import { describe, expect, it } from "vitest";
+import { rollup } from "rollup";
+import ts from "typescript";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { dts } from "../src/index.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (...segments: string[]) => path.resolve(dirname, "fixtures/triple-slash-bundling", ...segments);
+const temporaryDirectory = path.join(dirname, "temp/triple-slash-bundling");
+
+// Diagnostics of the given declaration files, checked with `skipLibCheck` off so the `.d.ts` files are type-checked too.
+const diagnosticsOf = (files: string[]): ts.Diagnostic[] => {
+    const program = ts.createProgram(files, { noEmit: true, skipLibCheck: false, types: [] });
+
+    return [...program.getSyntacticDiagnostics(), ...program.getSemanticDiagnostics(), ...program.getGlobalDiagnostics()];
+};
 
 const build = (entry: string) =>
     rollupBuild(fixture(entry), [
@@ -86,6 +97,42 @@ describe("triple-slash reference bundling", () => {
         expect(snapshot).toMatch(OUTER_DIRECTIVE_RE);
         expect(snapshot).not.toContain("interface Outer");
         expect(snapshot).not.toContain("interface Inner");
+    });
+
+    describe("several entries referencing one script", () => {
+        beforeAll(async () => {
+            await rm(temporaryDirectory, { force: true, recursive: true });
+            await mkdir(temporaryDirectory, { recursive: true });
+        });
+
+        afterAll(async () => {
+            await rm(temporaryDirectory, { force: true, recursive: true });
+        });
+
+        it("inlines the shared script into one chunk and references that chunk from the others", async () => {
+            expect.assertions(6);
+
+            const bundle = await rollup({
+                input: { a: fixture("dedupe-entry/a.d.ts"), b: fixture("dedupe-entry/b.d.ts") },
+                plugins: [dts({ dtsInput: true, emitDtsOnly: true, sourcemap: false, tsconfig: false })],
+            });
+
+            await bundle.write({ dir: temporaryDirectory, format: "es" });
+            await bundle.close();
+
+            const aCode = await readFile(path.join(temporaryDirectory, "a.d.ts"), "utf8");
+            const bCode = await readFile(path.join(temporaryDirectory, "b.d.ts"), "utf8");
+
+            // `a` sorts first, so it owns the copy of the script; `b` points at it instead of declaring it again.
+            expect(aCode).toContain("interface Foo");
+            expect(bCode).not.toContain("interface Foo");
+            expect(bCode).toContain('/// <reference path="./a.d.ts" />');
+            expect(bCode).not.toContain("declare global");
+            // Both entries load together without duplicate declarations.
+            expect(diagnosticsOf([path.join(temporaryDirectory, "a.d.ts"), path.join(temporaryDirectory, "b.d.ts")])).toHaveLength(0);
+            // `b` alone still sees `Foo` and `Maybe` through the reference.
+            expect(diagnosticsOf([path.join(temporaryDirectory, "b.d.ts")])).toHaveLength(0);
+        });
     });
 
     it("keeps missing, module, unsafe-script, types and lib references", async () => {

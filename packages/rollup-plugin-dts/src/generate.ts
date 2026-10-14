@@ -15,6 +15,7 @@ import { is } from "yuku-ast";
 import type { TSPropertySignature } from "yuku-parser";
 import { parse } from "yuku-parser";
 
+import { getLanguageFingerprint } from "./custom-language";
 import {
     dtsEntryFileName,
     filenameToDts,
@@ -31,7 +32,7 @@ import {
 import type { OptionsResolved } from "./options";
 import { createReexportSpecifierRewriter } from "./reexport-specifier";
 import type { TscContext } from "./tsc/context";
-import { createContext, globalContext, invalidateContextFile } from "./tsc/context";
+import { createContext, invalidateContextFile, invalidateSharedContextFile } from "./tsc/context";
 import type { TscOptions, TscResult } from "./tsc/index";
 import type { WorkerRequest, WorkerResponse } from "./tsc/types";
 import { getTsgoEmitRoot, runTsgo } from "./tsgo";
@@ -115,7 +116,11 @@ export const createGeneratePlugin = ({
     | "exclude"
     | "entry"
     | "logger"
->): Plugin => {
+>,
+// Chunk names of the declaration entries this plugin emits, shared with the fake-js plugin so a
+// shared chunk never takes an entry's file name.
+entryChunkNames: Set<string> = new Set<string>(),
+): Plugin => {
     const filter = include || exclude ? createFilter(include, exclude) : null;
 
     // `entry` lets the user restrict which entry files emit `.d.ts` chunks via globs,
@@ -253,7 +258,9 @@ export const createGeneratePlugin = ({
                 } else {
                     tscModule = await import("./tsc/index.js");
 
-                    if (newContext) {
+                    // A language without an id cannot be shared, so its builds get a cache of their own. Other builds
+                    // leave `tscContext` unset and use the cache shared by their language set (see `tscEmit`).
+                    if (newContext || getLanguageFingerprint({ customLanguages, tsMacro, vue }) === undefined) {
                         tscContext = createContext();
                     }
                 }
@@ -619,6 +626,10 @@ export { __json_default_export as default }`;
 
                         const name = inputAliasMap.get(id);
 
+                        // rollup names an emitted chunk without an explicit name after the file
+                        // minus its last extension (`index.d.ts` -> `index.d`)
+                        entryChunkNames.add(name ? `${name}.d` : path.basename(dtsId, path.extname(dtsId)));
+
                         this.emitFile({
                             id: dtsId,
                             name: name ? `${name}.d` : undefined,
@@ -650,7 +661,11 @@ export { __json_default_export as default }`;
 
         watchChange(id) {
             if (tscModule) {
-                invalidateContextFile(tscContext || globalContext, id);
+                if (tscContext) {
+                    invalidateContextFile(tscContext, id);
+                } else {
+                    invalidateSharedContextFile(id);
+                }
             }
         },
     };

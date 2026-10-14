@@ -1,4 +1,3 @@
-import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,7 +11,6 @@ import type { CustomLanguage } from "../src/index.js";
 import { createTsMacroLanguage, createVueLanguage, dts, resolveOptions } from "../src/index.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-const require = createRequire(import.meta.url);
 
 const RE_CUSTOM = /\.custom$/;
 const RE_ASTRO = /\.astro$/;
@@ -20,8 +18,7 @@ const RE_TSGO_CUSTOM_UNSUPPORTED = /does not support custom languages/;
 const RE_VOLAR_NEEDS_TSC = /require the `tsc` generator/;
 const RE_TYPESCRIPT_7 = /TypeScript 7/;
 
-// Builds in one process share a TypeScript program cache, which ignores the vue and tsMacro options.
-// A fresh context per build makes each option set take effect.
+// Gives the build its own TypeScript program cache. Builds without it share the cache of their language set.
 const isolatedDts = (options: Parameters<typeof dts>[0] = {}): Plugin[] => dts({ newContext: true, ...options });
 
 // A language that needs no Volar: its files are TypeScript once `toTsFilename` maps them.
@@ -57,18 +54,12 @@ const convertCustomToTs = (): Plugin => {
     };
 };
 
-type AstroPlugin = Extract<ReturnType<NonNullable<CustomLanguage["createVolarPlugins"]>>, unknown[]>[number];
-
-// Only called when `@astrojs/ts-plugin` is installed; the Astro test is skipped otherwise.
-const createAstroLanguage = (): CustomLanguage => {
-    /* eslint-disable import/no-dynamic-require -- the Astro tooling is optional and loaded only when installed */
-    const { getLanguagePlugin } = require("@astrojs/ts-plugin/dist/language.js") as { getLanguagePlugin: () => AstroPlugin };
-    const plugin = getLanguagePlugin();
-    const volarTypeScript = require(require.resolve("@volar/typescript", { paths: [require.resolve("@astrojs/ts-plugin")] })) as CustomLanguage["volarTypeScript"];
-    /* eslint-enable import/no-dynamic-require */
+const createAstroLanguage = async (): Promise<CustomLanguage> => {
+    const { getLanguagePlugin } = await import("@astrojs/ts-plugin/dist/language.js");
+    const volarTypeScript = await import("@volar/typescript");
 
     return {
-        createVolarPlugins: () => [plugin],
+        createVolarPlugins: () => [getLanguagePlugin()],
         extensionPatterns: [RE_ASTRO],
         toTsFilename: (id: string): string => id.replace(RE_ASTRO, ".astro.ts"),
         volarTypeScript,
@@ -82,16 +73,6 @@ const createLogger = () => {
         warn: vi.fn<(...args: unknown[]) => void>(),
     };
 };
-
-const hasAstroTsPlugin = ((): boolean => {
-    try {
-        require.resolve("@astrojs/ts-plugin");
-
-        return true;
-    } catch {
-        return false;
-    }
-})();
 
 describe("custom languages", () => {
     describe("vue shortcut", () => {
@@ -130,6 +111,24 @@ describe("custom languages", () => {
             const withDefaults = await rollupBuild(entry, [isolatedDts({ emitDtsOnly: true, tsconfig: false, vue: true })]);
 
             expect(overridden.snapshot).toBe(withDefaults.snapshot);
+        });
+
+        it("does not leak vueCompilerOptions from an earlier build in the same process", async () => {
+            expect.assertions(2);
+
+            const root = path.resolve(dirname, "fixtures/vue-sfc-fallthrough");
+            const entry = path.resolve(root, "main.ts");
+
+            // Isolated baseline for the default options. The two builds below run without `newContext`, so they share
+            // the program cache of their language set: the second must not reuse the program of the first.
+            const expected = await rollupBuild(entry, [isolatedDts({ emitDtsOnly: true, tsconfig: false, vue: true })]);
+            const overridden = await rollupBuild(entry, [
+                dts({ emitDtsOnly: true, tsconfig: false, vue: { vueCompilerOptions: { fallthroughAttributes: true } } }),
+            ]);
+            const withDefaults = await rollupBuild(entry, [dts({ emitDtsOnly: true, tsconfig: false, vue: true })]);
+
+            expect(overridden.snapshot).not.toBe(expected.snapshot);
+            expect(withDefaults.snapshot).toBe(expected.snapshot);
         });
 
         it("keeps the vue shortcut working on the parallel worker", async () => {
@@ -192,12 +191,12 @@ describe("custom languages", () => {
             expect(snapshot).toMatchSnapshot();
         });
 
-        it.skipIf(!hasAstroTsPlugin)("builds an Astro file through Volar", async () => {
+        it("builds an Astro file through Volar", async () => {
             expect.assertions(1);
 
             const root = path.resolve(dirname, "fixtures/custom-languages/astro");
             const { snapshot } = await rollupBuild(path.resolve(root, "main.ts"), [
-                isolatedDts({ customLanguages: [createAstroLanguage()], emitDtsOnly: true }),
+                isolatedDts({ customLanguages: [await createAstroLanguage()], emitDtsOnly: true }),
             ]);
 
             expect(snapshot).toMatchSnapshot();

@@ -1,9 +1,9 @@
 /* eslint-disable import/exports-last -- the registry helpers are grouped with the language type they operate on */
 import type ts from "typescript";
 
-import createTsMacroLanguage from "./tsc/ts-macro";
+import createTsMacroLanguage, { TS_MACRO_LANGUAGE_ID } from "./tsc/ts-macro";
 import type { VueLanguageOptions } from "./tsc/vue";
-import { createVueLanguage } from "./tsc/vue";
+import { createVueLanguage, vueLanguageId } from "./tsc/vue";
 
 /**
  * The part of `@volar/typescript` this package uses. It is described structurally, so the published
@@ -34,6 +34,13 @@ export interface CustomLanguage {
 
     /** Patterns that identify files written in this language. */
     extensionPatterns: RegExp[];
+
+    /**
+     * Stable identity of the language. Builds in one process share a TypeScript program cache when their
+     * languages have the same ids, so change the id whenever the language's behaviour changes. A language
+     * without an id is never shared: each build gets its own cache.
+     */
+    id?: string;
 
     /** Maps a source filename to the TypeScript filename used for declarations. */
     toTsFilename?: (id: string) => string;
@@ -79,6 +86,40 @@ export const resolveCustomLanguages = ({
     }
 
     return languages;
+};
+
+/**
+ * Identity of the language set a build uses, which selects the TypeScript program cache it shares. Built from the ids
+ * only, so it does not load any language tooling. Empty when no language is used; `undefined` when a language has no id.
+ */
+export const getLanguageFingerprint = ({
+    customLanguages = [],
+    tsMacro = false,
+    vue = false,
+}: {
+    customLanguages?: CustomLanguage[];
+    tsMacro?: boolean;
+    vue?: boolean | VueLanguageOptions;
+}): string | undefined => {
+    const ids: string[] = [];
+
+    for (const language of customLanguages) {
+        if (language.id === undefined) {
+            return undefined;
+        }
+
+        ids.push(language.id);
+    }
+
+    if (vue) {
+        ids.push(vueLanguageId(typeof vue === "object" ? vue : {}));
+    }
+
+    if (tsMacro) {
+        ids.push(TS_MACRO_LANGUAGE_ID);
+    }
+
+    return ids.length === 0 ? "" : JSON.stringify(ids);
 };
 
 export class LanguageContext {

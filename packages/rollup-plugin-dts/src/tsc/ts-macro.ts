@@ -39,6 +39,9 @@ const loadTsMacroLanguageTools = (): {
     }
 };
 
+// Identity of the ts-macro language. It takes no options, so one id covers every build that enables it.
+const TS_MACRO_LANGUAGE_ID = "ts-macro";
+
 /**
  * Creates the Volar-based language definition for ts-macro. The `tsMacro` option of the plugin is a
  * shortcut for `customLanguages: [createTsMacroLanguage()]`.
@@ -53,9 +56,12 @@ const createTsMacroLanguage = (): CustomLanguage => {
             return tsMacro.getLanguagePlugins(ts, options.options, getOptions(ts, $rootDir));
         },
         extensionPatterns: [],
+        id: TS_MACRO_LANGUAGE_ID,
         tsFileExtensionInfos: [],
         volarTypeScript,
     };
 };
+
+export { TS_MACRO_LANGUAGE_ID };
 
 export default createTsMacroLanguage;

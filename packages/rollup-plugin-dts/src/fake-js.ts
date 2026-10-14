@@ -156,12 +156,20 @@ interface ChunkExportInfo {
 
 type NamespaceMap = Map<string, { local: t.Identifier | t.TSQualifiedName; stmt: t.ProgramStatement }>;
 
-const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">): Plugin => {
+const createFakeJsPlugin = (
+    { cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">,
+    entryChunkNames: ReadonlySet<string> = new Set<string>(),
+): Plugin => {
     let declarationIndex = 0;
     const declarationMap = new Map<number /* declaration id */, DeclarationInfo>();
     const commentsMap = new Map<string /* filename */, t.Comment[]>();
     // `/// <reference path>` directives that point at a local global script, mapped to that script (see reference-directives.ts).
     const referencedScriptMap = new WeakMap<t.Comment, InlinableScript>();
+    // The global scripts each module references. Kept per module, not per directive, so that any chunk can find
+    // which other chunks inline the same script (see `getScriptOwners`).
+    const moduleScriptsMap = new Map<string /* filename */, InlinableScript[]>();
+    // Per render: the chunk file that inlines each script, computed once from the chunk graph of that output.
+    let scriptOwners: Map<string /* script file */, string /* chunk file name */> | undefined;
     // Leading JSDoc of specifier-based export statements, which — unlike declarations — are
     // handed to rollup verbatim and would otherwise be lost to the `comments: false` print
     // at the end of `transform`. Re-attached by name in `renderChunk`.
@@ -270,8 +278,16 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
             return {
                 ...options,
-                chunkFileNames(chunk) {
+                chunkFileNames(preRenderedChunk) {
+                    let chunk = preRenderedChunk;
                     const nameTemplate = resolveTemplateFunction(chunk.isEntry ? entryFileNames || "[name].js" : chunkFileNames || "[name]-[hash].js", chunk);
+
+                    // Rollup does not reserve the names of the declaration entries we emit, so with a
+                    // template that has no `[hash]` a shared chunk could claim an entry's file name
+                    // first and push the entry to `name2`. Name the shared chunk apart instead.
+                    if (!chunk.isEntry && !nameTemplate.includes("[hash]") && entryChunkNames.has(chunk.name)) {
+                        chunk = { ...chunk, name: chunk.name.endsWith(".d") ? `${chunk.name.slice(0, -2)}-shared.d` : `${chunk.name}-shared` };
+                    }
 
                     if (chunk.name.endsWith(".d")) {
                         const renderedNameWithoutD = filenameJsToDts(replaceTemplateName(nameTemplate, chunk.name.slice(0, -2)));
@@ -287,7 +303,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                         }
                     }
 
-                    return nameTemplate;
+                    return chunk === preRenderedChunk ? nameTemplate : replaceTemplateName(nameTemplate, chunk.name);
                 },
                 sourcemap: options.sourcemap || sourcemap,
             };
@@ -298,6 +314,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             // Invalidate the per-render type-only propagation cache so watch-mode
             // rebuilds recompute it from the freshly-populated moduleExportsMap.
             resolvedExportsByModule = undefined;
+            scriptOwners = undefined;
         },
 
         async transform(code: string, id: string) {
@@ -346,6 +363,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         moduleExportsMap.set(id, await collectModuleExports(this, program.body, id, collectTypeofNames(program)));
 
         const directives = collectReferenceDirectives(file.comments);
+        const scripts: InlinableScript[] = [];
 
         if (directives.length > 0) {
             commentsMap.set(id, directives);
@@ -355,10 +373,17 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                 if (script) {
                     referencedScriptMap.set(directive, script);
+                    scripts.push(script);
                     // The chunk now contains this file's text, so a change to it must rebuild in watch mode.
                     this.addWatchFile(script.file);
                 }
             }
+        }
+
+        if (scripts.length > 0) {
+            moduleScriptsMap.set(id, scripts);
+        } else {
+            moduleScriptsMap.delete(id);
         }
 
         const exportComments = collectExportComments(program.body);
@@ -689,7 +714,32 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         };
     }
 
-    function renderChunk(code: string, chunk: RenderedChunk, options: NormalizedOutputOptions) {
+    // The chunk that inlines each script, when several chunks reference it: the first by file name, so the choice does not
+    // depend on the order rollup renders the chunks. The other chunks reference that copy instead (see `referenceOutputFile`).
+    function getScriptOwners(chunks: Record<string, RenderedChunk>): Map<string, string> {
+        if (scriptOwners) return scriptOwners;
+
+        const owners = new Map<string, string>();
+
+        for (const name of Object.keys(chunks).toSorted((a, b) => (a < b ? -1 : Number(a > b)))) {
+            const { fileName, moduleIds } = chunks[name];
+
+            // Only declaration chunks inline scripts (see `renderChunk`), so only they can own one.
+            if (!RE_DTS.test(fileName)) continue;
+
+            for (const moduleId of moduleIds) {
+                for (const script of moduleScriptsMap.get(moduleId) ?? []) {
+                    if (!owners.has(script.file)) owners.set(script.file, fileName);
+                }
+            }
+        }
+
+        scriptOwners = owners;
+
+        return owners;
+    }
+
+    function renderChunk(code: string, chunk: RenderedChunk, options: NormalizedOutputOptions, meta: { chunks: Record<string, RenderedChunk> }) {
         if (!RE_DTS.test(chunk.fileName)) {
             return;
         }
@@ -954,14 +1004,23 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                 preserveComments.forEach((c) => {
                     const script = referencedScriptMap.get(c);
+                    let rebased: t.Comment;
 
                     if (script) {
-                        inlinedScripts.set(script.file, script);
+                        const owner = getScriptOwners(meta.chunks).get(script.file);
 
-                        return;
+                        if (owner === undefined || owner === chunk.fileName) {
+                            inlinedScripts.set(script.file, script);
+
+                            return;
+                        }
+
+                        // Another chunk already inlines this script, so reference its copy rather than declare it twice.
+                        rebased = referenceOutputFile(c, path.resolve(outputDirectory, owner), chunkOutputDirectory);
+                    } else {
+                        rebased = rebaseReferencePath(c, sourceDirectory, chunkOutputDirectory);
                     }
 
-                    const rebased = rebaseReferencePath(c, sourceDirectory, chunkOutputDirectory);
                     const dedupeKey = rebased.type + rebased.value;
 
                     if (commentsValue.has(dedupeKey)) return;
@@ -1346,6 +1405,17 @@ const REFERENCE_PATH_RE = /(\/\s*<reference\s+path=)(["'])(.+?)\2/;
 // correct relative to `sourceDirectory` — is correct relative to `chunkOutputDirectory` where
 // the comment is being hoisted. `types=` directives reference package names (not file paths)
 // and are returned untouched. Absolute paths are also left as-is.
+// A directive that references another output file, with the path relative to the chunk's own directory.
+const referenceOutputFile = (comment: t.Comment, targetFile: string, chunkOutputDirectory: string): t.Comment => {
+    let relative = path.relative(chunkOutputDirectory, targetFile).replaceAll("\\", "/");
+
+    if (!relative.startsWith(".")) {
+        relative = `./${relative}`;
+    }
+
+    return { ...comment, value: `/ <reference path="${relative}" />` };
+};
+
 const rebaseReferencePath = (comment: t.Comment, sourceDirectory: string, chunkOutputDirectory: string): t.Comment => {
     const match = REFERENCE_PATH_RE.exec(comment.value);
 

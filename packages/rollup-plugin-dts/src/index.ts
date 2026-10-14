@@ -18,14 +18,15 @@ export const dts = (options: Options = {}): Plugin[] => {
     debug("resolved dts options %o", resolved);
 
     const plugins: Plugin[] = [];
+    const entryChunkNames = new Set<string>();
 
     if (options.dtsInput) {
         plugins.push(createDtsInputPlugin(resolved));
     } else {
-        plugins.push(createGeneratePlugin(resolved));
+        plugins.push(createGeneratePlugin(resolved, entryChunkNames));
     }
 
-    plugins.push(createDtsResolvePlugin(resolved), createFakeJsPlugin(resolved));
+    plugins.push(createDtsResolvePlugin(resolved), createFakeJsPlugin(resolved, entryChunkNames));
 
     if (options.banner || options.footer) {
         plugins.push(createBannerPlugin(resolved));

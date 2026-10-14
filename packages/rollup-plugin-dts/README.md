@@ -34,7 +34,7 @@ export default {
 
 ### Output file names with shared chunks
 
-If you set `chunkFileNames` without `[hash]` (for example `"[name].js"`), a shared chunk can take the name of an entry. With entries `index` and `index2` that both re-export a module which rollup also names `index2`, the entry `index2.d.ts` is renamed to `index22.d.ts`. Declaration entries are emitted as chunks by this plugin, so rollup does not reserve their names before it names the shared chunk. Use `chunkFileNames: "[name]-[hash].js"` (the plugin's default) so shared chunks never claim an entry's name. In `dtsInput` mode the entries keep their names regardless of the template.
+Declaration entries are emitted as chunks by this plugin, so rollup does not reserve their names before it names the shared chunks. With a `chunkFileNames` template that has no `[hash]` (for example `"[name].js"`), a shared chunk could therefore take an entry's name — entries `index` and `index2` that both re-export a module rollup also names `index2` would turn the `index2` entry into `index22.d.ts`. The plugin avoids this: a shared chunk whose name equals an entry's name is written as `<name>-shared.d.ts` (`index2-shared.d.ts`), and the entry keeps its own file name. Templates with `[hash]` (the default) never collide and are left alone. In `dtsInput` mode the entries are real rollup entries and keep their names regardless of the template.
 
 ## Options
 
@@ -161,12 +161,9 @@ Indicates whether the generated `.d.ts` files have side effects.
 
 If `true`, type errors in your sources are reported while declarations are generated, and they fail the build. By default declarations are emitted without type-checking.
 
-- `tsc`: the syntactic and semantic errors of each emitted file fail the build. With `build: true`, every error reported by the project build fails it.
+- `tsc`: the syntactic and semantic errors of each emitted file fail the build. With `build: true`, the syntactic and semantic errors of every project in the build fail it, including projects the solution builder skipped as up to date.
 - `tsgo`: the compiler runs with type-checking enabled, and a non-zero exit fails the build with its diagnostics.
 - `oxc`: has no effect, because isolated declarations are not type-checked. A warning is logged instead.
-
-> [!NOTE]
-> With `build: true` and `incremental`, a project that is already up to date is skipped by the solution builder, so it reports no diagnostics and `check` passes without re-checking it.
 
 ```ts
 dts({ check: true });
@@ -286,6 +283,7 @@ To use this option, ensure that `@typescript/native-preview` is installed as a d
 Registers non-standard source languages, such as Vue or Astro. Each entry describes one language:
 
 - `extensionPatterns`: regular expressions that match the files of the language.
+- `id`: optional. Builds in one process share a TypeScript program cache for the same language ids, so change the id when the language's behaviour changes. A language without an `id` is never shared.
 - `toTsFilename(id)`: maps a source filename to the TypeScript filename used for declarations, for example `foo.custom` to `foo.custom.ts`.
 - `tsFileExtensionInfos`: extra file extensions passed to the TypeScript compiler.
 - `volarTypeScript` and `createVolarPlugins`: needed when the language is supported through [Volar](https://volarjs.dev). Both are required together.
@@ -326,14 +324,15 @@ Constraints:
 
 A `/// <reference path="…" />` in a `.d.ts` input that points at a local global script (a file with only `interface`,
 `type`, `enum` and `declare` declarations, no imports or exports) is inlined into the output and the directive is removed.
-Inlined declarations are wrapped in `declare global { … }` when the output is a module. Several references to the same
-script are inlined once per output chunk, so with several entries each chunk gets its own copy. Duplicate `type`,
-`const`, `class` or `enum` declarations then conflict for consumers that load more than one entry, while interfaces
-and function overloads merge.
+Inlined declarations are wrapped in `declare global { … }` when the output is a module. When several output chunks reference
+the same script, the script is inlined into one of them, the first by file name, and the other chunks get a
+`/// <reference path="…" />` to that chunk. Consumers that load several entries therefore see one declaration, so duplicate
+`type`, `const`, `class` or `enum` declarations do not conflict.
 
 Limits: scripts that contain imports or `import()` types, scripts that have a reference directive of their own, and
 string-named `declare module` blocks are not inlined. Their directives are kept, with the path rebased to the output
-location. Directives in `.ts` sources do not reach the emitted declarations, so nothing is inlined for them.
+location. Directives in `.ts` sources do not reach the emitted declarations, so nothing is inlined for them. The owner is
+chosen by file name, not by use, and a chunk that references another also loads that chunk's declarations.
 `/// <reference types="…" />`, `lib=` and `no-default-lib` directives are kept as they are.
 
 ## Differences from `rollup-plugin-dts`

@@ -91,6 +91,7 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@astrojs/ts-plugin": "catalog:tsc",
         "@codspeed/vitest-plugin": "catalog:test",
         "@jridgewell/source-map": "catalog:test",
         "@sxzz/test-utils": "catalog:test",
