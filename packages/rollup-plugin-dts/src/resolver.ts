@@ -8,17 +8,55 @@ import type { Plugin, ResolvedId } from "rollup";
 import { filenameJsToDts, filenameToDts, RE_CSS, RE_DTS, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
 import type { OptionsResolved } from "./options";
 
-const isSourceFile = (id: string) => RE_TS.test(id) || RE_VUE.test(id) || RE_JSON.test(id);
+// Extensions a relative import may stand for, keyed by the extension written in the specifier.
+const MODULE_SUFFIX_EXTENSIONS: Record<string, string[] | undefined> = {
+    "": [".ts", ".tsx", ".d.ts"],
+    ".cjs": [".cts", ".d.cts"],
+    ".js": [".ts", ".tsx", ".d.ts"],
+    ".jsx": [".tsx", ".d.ts"],
+    ".mjs": [".mts", ".d.mts"],
+};
+
+/**
+ * Resolve a relative import the way TypeScript does when `compilerOptions.moduleSuffixes` is set:
+ * `./d.js` with `[".ios", ""]` is looked up as `d.ios.ts` before `d.ts`. oxc-resolver has no
+ * equivalent option, so the suffixed candidates are probed here; an empty suffix hands back to
+ * the regular resolver (TypeScript tries the suffixes in order and stops at the first hit).
+ */
+const resolveModuleSuffix = (id: string, importer: string, moduleSuffixes: string[]): string | null => {
+    const written = path.extname(id);
+    const extensions = MODULE_SUFFIX_EXTENSIONS[written];
+    const stem = extensions ? id.slice(0, id.length - written.length) : id;
+    const candidates = extensions ?? [".ts", ".tsx", ".d.ts"];
+
+    for (const suffix of moduleSuffixes) {
+        if (suffix === "") return null;
+
+        for (const extension of candidates) {
+            const candidate = path.resolve(path.dirname(importer), `${stem}${suffix}${extension}`);
+
+            if (existsSync(candidate)) return candidate;
+        }
+    }
+
+    return null;
+};
+
+const isBuiltinSourceFile = (id: string) => RE_TS.test(id) || RE_VUE.test(id) || RE_JSON.test(id);
 
 const createDtsResolvePlugin = ({
     cwd,
     emitJs,
+    languageContext,
     resolve,
     resolver,
     sideEffects,
     tsconfig,
     tsconfigRaw,
-}: Pick<OptionsResolved, "cwd" | "tsconfig" | "tsconfigRaw" | "resolve" | "resolver" | "sideEffects" | "emitJs">): Plugin => {
+}: Pick<OptionsResolved, "cwd" | "tsconfig" | "tsconfigRaw" | "resolve" | "resolver" | "sideEffects" | "emitJs" | "languageContext">): Plugin => {
+    // Files of registered custom languages (for example `.astro`) are source files too.
+    const isSourceFile = (id: string): boolean => isBuiltinSourceFile(id) || languageContext.isCustomLanguageFile(id);
+
     // When `emitJs` is on (JSDoc/`allowJs` declarations), a local `.js` file that a
     // `.d.ts` re-exports from must be redirected to its generated `.d.ts`, exactly
     // like a `.ts` source. Without this, rollup links to the raw `.js` (which the
@@ -33,6 +71,8 @@ const createDtsResolvePlugin = ({
         tsconfig: tsconfig ? { configFile: tsconfig, references: "auto" } : undefined,
     });
     const moduleSideEffects = sideEffects ? true : null;
+    const moduleSuffixes = (tsconfigRaw.compilerOptions as { moduleSuffixes?: string[] }).moduleSuffixes?.filter((suffix) => typeof suffix === "string") ?? [];
+    const hasModuleSuffixes = moduleSuffixes.some((suffix) => suffix !== "");
 
     return {
         name: "rollup-plugin-dts:resolver",
@@ -71,7 +111,7 @@ const createDtsResolvePlugin = ({
                     if (directDtsResolution && isSourceFile(directDtsResolution)) {
                         await this.load({ id: directDtsResolution });
 
-                        return { id: filenameToDts(directDtsResolution), moduleSideEffects };
+                        return { id: filenameToDts(directDtsResolution, languageContext), moduleSideEffects };
                     }
 
                     // Couldn't find types despite being on the bundle list — fall through
@@ -135,7 +175,7 @@ const createDtsResolvePlugin = ({
                     await this.load({ id: dtsResolution });
 
                     return {
-                        id: filenameToDts(dtsResolution),
+                        id: filenameToDts(dtsResolution, languageContext),
                         moduleSideEffects,
                     };
                 }
@@ -188,7 +228,11 @@ const createDtsResolvePlugin = ({
     async function resolveDtsPath(id: string, importer: string, rollupResolution: ResolvedId | null): Promise<string | null> {
         let dtsPath: string | undefined | null;
 
-        if (resolver === "tsc") {
+        if (hasModuleSuffixes && isFilePath(id) && !path.isAbsolute(id)) {
+            dtsPath = resolveModuleSuffix(id, importer, moduleSuffixes);
+        }
+
+        if (!dtsPath && resolver === "tsc") {
             const { default: tscResolve } = await import("./tsc/resolver.js");
 
             dtsPath = tscResolve(
@@ -199,7 +243,7 @@ const createDtsResolvePlugin = ({
                 tsconfigRaw,
                 // TODO reference
             );
-        } else {
+        } else if (!dtsPath) {
             const result = dtsResolver.resolveDtsSync(importer, id);
 
             dtsPath = result.path;

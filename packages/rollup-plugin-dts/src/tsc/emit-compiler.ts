@@ -3,11 +3,11 @@ import { createDebug } from "obug";
 import type { ExistingRawSourceMap } from "rollup";
 import ts from "typescript";
 
+import { LanguageContext, resolveCustomLanguages } from "../custom-language";
 import { globalContext } from "./context.js";
 import { createFsSystem } from "./system.js";
 import type { TscModule, TscOptions, TscResult } from "./types.js";
 import { customTransformers, formatHost, setSourceMapRoot } from "./utils.js";
-import createProgramFactory from "./volar.js";
 
 const debug = createDebug("rollup-plugin-dts:tsc-compiler");
 
@@ -28,12 +28,12 @@ const createTsProgramFromParsedConfig = ({
     baseDirectory,
     fsSystem,
     id,
+    languageContext,
     parsedConfig,
-    tsMacro,
-    vue,
-}: Pick<TscOptions, "vue" | "tsMacro" | "id"> & {
+}: Pick<TscOptions, "id"> & {
     baseDirectory: string;
     fsSystem: ts.System;
+    languageContext: LanguageContext;
     parsedConfig: ts.ParsedCommandLine;
 }): TscModule => {
     const compilerOptions: ts.CompilerOptions = {
@@ -53,10 +53,10 @@ const createTsProgramFromParsedConfig = ({
         // Allow non-TS extensions (e.g. `.vue`) to be used as root files. Without this,
         // TypeScript silently drops root files whose extension is not in its built-in
         // supported list, so `program.getSourceFile(id)` returns `undefined` for a `.vue`
-        // entry that no `.ts` file imports. Only relevant when a language plugin
-        // (Vue/ts-macro) registers such extensions; module resolution already handles the
+        // entry that no `.ts` file imports. Only relevant when a custom language (Vue, ts-macro,
+        // or a user-defined one) registers such extensions; module resolution already handles the
         // imported-file case. See sxzz/rolldown-plugin-dts#272.
-        ...((vue === true || tsMacro === true) && { allowNonTsExtensions: true }),
+        ...(languageContext.languages.length > 0 && { allowNonTsExtensions: true }),
     };
 
     // Root the program at only this module. TypeScript still pulls in everything `id`
@@ -68,7 +68,7 @@ const createTsProgramFromParsedConfig = ({
 
     const host = ts.createCompilerHost(compilerOptions, true);
 
-    const createProgram = createProgramFactory(ts, { tsMacro, vue });
+    const createProgram = languageContext.getCreateProgram(ts);
     const program = createProgram({
         host,
         options: compilerOptions,
@@ -106,10 +106,20 @@ const createTsProgramFromParsedConfig = ({
     };
 };
 
-const createTsProgram = ({ context = globalContext, cwd, id, tsconfig, tsconfigRaw, tsMacro, vue }: TscOptions): TscModule => {
+const createTsProgram = (options: TscOptions): TscModule => {
+    const { context = globalContext, cwd, id, tsconfig, tsconfigRaw } = options;
+    const languageContext = new LanguageContext(resolveCustomLanguages(options));
     const fsSystem = createFsSystem(context.files);
     const baseDirectory = tsconfig ? dirname(tsconfig) : cwd;
-    const parsedConfig = ts.parseJsonConfigFileContent(tsconfigRaw, fsSystem, baseDirectory);
+    const parsedConfig = ts.parseJsonConfigFileContent(
+        tsconfigRaw,
+        fsSystem,
+        baseDirectory,
+        undefined,
+        undefined,
+        undefined,
+        languageContext.getExtraFileExtensions(),
+    );
 
     debug(`Creating program for root project: ${baseDirectory}`);
 
@@ -117,9 +127,8 @@ const createTsProgram = ({ context = globalContext, cwd, id, tsconfig, tsconfigR
         baseDirectory,
         fsSystem,
         id,
+        languageContext,
         parsedConfig,
-        tsMacro,
-        vue,
     });
 };
 
@@ -199,6 +208,18 @@ const tscEmitCompiler = (tscOptions: TscOptions): TscResult => {
     // doing so would defeat the forced-emit design this plugin relies on.
     if (emitSkipped) {
         const errors = diagnostics.filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
+
+        if (errors.length > 0) {
+            return { error: ts.formatDiagnostics(errors, formatHost) };
+        }
+    }
+
+    // With `check`, report the type errors of this file only. Global and options diagnostics are
+    // left out on purpose: they belong to the whole program, not to the file being emitted.
+    if (tscOptions.check) {
+        const errors = [...program.getSyntacticDiagnostics(file), ...program.getSemanticDiagnostics(file)].filter(
+            (diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error,
+        );
 
         if (errors.length > 0) {
             return { error: ts.formatDiagnostics(errors, formatHost) };

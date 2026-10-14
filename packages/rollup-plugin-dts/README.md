@@ -32,6 +32,10 @@ export default {
 };
 ```
 
+### Output file names with shared chunks
+
+If you set `chunkFileNames` without `[hash]` (for example `"[name].js"`), a shared chunk can take the name of an entry. With entries `index` and `index2` that both re-export a module which rollup also names `index2`, the entry `index2.d.ts` is renamed to `index22.d.ts`. Declaration entries are emitted as chunks by this plugin, so rollup does not reserve their names before it names the shared chunk. Use `chunkFileNames: "[name]-[hash].js"` (the plugin's default) so shared chunks never claim an entry's name. In `dtsInput` mode the entries keep their names regardless of the template.
+
 ## Options
 
 Configuration options for the plugin.
@@ -48,7 +52,7 @@ The generator used to produce `.d.ts` files.
 
 When unset, the generator is inferred:
 
-- `'tsc'` whenever `vue` or `tsMacro` is enabled (both require the TypeScript compiler API).
+- `'tsc'` whenever `vue`, `tsMacro`, or a Volar-based entry in `customLanguages` is used (they require the TypeScript compiler API).
 - `'tsgo'` if `tsgo` options are provided.
 - `'oxc'` if `oxc` options are provided, or `isolatedDeclarations` is enabled in `compilerOptions`.
 - `'tsgo'` if TypeScript 7.0 (or `@typescript/native-preview`) is installed.
@@ -121,6 +125,9 @@ By default, dependencies are external, resulting in `import { Type } from 'some-
 - `false`: (Default) Keeps all dependencies external.
 - `(string | RegExp)[]`: Bundles only dependencies matching the provided strings or regular expressions (e.g. `['pkg-a', /^@scope\//]`).
 
+> [!TIP]
+> A workspace package that is published as TypeScript source (its `types` point at `.ts` files, or your `tsconfig` `paths` map it to its sources) is resolved like local code, so its whole type graph is inlined — which can be very large. To keep it as an `import`, mark it external in Rollup (`external: ['@scope/kernel']`).
+
 #### `resolver`
 
 Specifies a resolver to resolve type definitions, especially for `node_modules`.
@@ -144,6 +151,26 @@ Indicates whether the generated `.d.ts` files have side effects.
 
 - If `true`, Rollup will treat the `.d.ts` files as having side effects during tree-shaking.
 - If `false`, Rollup may consider the `.d.ts` files as side-effect-free, potentially removing them if they are not imported.
+
+> [!NOTE]
+> Module augmentations are always kept, whatever this option is set to. A module that declares `declare global { … }` or `declare module "…" { … }` is marked as side-effectful, so an augmentation-only file imported for its side effect (`import "./augment"`) and a `declare module "./index.js"` block inside a re-exported module both stay in the bundle, even with the default `false`. A relative `declare module` is rewritten to the output chunk that holds its target. This option governs every other module.
+
+**Default:** `false`
+
+#### `check`
+
+If `true`, type errors in your sources are reported while declarations are generated, and they fail the build. By default declarations are emitted without type-checking.
+
+- `tsc`: the syntactic and semantic errors of each emitted file fail the build. With `build: true`, every error reported by the project build fails it.
+- `tsgo`: the compiler runs with type-checking enabled, and a non-zero exit fails the build with its diagnostics.
+- `oxc`: has no effect, because isolated declarations are not type-checked. A warning is logged instead.
+
+> [!NOTE]
+> With `build: true` and `incremental`, a project that is already up to date is skipped by the solution builder, so it reports no diagnostics and `check` passes without re-checking it.
+
+```ts
+dts({ check: true });
+```
 
 **Default:** `false`
 
@@ -184,9 +211,19 @@ Enabling this option can speed up builds by caching previous results, which is h
 
 If `true`, the plugin will generate `.d.ts` files using `vue-tsc`.
 
+Pass an object to override `vueCompilerOptions`. The overrides are merged over the `vueCompilerOptions` in the tsconfig, so a value set here wins over the same key in the tsconfig:
+
+```ts
+dts({ vue: { vueCompilerOptions: { fallthroughAttributes: true } } });
+```
+
+This is a shortcut for a preconfigured entry in [`customLanguages`](#customlanguages), so it requires the `tsc` generator.
+
 #### `tsMacro`
 
 If `true`, the plugin will generate `.d.ts` files using `@ts-macro/tsc`.
+
+This is a shortcut for a preconfigured entry in [`customLanguages`](#customlanguages), so it requires the `tsc` generator.
 
 #### `parallel`
 
@@ -232,15 +269,72 @@ This option is automatically enabled when `isolatedDeclarations` in `compilerOpt
 ### TypeScript Go
 
 > [!WARNING]
-> This feature is experimental and not yet recommended for production environments.
+> With `typescript@7` installed this is the default generator and is stable. On the `@typescript/native-preview` build it is still experimental.
 
 #### `tsgo`
 
-**[Experimental]** Enables DTS generation using [`tsgo`](https://github.com/microsoft/typescript-go).
+Enables DTS generation using [`tsgo`](https://github.com/microsoft/typescript-go).
 
 To use this option, ensure that `@typescript/native-preview` is installed as a dependency.
 
 `tsconfigRaw` and `compilerOptions` options will be ignored when this option is enabled.
+
+### Custom Languages
+
+#### `customLanguages`
+
+Registers non-standard source languages, such as Vue or Astro. Each entry describes one language:
+
+- `extensionPatterns`: regular expressions that match the files of the language.
+- `toTsFilename(id)`: maps a source filename to the TypeScript filename used for declarations, for example `foo.custom` to `foo.custom.ts`.
+- `tsFileExtensionInfos`: extra file extensions passed to the TypeScript compiler.
+- `volarTypeScript` and `createVolarPlugins`: needed when the language is supported through [Volar](https://volarjs.dev). Both are required together.
+
+```ts
+import { dts } from "@visulima/rollup-plugin-dts";
+
+dts({
+    customLanguages: [
+        {
+            extensionPatterns: [/\.custom$/],
+            tsFileExtensionInfos: [{ extension: "custom", isMixedContent: true, scriptKind: 7 /* ScriptKind.Deferred */ }],
+            toTsFilename: (id) => id.replace(/\.custom$/, ".custom.ts"),
+        },
+    ],
+});
+```
+
+`createVueLanguage` and `createTsMacroLanguage` build the entries behind the `vue` and `tsMacro` options. Use them to combine these languages with your own:
+
+```ts
+import { createVueLanguage, dts } from "@visulima/rollup-plugin-dts";
+
+dts({ customLanguages: [createVueLanguage({ vueCompilerOptions: { fallthroughAttributes: true } })] });
+```
+
+Constraints:
+
+- Volar-based languages require the `tsc` generator, and an explicit `generator` other than `'tsc'` is an error.
+- Languages without Volar also work with the `oxc` generator.
+- The `tsgo` generator does not support custom languages, and the `tsgo` option is rejected with them.
+- Volar-based languages need the classic TypeScript compiler API, so they cannot be used with TypeScript 7.
+- Custom languages run in the main process. `parallel` is ignored when `customLanguages` is set, and a warning is logged.
+- The `build` option (`tsc -b`) does not apply custom languages.
+- With `emitDtsOnly: false`, the JavaScript output of a custom file needs a transform, placed before this plugin, that turns the file into TypeScript.
+
+## Triple-slash reference directives
+
+A `/// <reference path="…" />` in a `.d.ts` input that points at a local global script (a file with only `interface`,
+`type`, `enum` and `declare` declarations, no imports or exports) is inlined into the output and the directive is removed.
+Inlined declarations are wrapped in `declare global { … }` when the output is a module. Several references to the same
+script are inlined once per output chunk, so with several entries each chunk gets its own copy. Duplicate `type`,
+`const`, `class` or `enum` declarations then conflict for consumers that load more than one entry, while interfaces
+and function overloads merge.
+
+Limits: scripts that contain imports or `import()` types, scripts that have a reference directive of their own, and
+string-named `declare module` blocks are not inlined. Their directives are kept, with the path rebased to the output
+location. Directives in `.ts` sources do not reach the emitted declarations, so nothing is inlined for them.
+`/// <reference types="…" />`, `lib=` and `no-default-lib` directives are kept as they are.
 
 ## Differences from `rollup-plugin-dts`
 

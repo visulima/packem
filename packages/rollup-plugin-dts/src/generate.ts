@@ -34,7 +34,7 @@ import type { TscContext } from "./tsc/context";
 import { createContext, globalContext, invalidateContextFile } from "./tsc/context";
 import type { TscOptions, TscResult } from "./tsc/index";
 import type { WorkerRequest, WorkerResponse } from "./tsc/types";
-import { runTsgo } from "./tsgo";
+import { getTsgoEmitRoot, runTsgo } from "./tsgo";
 
 const debug = createDebug("rollup-plugin-dts:generate");
 
@@ -70,6 +70,8 @@ export type DtsMap = Map<string, TsModule>;
 
 export const createGeneratePlugin = ({
     build,
+    check,
+    customLanguages,
     cwd,
     eager,
     emitDtsOnly,
@@ -78,6 +80,7 @@ export const createGeneratePlugin = ({
     exclude,
     include,
     incremental,
+    languageContext,
     logger,
     newContext,
     oxc,
@@ -94,7 +97,10 @@ export const createGeneratePlugin = ({
     | "tsconfig"
     | "tsconfigRaw"
     | "build"
+    | "check"
+    | "customLanguages"
     | "incremental"
+    | "languageContext"
     | "oxc"
     | "emitDtsOnly"
     | "vue"
@@ -172,17 +178,25 @@ export const createGeneratePlugin = ({
     let tscModule: typeof import("./tsc/index.ts");
     let tscContext: TscContext | undefined;
     let tsgoDist: string | undefined;
+    // One plugin instance can serve several overlapping builds (packem reuses it across the
+    // per-format dts builds). They share a single tsgo run, and its output is removed only
+    // once the last build ends, so an early finisher can't delete the others' declarations.
+    let tsgoBuilds = 0;
+    let tsgoRun: Promise<string> | undefined;
     const rootDir = tsconfig ? path.dirname(tsconfig) : cwd;
 
     return {
         async buildEnd() {
             childProcess?.kill();
 
-            if (!debug.enabled && tsgoDist) {
-                await rm(tsgoDist, { force: true, recursive: true }).catch(() => {});
-            }
+            if (tsgo && --tsgoBuilds === 0) {
+                if (!debug.enabled && tsgoDist) {
+                    await rm(tsgoDist, { force: true, recursive: true }).catch(() => {});
+                }
 
-            tsgoDist = undefined;
+                tsgoDist = undefined;
+                tsgoRun = undefined;
+            }
 
             if (newContext) {
                 tscContext = undefined;
@@ -193,7 +207,9 @@ export const createGeneratePlugin = ({
             // isWatch = this.meta.watchMode
 
             if (tsgo) {
-                tsgoDist = await runTsgo(rootDir, tsconfig, sourcemap, tsgo.path, tsconfigRaw, logger);
+                tsgoBuilds++;
+                tsgoRun ??= runTsgo(rootDir, tsconfig, sourcemap, tsgo.path, tsconfigRaw, logger, check);
+                tsgoDist = await tsgoRun;
             } else if (!oxc) {
                 // tsc
                 if (parallel) {
@@ -320,7 +336,7 @@ export const createGeneratePlugin = ({
                 if (tsgo) {
                     if (RE_VUE.test(id)) throw new Error("tsgo does not support Vue files.");
 
-                    const dtsPath = path.resolve(tsgoDist!, path.relative(rootDir, filenameToDts(id)));
+                    const dtsPath = path.resolve(tsgoDist!, path.relative(getTsgoEmitRoot(rootDir), filenameToDts(id)));
 
                     if (existsSync(dtsPath)) {
                         dtsCode = await readFile(dtsPath, "utf8");
@@ -350,7 +366,9 @@ export const createGeneratePlugin = ({
                         throw new Error(`tsgo did not generate dts file for ${id}, please check your tsconfig.`);
                     }
                 } else if (oxc && !RE_VUE.test(id)) {
-                    const result = isolatedDeclarationSync(id, code, oxc);
+                    // oxc infers the language from the filename, so a custom language is parsed as its TypeScript form.
+                    const tsFilename = languageContext.toTsFilename(id);
+                    const result = isolatedDeclarationSync(tsFilename, code, oxc);
 
                     if (result.errors.length > 0) {
                         const [first] = result.errors;
@@ -381,13 +399,21 @@ export const createGeneratePlugin = ({
                         result.map.sourcesContent = undefined;
                         // DTS sourcemaps should not contain names
                         result.map.names = [];
+
+                        // Point the map back at the original file rather than the TypeScript filename it was parsed as.
+                        if (tsFilename !== id) {
+                            result.map.sources = [id];
+                        }
+
                         map = result.map;
                     }
                 } else {
                     const entries = eager ? undefined : [...entryIds];
                     const options: Omit<TscOptions, "programs"> = {
                         build,
+                        check,
                         context: tscContext,
+                        customLanguages,
                         cwd,
                         entries,
                         id,
@@ -583,7 +609,7 @@ export { __json_default_export as default }`;
                     // must not turn internal/transitive modules into emitted chunks).
                     const isRollupIsEntry = !!this.getModuleInfo(id)?.isEntry;
                     const isEntry = entryMatcher ? isRollupIsEntry && entryMatcher(path.relative(cwd, id)) : isRollupIsEntry;
-                    const dtsId = filenameToDts(id);
+                    const dtsId = filenameToDts(id, languageContext);
 
                     dtsMap.set(dtsId, { code, id, isEntry, jsFile: isJsFile });
                     debug("register dts source: %s", id);
@@ -603,18 +629,18 @@ export { __json_default_export as default }`;
                     }
                 }
 
+                // The stubs below replace the whole module, so there is nothing to map back to;
+                // saying so explicitly keeps rollup from warning SOURCEMAP_BROKEN.
                 if (emitDtsOnly) {
-                    if (RE_JSON.test(id)) return "{}";
-
-                    return "export { }";
+                    return { code: RE_JSON.test(id) ? "{}" : "export { }", map: { mappings: "" } };
                 }
 
                 // Strip TypeScript types so rollup can parse the file as JavaScript.
                 // In rolldown, TypeScript is natively supported; in rollup it is not.
-                if (RE_TS.test(id) || RE_VUE.test(id)) {
-                    const result = transformSync(id, code, {});
+                if (RE_TS.test(id) || RE_VUE.test(id) || languageContext.isCustomLanguageFile(id)) {
+                    const result = transformSync(languageContext.toTsFilename(id), code, { sourcemap: true });
 
-                    return result.code;
+                    return { code: result.code, map: result.map };
                 }
 
                 return null;

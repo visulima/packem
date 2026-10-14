@@ -2,7 +2,9 @@ import type { TsConfigJson } from "@visulima/tsconfig";
 import type { SourceMapInput } from "rollup";
 import type ts from "typescript";
 
+import type { CustomLanguage } from "../custom-language";
 import type { TscContext } from "./context.js";
+import type { VueLanguageOptions } from "./vue";
 
 export interface TscModule {
     file: ts.SourceFile;
@@ -11,7 +13,11 @@ export interface TscModule {
 
 export interface TscOptions {
     build: boolean;
+    /** Report type errors of the emitted file(s) as a build error. */
+    check?: boolean;
     context?: TscContext;
+    /** Volar-based custom languages. Only available in-process: functions cannot be sent to a worker. */
+    customLanguages?: CustomLanguage[];
     cwd: string;
     entries?: string[];
     id: string;
@@ -20,7 +26,7 @@ export interface TscOptions {
     tsconfig?: string;
     tsconfigRaw: TsConfigJson;
     tsMacro?: boolean;
-    vue?: boolean;
+    vue?: boolean | VueLanguageOptions;
 }
 
 export interface TscResult {

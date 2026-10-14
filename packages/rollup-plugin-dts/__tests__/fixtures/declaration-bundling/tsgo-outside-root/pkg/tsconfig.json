@@ -1,0 +1,4 @@
+{
+    "compilerOptions": { "allowImportingTsExtensions": true, "declaration": true },
+    "include": ["index.ts"]
+}

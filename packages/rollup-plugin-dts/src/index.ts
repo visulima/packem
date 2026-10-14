@@ -34,7 +34,10 @@ export const dts = (options: Options = {}): Plugin[] => {
     return plugins;
 };
 
+export { type CustomLanguage } from "./custom-language";
 export { default as createFakeJsPlugin } from "./fake-js";
 export { RE_CSS, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
 export { createGeneratePlugin } from "./generate";
 export { type FilterPattern, type Generator, type Logger, type Options, resolveOptions } from "./options";
+export { default as createTsMacroLanguage } from "./tsc/ts-macro";
+export { createVueLanguage, type VueLanguageOptions } from "./tsc/vue";

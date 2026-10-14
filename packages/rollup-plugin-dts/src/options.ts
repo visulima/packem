@@ -16,6 +16,9 @@ import type { RenderedChunk } from "rollup";
 // needs the classic API, is loaded lazily and only when `generator === 'tsc'`.
 import ts from "typescript";
 
+import type { CustomLanguage } from "./custom-language";
+import { isVolarLanguage, LanguageContext, resolveCustomLanguages } from "./custom-language";
+import type { VueLanguageOptions } from "./tsc/vue";
 import { isTS70Installed } from "./tsgo";
 
 type AddonFunction = (chunk: RenderedChunk) => string | Promise<string>;
@@ -47,6 +50,16 @@ export interface TsgoOptions {
 
 // #region General Options
 export interface GeneralOptions {
+    /**
+     * If `true`, type errors in the sources are reported and fail the build instead of being ignored.
+     *
+     * - `tsc`: the emitted file's syntactic and semantic errors (in `build` mode, every error the project build reports) fail the build.
+     * - `tsgo`: the compiler runs with type-checking enabled and a non-zero exit fails the build.
+     * - `oxc`: no effect. Isolated declarations do not type-check, so a warning is logged instead.
+     * @default false
+     */
+    check?: boolean;
+
     /**
      * Determines how the default export is emitted.
      *
@@ -281,16 +294,33 @@ export interface TscOptions {
 
     /**
      * If `true`, the plugin will generate `.d.ts` files using `@ts-macro/tsc`.
+     *
+     * This is a shortcut for a preconfigured entry in {@link Options.customLanguages}, and requires the `tsc` generator.
      */
     tsMacro?: boolean;
 
     /**
      * If `true`, the plugin will generate `.d.ts` files using `vue-tsc`.
+     *
+     * Pass an object to override `vueCompilerOptions`. The overrides are merged over the `vueCompilerOptions` found in the tsconfig.
+     *
+     * This is a shortcut for a preconfigured entry in {@link Options.customLanguages}, and requires the `tsc` generator.
      */
-    vue?: boolean;
+    vue?: boolean | VueLanguageOptions;
 }
 
 export interface Options extends GeneralOptions, TscOptions {
+    /**
+     * Registers non-standard source languages, such as Vue or Astro.
+     *
+     * A language that is supported through Volar needs both `volarTypeScript` and `createVolarPlugins`; it requires the `tsc` generator.
+     * A language without Volar also works with the `oxc` generator. The `tsgo` generator does not support custom languages.
+     *
+     * Custom languages run in the main process, so the `parallel` option is ignored when any are set.
+     * @experimental
+     */
+    customLanguages?: CustomLanguage[];
+
     // #region Oxc
 
     /**
@@ -327,6 +357,7 @@ export type OptionsResolved = Overwrite<
         exclude: FilterPattern;
         generator: Generator;
         include: FilterPattern;
+        languageContext: LanguageContext;
         logger: Logger;
         oxc: IsolatedDeclarationsOptions | false;
         tsconfig?: string;
@@ -539,10 +570,11 @@ const validateGenerator = (generator: Generator, logger: Logger): void => {
         return;
     }
 
-    if (generator === "tsgo" && !isWarnedTsgo) {
+    // TypeScript 7 is stable; only the `@typescript/native-preview` build is still a preview.
+    if (generator === "tsgo" && !isTS70Installed() && !isWarnedTsgo) {
         isWarnedTsgo = true;
         logger.warn(
-            "[@visulima/rollup-plugin-dts] The `tsgo` generator is experimental: TypeScript 7.0 does not yet have a stable API, and some options (such as `isolatedDeclarations`) are unavailable.",
+            "[@visulima/rollup-plugin-dts] The `tsgo` generator runs on the `@typescript/native-preview` build, which is experimental: some options (such as `isolatedDeclarations`) are unavailable. Install `typescript@7` for the stable compiler.",
         );
     }
 };
@@ -600,24 +632,77 @@ const applyOxcDefaults = (
     return oxcResolved;
 };
 
+const validateCustomLanguageCompatibility = ({
+    generator,
+    languageContext,
+    oxc,
+    tsgo,
+}: {
+    generator: Generator | undefined;
+    languageContext: LanguageContext;
+    oxc: boolean;
+    tsgo: boolean;
+}): void => {
+    if (languageContext.isUsingVolar()) {
+        if (tsgo) {
+            throw new Error("[@visulima/rollup-plugin-dts] The `tsgo` option is not compatible with Volar-based custom languages. Please disable one of them.");
+        }
+
+        if (oxc) {
+            throw new Error("[@visulima/rollup-plugin-dts] The `oxc` option is not compatible with Volar-based custom languages. Please disable one of them.");
+        }
+
+        return;
+    }
+
+    if (languageContext.languages.length > 0 && (tsgo || generator === "tsgo")) {
+        throw new Error("[@visulima/rollup-plugin-dts] The `tsgo` generator does not support custom languages. Use the `tsc` or `oxc` generator instead.");
+    }
+};
+
+// Volar-based languages hook into the classic compiler API, which TypeScript 7 does not ship. This runs
+// before the languages are resolved, because the `vue` and `tsMacro` shortcuts load their Volar tooling
+// while being created.
+const assertVolarRuntimeAvailable = ({
+    customLanguages,
+    tsMacro,
+    vue,
+}: {
+    customLanguages: CustomLanguage[];
+    tsMacro: boolean;
+    vue: boolean | VueLanguageOptions;
+}): void => {
+    const hasVolarCustomLanguage = customLanguages.some((language) => isVolarLanguage(language));
+
+    if (!(vue || tsMacro || hasVolarCustomLanguage) || !isTS70Installed()) {
+        return;
+    }
+
+    throw new Error(
+        hasVolarCustomLanguage
+            ? "[@visulima/rollup-plugin-dts] The `vue`, `tsMacro` and Volar-based `customLanguages` options need the classic TypeScript compiler API, which TypeScript 7 does not provide. Use TypeScript 6 for these options."
+            : "[@visulima/rollup-plugin-dts] The `vue` and `tsMacro` options need the classic TypeScript compiler API, which TypeScript 7 does not provide. Use TypeScript 6 for these options.",
+    );
+};
+
 const resolveGenerator = (
     explicit: Generator | undefined,
     oxcRequested: boolean,
     tsgoRequested: boolean,
-    vue: boolean,
-    tsMacro: boolean,
+    languageContext: LanguageContext,
+    customLanguages: CustomLanguage[],
     logger: Logger,
 ): Generator => {
-    // Volar-based backends (Vue / ts-macro) hook into the TypeScript compiler API, so they
-    // can only run under `tsc`.
-    if (vue || tsMacro) {
-        if (isTS70Installed()) {
-            throw new Error(
-                "[@visulima/rollup-plugin-dts] TypeScript 7.0 does not yet have a stable API and is experimental. The `vue` and `tsMacro` options are not yet supported with TypeScript 7.0.",
-            );
-        }
-
+    // Volar-based backends (Vue / ts-macro / custom Volar languages) hook into the TypeScript
+    // compiler API, so they can only run under `tsc`.
+    if (languageContext.isUsingVolar()) {
         if (explicit && explicit !== "tsc") {
+            if (customLanguages.some((language) => isVolarLanguage(language))) {
+                throw new Error(
+                    `[@visulima/rollup-plugin-dts] Volar-based custom languages require the \`tsc\` generator; the \`generator: '${explicit}'\` option is not compatible with them.`,
+                );
+            }
+
             logger.warn(
                 `[@visulima/rollup-plugin-dts] The \`vue\`/\`tsMacro\` option requires the \`tsc\` generator; the \`generator: '${explicit}'\` option is ignored.`,
             );
@@ -641,6 +726,12 @@ const resolveGenerator = (
     // TypeScript 7 ships the native Go compiler as `typescript` itself; prefer it over the
     // (much slower) JS compiler when it is what the user has installed.
     if (isTS70Installed()) {
+        if (languageContext.languages.length > 0) {
+            throw new Error(
+                "[@visulima/rollup-plugin-dts] TypeScript 7.0 is installed, but the `tsgo` generator does not support custom languages. Enable `isolatedDeclarations` or set `generator: 'oxc'` to use Oxc instead, or install TypeScript 6.0 or below.",
+            );
+        }
+
         return "tsgo";
     }
 
@@ -651,8 +742,10 @@ export const resolveOptions = ({
     banner,
     // tsc
     build = false,
+    check = false,
     cjsDefault = false,
     compilerOptions: userCompilerOptions = {},
+    customLanguages = [],
     cwd = process.cwd(),
     dtsInput = false,
     eager = false,
@@ -733,14 +826,31 @@ export const resolveOptions = ({
     const tsgoNormalized = normalizeTsgo(tsgoOption);
     const oxcRequested = isOxcRequested(oxcOption, compilerOptions);
 
+    // Volar-based languages hook into the classic compiler API, which TypeScript 7 does not ship.
+    // This runs before the languages are resolved, because the `vue` and `tsMacro` shortcuts load
+    // their Volar tooling while being created.
+    assertVolarRuntimeAvailable({ customLanguages, tsMacro, vue });
+
+    const languageContext = new LanguageContext(resolveCustomLanguages({ customLanguages, tsMacro, vue }));
+
     // Conflicting *explicit* options are an error rather than something we silently drop,
     // so validate the requested intent before the generator collapses it to one backend.
-    validateTsgoCompatibility(tsgoNormalized !== false, vue, tsMacro, oxcRequested);
-    validateOxcCompatibility(oxcRequested, vue, tsMacro);
+    validateTsgoCompatibility(tsgoNormalized !== false, Boolean(vue), tsMacro, oxcRequested);
+    validateOxcCompatibility(oxcRequested, Boolean(vue), tsMacro);
+    validateCustomLanguageCompatibility({
+        generator: generatorOption,
+        languageContext,
+        oxc: oxcRequested,
+        tsgo: tsgoNormalized !== false,
+    });
 
-    const generator = resolveGenerator(generatorOption, oxcRequested, tsgoNormalized !== false, vue, tsMacro, logger);
+    const generator = resolveGenerator(generatorOption, oxcRequested, tsgoNormalized !== false, languageContext, customLanguages, logger);
 
     validateGenerator(generator, logger);
+
+    if (check && generator === "oxc") {
+        logger.warn("[@visulima/rollup-plugin-dts] The `check` option has no effect with the `oxc` generator (isolated declarations are not type-checked).");
+    }
 
     // Exactly one backend runs. Collapsing the other to `false` here keeps the single
     // source of truth in `generator` while leaving the downstream `if (tsgo) … else if (oxc)`
@@ -756,11 +866,19 @@ export const resolveOptions = ({
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- `||` is intentional: this is boolean OR semantics (either flag enables JS emit), not a null/undefined fallback; `??` would let an explicit `checkJs: false` veto `allowJs: true`.
     const isEmitJs = emitJsOption ?? Boolean(compilerOptions.checkJs || compilerOptions.allowJs);
 
+    // Custom languages are functions, which cannot be sent to the forked tsc worker, so a build that
+    // uses them runs in-process.
+    if (parallel && customLanguages.length > 0) {
+        logger.warn("[@visulima/rollup-plugin-dts] The `parallel` option is ignored when `customLanguages` are set; the build runs in-process.");
+    }
+
     return {
         banner,
         // tsc
         build,
+        check,
         cjsDefault,
+        customLanguages,
         cwd,
         dtsInput,
         eager,
@@ -772,11 +890,12 @@ export const resolveOptions = ({
         generator,
         include,
         incremental: isIncremental,
+        languageContext,
         logger,
         newContext,
         oxc: oxcResolved,
 
-        parallel,
+        parallel: parallel && customLanguages.length === 0,
         resolve,
         resolver,
         sideEffects,

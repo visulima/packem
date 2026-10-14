@@ -11,6 +11,10 @@ import { customTransformers, formatHost, setSourceMapRoot } from "./utils.js";
 
 const debug = createDebug("rollup-plugin-dts:tsc-build");
 
+// Error diagnostics reported by the solution build, keyed by the project map it produced. They
+// are stored beside the cached map so a later `check` build that reuses the cache still sees them.
+const buildErrors = new WeakMap<SourceFileToProjectMap, string[]>();
+
 const getOrBuildProjects = (context: TscContext, fsSystem: ts.System, tsconfig: string, force: boolean, sourcemap: boolean): SourceFileToProjectMap => {
     let projectMap = context.projects.get(tsconfig);
 
@@ -43,6 +47,19 @@ const buildProjects = (fsSystem: ts.System, tsconfig: string, force: boolean, so
     );
 
     const host = ts.createSolutionBuilderHost(fsSystem, createProgramFactory(sourcemap));
+    const errors: string[] = [];
+    // Keep the default reporter, so diagnostics are printed exactly as before, and also keep the
+    // error text for the `check` option.
+    const { reportDiagnostic } = host;
+
+    host.reportDiagnostic = (diagnostic) => {
+        if (diagnostic.category === ts.DiagnosticCategory.Error) {
+            errors.push(ts.formatDiagnostics([diagnostic], formatHost));
+        }
+
+        reportDiagnostic(diagnostic);
+    };
+
     const builder = ts.createSolutionBuilder(host, [tsconfig], {
         force,
         verbose: true,
@@ -63,6 +80,8 @@ const buildProjects = (fsSystem: ts.System, tsconfig: string, force: boolean, so
             sourceFileToProjectMap.set(fsSystem.resolvePath(fileName), project);
         }
     }
+
+    buildErrors.set(sourceFileToProjectMap, errors);
 
     return sourceFileToProjectMap;
 };
@@ -91,7 +110,10 @@ const collectProjectGraph = (rootTsconfigPath: string, fsSystem: ts.System, forc
         parsedConfig.options = patchCompilerOptions(parsedConfig.options, {
             force,
             sourcemap,
-            tsconfigPath,
+            // A project without source files (e.g. a solution tsconfig that only holds
+            // `references`) emits no declarations, so there is nothing for the user to fix
+            // in it — patch it without warning.
+            tsconfigPath: parsedConfig.fileNames.length > 0 ? tsconfigPath : "",
         });
 
         projects.push({ parsedConfig, tsconfigPath });
@@ -189,7 +211,7 @@ const createProgramFactory =
 
 // Emit file using `tsc --build` mode.
 const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
-    const { context = globalContext, id, incremental, sourcemap, tsconfig } = tscOptions;
+    const { check, context = globalContext, id, incremental, sourcemap, tsconfig } = tscOptions;
 
     debug(`running tscEmitBuild id: ${id}, tsconfig: ${tsconfig}, incremental: ${incremental}`);
 
@@ -209,6 +231,16 @@ const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
 
     // Build projects (if necessary) and collect all projects.
     const sourceFileToProjectMap = getOrBuildProjects(context, fsSystem, tsconfig, !incremental, sourcemap);
+
+    // `build` mode checks the whole project, as `tsc --build` does, so every error the project
+    // build reported fails this build.
+    if (check) {
+        const errors = buildErrors.get(sourceFileToProjectMap) ?? [];
+
+        if (errors.length > 0) {
+            return { error: errors.join("") };
+        }
+    }
 
     const project = sourceFileToProjectMap.get(resolvedId);
 

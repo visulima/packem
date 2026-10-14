@@ -798,6 +798,9 @@ declare const all = 42;
 declare class A {}
 declare class B {}
 declare const ns$1 = 42;
+declare namespace namespace_d {
+  export { ns$1 as ns };
+}
 export { A as RuntimeA, type A as TypeA, type B as TypeB, type A as TypeC, type all, type namespace_d as ns };
 "
 `;

@@ -2,6 +2,9 @@
 
 ```ts
 declare const foo: number;
+declare namespace mod_d {
+  export { foo };
+}
 declare const a: string;
 declare const b: string;
 type Str = string;
@@ -28,7 +31,7 @@ export { mod_d as Mod, Ns, Obj, a, b, fn };
 ## index.d.ts.map
 
 ```map
-{"version":3,"file":"index.d.ts","sources":["../../fixtures/source-map/mod.ts","../../fixtures/source-map/index.ts"],"names":[],"mappings":"AAAO,IAAA,CAAA,GAAA,CAAA,GAAA,CAAA,CAAM,EAAA,MAAA,EAAA,EAAA,EAAA,CAAA;;;;;;;ACAN,IAAA,CAAA,CAAA,CAAA,GAAA,CAAA,CAAA,EAAM,MAAA,EAAA,EAAA,EAAA;AAEN,IAAA,CAAA,CAAA,CAAA,GAAA,CAAA,CAAA,EAAM,MAAA,EAAA,EAAA,EAAA;AAIR,IAAA,CAAA,GAAA,CAAA,GAAA,CAAA,CAAA,EAAA,MAAA,EAAA,EAAA,EAAA,CAAA;AACE,IAAA,CAAA,EAAA,CAAA,GAAA,CAAA,CAAA,EAAA,MAAY,CAAA,GAAA,CAAA,EAAO,CAAA,EAAA,EAAA,EAAA,CAAA;AAI1B,IAAA,CAAA,GAAA,CAAA,GAAiB,CAAA,CAAI,EAAA,MAAA,EAAA,EAAA,CAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,CAAA;AACX,IAAA,CAAA,EAAA,CAAA,GAAA,CAAA,CAAA,EAAA,CAAA,CAAA,KAAA,CAAA,CAAA,CAAA,EAAA,CAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,EAAA,CAAA;;"}
+{"version":3,"file":"index.d.ts","sources":["../../fixtures/source-map/mod.ts","../../fixtures/source-map/index.ts"],"names":[],"mappings":"AAAA,cAAa;;;;cCAA;cAEA;KAIR;iBACW,GAAG,OAAO;UAIT;EACf;IACE;;EAEF;EACA;;kBAGe;OACH;OACA,IAAI,KAAK;OACT;IACV;;;"}
 ```
 
 ## index.js.map
