@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem cli > should enable minify when --production option is used > minified output 1`] = `
+"const n=42;function r(){return 84}export{r as myFunction,n as myVariable};
+"
+`;
+
+exports[`packem cli > should externalize dependencies provided by --external option > --external option output 1`] = `
+"import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal';
+import bar from 'bar-package';
+
+function baz() {
+  return __TEST_EXPECTED_STRING__;
+}
+function barFunction() {
+  return bar;
+}
+
+export { barFunction, baz };
+"
+`;
+
+exports[`packem cli > should support of tsconfig overwrite > tsconfig-overwrite es2018 output 1`] = `
+"class A {
+}
+
+export { A as default };
+"
+`;

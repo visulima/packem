@@ -189,8 +189,10 @@
         "test:bench": "vitest bench --run --config vitest.bench.config.ts",
         "test:bundlers": "pnpm run test:rollup && pnpm run test:rolldown",
         "test:coverage": "vitest run --cache --coverage",
+        "test:matrix": "bash scripts/test-matrix.sh",
         "test:rolldown": "cross-env PACKEM_TEST_BUNDLER=rolldown vitest run --cache __tests__/intigration",
         "test:rollup": "cross-env PACKEM_TEST_BUNDLER=rollup vitest run --cache __tests__/intigration",
+        "test:ts7": "cross-env PACKEM_TEST_BUNDLER=rollup PACKEM_TEST_TYPESCRIPT=7 vitest run --cache __tests__/intigration",
         "test:ui": "vitest --cache --ui --coverage.enabled=true",
         "test:watch": "vitest"
     },

@@ -3,8 +3,10 @@ import { rm } from "node:fs/promises";
 import { readFileSync, writeFileSync } from "@visulima/fs";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage, isTypeScript7 } from "../helpers";
 import temporaryDirectory from "../helpers/temporary-directory";
+
+const TYPESCRIPT_EXTENSION_REGEX = /^\.[cm]?tsx?$/;
 
 describe("packem import-attributes", () => {
     let temporaryDirectoryPath: string;
@@ -267,7 +269,11 @@ export const data = bytes;`,
         const extensions = [".js", ".mjs", ".cjs", ".ts", ".mts", ".cts", ".tsx", ".jsx", ".txt", ".html", ".bin", ".wasm"];
 
         describe.each(extensions)("%s", (extension) => {
-            it(`type: "text" with ${extension}`, async () => {
+            // tsgo parses the imported `data.ts` (the text "file content") and reports syntax errors;
+            // the classic compiler never opens a file imported with a `type` attribute.
+            const skipTypeScriptSource = isTypeScript7 && TYPESCRIPT_EXTENSION_REGEX.test(extension);
+
+            it.skipIf(skipTypeScriptSource)(`type: "text" with ${extension}`, async () => {
                 expect.assertions(3);
 
                 const fileName = `data${extension}`;
@@ -302,7 +308,7 @@ export const content = text;`,
                 expect(mjsContent).toContain("file content");
             });
 
-            it(`type: "bytes" with ${extension}`, async () => {
+            it.skipIf(skipTypeScriptSource)(`type: "bytes" with ${extension}`, async () => {
                 expect.assertions(3);
 
                 const fileName = `data${extension}`;

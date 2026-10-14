@@ -1,0 +1,53 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem alias > should not trigger a warning if alias option and original is used > cjs content 1`] = `
+"'use strict';
+
+const log = () => console.log("test");
+
+const bar = () => console.log("bar");
+
+bar();
+const index = log();
+
+module.exports = index;
+"
+`;
+
+exports[`packem alias > should not trigger a warning if alias option and original is used > mjs content 1`] = `
+"const log = () => console.log("test");
+
+const bar = () => console.log("bar");
+
+bar();
+const index = log();
+
+export { index as default };
+"
+`;
+
+exports[`packem alias > should not trigger a warning if alias option is used > cjs content 1`] = `
+"'use strict';
+
+const log = () => console.log("test");
+
+const bar = () => console.log("bar");
+
+bar();
+const index = log();
+
+module.exports = index;
+"
+`;
+
+exports[`packem alias > should not trigger a warning if alias option is used > mjs content 1`] = `
+"const log = () => console.log("test");
+
+const bar = () => console.log("bar");
+
+bar();
+const index = log();
+
+export { index as default };
+"
+`;

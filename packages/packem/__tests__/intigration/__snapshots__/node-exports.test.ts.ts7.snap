@@ -1,0 +1,442 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > cjs dts output 1`] = `
+"// @ts-ignore
+test;
+export { test2, test3, test4, test5 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle";
+    export const test3 = "this should be in final bundle";
+    export const test4 = "this should be in final bundle";
+    export const test5 = "this should be in final bundle";
+    import _default = test;
+    export { _default as default };
+}
+export = test;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+const test = () => {
+  return "this should be in final bundle";
+};
+const test2 = "this should be in final bundle";
+const test3 = "this should be in final bundle";
+const test4 = "this should be in final bundle";
+const test5 = "this should be in final bundle";
+
+module.exports = test;
+module.exports.test2 = test2;
+module.exports.test3 = test3;
+module.exports.test4 = test4;
+module.exports.test5 = test5;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > dts output 1`] = `
+"// @ts-ignore
+test;
+export { test2, test3, test4, test5 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle";
+    export const test3 = "this should be in final bundle";
+    export const test4 = "this should be in final bundle";
+    export const test5 = "this should be in final bundle";
+    import _default = test;
+    export { _default as default };
+}
+export = test;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > mjs dts output 1`] = `
+"declare const test: () => string;
+declare const test2 = "this should be in final bundle";
+declare const test3 = "this should be in final bundle";
+declare const test4 = "this should be in final bundle";
+declare const test5 = "this should be in final bundle";
+export { test as default, test2, test3, test4, test5 };
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > mjs output 1`] = `
+"const test = () => {
+  return "this should be in final bundle";
+};
+const test2 = "this should be in final bundle";
+const test3 = "this should be in final bundle";
+const test4 = "this should be in final bundle";
+const test5 = "this should be in final bundle";
+
+export { test as default, test2, test3, test4, test5 };
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > cjs dts output 1`] = `
+"// @ts-ignore
+test;
+export { test2 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle";
+    import _default = test;
+    export { _default as default };
+}
+export = test;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+const test = () => {
+  return "this should be in final bundle";
+};
+const test2 = "this should be in final bundle";
+
+module.exports = test;
+module.exports.test2 = test2;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > dts output 1`] = `
+"// @ts-ignore
+test;
+export { test2 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle";
+    import _default = test;
+    export { _default as default };
+}
+export = test;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > mjs dts output 1`] = `
+"declare const test: () => string;
+declare const test2 = "this should be in final bundle";
+export { test as default, test2 };
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > mjs output 1`] = `
+"const test = () => {
+  return "this should be in final bundle";
+};
+const test2 = "this should be in final bundle";
+
+export { test as default, test2 };
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop > cjs output 1`] = `
+"'use strict';
+
+const test = () => "this should be in final bundle";
+
+module.exports = test;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop > mjs output 1`] = `
+"const test = () => "this should be in final bundle";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > index.cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const _package = require('./package.cjs');
+
+exports.packageA = _package.packageA;
+"
+`;
+
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > index.mjs output 1`] = `
+"export { packageA } from './package.mjs';
+"
+`;
+
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > package.cjs output 1`] = `
+"'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+const packageA = () => "This is a named export";
+const d = "This is a default export";
+
+exports.default = d;
+exports.packageA = packageA;
+"
+`;
+
+exports[`packem node exports > should generate correct chunks names, when chunk per export is generated > package.mjs output 1`] = `
+"const packageA = () => "This is a named export";
+const d = "This is a default export";
+
+export { d as default, packageA };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > cjs dts output 1`] = `
+"declare const test = "test content";
+export = test;
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > cjs output 1`] = `
+"'use strict';
+
+const test = "test content";
+
+module.exports = test;
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > dts output 1`] = `
+"declare const test = "test content";
+export = test;
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > mjs dts output 1`] = `
+"declare const test = "test content";
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > mjs output 1`] = `
+"const test = "test content";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > cjs dts output 1`] = `
+"declare const test = "test content";
+export = test;
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > cjs output 1`] = `
+"'use strict';
+
+const test = "test content";
+
+module.exports = test;
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > dts output 1`] = `
+"declare const test = "test content";
+export = test;
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > mjs dts output 1`] = `
+"declare const test = "test content";
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > mjs output 1`] = `
+"const test = "test content";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > cjs dts output 1`] = `
+"declare class Parent {
+  constructor();
+}
+declare class Feature {
+  constructor();
+}
+declare class Child extends Parent {
+  feature: Feature;
+  constructor();
+}
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+class Parent {
+  constructor() {
+  }
+}
+class Feature {
+  constructor() {
+  }
+}
+class Child extends Parent {
+  feature = new Feature();
+  constructor() {
+    console.log("before");
+    super();
+    console.log("after");
+  }
+}
+
+exports.Child = Child;
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > dts output 1`] = `
+"declare class Parent {
+  constructor();
+}
+declare class Feature {
+  constructor();
+}
+declare class Child extends Parent {
+  feature: Feature;
+  constructor();
+}
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > mjs dts output 1`] = `
+"declare class Parent {
+  constructor();
+}
+declare class Feature {
+  constructor();
+}
+declare class Child extends Parent {
+  feature: Feature;
+  constructor();
+}
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > mjs output 1`] = `
+"class Parent {
+  constructor() {
+  }
+}
+class Feature {
+  constructor() {
+  }
+}
+class Child extends Parent {
+  feature = new Feature();
+  constructor() {
+    console.log("before");
+    super();
+    console.log("after");
+  }
+}
+
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > cjs dts output 1`] = `
+"declare class Parent {
+  constructor();
+}
+declare class Feature {
+  constructor();
+}
+declare class Child extends Parent {
+  feature: Feature;
+  constructor();
+}
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > cjs output 1`] = `
+""use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});class o{constructor(){}}class t{constructor(){}}class r extends o{feature=new t;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=r;
+//# sourceMappingURL=index.cjs.map
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > dts output 1`] = `
+"declare class Parent {
+  constructor();
+}
+declare class Feature {
+  constructor();
+}
+declare class Child extends Parent {
+  feature: Feature;
+  constructor();
+}
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs dts output 1`] = `
+"declare class Parent {
+  constructor();
+}
+declare class Feature {
+  constructor();
+}
+declare class Child extends Parent {
+  feature: Feature;
+  constructor();
+}
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs output 1`] = `
+"class o{constructor(){}}class r{constructor(){}}class s extends o{feature=new r;constructor(){console.log("before"),super(),console.log("after")}}export{s as Child};
+//# sourceMappingURL=index.mjs.map
+"
+`;
+
+exports[`packem node exports > should output 'default export' correctly > cjs output 1`] = `
+"'use strict';
+
+const test = "this should be in final bundle";
+
+module.exports = test;
+"
+`;
+
+exports[`packem node exports > should output 'default export' correctly > mjs output 1`] = `
+"const test = "this should be in final bundle";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should output 'default export' for nested folder correctly > cjs output 1`] = `
+"'use strict';
+
+const test = "this should be in final bundle";
+
+module.exports = test;
+"
+`;
+
+exports[`packem node exports > should output 'default export' for nested folder correctly > mjs output 1`] = `
+"const test = "this should be in final bundle";
+
+export { test as default };
+"
+`;

@@ -11,6 +11,7 @@ packages:
   - "!packages/packem/__fixtures__/url/**"
   - "packages/packem/__fixtures__/ecosystem/**"
   - "packages/**"
+  - "tools/typescript-7"
   - "examples/**"
   - "benchmarks/**"
 allowBuilds:
@@ -232,8 +233,8 @@ catalogs:
     # The workspace uses the classic TypeScript compiler (5/6 API): the `tsc` dts backend,
     # vue-tsc, @volar/typescript and @ts-macro/tsc all wrap it. TypeScript 7 is the native
     # (Go) compiler with a different, minimal API those tools cannot use, so it must NOT be
-    # the workspace `typescript`. TS 7 support is exercised through `@typescript/native-preview`
-    # (the tsgo binary) instead — see rollup-plugin-dts's tsgo path and test lane.
+    # the workspace `typescript`. TS 7 lives in the private `tools/typescript-7` package and is
+    # linked into integration-test fixtures as `typescript` when PACKEM_TEST_TYPESCRIPT=7.
     typescript: 6.0.3
     vue-tsc: 3.3.12
   types:
