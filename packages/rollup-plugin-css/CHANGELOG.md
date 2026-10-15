@@ -1,3 +1,60 @@
+## @visulima/rollup-plugin-css [2.0.0](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.1...@visulima/rollup-plugin-css@2.0.0) (2026-10-15)
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** updated dependencies to major versions
+
+* chore(deps): update dependency devalue@>=5.0.0 <5.8.1 to v6
+* **deps:** updated dependencies to major versions
+
+* fix(deps): update minor updates
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* chore: wip before merging renovate/patch-vue-language-tools-monorepo
+
+* fix(deps): align @vitest/coverage-v8 with vitest 4 (catalog and lockfile)
+* **deps:** updated dependencies to major versions
+
+* fix(deps): update dependency @rspack/core to ^2.2.2
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* fix(deps): update dependency nx to v23.1.3
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* chore(deps): lockfile maintenance
+
+### Features
+
+* **packem:** pkg-style standalone executables for the `exe` option ([#302](https://github.com/visulima/packem/issues/302)) ([f666694](https://github.com/visulima/packem/commit/f6666942002e944da2c1c252e53a6d565d00ec95))
+
+### Bug Fixes
+
+* **deps:** combine open Renovate updates ([#335](https://github.com/visulima/packem/issues/335)) ([2f59d60](https://github.com/visulima/packem/commit/2f59d60c2abb5c5414fdca086309a665853516a2))
+* **deps:** keep @vitest/coverage-v8 on v4 to match vitest ([5c45e90](https://github.com/visulima/packem/commit/5c45e90131bb668e1fb19f7abdea9ae965bfbda3))
+* **deps:** update patch updates ([a2ee146](https://github.com/visulima/packem/commit/a2ee146d6e546c29c5351fb44324b38782349a34))
+* **deps:** update style tools ([32ea76d](https://github.com/visulima/packem/commit/32ea76dde651ac699272169d2dfc1b6b2597f2a4))
+* migrate benchmarks to the vitest 5 API (+ the last two Renovate patches) ([#376](https://github.com/visulima/packem/issues/376)) ([5ae8eca](https://github.com/visulima/packem/commit/5ae8eca327db242651bd3d2d7495a13ff2d7a808))
+
+### Miscellaneous Chores
+
+* **deps:** combine all pending renovate updates ([#301](https://github.com/visulima/packem/issues/301)) ([05c50b0](https://github.com/visulima/packem/commit/05c50b087cfe4a7be2841d87fb1c34ab1d85a5e1))
+* **deps:** combine open Renovate dependency updates ([#325](https://github.com/visulima/packem/issues/325)) ([e868152](https://github.com/visulima/packem/commit/e8681525470c002dca1e925c743f3a23a417b830))
+* **deps:** combine open Renovate updates (6 PRs) ([#370](https://github.com/visulima/packem/issues/370)) ([0674003](https://github.com/visulima/packem/commit/067400376b90c3ffeab0cd756a4a8f881b5d8946))
+* **deps:** combine open Renovate updates into renovate/combined ([7a3e0b4](https://github.com/visulima/packem/commit/7a3e0b41a7ccd6000e0f2efeedf841bcc56a0853))
+* **deps:** consolidate pending dependency updates ([#307](https://github.com/visulima/packem/issues/307)) ([e7abfa4](https://github.com/visulima/packem/commit/e7abfa42a56e1b427d64fe695854f1616ed81306))
+* **deps:** merge renovate branch patch-style-tools ([f1cb141](https://github.com/visulima/packem/commit/f1cb14145af01cdb2258717c35f16c1b255dc9a9))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.1.0
+* **@visulima/css-style-inject:** upgraded to 1.1.0
+* **p-queue:** 9.3.3 → 9.3.5
+* **source-map-js:** ^1.2.1 → ^1.2.2
+
 ## @visulima/rollup-plugin-css [1.0.1](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0...@visulima/rollup-plugin-css@1.0.1) (2026-09-06)
 
 ### Bug Fixes
