@@ -143,7 +143,7 @@ catalogs:
     "@antfu/install-pkg": 2.1.0
     "@babel/preset-env": 8.0.7
     "@clack/prompts": 1.8.1
-    cac: 7.0.1
+    cac: 7.1.0
     cross-env: ^10.1.0
     dts-resolver: 3.0.0
     execa: ^10.1.0
@@ -184,9 +184,9 @@ catalogs:
     source-map-js: ^1.2.2
     tailwind-merge: 3.7.0
     workerpool: 10.0.3
-    yuku-ast: ^0.18.0
-    yuku-codegen: ^0.18.0
-    yuku-parser: ^0.18.0
+    yuku-ast: ^0.19.0
+    yuku-codegen: ^0.19.0
+    yuku-parser: ^0.19.0
   script:
     jiti: 2.7.0
     tsx: 4.23.15
@@ -201,7 +201,7 @@ catalogs:
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.0-alpha.15
     clean-css: ^5.3.3
-    cssnano: 9.4.0
+    cssnano: 9.6.0
     icss-utils: ^5.1.0
     less: 4.9.1
     lightningcss: 1.33.0
