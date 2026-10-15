@@ -1960,16 +1960,16 @@ importers:
         specifier: catalog:visulima
         version: 3.1.0(@visulima/find-cache-dir@3.0.1)(@visulima/pail@4.1.1)(github-slugger@2.0.0)
       '@visulima/packem-share':
-        specifier: 1.0.1
+        specifier: 1.1.0
         version: link:../packem-share
       '@visulima/pail':
         specifier: catalog:visulima
         version: 4.1.1
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.1
+        specifier: 2.0.0
         version: link:../rollup-plugin-css
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.1
+        specifier: 1.1.0
         version: link:../rollup-plugin-dts
       '@visulima/tsconfig':
         specifier: catalog:visulima
@@ -2141,7 +2141,7 @@ importers:
         specifier: workspace:*
         version: link:../packem-plugins
       '@visulima/packem-rollup':
-        specifier: 1.1.0
+        specifier: 1.2.0
         version: link:../packem-rollup
       '@visulima/path':
         specifier: catalog:visulima
@@ -2616,13 +2616,13 @@ importers:
         specifier: catalog:visulima
         version: 5.0.18(@visulima/yaml@1.0.0)(ini@7.0.0)(jsonc-parser@3.3.1)(smol-toml@1.9.1)
       '@visulima/packem-share':
-        specifier: 1.0.1
+        specifier: 1.1.0
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
         version: 4.0.0
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.1
+        specifier: 1.1.0
         version: link:../rollup-plugin-dts
       clean-css:
         specifier: catalog:style
@@ -2971,7 +2971,7 @@ importers:
         specifier: catalog:visulima
         version: 5.0.18(@visulima/yaml@1.0.0)(ini@7.0.0)(jsonc-parser@3.3.1)(smol-toml@1.9.1)
       '@visulima/packem-share':
-        specifier: 1.0.1
+        specifier: 1.1.0
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
@@ -3053,7 +3053,7 @@ importers:
         specifier: catalog:types
         version: 0.0.11
       '@visulima/css-style-inject':
-        specifier: 1.0.1
+        specifier: 1.1.0
         version: link:../css-style-inject
       '@vitest/coverage-v8':
         specifier: catalog:test
