@@ -5,7 +5,7 @@ import { walk } from "@visulima/fs";
 import { formatBytes } from "@visulima/humanizer";
 import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry, Environment, Runtime } from "@visulima/packem-share/types";
-import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/utils";
+import { getDtsExtension, getOutputExtension, warn } from "@visulima/packem-share/utils";
 import { join, relative, resolve } from "@visulima/path";
 
 import bundlerBuild, { resolveBundlerName } from "../bundler/build";
@@ -643,6 +643,15 @@ const prepareRollupConfig = async (
                     } else if (entry.declaration) {
                         // Entry with only declaration, no JS builds
                         dtsEntries.push(entry);
+                    } else {
+                        // Entry with no output format. Package.json inference always
+                        // resolves at least one format, so this only happens with manual
+                        // entries (which skip inference). Without this warning the entry
+                        // is silently dropped and the build "succeeds" with an empty dist.
+                        warn(
+                            context,
+                            `Entry \`${entry.input}\` has neither \`esm\` nor \`cjs\` enabled and will not be built. When \`entries\` are set manually, output formats are not inferred from package.json. Set \`esm: true\` or \`cjs: true\` on the entry, or \`emitESM\`/\`emitCJS\` in the config.`,
+                        );
                     }
                 }
 
