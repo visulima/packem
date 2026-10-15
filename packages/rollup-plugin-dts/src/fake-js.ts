@@ -365,7 +365,10 @@ const createFakeJsPlugin = (
         const directives = collectReferenceDirectives(file.comments);
         const scripts: InlinableScript[] = [];
 
-        if (directives.length > 0) {
+        // Replaces what an earlier transform of this file left behind, so a removed directive does not survive a rebuild.
+        if (directives.length === 0) {
+            commentsMap.delete(id);
+        } else {
             commentsMap.set(id, directives);
 
             for (const directive of directives) {
@@ -388,8 +391,11 @@ const createFakeJsPlugin = (
 
         const exportComments = collectExportComments(program.body);
 
+        // a re-transformed file that no longer has documented re-exports must drop its old entry
         if (exportComments.size > 0) {
             exportCommentsMap.set(id, exportComments);
+        } else {
+            exportCommentsMap.delete(id);
         }
 
         const appendStatements: t.ProgramStatement[] = [];
@@ -714,15 +720,34 @@ const createFakeJsPlugin = (
         };
     }
 
-    // The chunk that inlines each script, when several chunks reference it: the first by file name, so the choice does not
-    // depend on the order rollup renders the chunks. The other chunks reference that copy instead (see `referenceOutputFile`).
+    // The chunk that inlines each script, when several chunks reference it. The other chunks reference that copy instead
+    // (see `referenceOutputFile`). Chunks are ranked in a post-order over the static import graph (roots and imports
+    // visited by file name), so a chunk comes after the chunks it imports and the owner is the referencing chunk with the
+    // lowest rank: a chunk that the others already import owns the copy, and the references always point to a lower rank,
+    // so they cannot form a cycle. Chunks that do not import each other are ordered by file name.
     function getScriptOwners(chunks: Record<string, RenderedChunk>): Map<string, string> {
         if (scriptOwners) return scriptOwners;
 
         const owners = new Map<string, string>();
+        const byFileName = new Map(Object.values(chunks).map((chunk) => [chunk.fileName, chunk]));
+        const compareNames = (a: string, b: string): number => (a < b ? -1 : Number(a > b));
+        const ranked: string[] = [];
+        const visited = new Set<string>();
 
-        for (const name of Object.keys(chunks).toSorted((a, b) => (a < b ? -1 : Number(a > b)))) {
-            const { fileName, moduleIds } = chunks[name];
+        const visit = (fileName: string): void => {
+            if (visited.has(fileName)) return;
+
+            visited.add(fileName);
+
+            for (const imported of byFileName.get(fileName)?.imports.toSorted(compareNames) ?? []) visit(imported);
+
+            ranked.push(fileName);
+        };
+
+        for (const fileName of [...byFileName.keys()].toSorted(compareNames)) visit(fileName);
+
+        for (const fileName of ranked) {
+            const { moduleIds } = byFileName.get(fileName) ?? { moduleIds: [] };
 
             // Only declaration chunks inline scripts (see `renderChunk`), so only they can own one.
             if (!RE_DTS.test(fileName)) continue;
@@ -1028,7 +1053,6 @@ const createFakeJsPlugin = (
                     commentsValue.add(dedupeKey);
                     comments.add(rebased);
                 });
-                commentsMap.delete(id);
             }
         }
 

@@ -6,6 +6,7 @@ import type Ts from "typescript";
 
 import type { CustomLanguage } from "../custom-language";
 import { RE_VUE } from "../filename";
+import { stableKey } from "./context.js";
 
 const debug = createDebug("rollup-plugin-dts:vue");
 const require = createRequire(import.meta.url);
@@ -39,8 +40,15 @@ const loadVueLanguageTools = (): {
     }
 };
 
-/** Identity of the vue language for the given options: builds with equal options share one program cache. */
-export const vueLanguageId = (userOptions: VueLanguageOptions): string => `vue:${JSON.stringify(userOptions)}`;
+/**
+ * Identity of the vue language for the given options: builds with equal options share one program cache. Options that cannot
+ * be encoded faithfully (such as functions) have no identity, so their builds do not share a cache.
+ */
+export const vueLanguageId = (userOptions: VueLanguageOptions): string | undefined => {
+    const key = stableKey(userOptions);
+
+    return key === undefined ? undefined : `vue:${key}`;
+};
 
 /**
  * Creates the Volar-based language definition for `.vue` single-file components.

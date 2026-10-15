@@ -18,7 +18,7 @@ const RE_TSGO_CUSTOM_UNSUPPORTED = /does not support custom languages/;
 const RE_VOLAR_NEEDS_TSC = /require the `tsc` generator/;
 const RE_TYPESCRIPT_7 = /TypeScript 7/;
 
-// Gives the build its own TypeScript program cache. Builds without it share the cache of their language set.
+// Gives the build its own TypeScript program cache, for a baseline that must not share a program with earlier builds.
 const isolatedDts = (options: Parameters<typeof dts>[0] = {}): Plugin[] => dts({ newContext: true, ...options });
 
 // A language that needs no Volar: its files are TypeScript once `toTsFilename` maps them.
@@ -83,13 +83,11 @@ describe("custom languages", () => {
             const entry = path.resolve(root, "main.ts");
 
             // `fallthroughAttributes` is set in the tsconfig of this fixture.
-            const fromTsconfig = await rollupBuild(entry, [
-                isolatedDts({ emitDtsOnly: true, tsconfig: path.resolve(root, "tsconfig.json"), vue: true }),
-            ]);
+            const fromTsconfig = await rollupBuild(entry, [dts({ emitDtsOnly: true, tsconfig: path.resolve(root, "tsconfig.json"), vue: true })]);
             const fromOverride = await rollupBuild(entry, [
-                isolatedDts({ emitDtsOnly: true, tsconfig: false, vue: { vueCompilerOptions: { fallthroughAttributes: true } } }),
+                dts({ emitDtsOnly: true, tsconfig: false, vue: { vueCompilerOptions: { fallthroughAttributes: true } } }),
             ]);
-            const withDefaults = await rollupBuild(entry, [isolatedDts({ emitDtsOnly: true, tsconfig: false, vue: true })]);
+            const withDefaults = await rollupBuild(entry, [dts({ emitDtsOnly: true, tsconfig: false, vue: true })]);
 
             expect(fromOverride.snapshot).toBe(fromTsconfig.snapshot);
             expect(fromOverride.snapshot).not.toBe(withDefaults.snapshot);
@@ -102,13 +100,13 @@ describe("custom languages", () => {
             const entry = path.resolve(root, "main.ts");
 
             const overridden = await rollupBuild(entry, [
-                isolatedDts({
+                dts({
                     emitDtsOnly: true,
                     tsconfig: path.resolve(root, "tsconfig.json"),
                     vue: { vueCompilerOptions: { fallthroughAttributes: false } },
                 }),
             ]);
-            const withDefaults = await rollupBuild(entry, [isolatedDts({ emitDtsOnly: true, tsconfig: false, vue: true })]);
+            const withDefaults = await rollupBuild(entry, [dts({ emitDtsOnly: true, tsconfig: false, vue: true })]);
 
             expect(overridden.snapshot).toBe(withDefaults.snapshot);
         });
@@ -119,8 +117,8 @@ describe("custom languages", () => {
             const root = path.resolve(dirname, "fixtures/vue-sfc-fallthrough");
             const entry = path.resolve(root, "main.ts");
 
-            // Isolated baseline for the default options. The two builds below run without `newContext`, so they share
-            // the program cache of their language set: the second must not reuse the program of the first.
+            // Isolated baseline for the default options. The two builds below share the program cache of their language set and
+            // tsconfig: the second must not reuse the program of the first.
             const expected = await rollupBuild(entry, [isolatedDts({ emitDtsOnly: true, tsconfig: false, vue: true })]);
             const overridden = await rollupBuild(entry, [
                 dts({ emitDtsOnly: true, tsconfig: false, vue: { vueCompilerOptions: { fallthroughAttributes: true } } }),
@@ -138,11 +136,9 @@ describe("custom languages", () => {
             const entry = path.resolve(root, "main.ts");
 
             // The shortcut is plain data, so it crosses the worker boundary and the worker rebuilds the language itself.
-            const inProcess = await rollupBuild(entry, [
-                isolatedDts({ compilerOptions: { isolatedDeclarations: false }, emitDtsOnly: true, vue: true }),
-            ]);
+            const inProcess = await rollupBuild(entry, [dts({ compilerOptions: { isolatedDeclarations: false }, emitDtsOnly: true, vue: true })]);
             const parallel = await rollupBuild(entry, [
-                isolatedDts({ compilerOptions: { isolatedDeclarations: false }, emitDtsOnly: true, parallel: true, vue: true }),
+                dts({ compilerOptions: { isolatedDeclarations: false }, emitDtsOnly: true, parallel: true, vue: true }),
             ]);
 
             expect(parallel.snapshot).toBe(inProcess.snapshot);
@@ -156,11 +152,9 @@ describe("custom languages", () => {
             const root = path.resolve(dirname, "fixtures/vue-sfc");
             const entry = path.resolve(root, "main.ts");
 
-            const shortcut = await rollupBuild(entry, [
-                isolatedDts({ compilerOptions: { isolatedDeclarations: false }, emitDtsOnly: true, vue: true }),
-            ]);
+            const shortcut = await rollupBuild(entry, [dts({ compilerOptions: { isolatedDeclarations: false }, emitDtsOnly: true, vue: true })]);
             const custom = await rollupBuild(entry, [
-                isolatedDts({ compilerOptions: { isolatedDeclarations: false }, customLanguages: [createVueLanguage()], emitDtsOnly: true }),
+                dts({ compilerOptions: { isolatedDeclarations: false }, customLanguages: [createVueLanguage()], emitDtsOnly: true }),
             ]);
 
             expect(custom.snapshot).toBe(shortcut.snapshot);
@@ -173,8 +167,8 @@ describe("custom languages", () => {
             const entry = path.resolve(root, "main.ts");
             const tsconfig = path.resolve(root, "tsconfig.json");
 
-            const shortcut = await rollupBuild(entry, [isolatedDts({ emitDtsOnly: true, tsconfig, tsMacro: true })]);
-            const custom = await rollupBuild(entry, [isolatedDts({ customLanguages: [createTsMacroLanguage()], emitDtsOnly: true, tsconfig })]);
+            const shortcut = await rollupBuild(entry, [dts({ emitDtsOnly: true, tsconfig, tsMacro: true })]);
+            const custom = await rollupBuild(entry, [dts({ customLanguages: [createTsMacroLanguage()], emitDtsOnly: true, tsconfig })]);
 
             expect(custom.snapshot).toBe(shortcut.snapshot);
         });
@@ -185,7 +179,7 @@ describe("custom languages", () => {
             const root = path.resolve(dirname, "fixtures/custom-languages/custom");
             const { snapshot } = await rollupBuild(path.resolve(root, "main.ts"), [
                 convertCustomToTs(),
-                isolatedDts({ customLanguages: [createCustomLanguage()], emitDtsOnly: true, generator }),
+                dts({ customLanguages: [createCustomLanguage()], emitDtsOnly: true, generator }),
             ]);
 
             expect(snapshot).toMatchSnapshot();
@@ -195,9 +189,7 @@ describe("custom languages", () => {
             expect.assertions(1);
 
             const root = path.resolve(dirname, "fixtures/custom-languages/astro");
-            const { snapshot } = await rollupBuild(path.resolve(root, "main.ts"), [
-                isolatedDts({ customLanguages: [await createAstroLanguage()], emitDtsOnly: true }),
-            ]);
+            const { snapshot } = await rollupBuild(path.resolve(root, "main.ts"), [dts({ customLanguages: [await createAstroLanguage()], emitDtsOnly: true })]);
 
             expect(snapshot).toMatchSnapshot();
         });
@@ -207,12 +199,8 @@ describe("custom languages", () => {
         it("rejects custom languages with the tsgo generator", () => {
             expect.assertions(2);
 
-            expect(() => resolveOptions({ customLanguages: [createCustomLanguage()], generator: "tsgo", tsconfig: false })).toThrow(
-                RE_TSGO_CUSTOM_UNSUPPORTED,
-            );
-            expect(() => resolveOptions({ customLanguages: [createCustomLanguage()], tsconfig: false, tsgo: true })).toThrow(
-                RE_TSGO_CUSTOM_UNSUPPORTED,
-            );
+            expect(() => resolveOptions({ customLanguages: [createCustomLanguage()], generator: "tsgo", tsconfig: false })).toThrow(RE_TSGO_CUSTOM_UNSUPPORTED);
+            expect(() => resolveOptions({ customLanguages: [createCustomLanguage()], tsconfig: false, tsgo: true })).toThrow(RE_TSGO_CUSTOM_UNSUPPORTED);
         });
 
         it("requires the tsc generator for Volar-based languages", () => {

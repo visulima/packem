@@ -1,8 +1,9 @@
-import { mkdir, readFile, rm } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { rollupBuild } from "@sxzz/test-utils";
+import type { OutputChunk } from "rollup";
 import { rollup } from "rollup";
 import ts from "typescript";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -35,6 +36,8 @@ const MISSING_DIRECTIVE_RE = /\/\/\/ <reference path="[^"]*missing\.d\.ts" \/>/u
 const MODULE_DIRECTIVE_RE = /\/\/\/ <reference path="[^"]*module\.d\.ts" \/>/u;
 const IMPORT_TYPE_DIRECTIVE_RE = /\/\/\/ <reference path="[^"]*import-type\.d\.ts" \/>/u;
 const STRING_MODULE_DIRECTIVE_RE = /\/\/\/ <reference path="[^"]*string-module\.d\.ts" \/>/u;
+const SHARED_OWNER_FILE_RE = /^common-.*\.d\.ts$/u;
+const SHARED_OWNER_DIRECTIVE_RE = /\/\/\/ <reference path="\.\/common-[^"]+\.d\.ts" \/>/u;
 
 const countOf = (text: string, needle: string): number => text.split(needle).length - 1;
 
@@ -132,6 +135,89 @@ describe("triple-slash reference bundling", () => {
             expect(diagnosticsOf([path.join(temporaryDirectory, "a.d.ts"), path.join(temporaryDirectory, "b.d.ts")])).toHaveLength(0);
             // `b` alone still sees `Foo` and `Maybe` through the reference.
             expect(diagnosticsOf([path.join(temporaryDirectory, "b.d.ts")])).toHaveLength(0);
+        });
+
+        it("hands the shared script to the chunk both entries already import", async () => {
+            expect.assertions(6);
+
+            const outputDirectory = path.join(temporaryDirectory, "shared-owner");
+
+            const bundle = await rollup({
+                input: { a: fixture("shared-owner/a.d.ts"), b: fixture("shared-owner/b.d.ts") },
+                plugins: [dts({ dtsInput: true, emitDtsOnly: true, sourcemap: false, tsconfig: false })],
+            });
+
+            const { output } = await bundle.write({ dir: outputDirectory, format: "es" });
+
+            await bundle.close();
+
+            const chunks = output.filter((item): item is OutputChunk => item.type === "chunk");
+            const codeOf = (name: string): string => chunks.find((chunk) => chunk.fileName === name)?.code ?? "";
+            const owner = chunks.find((chunk) => chunk.code.includes("interface Foo"));
+
+            // `common` is imported by both entries, so it sits below them in the import order and owns the copy.
+            expect(owner?.fileName).toMatch(SHARED_OWNER_FILE_RE);
+            expect(codeOf("a.d.ts")).toMatch(SHARED_OWNER_DIRECTIVE_RE);
+            expect(codeOf("b.d.ts")).toMatch(SHARED_OWNER_DIRECTIVE_RE);
+            // Owner names are placeholders until rollup assigns hashes; none may survive into the directive.
+            expect(chunks.some((chunk) => chunk.code.includes("!~{"))).toBe(false);
+            // Each entry, on its own, still loads cleanly through the shared chunk.
+            expect(diagnosticsOf([path.join(outputDirectory, "a.d.ts")])).toHaveLength(0);
+            expect(diagnosticsOf([path.join(outputDirectory, "b.d.ts")])).toHaveLength(0);
+        });
+    });
+
+    describe("rendering the same bundle again", () => {
+        beforeAll(async () => {
+            await rm(temporaryDirectory, { force: true, recursive: true });
+            await mkdir(temporaryDirectory, { recursive: true });
+        });
+
+        afterAll(async () => {
+            await rm(temporaryDirectory, { force: true, recursive: true });
+        });
+
+        it("keeps the reference directives in a second generate of the same bundle", async () => {
+            expect.assertions(2);
+
+            const bundle = await rollup({
+                input: fixture("fallback/index.d.ts"),
+                plugins: [dts({ dtsInput: true, emitDtsOnly: true, sourcemap: false, tsconfig: false })],
+            });
+
+            const first = await bundle.generate({ format: "es" });
+            const second = await bundle.generate({ format: "es" });
+
+            await bundle.close();
+
+            expect(first.output[0].code).toContain('/// <reference types="node" />');
+            expect(second.output[0].code).toContain('/// <reference types="node" />');
+        });
+
+        it("drops a directive that a re-transformed module no longer has", async () => {
+            expect.assertions(2);
+
+            const entry = path.join(temporaryDirectory, "rebuild.d.ts");
+            const plugin = dts({ dtsInput: true, emitDtsOnly: true, sourcemap: false, tsconfig: false });
+
+            await writeFile(entry, '/// <reference types="node" />\n\nexport declare const value: number;\n');
+
+            const first = await rollup({ input: entry, plugins: [plugin] });
+
+            const firstOutput = await first.generate({ format: "es" });
+
+            expect(firstOutput.output[0].code).toContain('/// <reference types="node" />');
+
+            // Simulates watch mode: the module is re-transformed with its directive removed, the rest of the bundle is cached.
+            await writeFile(entry, "export declare const value: number;\n");
+
+            const second = await rollup({ cache: first.cache, input: entry, plugins: [plugin] });
+            const secondOutput = await second.generate({ format: "es" });
+
+            expect(secondOutput.output[0].code).not.toContain("reference types");
+
+            await second.close();
+            await first.close();
         });
     });
 

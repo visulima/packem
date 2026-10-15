@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "stripInternal": true,
+        "strict": true,
+        "target": "ESNext"
+    }
+}

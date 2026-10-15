@@ -6,7 +6,7 @@ import { rollup } from "rollup";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { dts } from "../src/index.js";
-import { globalContext } from "../src/tsc/context.js";
+import { countSharedPrograms, resetSharedContexts } from "../src/tsc/context.js";
 import { MAX_RETAINED_PROGRAMS } from "../src/tsc/emit-compiler.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,9 +38,9 @@ describe("many-entry dts (packem#216)", () => {
     it("emits a correct declaration for every entry when a build has many independent entries", async () => {
         expect.hasAssertions();
 
-        // Default options use `globalContext` (newContext is false), so reset it for an isolated
-        // program-count assertion below.
-        globalContext.programs.length = 0;
+        // Default options share the program cache of their tsconfig (newContext is false), so drop it for an
+        // isolated program-count assertion below.
+        resetSharedContexts();
 
         const entryCount = 12;
         const input: Record<string, string> = {};
@@ -77,7 +77,7 @@ describe("many-entry dts (packem#216)", () => {
         // The fix roots each program at one entry, so independent entries produce multiple programs
         // (a revert to the shared all-entries program would leave exactly 1), and retention is
         // capped (a revert of the eviction would leave one per entry, i.e. `entryCount`).
-        expect(globalContext.programs.length).toBeGreaterThan(1);
-        expect(globalContext.programs.length).toBeLessThanOrEqual(MAX_RETAINED_PROGRAMS);
+        expect(countSharedPrograms()).toBeGreaterThan(1);
+        expect(countSharedPrograms()).toBeLessThanOrEqual(MAX_RETAINED_PROGRAMS);
     }, 120_000);
 });

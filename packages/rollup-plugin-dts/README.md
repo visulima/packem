@@ -325,14 +325,16 @@ Constraints:
 A `/// <reference path="…" />` in a `.d.ts` input that points at a local global script (a file with only `interface`,
 `type`, `enum` and `declare` declarations, no imports or exports) is inlined into the output and the directive is removed.
 Inlined declarations are wrapped in `declare global { … }` when the output is a module. When several output chunks reference
-the same script, the script is inlined into one of them, the first by file name, and the other chunks get a
-`/// <reference path="…" />` to that chunk. Consumers that load several entries therefore see one declaration, so duplicate
+the same script, the script is inlined into one of them, and the other chunks get a `/// <reference path="…" />` to that
+chunk. The owner is the referencing chunk that comes first in an import order: a chunk comes after the chunks it imports,
+and unrelated chunks are ordered by file name. So a shared chunk that the others already import owns the script, and
+the references always point in one direction, so they never form a cycle. Consumers that load several entries therefore see one declaration, so duplicate
 `type`, `const`, `class` or `enum` declarations do not conflict.
 
 Limits: scripts that contain imports or `import()` types, scripts that have a reference directive of their own, and
 string-named `declare module` blocks are not inlined. Their directives are kept, with the path rebased to the output
-location. Directives in `.ts` sources do not reach the emitted declarations, so nothing is inlined for them. The owner is
-chosen by file name, not by use, and a chunk that references another also loads that chunk's declarations.
+location. Directives in `.ts` sources do not reach the emitted declarations, so nothing is inlined for them. When the owner
+is not a chunk that the others already import, a referencing chunk also loads the owner's other declarations.
 `/// <reference types="…" />`, `lib=` and `no-default-lib` directives are kept as they are.
 
 ## Differences from `rollup-plugin-dts`
