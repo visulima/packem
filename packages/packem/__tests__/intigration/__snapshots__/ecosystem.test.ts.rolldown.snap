@@ -993,11 +993,11 @@ export { Container as default };
 exports[`packem ecosystem > should work with provided 'sitefetch' ecosystem suite 1`] = `
 [
   "#!/usr/bin/env node
-import { a as logger, i as formatNumber, n as serializePages, r as ensureArray, t as fetchSite } from "./packem_shared/src-C8tgbaBj.js";
+import { a as logger, i as formatNumber, n as serializePages, r as ensureArray, t as fetchSite } from "./packem_shared/src-C_LOJLFW.js";
 import path from "node:path";
 import fs from "node:fs";
 import { encode } from "gpt-tokenizer/model/gpt-4o";
-//#region ../../../../../node_modules/.pnpm/cac@7.0.1/node_modules/cac/dist/index.js
+//#region ../../../../../node_modules/.pnpm/cac@7.1.0/node_modules/cac/dist/index.js
 function toArr(any) {
 	return any == null ? [] : /* @__PURE__ */ Array.isArray(any) ? any : [any];
 }
@@ -1146,7 +1146,7 @@ function setDotProp(obj, keys, val) {
 	}
 }
 function setByType(obj, transforms) {
-	for (const [key, transform] of Object.entries(transforms)) if (transform.shouldTransform) {
+	for (const [key, transform] of Object.entries(transforms)) if (transform.shouldTransform && key in obj) {
 		obj[key] = [obj[key]].flat();
 		if (typeof transform.transformFunction === "function") obj[key] = obj[key].map(transform.transformFunction);
 	}
@@ -1199,7 +1199,6 @@ var Option = class {
 		else this.isBoolean = true;
 	}
 };
-let runtimeProcessArgs;
 let runtimeInfo;
 {
 	let runtimeName;
@@ -1207,7 +1206,14 @@ let runtimeInfo;
 	else if (typeof Bun !== "undefined" && typeof Bun.version === "string") runtimeName = "bun";
 	else runtimeName = "node";
 	runtimeInfo = \`\${process.platform}-\${process.arch} \${runtimeName}-\${process.version}\`;
-	runtimeProcessArgs = process.argv;
+}
+/**
+* \`process.argv\` at call time. It must not be captured when this module is
+* imported: a runner may load cac before it rewrites \`process.argv\` for the
+* script it is about to run.
+*/
+function getRuntimeProcessArgs() {
+	return process.argv;
 }
 var Command = class {
 	rawName;
@@ -1510,6 +1516,7 @@ var CAC = class extends EventTarget {
 	*/
 	parse(argv, { run = true } = {}) {
 		if (!argv) {
+			const runtimeProcessArgs = getRuntimeProcessArgs();
 			if (!runtimeProcessArgs) throw new Error("No argv provided and runtime process argv is not available.");
 			argv = runtimeProcessArgs;
 		}
@@ -1684,7 +1691,7 @@ declare function fetchSite(url: string, options: Options): Promise<FetchSiteResu
 declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 export { fetchSite, serializePages };
 ",
-  "export { t as fetchSite, n as serializePages } from "./packem_shared/src-C8tgbaBj.js";
+  "export { t as fetchSite, n as serializePages } from "./packem_shared/src-C_LOJLFW.js";
 ",
   "import { Window } from "happy-dom";
 import Turndown from "turndown";
@@ -2010,7 +2017,7 @@ function pTimeout(promise, options) {
 	return cancelablePromise;
 }
 //#endregion
-//#region ../../../../../node_modules/.pnpm/p-queue@9.3.3/node_modules/p-queue/dist/lower-bound.js
+//#region ../../../../../node_modules/.pnpm/p-queue@9.3.4/node_modules/p-queue/dist/lower-bound.js
 function lowerBound(array, value, comparator) {
 	let first = 0;
 	let count = array.length;
@@ -2025,7 +2032,7 @@ function lowerBound(array, value, comparator) {
 	return first;
 }
 //#endregion
-//#region ../../../../../node_modules/.pnpm/p-queue@9.3.3/node_modules/p-queue/dist/priority-queue.js
+//#region ../../../../../node_modules/.pnpm/p-queue@9.3.4/node_modules/p-queue/dist/priority-queue.js
 const compactionThreshold = 100;
 var PriorityQueue = class {
 	#queue = [];
@@ -2097,7 +2104,7 @@ var PriorityQueue = class {
 	}
 };
 //#endregion
-//#region ../../../../../node_modules/.pnpm/p-queue@9.3.3/node_modules/p-queue/dist/index.js
+//#region ../../../../../node_modules/.pnpm/p-queue@9.3.4/node_modules/p-queue/dist/index.js
 /**
 Promise queue with concurrency control.
 */
@@ -2274,8 +2281,8 @@ var PQueue = class extends import_eventemitter3.default {
 					this.#scheduleRateLimitUpdate();
 				}
 				if (canInitializeInterval) this.#initializeIntervalIfNeeded();
-				this.emit("active");
 				job();
+				this.emit("active");
 				taskStarted = true;
 			}
 		}
