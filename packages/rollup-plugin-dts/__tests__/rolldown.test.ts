@@ -9,7 +9,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { OutputChunk } from "rolldown";
+import type { OutputAsset, OutputChunk } from "rolldown";
 import { rolldown } from "rolldown";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -250,5 +250,33 @@ describe("dts plugin – rolldown compat", () => {
         for (const probe of REEXPORT_JSDOC_PROBES) {
             expect(code).toMatch(probe);
         }
+    });
+
+    // A script two entries reference without importing anything the other does: neither may declare it, so it is written to
+    // a file of its own and both entries point at it (see the triple-slash section of the README).
+    it("writes a shared global script to a file of its own", async () => {
+        expect.assertions(4);
+
+        const root = path.resolve(dirname, "fixtures/triple-slash-bundling/dedupe-entry");
+
+        const bundle = await rolldown({
+            checks: { pluginTimings: false },
+            input: { a: path.resolve(root, "a.d.ts"), b: path.resolve(root, "b.d.ts") },
+            plugins: [dts({ dtsInput: true, emitDtsOnly: true, sourcemap: false, tsconfig: false })],
+            treeshake: false,
+        });
+
+        const { output } = await bundle.generate({ format: "esm", sourcemap: false });
+
+        await bundle.close();
+
+        const chunks = output.filter((item): item is OutputChunk => item.type === "chunk");
+        const scriptFile = output.find((item): item is OutputAsset => item.type === "asset" && item.fileName.includes("_dts-scripts"));
+        const codeOf = (name: string): string => chunks.find((chunk) => chunk.fileName === name)?.code ?? "";
+
+        expect(String(scriptFile?.source ?? "")).toContain("interface Foo");
+        expect(codeOf("a.d.ts")).toContain("_dts-scripts/");
+        expect(codeOf("b.d.ts")).toContain("_dts-scripts/");
+        expect(codeOf("a.d.ts")).not.toContain("interface Foo");
     });
 });

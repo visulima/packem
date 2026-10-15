@@ -19,12 +19,15 @@ import {
     installPackage,
     normalizeRolldownOutput,
 } from "../helpers";
-import { normalizeBundleOutput } from "../helpers/testing-utils";
+import { baseUrlCompilerOptions, isTypeScript7, normalizeBundleOutput } from "../helpers/testing-utils";
 
 // Tests that compare bundled output byte-exactly fail under rolldown because
 // rolldown wraps each module with `//#region`/`//#endregion` markers and renames
 // default exports (`var src_default = ...`). The asserts below opt out via this flag.
 const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
+
+// tsgo keeps `export default () => …` as a function declaration where tsc emits a const.
+const defaultExportDeclaration = isTypeScript7 ? "declare function _default(): string;" : "declare const _default: () => string;";
 
 const LOG_A_OR_1_REGEX = /console\.log\([a1]\)/;
 const LOG_B_OR_2_REGEX = /console\.log\([b2]\)/;
@@ -674,10 +677,9 @@ console.log(value);
 
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
-                    baseUrl: "src",
-                    paths: {
+                    ...baseUrlCompilerOptions("src", {
                         "components:*": ["components/*.ts"],
-                    },
+                    }),
                 },
             });
             await createPackageJson(temporaryDirectoryPath, {
@@ -721,10 +723,9 @@ console.log(value);
             await installPackage(temporaryDirectoryPath, "typescript");
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
-                    baseUrl: "src",
-                    paths: {
+                    ...baseUrlCompilerOptions("src", {
                         [patchKey]: ["components/*.ts"],
-                    },
+                    }),
                 },
             });
             await createPackageJson(temporaryDirectoryPath, {
@@ -866,7 +867,7 @@ export class ExampleClass {
         await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 allowJs: true,
-                baseUrl: "./",
+                ...baseUrlCompilerOptions("./"),
             },
         });
         await createPackageJson(temporaryDirectoryPath, {
@@ -974,13 +975,13 @@ export { version };
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toBe(`declare const _default: () => string;
+        expect(dMtsContent).toBe(`${defaultExportDeclaration}
 export { _default as default };
 `);
 
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dTsContent).toBe(`declare const _default: () => string;
+        expect(dTsContent).toBe(`${defaultExportDeclaration}
 export = _default;
 `);
 
@@ -1025,13 +1026,13 @@ export { index as default };
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toBe(`declare const _default: () => string;
+        expect(dMtsContent).toBe(`${defaultExportDeclaration}
 export { _default as default };
 `);
 
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dTsContent).toBe(`declare const _default: () => string;
+        expect(dTsContent).toBe(`${defaultExportDeclaration}
 export = _default;
 `);
 
@@ -1042,7 +1043,9 @@ export = _default;
 export { index as default };
 `);
 
-        expect(existsSync(join(temporaryDirectoryPath, ".tsbuildinfo"))).toBe(false);
+        // The tsc backend never emits the build info; the tsgo compiler honours `incremental`
+        // and writes it to the configured `tsBuildInfoFile`.
+        expect(existsSync(join(temporaryDirectoryPath, ".tsbuildinfo"))).toBe(isTypeScript7);
     });
 
     it.skipIf(isRolldown)("should work with tsconfig 'noEmit' option", async () => {
@@ -1087,7 +1090,7 @@ export { index as default };
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dMtsContent).toBe(`declare const _default: () => string;
+        expect(dMtsContent).toBe(`${defaultExportDeclaration}
 export { _default as default };
 `);
     });
@@ -1674,7 +1677,7 @@ export { test2, test as default };
 
         await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
-                baseUrl: ".",
+                ...baseUrlCompilerOptions("."),
                 moduleResolution: "bundler",
             },
         });
@@ -1771,7 +1774,7 @@ export { test2 };
 
         await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
-                baseUrl: ".",
+                ...baseUrlCompilerOptions("."),
                 moduleResolution: "bundler",
             },
         });
@@ -1865,7 +1868,7 @@ export default test;
 
         await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
-                baseUrl: ".",
+                ...baseUrlCompilerOptions("."),
                 moduleResolution: "bundler",
             },
         });
@@ -3730,5 +3733,37 @@ throw new Error('line 9');
 
         // No absolute paths leaking into the output.
         expect(dTsContent).not.toContain(temporaryDirectoryPath);
+    });
+
+    it("should declare the namespace of an `export * as` re-export", async () => {
+        expect.assertions(4);
+
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'export * as ns from "./ns";\n');
+        await writeFile(`${temporaryDirectoryPath}/src/ns.ts`, "export const foo: number = 1;\nexport type Bar = string;\n");
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: { typescript: "*" },
+            exports: {
+                ".": {
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                },
+            },
+            module: "./dist/index.mjs",
+            type: "module",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // The re-exported namespace must be declared in the file, not just referenced by name.
+        expect(dMtsContent).toContain("declare namespace");
+        expect(dMtsContent).toContain("foo");
+        expect(dMtsContent).toContain("Bar");
     });
 });

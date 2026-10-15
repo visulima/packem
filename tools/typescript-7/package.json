@@ -1,0 +1,9 @@
+{
+    "name": "@internal/typescript-7",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Isolated TypeScript 7 install for the PACKEM_TEST_TYPESCRIPT=7 test lane. Kept out of packages/packem so its `tsc` bin cannot shadow the workspace TypeScript 6.",
+    "dependencies": {
+        "typescript": "7.0.2"
+    }
+}

@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`custom languages > customLanguages > builds a language without Volar with the oxc generator 1`] = `
+"// main.d.ts
+declare const foo: string;
+export { foo };
+"
+`;
+
+exports[`custom languages > customLanguages > builds a language without Volar with the tsc generator 1`] = `
+"// main.d.ts
+declare const foo: string;
+export { foo };
+"
+`;
+
+exports[`custom languages > customLanguages > builds an Astro file through Volar 1`] = `
+"// main.d.ts
+interface Props {
+  name: string;
+}
+declare function Foo(_props: Props): any;
+"
+`;

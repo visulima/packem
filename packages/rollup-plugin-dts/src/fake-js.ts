@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-shadow, func-style, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-non-null-assertion, unicorn/no-null, sonarjs/cognitive-complexity, jsdoc/match-description, @typescript-eslint/prefer-nullish-coalescing, no-plusplus, @typescript-eslint/restrict-template-expressions, sonarjs/function-return-type, sonarjs/different-types-comparison, no-return-assign, consistent-return, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-dynamic-delete, sonarjs/no-nested-assignment, sonarjs/no-empty-collection, no-secrets/no-secrets, no-await-in-loop, default-case -- this file implements a yuku-based AST transform; helper functions are hoisted as expressions to match the data flow, params are mutated for in-place rewriting, and several SonarJS / TS-strict rules clash with the in-place ESTree node rewriting this transform relies on */
+import { createHash } from "node:crypto";
+import { realpathSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import type { ExistingRawSourceMap, NormalizedOutputOptions, Plugin, RenderedChunk, SourceMapInput, TransformPluginContext, TransformResult } from "rollup";
+import type { ExistingRawSourceMap, NormalizedOutputOptions, Plugin, PluginContext, RenderedChunk, SourceMapInput, TransformPluginContext, TransformResult } from "rollup";
 import { b, is, isIdentifierName, nameOf, walk } from "yuku-ast";
 import { generate } from "yuku-codegen";
 // eslint-disable-next-line import/no-namespace -- the ESTree/TS-ESTree node types are a large flat namespace; importing them one by one would add ~40 named type imports
@@ -11,6 +14,8 @@ import { parse } from "yuku-parser";
 
 import { filenameDtsTo, filenameJsToDts, filenameToDts, RE_DTS, RE_DTS_MAP, RE_NODE_MODULES, replaceTemplateName, resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
+import type { InlinableScript } from "./reference-directives";
+import { appendInlinedScripts, loadReferencedScript } from "./reference-directives";
 
 // input:
 // export declare function x(xx: X): void
@@ -26,6 +31,33 @@ type Dependency = t.Expression & { replace?: (newNode: t.Node) => void };
 
 const CROSS_CHUNK_PLACEHOLDER = "__rollup_dts_resolve__:";
 
+// Declaration ids are generated and may not exist on disk, so only the directory is resolved.
+const realpathOrSelf = (id: string): string => {
+    try {
+        return path.join(realpathSync(path.dirname(id)), path.basename(id));
+    } catch {
+        return id;
+    }
+};
+// A declaration's type parameters become the parameters of the arrow function that carries its
+// dependencies, so one named like a module-level import would shadow it and the import would be
+// dropped as unused. The parameters are prefixed to keep the two apart and the prefix is stripped
+// again when the original names are restored in `renderChunk`.
+const TYPE_PARAM_PREFIX = "_$tp$";
+const stripTypeParamPrefix = (name: string): string => (name.startsWith(TYPE_PARAM_PREFIX) ? name.slice(TYPE_PARAM_PREFIX.length) : name);
+const restoreTypeParamName = (node: t.Node): void => {
+    if (node.type === "Identifier") node.name = stripTypeParamPrefix(node.name);
+};
+const RE_FILE_DOC_TAG = /@(?:module|packageDocumentation|fileoverview|file)\b/;
+const SOURCE_MAPPING_URL_MARKER = "//# sourceMappingURL=";
+
+/** Rollup appends the comment as the last line, so only a trailing one is removed. */
+const stripTrailingSourceMappingUrl = (code: string): string => {
+    const index = code.lastIndexOf(SOURCE_MAPPING_URL_MARKER);
+
+    return index !== -1 && !code.slice(index).trimEnd().includes("\n") ? code.slice(0, index).trimEnd() : code;
+};
+
 /**
  * `b.Literal` is typed for every literal shape at once, so it returns the whole
  * union. These two build the only literals this transform needs, already narrowed.
@@ -37,6 +69,17 @@ const stringLiteral = (value: string): t.StringLiteral => {
 const numericLiteral = (value: number): t.NumericLiteral => {
     return { end: 0, raw: String(value), start: 0, type: "Literal", value };
 };
+
+/** One placeholder per child node, carrying that node's source span for `renderChunk` to restore. */
+const childPlaceholders = (children: t.Node[]): t.StringLiteral[] =>
+    children.map((node) => {
+        const placeholder = stringLiteral("");
+
+        placeholder.start = node.start;
+        placeholder.end = node.end;
+
+        return placeholder;
+    });
 
 /** `export { ... }` with no declaration and no source, which is all this transform emits. */
 const exportNamedDeclaration = (specifiers: t.ExportSpecifier[]): t.ExportNamedDeclaration =>
@@ -63,6 +106,8 @@ interface OverloadInfo {
 interface DeclarationInfo {
     bindings: t.Identifier[];
     children: t.Node[];
+    /** The runtime `children` array literal; merged overloads append their placeholders to it. */
+    childrenNode?: t.ArrayExpression;
     decl: t.Declaration;
     deps: Dependency[];
     overloads?: OverloadInfo[];
@@ -76,9 +121,18 @@ interface DeclarationInfo {
     resolvedModuleId?: string;
 }
 
+/** What a top-level declaration introduces: a type, a value, or both (class, enum, merged). */
+type DeclarationMeaning = "both" | "type" | "value";
+
 interface ModuleExports {
+    /** Top-level declarations and what they mean. */
+    declared: Map<string, DeclarationMeaning>;
     exportAlls: ExportAllInfo[];
+    /** Exported name → the local binding it exports. */
+    exportLocals: Map<string, string>;
     exports: Map<string, boolean>;
+    /** Named/default imports: local name → what they import and from which resolved module. */
+    imports: Map<string, { imported: string; source?: string }>;
     reExports: ReExportInfo[];
     typeOnlyLocals: Set<string>;
 }
@@ -103,16 +157,43 @@ interface ChunkExportInfo {
 
 type NamespaceMap = Map<string, { local: t.Identifier | t.TSQualifiedName; stmt: t.ProgramStatement }>;
 
-const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">): Plugin => {
+/**
+ * Where a referenced global script lands in the output: inlined into a chunk every referencing chunk already imports, so the
+ * references between them cannot form a cycle, or written to a file of its own when the output holds no such chunk.
+ */
+type ScriptPlacement = { file: string; kind: "file"; script: InlinableScript } | { kind: "chunk"; owner: string; script: InlinableScript };
+
+const createFakeJsPlugin = (
+    { cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">,
+    entryChunkNames: ReadonlySet<string> = new Set<string>(),
+): Plugin => {
     let declarationIndex = 0;
     const declarationMap = new Map<number /* declaration id */, DeclarationInfo>();
     const commentsMap = new Map<string /* filename */, t.Comment[]>();
+    // `/// <reference path>` directives that point at a local global script, mapped to that script (see reference-directives.ts).
+    const referencedScriptMap = new WeakMap<t.Comment, InlinableScript>();
+    // The global scripts each module references. Kept per module, not per directive, so that any chunk can find
+    // which other chunks inline the same script (see `getScriptPlacements`).
+    const moduleScriptsMap = new Map<string /* filename */, InlinableScript[]>();
+    // Per render: where each script lands in the output, computed once from the chunk graph of that output.
+    let scriptPlacements: Map<string /* script file */, ScriptPlacement> | undefined;
+    // Script files of their own that this output already holds, so several chunks emit each of them once.
+    const emittedScriptFiles = new Set<string>();
     // Leading JSDoc of specifier-based export statements, which — unlike declarations — are
     // handed to rollup verbatim and would otherwise be lost to the `comments: false` print
     // at the end of `transform`. Re-attached by name in `renderChunk`.
     const exportCommentsMap = new Map<string /* filename */, ExportComments>();
+    // A file's own doc comment (`@module`, `@packageDocumentation`) sits on its first statement.
+    // When that statement is an import or `export … from`, the statement keeps no comments, so
+    // the block is saved here and put back on the entry's chunk in `renderChunk`.
+    const fileCommentsMap = new Map<string /* filename */, t.AttachedComment[]>();
     const moduleExportsMap = new Map<string /* filename */, ModuleExports>();
     const warnedCjsDtsInputs = new Set<string>();
+    // `typeof X` operands (plain identifiers) with the name they were written with. Rollup links
+    // them to whatever `X` is bound to in the module, which for an import that is the imported
+    // declaration — but if that declaration is only a type, `typeof X` can only have meant a
+    // global value of the same name. `renderChunk` gives those back their written name.
+    const typeofOperands = new WeakMap<Dependency, { moduleId: string; name: string }>();
     // Cross-module type-only propagation depends only on `moduleExportsMap`, not on
     // the chunk, so it is computed once per render and shared across all chunks
     // (reset in `renderStart` to stay correct in watch mode).
@@ -133,6 +214,18 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
             // Rewrite `declare module` placeholders to output chunk paths
             const placeholderRe = new RegExp(`"${CROSS_CHUNK_PLACEHOLDER}(.+?)"`, "g");
+            // Rollup keeps the path an entry was given, but resolves imports to realpaths, so an entry
+            // reached through a symlink (macOS `/tmp`) is only found by its realpath. Built on first miss.
+            let moduleToChunkByRealpath: Map<string, string> | undefined;
+            const findChunk = (moduleId: string): string | undefined => {
+                const direct = moduleToChunk.get(moduleId);
+
+                if (direct) return direct;
+
+                moduleToChunkByRealpath ??= new Map(Array.from(moduleToChunk, ([id, fileName]) => [realpathOrSelf(id), fileName]));
+
+                return moduleToChunkByRealpath.get(realpathOrSelf(moduleId));
+            };
 
             for (const chunk of Object.values(bundle)) {
                 if (chunk.type !== "chunk" || !RE_DTS.test(chunk.fileName)) continue;
@@ -140,7 +233,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 if (!chunk.code.includes(CROSS_CHUNK_PLACEHOLDER)) continue;
 
                 chunk.code = chunk.code.replaceAll(placeholderRe, (_match, resolvedId: string) => {
-                    const targetFileName = moduleToChunk.get(resolvedId);
+                    const targetFileName = findChunk(resolvedId);
 
                     if (!targetFileName) return _match;
 
@@ -152,6 +245,18 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                     return JSON.stringify(specifier);
                 });
+            }
+
+            // Rollup appends `//# sourceMappingURL=…` to every chunk once output sourcemaps are
+            // on, but the `.d.ts.map` assets are deleted below when declaration maps are off —
+            // leave no comment pointing at a map that does not exist.
+            if (!sourcemap) {
+                for (const chunk of Object.values(bundle)) {
+                    if (chunk.type !== "chunk" || !RE_DTS.test(chunk.fileName)) continue;
+
+                    chunk.code = stripTrailingSourceMappingUrl(chunk.code);
+                    chunk.map = null;
+                }
             }
 
             for (const chunk of Object.values(bundle)) {
@@ -182,8 +287,16 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
             return {
                 ...options,
-                chunkFileNames(chunk) {
+                chunkFileNames(preRenderedChunk) {
+                    let chunk = preRenderedChunk;
                     const nameTemplate = resolveTemplateFunction(chunk.isEntry ? entryFileNames || "[name].js" : chunkFileNames || "[name]-[hash].js", chunk);
+
+                    // Rollup does not reserve the names of the declaration entries we emit, so with a
+                    // template that has no `[hash]` a shared chunk could claim an entry's file name
+                    // first and push the entry to `name2`. Name the shared chunk apart instead.
+                    if (!chunk.isEntry && !nameTemplate.includes("[hash]") && entryChunkNames.has(chunk.name)) {
+                        chunk = { ...chunk, name: chunk.name.endsWith(".d") ? `${chunk.name.slice(0, -2)}-shared.d` : `${chunk.name}-shared` };
+                    }
 
                     if (chunk.name.endsWith(".d")) {
                         const renderedNameWithoutD = filenameJsToDts(replaceTemplateName(nameTemplate, chunk.name.slice(0, -2)));
@@ -199,7 +312,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                         }
                     }
 
-                    return nameTemplate;
+                    return chunk === preRenderedChunk ? nameTemplate : replaceTemplateName(nameTemplate, chunk.name);
                 },
                 sourcemap: options.sourcemap || sourcemap,
             };
@@ -210,6 +323,8 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             // Invalidate the per-render type-only propagation cache so watch-mode
             // rebuilds recompute it from the freshly-populated moduleExportsMap.
             resolvedExportsByModule = undefined;
+            scriptPlacements = undefined;
+            emittedScriptFiles.clear();
         },
 
         async transform(code: string, id: string) {
@@ -254,18 +369,43 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         // Collect export metadata up-front (before the loop below rewrites
         // `exportKind`/`importKind` to `value`) so renderChunk can later decide
         // which exports must be emitted as `export type`.
-        moduleExportsMap.set(id, await collectModuleExports(this, program.body, id));
+        fileCommentsMap.delete(id);
+        moduleExportsMap.set(id, await collectModuleExports(this, program.body, id, collectTypeofNames(program)));
 
         const directives = collectReferenceDirectives(file.comments);
+        const scripts: InlinableScript[] = [];
 
-        if (directives.length > 0) {
+        // Replaces what an earlier transform of this file left behind, so a removed directive does not survive a rebuild.
+        if (directives.length === 0) {
+            commentsMap.delete(id);
+        } else {
             commentsMap.set(id, directives);
+
+            for (const directive of directives) {
+                const script = await loadReferencedScript(directive, id);
+
+                if (script) {
+                    referencedScriptMap.set(directive, script);
+                    scripts.push(script);
+                    // The chunk now contains this file's text, so a change to it must rebuild in watch mode.
+                    this.addWatchFile(script.file);
+                }
+            }
+        }
+
+        if (scripts.length > 0) {
+            moduleScriptsMap.set(id, scripts);
+        } else {
+            moduleScriptsMap.delete(id);
         }
 
         const exportComments = collectExportComments(program.body);
 
+        // a re-transformed file that no longer has documented re-exports must drop its old entry
         if (exportComments.size > 0) {
             exportCommentsMap.set(id, exportComments);
+        } else {
+            exportCommentsMap.delete(id);
         }
 
         const appendStatements: t.ProgramStatement[] = [];
@@ -273,6 +413,9 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         // Track binding names to their declaration IDs for function overload merging
         const bindingToDeclarationId = new Map<string, number>();
         const statementsToRemove = new Set<number>();
+        // `declare global` and `declare module "…"` augment another declaration. Nothing imports a binding
+        // from them, so tree-shaking would drop the module; `moduleSideEffects` is set on the result instead.
+        let hasAugmentation = false;
         // Memoize `context.resolve(source, importer)` results for `import("x").T` references
         // across every declaration in THIS module. Module-scoped + same importer, so the same
         // specifier referenced in N declarations is resolved exactly once.
@@ -285,21 +428,53 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         // so they flow through the normal declaration machinery below.
         for (const [i, statement] of program.body.entries()) {
             if (statement.type === "TSImportEqualsDeclaration" && statement.moduleReference.type !== "TSExternalModuleReference") {
-                program.body[i] = b.TSTypeAliasDeclaration({
-                    declare: false,
-                    id: statement.id,
-                    typeAnnotation: b.TSTypeReference({ typeArguments: null, typeName: statement.moduleReference }),
-                    typeParameters: null,
-                });
+                program.body[i] = importEqualsToTypeAlias(statement);
+            } else if (
+                statement.type === "ExportNamedDeclaration"
+                && statement.declaration?.type === "TSImportEqualsDeclaration"
+                && statement.declaration.moduleReference.type !== "TSExternalModuleReference"
+            ) {
+                statement.declaration = importEqualsToTypeAlias(statement.declaration);
             } else if (statement.type === "TSExportAssignment" && statement.expression.type !== "Identifier") {
                 program.body[i] = b.ExportDefaultDeclaration({ declaration: statement.expression });
+            }
+        }
+
+        // `export import x = require("m")` becomes an import plus a trailing `export { x }`.
+        const appendedStatements: t.ProgramStatement[] = [];
+        // `import x = require("m")` binds the whole module — unless "m" is written with `export =`,
+        // where it binds that exported value, which is the default import in ES terms.
+        const requireAsDefault = new WeakSet<t.TSImportEqualsDeclaration>();
+
+        for (const statement of program.body) {
+            const importEquals = statement.type === "ExportNamedDeclaration" ? statement.declaration : statement;
+
+            if (
+                importEquals?.type === "TSImportEqualsDeclaration"
+                && importEquals.moduleReference.type === "TSExternalModuleReference"
+                && (await usesExportAssignment(this, importEquals.moduleReference.expression, id))
+            ) {
+                requireAsDefault.add(importEquals);
             }
         }
 
         for (const [i, statement] of program.body.entries()) {
             const setStatement = (statement_: t.ProgramStatement) => (program.body[i] = statement_);
 
-            if (rewriteImportExport(statement, setStatement)) continue;
+            // A doc block ahead of an `export … from` documents that export (restored by name via
+            // `exportCommentsMap`), so on those only an explicit file tag makes it the file's.
+            const fileDocComments
+                = i === 0
+                    ? statement.comments?.filter(
+                        (comment) => isDocumentationComment(comment) && (statement.type === "ImportDeclaration" || RE_FILE_DOC_TAG.test(comment.value)),
+                    )
+                    : undefined;
+
+            if (rewriteImportExport(statement, setStatement, appendedStatements, requireAsDefault)) {
+                if (fileDocComments?.length) fileCommentsMap.set(id, fileDocComments);
+
+                continue;
+            }
 
             // `export as namespace X;` is a TypeScript UMD global declaration with no
             // JS equivalent. Strip it — leaving it in the output makes rollup's parser
@@ -330,6 +505,10 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
             if (isSideEffect && id.endsWith(".vue.d.ts") && code.slice(statement.start, statement.end).includes("__VLS_")) {
                 continue;
+            }
+
+            if (statement.type === "TSModuleDeclaration" && (statement.kind === "global" || is.StringLiteral(statement.id))) {
+                hasAugmentation = true;
             }
 
             const isDefaultExport = statement.type === "ExportDefaultDeclaration";
@@ -391,7 +570,16 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             const params: TypeParams = collectParams(declaration);
 
             const childrenSet = new Set<t.Node>();
-            const dependencies = await collectDependencies(this, declaration, id, namespaceStatements, childrenSet, identifierMap, preserveImportTypeCache);
+            const dependencies = await collectDependencies(
+                this,
+                declaration,
+                id,
+                namespaceStatements,
+                childrenSet,
+                identifierMap,
+                preserveImportTypeCache,
+                new Set(params.map(({ name }) => name)),
+            );
             const children = [...childrenSet].filter((child) => bindings.every((b) => child !== b));
 
             if (declaration !== statement) {
@@ -416,8 +604,13 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     existing.primaryChildrenCount = existing.children.length;
                 }
 
+                // The overload's own name is the binding the primary already owns, so it is not a
+                // child of the primary. It still needs a placeholder of its own so its span is
+                // restored from the chunk like the members' spans are.
+                const overloadChildren = "id" in declaration && declaration.id?.type === "Identifier" ? [declaration.id, ...children] : children;
+
                 existing.overloads.push({
-                    children,
+                    children: overloadChildren,
                     childrenOffset: existing.children.length,
                     decl: declaration,
                     deps: dependencies,
@@ -429,7 +622,10 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 // Rollup's identifier renaming pipeline
                 existing.deps.push(...dependencies);
                 existing.params.push(...params);
-                existing.children.push(...children);
+                existing.children.push(...overloadChildren);
+                // The runtime children array was built with the primary's children only, so the
+                // overload's placeholders have to be appended for `renderChunk` to find them.
+                existing.childrenNode!.elements.push(...childPlaceholders(overloadChildren));
                 statementsToRemove.add(i);
 
                 continue;
@@ -457,18 +653,12 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 expression: true,
                 generator: false,
                 id: null,
-                params: params.map(({ name }) => b.Identifier({ name })),
+                params: params.map(({ name }) => b.Identifier({ name: `${TYPE_PARAM_PREFIX}${name}` })),
             });
-            const childrenNode = b.ArrayExpression({
-                elements: children.map((node) => {
-                    const placeholder = stringLiteral("");
+            const childrenNode = b.ArrayExpression({ elements: childPlaceholders(children) });
 
-                    placeholder.start = node.start;
-                    placeholder.end = node.end;
+            getDeclaration(declarationId).childrenNode = childrenNode;
 
-                    return placeholder;
-                }),
-            });
             const sideEffectNode =
                 isSideEffect && b.CallExpression({ arguments: [bindings[0]], callee: b.Identifier({ name: "sideEffect" }), optional: false });
             const runtimeArrayNode = runtimeBindingArrayExpression(
@@ -523,22 +713,121 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             ...Array.from(namespaceStatements.values(), ({ stmt }) => stmt),
             ...program.body.filter((_, index) => !statementsToRemove.has(index)),
             ...appendStatements,
+            ...appendedStatements,
         ];
 
         const result = generate(program, {
             comments: false,
             ...(sourcemap && {
-                sourceMaps: { source: code, sourceFileName: id },
+                sourceMap: { source: code, sourceFileName: id },
             }),
         });
 
         return {
             code: result.code,
             map: (result.map ?? null) as SourceMapInput | null,
+            ...(hasAugmentation && { moduleSideEffects: true }),
         };
     }
 
-    function renderChunk(code: string, chunk: RenderedChunk, options: NormalizedOutputOptions) {
+    // Where the script each chunk references lands, when several chunks reference it. The other chunks reference that copy
+    // instead of declaring it twice (see `referenceOutputFile`). Chunks are ranked in a post-order over the static import
+    // graph (roots and imports visited by file name), so a chunk comes after the chunks it imports. The copy goes to the
+    // first ranked chunk that every referencing chunk imports — itself when it imports nothing — which is a chunk the others
+    // already load, so the references always point the way an import goes and cannot form a cycle. Without such a chunk the
+    // script gets a file of its own, so a referencing chunk never loads the other declarations of a sibling.
+    function getScriptPlacements(chunks: Record<string, RenderedChunk>): Map<string, ScriptPlacement> {
+        if (scriptPlacements) return scriptPlacements;
+
+        const byFileName = new Map(Object.values(chunks).map((chunk) => [chunk.fileName, chunk]));
+        const compareNames = (a: string, b: string): number => (a < b ? -1 : Number(a > b));
+        const ranked: string[] = [];
+        const visited = new Set<string>();
+
+        const visit = (fileName: string): void => {
+            if (visited.has(fileName)) return;
+
+            visited.add(fileName);
+
+            for (const imported of byFileName.get(fileName)?.imports.toSorted(compareNames) ?? []) visit(imported);
+
+            ranked.push(fileName);
+        };
+
+        for (const fileName of [...byFileName.keys()].toSorted(compareNames)) visit(fileName);
+
+        // The chunk files each chunk can load declarations from, itself included. A chunk that is not in the output (a
+        // dangling name) reaches only itself.
+        const reachByFileName = new Map<string, Set<string>>();
+
+        const reachOf = (fileName: string): Set<string> => {
+            let reach = reachByFileName.get(fileName);
+
+            if (reach) return reach;
+
+            // Registered before the walk, so a cycle in the import graph cannot recurse without end.
+            reach = new Set([fileName]);
+            reachByFileName.set(fileName, reach);
+
+            for (const imported of byFileName.get(fileName)?.imports ?? []) {
+                for (const reached of reachOf(imported)) reach.add(reached);
+            }
+
+            return reach;
+        };
+
+        // The chunks that reference each script, in rank order, and the script itself.
+        const referrers = new Map<string, string[]>();
+        const scriptsByFile = new Map<string, InlinableScript>();
+
+        for (const fileName of ranked) {
+            // Only declaration chunks inline scripts (see `renderChunk`), so only they can carry one.
+            if (!RE_DTS.test(fileName)) continue;
+
+            for (const moduleId of byFileName.get(fileName)?.moduleIds ?? []) {
+                for (const script of moduleScriptsMap.get(moduleId) ?? []) {
+                    scriptsByFile.set(script.file, script);
+
+                    const referrerList = referrers.get(script.file);
+
+                    if (referrerList) {
+                        if (!referrerList.includes(fileName)) referrerList.push(fileName);
+                    } else {
+                        referrers.set(script.file, [fileName]);
+                    }
+                }
+            }
+        }
+
+        const placements = new Map<string, ScriptPlacement>();
+
+        for (const [scriptFile, scriptReferrers] of referrers) {
+            const script = scriptsByFile.get(scriptFile)!;
+            // A referencing chunk that every other referencing chunk loads takes the copy, which keeps a build that already
+            // shared a chunk where it was. Failing that — entries with nothing in common — a chunk all of them load carries
+            // it, and only when the output has neither does the script get a file of its own.
+            const owner =
+                scriptReferrers.find((referrer) => scriptReferrers.every((other) => reachOf(other).has(referrer)))
+                ?? ranked.find((fileName) => RE_DTS.test(fileName) && scriptReferrers.every((referrer) => reachOf(referrer).has(fileName)));
+
+            placements.set(
+                scriptFile,
+                owner === undefined ? { file: scriptOutputFileName(scriptFile), kind: "file", script } : { kind: "chunk", owner, script },
+            );
+        }
+
+        scriptPlacements = placements;
+
+        return placements;
+    }
+
+    function renderChunk(
+        this: PluginContext,
+        code: string,
+        chunk: RenderedChunk,
+        options: NormalizedOutputOptions,
+        meta: { chunks: Record<string, RenderedChunk> },
+    ) {
         if (!RE_DTS.test(chunk.fileName)) {
             return;
         }
@@ -633,7 +922,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                 for (let i = 0; i < primaryParamsCount; i++) {
                     const transformedParameter = transformedParams[i];
-                    const transformedName = transformedParameter.name;
+                    const transformedName = stripTypeParamPrefix(transformedParameter.name);
 
                     for (const originalTypeParameter of declaration.params[i].typeParams) {
                         originalTypeParameter.name = transformedName;
@@ -656,7 +945,11 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                         transformedDependency = undefinedDependency;
                     } else if (isInfer(transformedDependency)) {
                         transformedDependency.name = "__Infer";
+                    } else {
+                        restoreTypeParamName(transformedDependency);
                     }
+
+                    restoreGlobalTypeofName(originalDependency, transformedDependency);
 
                     if (originalDependency.replace) {
                         originalDependency.replace(transformedDependency);
@@ -706,7 +999,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                             if (mergedParameter) {
                                 for (const typeParameter of parameter.typeParams) {
-                                    typeParameter.name = mergedParameter.name;
+                                    typeParameter.name = stripTypeParamPrefix(mergedParameter.name);
                                 }
                             }
                         }
@@ -725,7 +1018,11 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                                 transformedDependency = undefinedDependency;
                             } else if (isInfer(transformedDependency)) {
                                 transformedDependency.name = "__Infer";
+                            } else {
+                                restoreTypeParamName(transformedDependency);
                             }
+
+                            restoreGlobalTypeofName(originalDependency, transformedDependency);
 
                             if (originalDependency.replace) {
                                 originalDependency.replace(transformedDependency);
@@ -743,7 +1040,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             .filter((node) => !!node);
 
         if (program.body.length === 0) {
-            return "export { };";
+            return { code: "export { };", map: null };
         }
 
         // Ensure files with `declare module '...'` augmentations retain an `export {}`
@@ -761,14 +1058,30 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         // recover the JSDoc of re-export statements, which never became declarations
         restoreExportComments(program.body, resolveChunkExportComments(chunk, exportCommentsMap));
 
+        // recover the entry's own file doc comment, but not those of the modules it inlines
+        const fileComments = chunk.facadeModuleId && fileCommentsMap.get(chunk.facadeModuleId);
+
+        if (fileComments && program.body.length > 0) {
+            program.body[0].comments ||= [];
+
+            const existing = program.body[0].comments;
+
+            program.body[0].comments.unshift(...fileComments.filter((comment) => existing.every((current) => current.value !== comment.value)));
+        }
+
         // recover comments
         const comments = new Set<t.Comment>();
         const commentsValue = new Set<string>(); // deduplicate
+        // Referenced global scripts inlined into this chunk, keyed by file so several references dedupe.
+        const inlinedScripts = new Map<string, InlinableScript>();
 
         // Absolute directory the emitted chunk lives in, used to rebase
         // `/// <reference path="..." />` directives (see rebaseReferencePath).
         const outputDirectory = options.dir ?? (options.file ? path.dirname(options.file) : process.cwd());
         const chunkOutputDirectory = path.resolve(outputDirectory, path.dirname(chunk.fileName));
+
+        // A script lands in a chunk the referencing chunks share, or in a file of its own (see `getScriptPlacements`).
+        const placements = getScriptPlacements(meta.chunks);
 
         for (const id of chunk.moduleIds) {
             const preserveComments = commentsMap.get(id);
@@ -781,7 +1094,34 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 const sourceDirectory = path.dirname(id);
 
                 preserveComments.forEach((c) => {
-                    const rebased = rebaseReferencePath(c, sourceDirectory, chunkOutputDirectory);
+                    const script = referencedScriptMap.get(c);
+                    let rebased: t.Comment;
+
+                    if (script) {
+                        const placement = placements.get(script.file);
+
+                        if (placement === undefined || (placement.kind === "chunk" && placement.owner === chunk.fileName)) {
+                            inlinedScripts.set(script.file, script);
+
+                            return;
+                        }
+
+                        if (placement.kind === "file") {
+                            // The script has a file of its own; every chunk that needs it references that file.
+                            if (!emittedScriptFiles.has(placement.file)) {
+                                emittedScriptFiles.add(placement.file);
+                                this.emitFile({ fileName: placement.file, source: placement.script.source, type: "asset" });
+                            }
+
+                            rebased = referenceOutputFile(c, path.resolve(outputDirectory, placement.file), chunkOutputDirectory);
+                        } else {
+                            // Another chunk already inlines this script, so reference its copy rather than declare it twice.
+                            rebased = referenceOutputFile(c, path.resolve(outputDirectory, placement.owner), chunkOutputDirectory);
+                        }
+                    } else {
+                        rebased = rebaseReferencePath(c, sourceDirectory, chunkOutputDirectory);
+                    }
+
                     const dedupeKey = rebased.type + rebased.value;
 
                     if (commentsValue.has(dedupeKey)) return;
@@ -789,7 +1129,13 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     commentsValue.add(dedupeKey);
                     comments.add(rebased);
                 });
-                commentsMap.delete(id);
+            }
+        }
+
+        // A shared chunk carries a script its own modules never referenced, and the chunks that do reference it point here.
+        for (const placement of placements.values()) {
+            if (placement.kind === "chunk" && placement.owner === chunk.fileName) {
+                inlinedScripts.set(placement.script.file, placement.script);
             }
         }
 
@@ -807,10 +1153,12 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             );
         }
 
+        appendInlinedScripts(program, [...inlinedScripts.values()], sourcemap);
+
         const result = generate(program, {
             comments: true,
             ...(sourcemap && {
-                sourceMaps: { source: code, sourceFileName: chunk.fileName },
+                sourceMap: { source: code, sourceFileName: chunk.fileName },
             }),
         });
 
@@ -818,6 +1166,18 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             code: result.code,
             map: (result.map ?? null) as SourceMapInput | null,
         };
+    }
+
+    function restoreGlobalTypeofName(original: Dependency, transformed: t.Node): void {
+        const operand = typeofOperands.get(original);
+
+        if (!operand || transformed.type !== "Identifier" || transformed.name === operand.name) return;
+
+        const imported = moduleExportsMap.get(operand.moduleId)?.imports.get(operand.name);
+
+        if (imported?.source && resolveExportMeaning(moduleExportsMap, imported.source, imported.imported, new Set()) === "type") {
+            transformed.name = operand.name;
+        }
     }
 
     function getIdentifierIndex(identifierMap: Record<string, number>, name: string) {
@@ -905,6 +1265,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         // Module-scoped cache (keyed by import specifier, shared across all declarations of the
         // same module/importer) so `context.resolve` for `import("x").T` runs once per specifier.
         preserveImportTypeCache: Map<string, boolean>,
+        typeParamNames: Set<string>,
     ): Promise<Dependency[]> {
         const dependencies = new Set<Dependency>();
         const seen = new Set<t.Node>();
@@ -1015,12 +1376,28 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                             if (node.exprName.type === "TSImportType") break;
 
-                            addDependency(TSEntityNameToRuntime(node.exprName));
+                            const operand = TSEntityNameToRuntime(node.exprName);
+
+                            if (operand.type === "Identifier" && !typeParamNames.has(operand.name)) {
+                                typeofOperands.set(operand, { moduleId: importer, name: operand.name });
+                            }
+
+                            addDependency(operand);
 
                             break;
                         }
                         case "TSTypeReference": {
-                            addDependency(TSEntityNameToRuntime(node.typeName));
+                            const reference = TSEntityNameToRuntime(node.typeName);
+
+                            // Only a bare identifier reference can name a type parameter; as the left
+                            // of a qualified name, a `typeof` operand or an import type it resolves
+                            // in the namespace/value meaning instead. `isInferred` compares by name,
+                            // so it has to run before the rename.
+                            if (reference.type === "Identifier" && !isInferred(reference) && typeParamNames.has(reference.name)) {
+                                reference.name = `${TYPE_PARAM_PREFIX}${reference.name}`;
+                            }
+
+                            addDependency(reference);
 
                             break;
                         }
@@ -1131,10 +1508,40 @@ const isSourceMapPragma = (comment: { value: string }): boolean => SOURCE_MAP_PR
 // Matches the `path="..."` (or single-quoted) attribute of a triple-slash reference directive.
 const REFERENCE_PATH_RE = /(\/\s*<reference\s+path=)(["'])(.+?)\2/;
 
+// Directory of the output that holds the scripts no chunk could take. The name starts with an underscore so it reads as
+// generated, and is stable per build.
+const SCRIPT_FILE_DIRECTORY = "_dts-scripts";
+
+// The `.d.ts` extension of a referenced script, and anything that is not safe in a file name.
+const RE_SCRIPT_EXTENSION = /\.d\.[cm]?ts$/u;
+const RE_UNSAFE_FILE_NAME = /[^\w.-]+/gu;
+
+/**
+ * The file a referenced global script is written to when no chunk can carry it. Built from the script's path, so it is
+ * stable across builds, and hashed, so two scripts with the same basename in different directories stay apart.
+ */
+const scriptOutputFileName = (scriptFile: string): string => {
+    const basename = path.basename(scriptFile).replace(RE_SCRIPT_EXTENSION, "").replaceAll(RE_UNSAFE_FILE_NAME, "-");
+    const hash = createHash("sha256").update(scriptFile).digest("hex").slice(0, 8);
+
+    return path.posix.join(SCRIPT_FILE_DIRECTORY, `${basename}-${hash}.d.ts`);
+};
+
 // Rebase a `/// <reference path="./foo.d.ts" />` directive so its relative path — originally
 // correct relative to `sourceDirectory` — is correct relative to `chunkOutputDirectory` where
 // the comment is being hoisted. `types=` directives reference package names (not file paths)
 // and are returned untouched. Absolute paths are also left as-is.
+// A directive that references another output file, with the path relative to the chunk's own directory.
+const referenceOutputFile = (comment: t.Comment, targetFile: string, chunkOutputDirectory: string): t.Comment => {
+    let relative = path.relative(chunkOutputDirectory, targetFile).replaceAll("\\", "/");
+
+    if (!relative.startsWith(".")) {
+        relative = `./${relative}`;
+    }
+
+    return { ...comment, value: `/ <reference path="${relative}" />` };
+};
+
 const rebaseReferencePath = (comment: t.Comment, sourceDirectory: string, chunkOutputDirectory: string): t.Comment => {
     const match = REFERENCE_PATH_RE.exec(comment.value);
 
@@ -1432,6 +1839,21 @@ const collectDeclarationNames = (node: t.Node): string[] => {
 const isTypeOnlyExport = (node: t.ExportNamedDeclaration, specifier: t.ExportSpecifier): boolean =>
     node.exportKind === "type" || specifier.exportKind === "type";
 
+const RE_EXPORT_ASSIGNMENT = /^[\t ]*export[\t ]*=/m;
+
+/** Whether a local module that `source` points at is written with `export =`. */
+const usesExportAssignment = async (context: TransformPluginContext, source: t.StringLiteral, importer: string): Promise<boolean> => {
+    const target = await resolveExportSource(context, source, importer);
+
+    if (!target) return false;
+
+    try {
+        return RE_EXPORT_ASSIGNMENT.test(await readFile(target, "utf8"));
+    } catch {
+        return false;
+    }
+};
+
 const resolveExportSource = async (
     context: TransformPluginContext,
     source: t.StringLiteral | null | undefined,
@@ -1500,16 +1922,139 @@ const collectExportInfo = async (context: TransformPluginContext, node: t.Progra
     }
 };
 
-const collectModuleExports = async (context: TransformPluginContext, nodes: t.ProgramStatement[], id: string): Promise<ModuleExports> => {
+const declarationMeaning = (node: t.Node): DeclarationMeaning | undefined => {
+    switch (node.type) {
+        case "ClassDeclaration":
+        case "TSEnumDeclaration":
+        case "TSModuleDeclaration": {
+            return "both";
+        }
+        case "FunctionDeclaration":
+        case "TSDeclareFunction":
+        case "VariableDeclaration": {
+            return "value";
+        }
+        case "TSInterfaceDeclaration":
+        case "TSTypeAliasDeclaration": {
+            return "type";
+        }
+        default: {
+            return undefined;
+        }
+    }
+};
+
+/** Records what the top level binds: declarations with their meaning, imports, and local exports. */
+const collectBindings = async (context: TransformPluginContext, node: t.ProgramStatement, id: string, info: ModuleExports, typeofNames: Set<string>): Promise<void> => {
+    if (node.type === "ImportDeclaration") {
+        // Only imports used as a `typeof` operand are ever looked up again, so only those pay for a resolve.
+        if (node.specifiers.every((specifier) => !typeofNames.has(specifier.local.name))) return;
+
+        const source = await resolveExportSource(context, node.source, id);
+
+        for (const specifier of node.specifiers) {
+            if (specifier.type === "ImportSpecifier") {
+                info.imports.set(specifier.local.name, { imported: nameOf(specifier.imported), source });
+            } else if (specifier.type === "ImportDefaultSpecifier") {
+                info.imports.set(specifier.local.name, { imported: "default", source });
+            }
+        }
+
+        return;
+    }
+
+    const declaration = node.type === "ExportNamedDeclaration" ? node.declaration : node;
+
+    if (declaration) {
+        const meaning = declarationMeaning(declaration);
+
+        if (meaning) {
+            for (const name of collectDeclarationNames(declaration)) {
+                const previous = info.declared.get(name);
+
+                info.declared.set(name, previous && previous !== meaning ? "both" : meaning);
+
+                if (node.type === "ExportNamedDeclaration") info.exportLocals.set(name, name);
+            }
+        }
+
+        return;
+    }
+
+    if (node.type === "ExportNamedDeclaration" && !node.source) {
+        for (const specifier of node.specifiers) {
+            info.exportLocals.set(nameOf(specifier.exported), nameOf(specifier.local));
+        }
+    }
+};
+
+/**
+ * What an exported name means in a module, followed through local bindings, imports and
+ * re-exports. `undefined` when it cannot be told (external module, namespace, cycle), which
+ * callers must treat as "possibly anything".
+ */
+const resolveExportMeaning = (moduleExportsMap: Map<string, ModuleExports>, moduleId: string, name: string, visited: Set<string>): DeclarationMeaning | undefined => {
+    const key = `${moduleId}\0${name}`;
+    const info = moduleExportsMap.get(moduleId);
+
+    if (!info || visited.has(key)) return undefined;
+
+    visited.add(key);
+
+    const local = info.exportLocals.get(name);
+
+    if (local) {
+        const declared = info.declared.get(local);
+
+        if (declared) return declared;
+
+        const imported = info.imports.get(local);
+
+        return imported?.source ? resolveExportMeaning(moduleExportsMap, imported.source, imported.imported, visited) : undefined;
+    }
+
+    const reExport = info.reExports.find((candidate) => candidate.exported === name && candidate.source);
+
+    if (reExport?.source) return resolveExportMeaning(moduleExportsMap, reExport.source, reExport.local, visited);
+
+    if (name !== "default") {
+        for (const exportAll of info.exportAlls) {
+            const meaning = exportAll.source ? resolveExportMeaning(moduleExportsMap, exportAll.source, name, visited) : undefined;
+
+            if (meaning) return meaning;
+        }
+    }
+
+    return undefined;
+};
+
+/** Names used as a bare `typeof X` operand anywhere in the module. */
+const collectTypeofNames = (program: t.Program): Set<string> => {
+    const names = new Set<string>();
+
+    walk(program, {
+        TSTypeQuery(node) {
+            if (node.exprName.type === "Identifier") names.add(node.exprName.name);
+        },
+    });
+
+    return names;
+};
+
+const collectModuleExports = async (context: TransformPluginContext, nodes: t.ProgramStatement[], id: string, typeofNames: Set<string>): Promise<ModuleExports> => {
     const info: ModuleExports = {
+        declared: new Map(),
         exportAlls: [],
+        exportLocals: new Map(),
         exports: new Map(),
+        imports: new Map(),
         reExports: [],
         typeOnlyLocals: new Set(),
     };
 
     for (const node of nodes) {
         collectTypeOnlyLocals(node, info.typeOnlyLocals);
+        await collectBindings(context, node, id, info, typeofNames);
     }
 
     for (const node of nodes) {
@@ -1885,7 +2430,9 @@ const patchImportExport = (node: t.ProgramStatement, exportInfo: ChunkExportInfo
 };
 
 /**
- * Handle `__export` call
+ * Handle namespace objects: rolldown's `__export(ns, { a: () => a })` call and rollup's
+ * `var ns = /*#__PURE__*\/Object.freeze({ __proto__: null, a: a })`. Both become
+ * `declare namespace ns { export { a } }`.
  */
 const patchTsNamespace = (nodes: t.ProgramStatement[]) => {
     const removed = new Set<t.Node>();
@@ -1895,23 +2442,12 @@ const patchTsNamespace = (nodes: t.ProgramStatement[]) => {
 
         if (!result) continue;
 
-        const [binding, exports] = result;
+        const [binding, specifiers] = result;
 
-        if (exports.properties.length === 0) continue;
-
-        const namespaceExport = exportNamedDeclaration(
-            exports.properties
-                .filter((property) => property.type === "Property")
-                .map((property) => {
-                    const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
-                    const exported = property.key as t.Identifier;
-
-                    return b.ExportSpecifier({ exported, local });
-                }),
-        );
+        if (specifiers.length === 0) continue;
 
         nodes[i] = b.TSModuleDeclaration({
-            body: b.TSModuleBlock({ body: [namespaceExport] }),
+            body: b.TSModuleBlock({ body: [exportNamedDeclaration(specifiers)] }),
             declare: true,
             global: false,
             id: binding,
@@ -1921,24 +2457,74 @@ const patchTsNamespace = (nodes: t.ProgramStatement[]) => {
 
     return nodes.filter((node) => !removed.has(node));
 
-    function handleExport(node: t.ProgramStatement): false | [t.Identifier, t.ObjectExpression] {
-        if (
-            node.type !== "VariableDeclaration"
-            || node.declarations.length !== 1
-            || node.declarations[0].id.type !== "Identifier"
-            || node.declarations[0].init?.type !== "CallExpression"
-            || node.declarations[0].init.callee.type !== "Identifier"
-            || node.declarations[0].init.callee.name !== "__export"
-            || node.declarations[0].init.arguments.length !== 1
-            || node.declarations[0].init.arguments[0].type !== "ObjectExpression"
-        ) {
+    function handleExport(node: t.ProgramStatement): false | [t.Identifier, t.ExportSpecifier[]] {
+        if (node.type !== "VariableDeclaration" || node.declarations.length !== 1 || node.declarations[0].id.type !== "Identifier") {
             return false;
         }
 
-        const source = node.declarations[0].id;
-        const exports = node.declarations[0].init.arguments[0];
+        const binding = node.declarations[0].id;
+        const { init } = node.declarations[0];
 
-        return [source, exports] as const;
+        if (!init) return false;
+
+        // rolldown: `__export({ a: () => a })` (`__exportAll` since 1.2)
+        if (init.type === "CallExpression" && init.callee.type === "Identifier" && (init.callee.name === "__export" || init.callee.name === "__exportAll") && init.arguments.length === 1 && init.arguments[0].type === "ObjectExpression") {
+            return [
+                binding,
+                init.arguments[0].properties
+                    .filter((property): property is t.ObjectProperty => property.type === "Property")
+                    .map((property) => b.ExportSpecifier({ exported: property.key as t.Identifier, local: (property.value as t.ArrowFunctionExpression).body as t.Identifier })),
+            ];
+        }
+
+        // rollup: the namespace object, however `freeze` / `generatedCode.symbols` render it —
+        // `{ __proto__: null, a }`, `Object.freeze({ … })` or `Object.defineProperty({ … }, Symbol.toStringTag, …)`.
+        const namespaceObject = unwrapNamespaceObject(init);
+
+        if (!namespaceObject) return false;
+
+        const members = namespaceObject.properties.filter(
+            (property): property is t.ObjectProperty => property.type === "Property" && !property.computed && !(property.key.type === "Identifier" && property.key.name === "__proto__"),
+        );
+
+        if (members.some((property) => property.value.type !== "Identifier" || (property.key.type !== "Identifier" && property.key.type !== "Literal"))) {
+            return false;
+        }
+
+        return [
+            binding,
+            members.map((property) =>
+                b.ExportSpecifier({
+                    exported: property.key.type === "Identifier" ? property.key : b.Identifier({ name: (property.key as t.StringLiteral).value }),
+                    local: property.value as t.Identifier,
+                }),
+            ),
+        ];
+    }
+
+    function unwrapNamespaceObject(init: t.Expression): t.ObjectExpression | undefined {
+        let candidate: t.Expression | undefined = init;
+
+        // `Object.defineProperty(Object.freeze({ … }), Symbol.toStringTag, …)` nests the wrappers
+        while (
+            candidate?.type === "CallExpression"
+            && candidate.callee.type === "MemberExpression"
+            && candidate.callee.object.type === "Identifier"
+            && candidate.callee.object.name === "Object"
+            && candidate.callee.property.type === "Identifier"
+            && (candidate.callee.property.name === "freeze" || candidate.callee.property.name === "defineProperty")
+        ) {
+            [candidate] = candidate.arguments as t.Expression[];
+        }
+
+        if (candidate?.type !== "ObjectExpression") return undefined;
+
+        // `__proto__: null` is what marks rollup's namespace objects apart from any other object
+        const isNamespace = candidate.properties.some(
+            (property) => property.type === "Property" && !property.computed && property.key.type === "Identifier" && property.key.name === "__proto__",
+        );
+
+        return isNamespace ? candidate : undefined;
     }
 };
 
@@ -2022,6 +2608,8 @@ const patchReExport = (nodes: t.ProgramStatement[]) => {
 const rewriteImportExport = (
     node: t.Node,
     set: (node: t.ProgramStatement) => void,
+    appended: t.ProgramStatement[],
+    requireAsDefault: WeakSet<t.TSImportEqualsDeclaration>,
 ): node is t.ImportDeclaration | t.ExportAllDeclaration | t.TSImportEqualsDeclaration => {
     if (node.type === "ImportDeclaration" || (node.type === "ExportNamedDeclaration" && !node.declaration)) {
         for (const specifier of node.specifiers) {
@@ -2047,16 +2635,25 @@ const rewriteImportExport = (
         return true;
     }
 
-    if (node.type === "TSImportEqualsDeclaration") {
-        if (node.moduleReference.type === "TSExternalModuleReference") {
+    const importEquals = node.type === "ExportNamedDeclaration" && node.declaration?.type === "TSImportEqualsDeclaration" ? node.declaration : node;
+
+    if (importEquals.type === "TSImportEqualsDeclaration") {
+        if (importEquals.moduleReference.type === "TSExternalModuleReference") {
+            // `import x = require("m")` binds the whole module, so it is a namespace import —
+            // a default import would demand a `default` export the target may not have. Only a
+            // target written with `export =` binds that single value, i.e. its default.
             set(
                 b.ImportDeclaration({
                     attributes: [],
                     phase: null,
-                    source: node.moduleReference.expression,
-                    specifiers: [b.ImportDefaultSpecifier({ local: node.id })],
+                    source: importEquals.moduleReference.expression,
+                    specifiers: [requireAsDefault.has(importEquals) ? b.ImportDefaultSpecifier({ local: importEquals.id }) : b.ImportNamespaceSpecifier({ local: importEquals.id })],
                 }),
             );
+
+            if (importEquals !== node) {
+                appended.push(exportNamedDeclaration([b.ExportSpecifier({ exported: importEquals.id, local: importEquals.id })]));
+            }
 
             return true;
         }
@@ -2081,6 +2678,14 @@ const rewriteImportExport = (
 
     return false;
 };
+
+const importEqualsToTypeAlias = (node: t.TSImportEqualsDeclaration): t.TSTypeAliasDeclaration =>
+    b.TSTypeAliasDeclaration({
+        declare: false,
+        id: node.id,
+        typeAnnotation: b.TSTypeReference({ typeArguments: null, typeName: node.moduleReference as t.TSTypeName }),
+        typeParameters: null,
+    });
 
 const overwriteNode = <T>(node: t.Node, newNode: T): T => {
     // clear object keys

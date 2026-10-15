@@ -18,14 +18,15 @@ export const dts = (options: Options = {}): Plugin[] => {
     debug("resolved dts options %o", resolved);
 
     const plugins: Plugin[] = [];
+    const entryChunkNames = new Set<string>();
 
     if (options.dtsInput) {
         plugins.push(createDtsInputPlugin(resolved));
     } else {
-        plugins.push(createGeneratePlugin(resolved));
+        plugins.push(createGeneratePlugin(resolved, entryChunkNames));
     }
 
-    plugins.push(createDtsResolvePlugin(resolved), createFakeJsPlugin(resolved));
+    plugins.push(createDtsResolvePlugin(resolved), createFakeJsPlugin(resolved, entryChunkNames));
 
     if (options.banner || options.footer) {
         plugins.push(createBannerPlugin(resolved));
@@ -34,7 +35,10 @@ export const dts = (options: Options = {}): Plugin[] => {
     return plugins;
 };
 
+export { type CustomLanguage } from "./custom-language";
 export { default as createFakeJsPlugin } from "./fake-js";
 export { RE_CSS, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
 export { createGeneratePlugin } from "./generate";
 export { type FilterPattern, type Generator, type Logger, type Options, resolveOptions } from "./options";
+export { default as createTsMacroLanguage } from "./tsc/ts-macro";
+export { createVueLanguage, type VueLanguageOptions } from "./tsc/vue";

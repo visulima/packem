@@ -11,8 +11,20 @@ import { customTransformers, formatHost, setSourceMapRoot } from "./utils.js";
 
 const debug = createDebug("rollup-plugin-dts:tsc-build");
 
+// Error diagnostics reported by the solution build, keyed by the project map it produced. They
+// are stored beside the cached map so a later `check` build that reuses the cache still sees them.
+const buildErrors = new WeakMap<SourceFileToProjectMap, string[]>();
+
+// Errors of the projects the solution build skipped, found by checking their builder programs
+// (no emit), keyed like `buildErrors`.
+const checkErrors = new WeakMap<SourceFileToProjectMap, string[]>();
+
 const getOrBuildProjects = (context: TscContext, fsSystem: ts.System, tsconfig: string, force: boolean, sourcemap: boolean): SourceFileToProjectMap => {
-    let projectMap = context.projects.get(tsconfig);
+    // A forced (`tsc --build --force`) and an incremental build of the same tsconfig produce different projects: the
+    // compiler options carry the sourcemap patch and the configuration carries the parsed files. Keying on both keeps one
+    // build from reading the other's project map.
+    const key = `${tsconfig}\0${force ? "force" : "incremental"}\0${sourcemap ? "map" : "no-map"}`;
+    let projectMap = context.projects.get(key);
 
     if (projectMap) {
         debug(`skip building projects for ${tsconfig}`);
@@ -21,7 +33,7 @@ const getOrBuildProjects = (context: TscContext, fsSystem: ts.System, tsconfig: 
     }
 
     projectMap = buildProjects(fsSystem, tsconfig, force, sourcemap);
-    context.projects.set(tsconfig, projectMap);
+    context.projects.set(key, projectMap);
 
     return projectMap;
 };
@@ -43,6 +55,19 @@ const buildProjects = (fsSystem: ts.System, tsconfig: string, force: boolean, so
     );
 
     const host = ts.createSolutionBuilderHost(fsSystem, createProgramFactory(sourcemap));
+    const errors: string[] = [];
+    // Keep the default reporter, so diagnostics are printed exactly as before, and also keep the
+    // error text for the `check` option.
+    const { reportDiagnostic } = host;
+
+    host.reportDiagnostic = (diagnostic) => {
+        if (diagnostic.category === ts.DiagnosticCategory.Error) {
+            errors.push(ts.formatDiagnostics([diagnostic], formatHost));
+        }
+
+        reportDiagnostic(diagnostic);
+    };
+
     const builder = ts.createSolutionBuilder(host, [tsconfig], {
         force,
         verbose: true,
@@ -64,7 +89,53 @@ const buildProjects = (fsSystem: ts.System, tsconfig: string, force: boolean, so
         }
     }
 
+    buildErrors.set(sourceFileToProjectMap, errors);
+
     return sourceFileToProjectMap;
+};
+
+/**
+ * Type-checks each project of an incremental solution from its build info, without emitting.
+ *
+ * The solution builder skips a project whose sources look older than its build info, so an edit that
+ * leaves them older (e.g. a restored cache) reports nothing. A builder program re-checks every file
+ * whose content differs from the build info, so it still finds those errors.
+ */
+const checkProjects = (fsSystem: ts.System, sourceFileToProjectMap: SourceFileToProjectMap): string[] => {
+    let errors = checkErrors.get(sourceFileToProjectMap);
+
+    if (errors) {
+        return errors;
+    }
+
+    errors = [];
+
+    for (const { parsedConfig } of new Set(sourceFileToProjectMap.values())) {
+        if (parsedConfig.fileNames.length === 0) {
+            continue;
+        }
+
+        const program = ts.createIncrementalProgram({
+            host: ts.createIncrementalCompilerHost(parsedConfig.options, fsSystem),
+            options: parsedConfig.options,
+            projectReferences: parsedConfig.projectReferences,
+            rootNames: parsedConfig.fileNames,
+        });
+        const diagnostics = [
+            ...program.getOptionsDiagnostics(),
+            ...program.getGlobalDiagnostics(),
+            ...program.getSyntacticDiagnostics(),
+            ...program.getSemanticDiagnostics(),
+        ].filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
+
+        if (diagnostics.length > 0) {
+            errors.push(ts.formatDiagnostics(diagnostics, formatHost));
+        }
+    }
+
+    checkErrors.set(sourceFileToProjectMap, errors);
+
+    return errors;
 };
 
 /**
@@ -91,7 +162,10 @@ const collectProjectGraph = (rootTsconfigPath: string, fsSystem: ts.System, forc
         parsedConfig.options = patchCompilerOptions(parsedConfig.options, {
             force,
             sourcemap,
-            tsconfigPath,
+            // A project without source files (e.g. a solution tsconfig that only holds
+            // `references`) emits no declarations, so there is nothing for the user to fix
+            // in it — patch it without warning.
+            tsconfigPath: parsedConfig.fileNames.length > 0 ? tsconfigPath : "",
         });
 
         projects.push({ parsedConfig, tsconfigPath });
@@ -189,7 +263,7 @@ const createProgramFactory =
 
 // Emit file using `tsc --build` mode.
 const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
-    const { context = globalContext, id, incremental, sourcemap, tsconfig } = tscOptions;
+    const { check, context = globalContext, id, incremental, sourcemap, tsconfig } = tscOptions;
 
     debug(`running tscEmitBuild id: ${id}, tsconfig: ${tsconfig}, incremental: ${incremental}`);
 
@@ -209,6 +283,25 @@ const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
 
     // Build projects (if necessary) and collect all projects.
     const sourceFileToProjectMap = getOrBuildProjects(context, fsSystem, tsconfig, !incremental, sourcemap);
+
+    // `build` mode checks the whole project, as `tsc --build` does, so every error the project
+    // build reported fails this build.
+    if (check) {
+        const errors = buildErrors.get(sourceFileToProjectMap) ?? [];
+
+        if (errors.length > 0) {
+            return { error: errors.join("") };
+        }
+
+        // An up-to-date project is not built, so it reports nothing; check it from the build info instead.
+        if (incremental) {
+            const checked = checkProjects(fsSystem, sourceFileToProjectMap);
+
+            if (checked.length > 0) {
+                return { error: checked.join("") };
+            }
+        }
+    }
 
     const project = sourceFileToProjectMap.get(resolvedId);
 

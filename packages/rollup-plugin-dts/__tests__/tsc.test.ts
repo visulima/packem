@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -7,6 +8,8 @@ import { glob } from "@visulima/fs/glob";
 import { describe, expect, it } from "vitest";
 
 import { dts } from "../src/index.js";
+import { createContext } from "../src/tsc/context.js";
+import { tscEmit } from "../src/tsc/index.js";
 import findSourceMapChunk from "./utils.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -241,6 +244,81 @@ describe("tsc", () => {
         "dir2/tsconfig.2.tsbuildinfo",
       ]
     `);
+    });
+
+    describe("build mode project cache", () => {
+        // A project with the flags a `tsc --build` run needs, in a directory of its own so the emitted
+        // `.d.ts` and `.d.ts.map` files do not reach a fixture.
+        const createProject = async (): Promise<{ entry: string; root: string; tsconfig: string }> => {
+            const root = await fs.realpath(await fs.mkdtemp(path.join(tmpdir(), "rollup-plugin-dts-build-")));
+            const tsconfig = path.join(root, "tsconfig.json");
+            const entry = path.join(root, "index.ts");
+
+            await fs.writeFile(
+                tsconfig,
+                JSON.stringify({
+                    compilerOptions: {
+                        declaration: true,
+                        incremental: true,
+                        module: "esnext",
+                        moduleResolution: "bundler",
+                        outDir: "./dist",
+                        skipLibCheck: true,
+                        strict: true,
+                        target: "esnext",
+                        types: [],
+                    },
+                    include: ["index.ts"],
+                }),
+            );
+            await fs.writeFile(entry, "export const value: number = 1;\n");
+
+            return { entry, root, tsconfig };
+        };
+
+        it("does not reuse the projects of a build with source maps for one without", async () => {
+            expect.assertions(5);
+
+            const { entry, root, tsconfig } = await createProject();
+
+            try {
+                const context = createContext();
+                const shared = { build: true, context, cwd: root, id: entry, tsconfig, tsconfigRaw: {} };
+                const withMap = tscEmit({ ...shared, incremental: true, sourcemap: true });
+
+                expect(withMap.error).toBeUndefined();
+                expect(withMap.map).toBeDefined();
+
+                // Reusing the parsed project of the first build would make this one report the declaration map
+                // that build wrote, instead of the declarations it emitted itself.
+                const withoutMap = tscEmit({ ...shared, incremental: false, sourcemap: false });
+
+                expect(withoutMap.error).toBeUndefined();
+                expect(withoutMap.map).toBeUndefined();
+                expect(context.projects.size).toBe(2);
+            } finally {
+                await fs.rm(root, { force: true, recursive: true });
+            }
+        });
+
+        it("reuses the projects of a build with the same flags", async () => {
+            expect.assertions(3);
+
+            const { entry, root, tsconfig } = await createProject();
+
+            try {
+                const context = createContext();
+                const shared = { build: true, context, cwd: root, id: entry, tsconfig, tsconfigRaw: {} };
+                const first = tscEmit({ ...shared, incremental: true, sourcemap: true });
+                const second = tscEmit({ ...shared, incremental: true, sourcemap: true });
+
+                expect(first.error).toBeUndefined();
+                expect(second.error).toBeUndefined();
+                expect(context.projects.size).toBe(1);
+            } finally {
+                await fs.rm(root, { force: true, recursive: true });
+            }
+        });
     });
 
     it("vue-sfc w/ ts-compiler", async () => {

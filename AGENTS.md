@@ -44,6 +44,8 @@ Support status and graduation criteria: see [docs/rolldown-status.md](./docs/rol
 | Rollup integration tests (writes `.snap`)            | `pnpm run test:rollup`    | `packages/packem`      |
 | Rolldown integration tests (writes `.rolldown.snap`) | `pnpm run test:rolldown`  | `packages/packem`      |
 | Both backends                                        | `pnpm run test:bundlers`  | `packages/packem`      |
+| TypeScript 7 lane (writes `.ts7.snap`)               | `pnpm run test:ts7`       | `packages/packem`      |
+| All lanes (rollup, rolldown, TS 7) concurrently      | `pnpm run test:matrix`    | `packages/packem`      |
 
 Integration tests live in `packages/packem/__tests__/intigration/` (note the
 spelling) and run packem from its built `dist/` — **rebuild after source
@@ -73,6 +75,13 @@ Then **always** verify only the intended snapshot family changed:
 git status --short
 ```
 
+The TypeScript 7 lane (`PACKEM_TEST_TYPESCRIPT=7`) links the isolated
+`tools/typescript-7` install into fixtures as `typescript` and owns `.ts7.snap`
+baselines (declaration output differs from TS 6). Regenerate with
+`PACKEM_TEST_BUNDLER=rollup PACKEM_TEST_TYPESCRIPT=7 pnpm exec vitest run "<path>" -u`.
+The workspace itself stays on TypeScript 6 — the tsc dts backend, vue-tsc and volar
+need the classic compiler API that TS 7 does not ship.
+
 As a guardrail, `vitest.config.ts` now hard-fails a bare `vitest -u`/`--update`
 when `PACKEM_TEST_BUNDLER` is unset, so an accidental root-level update aborts
 with a self-explaining error instead of corrupting a baseline.
@@ -93,7 +102,8 @@ node 22/24/25 + macos matrix; `test-required-check` is the single required
 GitHub check. An advisory `test-rolldown` job runs the rolldown integration
 suite (`pnpm --filter @visulima/packem run test:rolldown`) — it surfaces
 rolldown regressions but is **not** required (not in `test-required-check`'s
-`needs`) until the suite proves stable.
+`needs`) until the suite proves stable. The advisory `test-typescript-7` job runs
+`test:ts7` the same way.
 
 ## Further context
 

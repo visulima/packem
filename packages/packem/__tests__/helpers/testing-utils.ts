@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { readFileSync, readJson, writeJson } from "@visulima/fs";
-import { dirname } from "@visulima/path";
+import { dirname, join as joinPosix } from "@visulima/path";
 // eslint-disable-next-line e18e/ban-dependencies -- tempy is core test-runner infra; fs.mkdtemp migration tracked separately
 import { temporaryDirectory } from "tempy";
 import { expect } from "vitest";
@@ -24,6 +24,29 @@ const ROLLDOWN_PNPM_STORE_PATH_REGEX = /(?:\.\.\/)+\S*?\/node_modules\/\.pnpm\//
 // between machines/CI. Replace the 8-char hash with a fixed token so the
 // reference compares equal regardless of where the bundle was produced.
 const ROLLDOWN_SHARED_CHUNK_HASH_REGEX = /(packem_shared\/[\w$.-]+?-)[\w-]{8}(\.[cm]?js)/g;
+
+/**
+ * True in the TypeScript 7 lane (`PACKEM_TEST_TYPESCRIPT=7`). Use `it.skipIf(isTypeScript7)`
+ * only for behaviour that is a genuine, documented TS 7 difference — not to hide a regression.
+ */
+export const isTypeScript7 = process.env.PACKEM_TEST_TYPESCRIPT === "7";
+
+/**
+ * `baseUrl` / `paths` compiler options that work on every TypeScript version. TS 7 removed
+ * `baseUrl` and requires `paths` targets to be relative to the tsconfig, so there the base
+ * directory is folded into each target instead.
+ */
+export const baseUrlCompilerOptions = (baseUrl: string, paths?: Record<string, string[]>): { baseUrl?: string; paths?: Record<string, string[]> } => {
+    if (!isTypeScript7) {
+        return paths ? { baseUrl, paths } : { baseUrl };
+    }
+
+    if (!paths) {
+        return {};
+    }
+
+    return { paths: Object.fromEntries(Object.entries(paths).map(([key, targets]) => [key, targets.map((target) => `./${joinPosix(baseUrl, target)}`)])) };
+};
 
 export interface CreateJobOptions {
     directory: string;

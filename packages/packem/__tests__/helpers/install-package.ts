@@ -1,9 +1,14 @@
 import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 import { ensureSymlink } from "@visulima/fs";
 import { dirname, join, resolve } from "@visulima/path";
+
+// PACKEM_TEST_TYPESCRIPT=7 links the native compiler from the isolated `tools/typescript-7`
+// install into fixtures as `typescript`; the workspace itself keeps TypeScript 6.
+const isTypeScript7Request = (packageName: string): boolean => packageName === "typescript" && process.env.PACKEM_TEST_TYPESCRIPT === "7";
 
 const installPackage = async (fixturePath: string, packageName: string): Promise<void> => {
     const nodeModulesDirectory = join(fixturePath, "node_modules");
@@ -24,9 +29,11 @@ const installPackage = async (fixturePath: string, packageName: string): Promise
     const workspaceRoot = join(packemPackageDirectory, "../..");
 
     // Try workspace root first, then packem package directory
-    let sourcePath = resolve(workspaceRoot, `node_modules/${packageName}`);
+    let sourcePath = isTypeScript7Request(packageName)
+        ? resolve(workspaceRoot, "tools/typescript-7/node_modules/typescript")
+        : resolve(workspaceRoot, `node_modules/${packageName}`);
 
-    if (!existsSync(sourcePath)) {
+    if (!existsSync(sourcePath) && !isTypeScript7Request(packageName)) {
         // Fallback to packem package's node_modules
         sourcePath = resolve(packemPackageDirectory, `node_modules/${packageName}`);
     }

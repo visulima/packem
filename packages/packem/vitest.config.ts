@@ -6,6 +6,10 @@ import { getVitestConfig } from "../../tools/get-vitest-config";
 // frozen baseline and the same test can match either bundler.
 const bundlerSnapshotSuffix = process.env.PACKEM_TEST_BUNDLER === "rolldown" ? ".rolldown" : "";
 
+// The TypeScript 7 lane (PACKEM_TEST_TYPESCRIPT=7) emits different declarations than
+// TypeScript 6, so it owns its own `.ts7` baselines instead of fighting the rollup `.snap`.
+const typescriptSnapshotSuffix = process.env.PACKEM_TEST_TYPESCRIPT === "7" ? ".ts7" : "";
+
 // Guardrail: the `.rolldown` snapshot suffix above lives only in THIS config.
 // Running `vitest -u` from the repo root loads the root config (no suffix), so
 // rolldown output silently overwrites the CI-checked rollup `.snap` files.
@@ -20,6 +24,7 @@ if (isSnapshotUpdate && !process.env.PACKEM_TEST_BUNDLER) {
             + "Regenerate from packages/packem with one of:\n"
             + '  rollup   (CI-checked .snap):     PACKEM_TEST_BUNDLER=rollup pnpm exec vitest run "<path>" -u\n'
             + '  rolldown (.rolldown.snap):       PACKEM_TEST_BUNDLER=rolldown pnpm exec vitest run "<path>" -u\n'
+            + '  TypeScript 7 (.ts7.snap):        PACKEM_TEST_BUNDLER=rollup PACKEM_TEST_TYPESCRIPT=7 pnpm exec vitest run "<path>" -u\n'
             + "Or use the package scripts: pnpm run test:rollup -- -u / pnpm run test:rolldown -- -u\n"
             + "Run `pnpm install --frozen-lockfile` first: snapshots capture minified output, "
             + "so a node_modules that has drifted from the lock file regenerates them against "
@@ -34,7 +39,7 @@ export default getVitestConfig({
             const dir = testPath.replace(/(\\|\/)([^\\/]+)$/, "$1__snapshots__$1");
             const file = testPath.replace(/^.*(\\|\/)/, "");
 
-            return `${dir}${file}${bundlerSnapshotSuffix}${snapExtension}`;
+            return `${dir}${file}${bundlerSnapshotSuffix}${typescriptSnapshotSuffix}${snapExtension}`;
         },
         testTimeout: 15_000,
     },

@@ -4,7 +4,7 @@ import { rm } from "node:fs/promises";
 import { readFileSync, writeFileSync } from "@visulima/fs";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage, isTypeScript7 } from "../helpers";
 import temporaryDirectory from "../helpers/temporary-directory";
 
 /**
@@ -72,7 +72,8 @@ export const sum = add(2, 3);`);
         expect(sum).toBe(5);
     });
 
-    it("should bind a compiled module for a source phase import", async () => {
+    // tsgo does not parse `import source` (source phase imports) yet.
+    it.skipIf(isTypeScript7)("should bind a compiled module for a source phase import", async () => {
         expect.assertions(4);
 
         await createPackemConfig(temporaryDirectoryPath);
@@ -93,7 +94,8 @@ export const result = new WebAssembly.Instance(addModule).exports.add(20, 22);`)
         expect(result).toBe(42);
     });
 
-    it("should leave source phase syntax inside comments and template literals alone", async () => {
+    // tsgo does not parse `import source` (source phase imports) yet.
+    it.skipIf(isTypeScript7)("should leave source phase syntax inside comments and template literals alone", async () => {
         expect.assertions(4);
 
         await createPackemConfig(temporaryDirectoryPath);
@@ -228,7 +230,8 @@ export const isModule = addModule instanceof WebAssembly.Module;`);
         expect(existsSync(output)).toBe(false);
     });
 
-    it("should survive a second build served from the file cache", async () => {
+    // tsgo does not parse `import source` (source phase imports) yet.
+    it.skipIf(isTypeScript7)("should survive a second build served from the file cache", async () => {
         expect.assertions(5);
 
         await createPackemConfig(temporaryDirectoryPath);

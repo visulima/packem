@@ -179,6 +179,52 @@ jobs:
                   affected-files: "${{ steps.files.outputs.all_changed_files }}"
                   exclude-affected-projects: "bench,docs,examples_*"
 
+    # Advisory lane: the integration suite against TypeScript 7 (the native compiler). It
+    # surfaces TS 7 regressions without gating merges, so it is deliberately absent from
+    # `test-required-check`'s `needs`. Snapshots live in `.ts7.snap` files.
+    test-typescript-7:
+        name: "Test (typescript-7)"
+        if: "needs.files-changed.outputs.packages == 'true'"
+        needs: "files-changed"
+        runs-on: "ubuntu-latest"
+        continue-on-error: true
+        timeout-minutes: 60
+        steps:
+            - name: "Harden Runner"
+              uses: "step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1" # v2.21.1
+              with:
+                  egress-policy: "audit"
+
+            - name: "Git checkout ${{ env.HEAD_REPOSITORY }}:${{ env.HEAD_REF }}"
+              uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+              with:
+                  persist-credentials: false
+
+            - name: "Setup resources and environment"
+              uses: "anolilab/workflows/step/setup@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
+              with:
+                  node-version: "24"
+                  upgrade-npm-version: "false"
+                  install-packages: "false"
+                  install-node-gyp: "true"
+
+            - name: "Install packages"
+              shell: "bash"
+              run: "pnpm install --frozen-lockfile --prefer-offline"
+              env:
+                  "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": true
+                  "CYPRESS_INSTALL_BINARY": true
+                  "SKIP_CHECK": "true"
+                  "HUSKY": 0
+
+            - name: "Build"
+              shell: "bash"
+              run: "pnpm run build:packages"
+
+            - name: "Run tests"
+              shell: "bash"
+              run: "pnpm --filter @visulima/packem run test:ts7"
+
     # This check runs once all dependant jobs have passed
     # It symbolizes that all required checks have successfully passed (Or skipped)
     # This check is the only required GitHub check

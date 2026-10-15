@@ -91,6 +91,7 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@astrojs/ts-plugin": "catalog:tsc",
         "@codspeed/vitest-plugin": "catalog:test",
         "@jridgewell/source-map": "catalog:test",
         "@sxzz/test-utils": "catalog:test",
@@ -119,7 +120,7 @@
         "@typescript/native-preview": ">=7.0.0-dev.20260707.2",
         "rolldown": ">=1.2.13",
         "rollup": ">=4.61.1",
-        "typescript": "^6.0.3 || ~7.0.0",
+        "typescript": "^6.0.3 || ^7.0.0",
         "vue-tsc": "catalog:tsc"
     },
     "peerDependenciesMeta": {
