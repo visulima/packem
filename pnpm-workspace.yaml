@@ -103,7 +103,7 @@ catalogs:
   frontend:
     "@babel/preset-react": ^8.0.1
     "@radix-ui/react-tooltip": ^1.4.0
-    "@vue/language-core": 3.3.12
+    "@vue/language-core": 3.3.13
     babel-plugin-react-compiler: 1.0.0
     preact: 10.29.8
     react: 19.3.0
@@ -237,7 +237,7 @@ catalogs:
     # the workspace `typescript`. TS 7 lives in the private `tools/typescript-7` package and is
     # linked into integration-test fixtures as `typescript` when PACKEM_TEST_TYPESCRIPT=7.
     typescript: 6.0.3
-    vue-tsc: 3.3.12
+    vue-tsc: 3.3.13
   types:
     "@types/babel__core": ^7.20.5
     "@types/babel__generator": ^7.27.0
