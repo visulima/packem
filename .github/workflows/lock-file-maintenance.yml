@@ -14,7 +14,10 @@ permissions:
 jobs:
     lock-file:
         name: "Lock File Maintenance"
-        if: "github.repository == 'visulima/packem'"
+        # The write-back only works for branches in this repository: a fork PR's
+        # `github.head_ref` does not exist in the base repo and fork runs receive
+        # no LOCK_MAINTENANCE_GITHUB_TOKEN, so checkout or push would fail.
+        if: "github.repository == 'visulima/packem' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)"
         runs-on: "ubuntu-latest"
         permissions:
             contents: "write"
