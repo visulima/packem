@@ -124,12 +124,23 @@ jobs:
               # belt-and-suspenders for the security scanner.
               run: "pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts"
 
+            # Checkout persists no credentials, so the token goes in as a per-command
+            # auth header and never lands in .git/config.
             - name: "Commit refreshed lockfile"
               if: "success()"
-              uses: "stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d" # v7.2.0
-              with:
-                  commit_author: "github-actions-shell <github-actions[bot]@users.noreply.github.com>"
-                  commit_message: "chore(deps): sync pnpm-lock.yaml with released manifests [skip ci]"
-                  commit_user_email: "github-actions[bot]@users.noreply.github.com"
-                  commit_user_name: "github-actions-shell"
-                  file_pattern: "pnpm-lock.yaml"
+              shell: "bash"
+              env:
+                  TOKEN: "${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}"
+                  BRANCH: "${{ github.ref_name }}"
+              run: |
+                  set -euo pipefail
+                  if git diff --quiet -- pnpm-lock.yaml; then
+                      echo "pnpm-lock.yaml is already in sync."
+                      exit 0
+                  fi
+                  git add pnpm-lock.yaml
+                  git -c user.name="github-actions-shell" -c user.email="github-actions[bot]@users.noreply.github.com" \
+                      commit -m "chore(deps): sync pnpm-lock.yaml with released manifests [skip ci]"
+                  auth="$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+                  echo "::add-mask::${auth}"
+                  git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic ${auth}" push origin "HEAD:refs/heads/${BRANCH}"
