@@ -1348,7 +1348,7 @@ exports[`packem ecosystem > should work with provided 'sitefetch' ecosystem suit
 import path from 'node:path';
 import fs from 'node:fs';
 import { encode } from 'gpt-tokenizer/model/gpt-4o';
-import { l as logger, f as fetchSite, e as ensureArray, a as formatNumber, s as serializePages } from './packem_shared/index-DCeiqxWS.js';
+import { l as logger, f as fetchSite, e as ensureArray, a as formatNumber, s as serializePages } from './packem_shared/index-CpvW5RGF.js';
 
 function toArr(any) {
   return any == null ? [] : Array.isArray(any) ? any : [any];
@@ -2040,7 +2040,7 @@ declare function fetchSite(url: string, options: Options): Promise<FetchSiteResu
 declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 export { fetchSite, serializePages };
 ",
-  "export { f as fetchSite, s as serializePages } from './packem_shared/index-DCeiqxWS.js';
+  "export { f as fetchSite, s as serializePages } from './packem_shared/index-CpvW5RGF.js';
 import 'happy-dom';
 import 'cheerio';
 ",
@@ -2752,6 +2752,9 @@ class PQueue extends EventEmitter {
                 reject2(signal.reason);
               };
               signal.addEventListener("abort", eventListener, { once: true });
+              if (signal.aborted) {
+                eventListener();
+              }
             })]);
           }
           const result = await operation;

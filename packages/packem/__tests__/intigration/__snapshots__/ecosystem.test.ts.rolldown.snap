@@ -993,7 +993,7 @@ export { Container as default };
 exports[`packem ecosystem > should work with provided 'sitefetch' ecosystem suite 1`] = `
 [
   "#!/usr/bin/env node
-import { a as logger, i as formatNumber, n as serializePages, r as ensureArray, t as fetchSite } from "./packem_shared/src-C_LOJLFW.js";
+import { a as logger, i as formatNumber, n as serializePages, r as ensureArray, t as fetchSite } from "./packem_shared/src-BMoqWLkn.js";
 import path from "node:path";
 import fs from "node:fs";
 import { encode } from "gpt-tokenizer/model/gpt-4o";
@@ -1691,7 +1691,7 @@ declare function fetchSite(url: string, options: Options): Promise<FetchSiteResu
 declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 export { fetchSite, serializePages };
 ",
-  "export { t as fetchSite, n as serializePages } from "./packem_shared/src-C_LOJLFW.js";
+  "export { t as fetchSite, n as serializePages } from "./packem_shared/src-BMoqWLkn.js";
 ",
   "import { Window } from "happy-dom";
 import Turndown from "turndown";
@@ -2017,7 +2017,7 @@ function pTimeout(promise, options) {
 	return cancelablePromise;
 }
 //#endregion
-//#region ../../../../../node_modules/.pnpm/p-queue@9.3.4/node_modules/p-queue/dist/lower-bound.js
+//#region ../../../../../node_modules/.pnpm/p-queue@9.3.5/node_modules/p-queue/dist/lower-bound.js
 function lowerBound(array, value, comparator) {
 	let first = 0;
 	let count = array.length;
@@ -2032,7 +2032,7 @@ function lowerBound(array, value, comparator) {
 	return first;
 }
 //#endregion
-//#region ../../../../../node_modules/.pnpm/p-queue@9.3.4/node_modules/p-queue/dist/priority-queue.js
+//#region ../../../../../node_modules/.pnpm/p-queue@9.3.5/node_modules/p-queue/dist/priority-queue.js
 const compactionThreshold = 100;
 var PriorityQueue = class {
 	#queue = [];
@@ -2104,7 +2104,7 @@ var PriorityQueue = class {
 	}
 };
 //#endregion
-//#region ../../../../../node_modules/.pnpm/p-queue@9.3.4/node_modules/p-queue/dist/index.js
+//#region ../../../../../node_modules/.pnpm/p-queue@9.3.5/node_modules/p-queue/dist/index.js
 /**
 Promise queue with concurrency control.
 */
@@ -2401,6 +2401,7 @@ var PQueue = class extends import_eventemitter3.default {
 								reject(signal.reason);
 							};
 							signal.addEventListener("abort", eventListener, { once: true });
+							if (signal.aborted) eventListener();
 						})]);
 					}
 					const result = await operation;
