@@ -1,5 +1,5 @@
 import { findMonorepoRoot, findPackageRoot } from "@visulima/package";
-import { bench, describe } from "vitest";
+import { test } from "vitest";
 
 // loadConfig runs once per CSS file and (pre-optimization) called
 // resolveStopDirectory(cwd) -> findMonorepoRoot(cwd) on every invocation, even
@@ -36,12 +36,13 @@ const resolveStopDirectoryMemoized = async (directory: string): Promise<string |
     return cached;
 };
 
-describe("loadConfig - stop directory resolution (per CSS file)", () => {
-    bench("before: findMonorepoRoot FS walk every file", async () => {
-        await computeStopDirectory(cwd);
-    });
-
-    bench("after: memoized stop directory per cwd", async () => {
-        await resolveStopDirectoryMemoized(cwd);
-    });
+test("loadConfig - stop directory resolution (per CSS file)", { timeout: 0 }, async ({ bench }) => {
+    await bench.compare(
+        bench("before: findMonorepoRoot FS walk every file", async () => {
+            await computeStopDirectory(cwd);
+        }),
+        bench("after: memoized stop directory per cwd", async () => {
+            await resolveStopDirectoryMemoized(cwd);
+        }),
+    );
 });

@@ -1,4 +1,4 @@
-import { bench, describe } from "vitest";
+import { test } from "vitest";
 
 import { cssStyleInject } from "../src";
 
@@ -8,7 +8,7 @@ import { cssStyleInject } from "../src";
 // parse + NodeList allocation on every call) with the cached `document.head`
 // property reference. This bench exercises the real module on the default
 // container path and includes a "before" baseline that resolves the container
-// the old way so the win is directly comparable in the same describe block.
+// the old way so the win is directly comparable in the same test.
 //
 // Needs a DOM. happy-dom rather than jsdom: it is already the workspace's
 // catalogued DOM environment, so this adds no new dependency tree for a bench
@@ -17,28 +17,28 @@ import { cssStyleInject } from "../src";
 
 const CSS = ".bench-a{color:red}";
 
-describe("default container resolution", () => {
-    bench("after: cssStyleInject default head path (document.head)", () => {
-        cssStyleInject(CSS);
-    });
+test("default container resolution", { timeout: 0 }, async ({ bench }) => {
+    await bench.compare(
+        bench("after: cssStyleInject default head path (document.head)", () => {
+            cssStyleInject(CSS);
+        }),
+        bench("baseline: querySelectorAll('head')[0] container lookup", () => {
+            // Mirror the pre-optimization container resolution to measure the cost
+            // that the optimization removes from the hot path.
+            const container = document.querySelectorAll("head")[0] as HTMLElement;
+            const styleTag = document.createElement("style");
 
-    bench("baseline: querySelectorAll('head')[0] container lookup", () => {
-        // Mirror the pre-optimization container resolution to measure the cost
-        // that the optimization removes from the hot path.
-        const container = document.querySelectorAll("head")[0] as HTMLElement;
-        const styleTag = document.createElement("style");
+            styleTag.setAttribute("type", "text/css");
+            styleTag.append(document.createTextNode(CSS));
+            container.append(styleTag);
+        }),
+        bench("optimized: document.head container lookup", () => {
+            const container = document.head;
+            const styleTag = document.createElement("style");
 
-        styleTag.setAttribute("type", "text/css");
-        styleTag.append(document.createTextNode(CSS));
-        container.append(styleTag);
-    });
-
-    bench("optimized: document.head container lookup", () => {
-        const container = document.head;
-        const styleTag = document.createElement("style");
-
-        styleTag.setAttribute("type", "text/css");
-        styleTag.append(document.createTextNode(CSS));
-        container.append(styleTag);
-    });
+            styleTag.setAttribute("type", "text/css");
+            styleTag.append(document.createTextNode(CSS));
+            container.append(styleTag);
+        }),
+    );
 });

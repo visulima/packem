@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import ts from "typescript";
-import { bench, describe } from "vitest";
+import { test } from "vitest";
 
 import tscResolve from "../src/tsc/resolver";
 
@@ -38,19 +38,20 @@ const tscResolveNaive = (id: string): string | undefined => {
 };
 
 for (const moduleCount of [50, 200]) {
-    describe(`tsc resolve phase (${moduleCount} modules x ${ids.length} imports)`, () => {
+    test(`tsc resolve phase (${moduleCount} modules x ${ids.length} imports)`, { timeout: 0 }, async ({ bench }) => {
         const calls = moduleCount * ids.length;
 
-        bench("before: parseJsonConfigFileContent per resolve", () => {
-            for (let index = 0; index < calls; index++) {
-                tscResolveNaive(ids[index % ids.length]!);
-            }
-        });
-
-        bench("after: memoized parsed tsconfig (tscResolve)", () => {
-            for (let index = 0; index < calls; index++) {
-                tscResolve(ids[index % ids.length]!, importer, cwd, tsconfig, tsconfigRaw, undefined);
-            }
-        });
+        await bench.compare(
+            bench("before: parseJsonConfigFileContent per resolve", () => {
+                for (let index = 0; index < calls; index++) {
+                    tscResolveNaive(ids[index % ids.length]!);
+                }
+            }),
+            bench("after: memoized parsed tsconfig (tscResolve)", () => {
+                for (let index = 0; index < calls; index++) {
+                    tscResolve(ids[index % ids.length]!, importer, cwd, tsconfig, tsconfigRaw, undefined);
+                }
+            }),
+        );
     });
 }

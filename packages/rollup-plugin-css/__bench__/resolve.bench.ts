@@ -2,7 +2,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { ResolverFactory } from "oxc-resolver";
-import { bench, describe } from "vitest";
+import { test } from "vitest";
 
 import { resolve } from "../src/utils/resolve";
 
@@ -33,12 +33,13 @@ const resolveFreshFactory = (): string => {
     throw new Error("could not resolve");
 };
 
-describe("resolve - ResolverFactory reuse", () => {
-    bench("before: new ResolverFactory per call", () => {
-        resolveFreshFactory();
-    });
-
-    bench("after: memoized ResolverFactory (real resolve)", () => {
-        resolve(ids, { baseDirs, extensions });
-    });
+test("resolve - ResolverFactory reuse", { timeout: 0 }, async ({ bench }) => {
+    await bench.compare(
+        bench("before: new ResolverFactory per call", () => {
+            resolveFreshFactory();
+        }),
+        bench("after: memoized ResolverFactory (real resolve)", () => {
+            resolve(ids, { baseDirs, extensions });
+        }),
+    );
 });
