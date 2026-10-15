@@ -126,7 +126,7 @@ catalogs:
       specifier: 3.3.3
       version: 3.3.3
     mime:
-      specifier: ^4.1.0
+      specifier: ^4.1.1
       version: 4.1.1
     oxc-parser:
       specifier: 0.153.0
@@ -612,17 +612,17 @@ overrides:
   follow-redirects@<1.16.0: '>=1.16.1'
   http-cache-semantics@<=4.2.0: '>=4.3.0 <5'
   form-data@>=4.0.0 <4.0.6: '>=4.0.6'
-  glob@>=10.0.0 <10.5.0: '>=10.5.0'
+  glob@>=10.0.0 <10.5.0: '>=13.0.6'
   handlebars@>=4.0.0 <4.7.9: '>=4.7.10'
   happy-dom@>=15.0.0 <20.8.8: '>=20.14.6'
   hono@<4.12.34: '>=4.12.34 <5'
   immutable@>=5.0.0 <5.1.8: '>=5.1.9'
   ip-address@<10.3.1: '>=10.3.1 <11'
-  js-yaml@>=4.0.0 <4.3.1: '>=4.3.1 <5'
+  js-yaml@>=4.0.0 <4.3.1: '>=4.3.1 <6'
   lodash@<4.18.0: '>=4.18.0'
   lodash-es@<4.18.0: '>=4.18.0'
-  markdown-it@<14.2.0: '>=14.3.2'
-  minimatch@<3.1.4: '>=3.1.5'
+  markdown-it@<14.2.0: '>=15.0.2'
+  minimatch@<3.1.4: '>=5.1.9'
   minimatch@>=5.0.0 <5.1.8: '>=5.1.9'
   minimatch@>=9.0.0 <9.0.7: '>=9.0.9'
   minimatch@>=10.0.0 <10.2.3: '>=10.2.6'
@@ -2168,7 +2168,7 @@ importers:
         specifier: catalog:node
         version: 10.1.0
       cssnano:
-        specifier: '>=9.6.0'
+        specifier: '>=9.7.0'
         version: 9.8.0(postcss@8.5.30)
       deeks:
         specifier: catalog:dev
@@ -3065,7 +3065,7 @@ importers:
         specifier: catalog:dev
         version: 9.3.1
       cssnano:
-        specifier: '>=9.6.0'
+        specifier: '>=9.7.0'
         version: 9.8.0(postcss@8.5.30)
       eslint:
         specifier: catalog:lint

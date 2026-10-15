@@ -14,7 +14,10 @@ permissions:
 jobs:
     lock-file:
         name: "Lock File Maintenance"
-        if: "github.repository == 'visulima/packem'"
+        # The write-back only works for branches in this repository: a fork PR's
+        # `github.head_ref` does not exist in the base repo and fork runs receive
+        # no LOCK_MAINTENANCE_GITHUB_TOKEN, so checkout or push would fail.
+        if: "github.repository == 'visulima/packem' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)"
         runs-on: "ubuntu-latest"
         permissions:
             contents: "write"
@@ -28,7 +31,13 @@ jobs:
             - name: "Git checkout"
               uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
               with:
+                  # On `pull_request` the default checkout is the merge commit, which
+                  # cannot be pushed back to the head branch; check out the real branch
+                  # so the refreshed lockfile fast-forwards cleanly.
+                  ref: "${{ github.head_ref || github.ref_name }}"
                   token: "${{ secrets.LOCK_MAINTENANCE_GITHUB_TOKEN }}"
+                  # Credentials are not persisted; the commit step below pushes with a
+                  # per-command auth header so the token never lands in .git/config.
                   persist-credentials: false
               env:
                   GIT_COMMITTER_NAME: "GitHub Actions Shell"
@@ -47,12 +56,26 @@ jobs:
               if: "success()"
               run: "pnpm install --lockfile-only"
 
+            # git-auto-commit-action cannot push when the checkout keeps no credentials
+            # ("fatal: could not read Username"), so commit and push explicitly with the
+            # maintenance token as a per-command auth header. Without a working push this
+            # job silently leaves pnpm-lock.yaml drifted, which then reds every later run
+            # on a frozen-lockfile install.
             - name: "Commit lock file"
               if: "success()"
-              uses: "stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d" # v7.2.0
-              with:
-                  file_pattern: "pnpm-lock.yaml"
-                  commit_message: "chore: updated lock file [ci skip]"
-                  commit_user_name: "github-actions-shell"
-                  commit_user_email: "github-actions[bot]@users.noreply.github.com"
-                  commit_author: "github-actions-shell <github-actions[bot]@users.noreply.github.com>"
+              shell: "bash"
+              env:
+                  TOKEN: "${{ secrets.LOCK_MAINTENANCE_GITHUB_TOKEN }}"
+                  BRANCH: "${{ github.head_ref || github.ref_name }}"
+              run: |
+                  set -euo pipefail
+                  if git diff --quiet -- pnpm-lock.yaml; then
+                      echo "pnpm-lock.yaml is already in sync."
+                      exit 0
+                  fi
+                  git add pnpm-lock.yaml
+                  git -c user.name="github-actions-shell" -c user.email="github-actions[bot]@users.noreply.github.com" \
+                      commit -m "chore: updated lock file [ci skip]"
+                  auth="$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+                  echo "::add-mask::${auth}"
+                  git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic ${auth}" push origin "HEAD:refs/heads/${BRANCH}"
