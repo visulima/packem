@@ -1,3 +1,37 @@
+## @visulima/rollup-plugin-dts [1.1.0](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.1...@visulima/rollup-plugin-dts@1.1.0) (2026-10-15)
+
+### Features
+
+* **packem:** pkg-style standalone executables for the `exe` option ([#302](https://github.com/visulima/packem/issues/302)) ([f666694](https://github.com/visulima/packem/commit/f6666942002e944da2c1c252e53a6d565d00ec95))
+* TypeScript 7 support, custom languages, check mode and declaration bundling fixes ([#365](https://github.com/visulima/packem/issues/365)) ([be9800c](https://github.com/visulima/packem/commit/be9800ca5f3e55388fe08eae33a9feb82d58775a))
+
+### Bug Fixes
+
+* **deps:** update patch updates ([a2ee146](https://github.com/visulima/packem/commit/a2ee146d6e546c29c5351fb44324b38782349a34))
+* follow-ups for the combined dependency update ([#325](https://github.com/visulima/packem/issues/325)) ([#326](https://github.com/visulima/packem/issues/326)) ([3fb2cda](https://github.com/visulima/packem/commit/3fb2cda19d988403c053bc868dd742bdf86da1f3))
+* migrate benchmarks to the vitest 5 API (+ the last two Renovate patches) ([#376](https://github.com/visulima/packem/issues/376)) ([5ae8eca](https://github.com/visulima/packem/commit/5ae8eca327db242651bd3d2d7495a13ff2d7a808))
+* **rollup-plugin-dts:** satisfy no-unsafe-enum-assignment on target ([ba5855c](https://github.com/visulima/packem/commit/ba5855cfe94990df755668df897b416e8dce036f))
+
+### Miscellaneous Chores
+
+* **deps:** combine open Renovate dependency updates ([#325](https://github.com/visulima/packem/issues/325)) ([e868152](https://github.com/visulima/packem/commit/e8681525470c002dca1e925c743f3a23a417b830))
+* **deps:** combine open Renovate updates into renovate/combined ([7a3e0b4](https://github.com/visulima/packem/commit/7a3e0b41a7ccd6000e0f2efeedf841bcc56a0853))
+* **deps:** consolidate pending dependency updates ([#307](https://github.com/visulima/packem/issues/307)) ([e7abfa4](https://github.com/visulima/packem/commit/e7abfa42a56e1b427d64fe695854f1616ed81306))
+
+### Tests
+
+* refresh stale snapshots for ci ([b9546a5](https://github.com/visulima/packem/commit/b9546a518244636d3c25ab441c80a070a7f8b15b))
+
+
+### Dependencies
+
+* **oxc-transform:** 0.147.0 → 0.153.0
+* **obug:** 2.1.4 → 2.2.1
+* **yuku-ast:** ^0.9.3 → ^0.19.0
+* **yuku-codegen:** ^0.9.3 → ^0.19.0
+* **yuku-parser:** ^0.9.3 → ^0.19.0
+* **vue-tsc:** 3.3.11 → 3.3.13
+
 ## @visulima/rollup-plugin-dts [1.0.1](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0...@visulima/rollup-plugin-dts@1.0.1) (2026-09-06)
 
 ### Bug Fixes
