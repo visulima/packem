@@ -112,13 +112,7 @@ export const getLanguageFingerprint = ({
     }
 
     if (vue) {
-        const vueId = vueLanguageId(typeof vue === "object" ? vue : {});
-
-        if (vueId === undefined) {
-            return undefined;
-        }
-
-        ids.push(vueId);
+        ids.push(vueLanguageId(typeof vue === "object" ? vue : {}));
     }
 
     if (tsMacro) {

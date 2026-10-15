@@ -6,7 +6,7 @@ import type Ts from "typescript";
 
 import type { CustomLanguage } from "../custom-language";
 import { RE_VUE } from "../filename";
-import { stableKey } from "./context.js";
+import { identityKey, stableKey } from "./context.js";
 
 const debug = createDebug("rollup-plugin-dts:vue");
 const require = createRequire(import.meta.url);
@@ -42,12 +42,13 @@ const loadVueLanguageTools = (): {
 
 /**
  * Identity of the vue language for the given options: builds with equal options share one program cache. Options that cannot
- * be encoded faithfully (such as functions) have no identity, so their builds do not share a cache.
+ * be encoded faithfully (such as functions) keep the identity of the object they were given in, so a build that repeats with
+ * the same object still shares a cache.
  */
-export const vueLanguageId = (userOptions: VueLanguageOptions): string | undefined => {
+export const vueLanguageId = (userOptions: VueLanguageOptions): string => {
     const key = stableKey(userOptions);
 
-    return key === undefined ? undefined : `vue:${key}`;
+    return key === undefined ? identityKey(userOptions) : `vue:${key}`;
 };
 
 /**

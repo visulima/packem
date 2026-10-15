@@ -52,6 +52,8 @@ const containsImportType = (program: Program): boolean => {
 export interface InlinableScript {
     /** Absolute path of the referenced file, the dedupe key. */
     file: string;
+    /** The file's own text, emitted as it is when the script gets a file of its own in the output. */
+    source: string;
     statements: ProgramStatement[];
 }
 
@@ -92,7 +94,7 @@ export const loadReferencedScript = async (directive: Comment, sourceFile: strin
     // An `import("./x")` type would point at a path that no longer exists once the declarations move.
     if (program.body.some((node) => !isScriptStatement(node)) || containsImportType(program)) return undefined;
 
-    return { file, statements: program.body };
+    return { file, source: code, statements: program.body };
 };
 
 /**

@@ -241,6 +241,14 @@ By default, the plugin may reuse internal caches or incremental build artifacts
 to speed up repeated builds. Enabling this option forces a clean context,
 guaranteeing that all type definitions are generated from scratch.
 
+Builds in one process share a TypeScript program cache when their tsconfig file,
+the config files that file extends, and their custom language set are the same.
+A configuration the plugin cannot describe textually — one holding a function or
+a class instance — is identified by the object it was given, so a repeated build
+with the same object still shares. The caches keep a bounded number of programs
+together and drop the least recently used one beyond that, so alternating among
+more configurations only costs a rebuild.
+
 The `invalidateContextFile` API can be used to clear invalidated files from the context:
 
 ```ts
@@ -325,16 +333,19 @@ Constraints:
 A `/// <reference path="…" />` in a `.d.ts` input that points at a local global script (a file with only `interface`,
 `type`, `enum` and `declare` declarations, no imports or exports) is inlined into the output and the directive is removed.
 Inlined declarations are wrapped in `declare global { … }` when the output is a module. When several output chunks reference
-the same script, the script is inlined into one of them, and the other chunks get a `/// <reference path="…" />` to that
-chunk. The owner is the referencing chunk that comes first in an import order: a chunk comes after the chunks it imports,
-and unrelated chunks are ordered by file name. So a shared chunk that the others already import owns the script, and
-the references always point in one direction, so they never form a cycle. Consumers that load several entries therefore see one declaration, so duplicate
-`type`, `const`, `class` or `enum` declarations do not conflict.
+the same script, it is inlined into one of them, and the other chunks get a `/// <reference path="…" />` to that chunk. The
+copy goes to the first chunk in an import order — a chunk comes after the chunks it imports, and unrelated chunks are ordered
+by file name — that every referencing chunk imports, so a shared chunk the others already load carries it, and the references
+always point the way an import goes, so they never form a cycle. Consumers that load several entries therefore see one
+declaration, so duplicate `type`, `const`, `class` or `enum` declarations do not conflict.
+
+When no chunk is imported by all the chunks that reference the script — two entries with no shared chunk, for example — the
+script is written to `_dts-scripts/<name>-<hash>.d.ts` under the output directory instead, and every referencing chunk points
+at that file. No chunk then has to load the other declarations of a sibling entry.
 
 Limits: scripts that contain imports or `import()` types, scripts that have a reference directive of their own, and
 string-named `declare module` blocks are not inlined. Their directives are kept, with the path rebased to the output
-location. Directives in `.ts` sources do not reach the emitted declarations, so nothing is inlined for them. When the owner
-is not a chunk that the others already import, a referencing chunk also loads the owner's other declarations.
+location. Directives in `.ts` sources do not reach the emitted declarations, so nothing is inlined for them.
 `/// <reference types="…" />`, `lib=` and `no-default-lib` directives are kept as they are.
 
 ## Differences from `rollup-plugin-dts`

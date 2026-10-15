@@ -3,12 +3,13 @@ import { fileURLToPath } from "node:url";
 
 import type { Plugin } from "rollup";
 import { rollup } from "rollup";
+import type ts from "typescript";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { getLanguageFingerprint } from "../src/custom-language.js";
 import type { Options } from "../src/index.js";
 import { dts } from "../src/index.js";
-import { countSharedPrograms, getConfigKey, getSharedContext, resetSharedContexts } from "../src/tsc/context.js";
+import { countSharedPrograms, getConfigKey, getSharedContext, MAX_SHARED_PROGRAMS, resetSharedContexts } from "../src/tsc/context.js";
 import { vueLanguageId } from "../src/tsc/vue.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -141,22 +142,28 @@ describe("vue language id", () => {
         expect(vueLanguageId({ vueCompilerOptions: { pattern: "/a/g" } })).not.toBe(vueLanguageId({ vueCompilerOptions: { pattern: PATTERN_G } }));
     });
 
-    it("has no id when the options hold a function, so the build gets a cache of its own", () => {
+    it("keeps the identity of the options when they hold a function, so a repeated build still shares a cache", () => {
         expect.hasAssertions();
 
-        expect(vueLanguageId({ vueCompilerOptions: { resolve: () => 1 } })).toBeUndefined();
-        expect(getLanguageFingerprint({ vue: { vueCompilerOptions: { resolve: () => 1 } } })).toBeUndefined();
+        const options = { vueCompilerOptions: { resolve: () => 1 } };
+
+        expect(vueLanguageId(options)).toBe(vueLanguageId(options));
+        // Another object with an equal function cannot be told apart from a changed one, so it gets its own id.
+        expect(vueLanguageId(options)).not.toBe(vueLanguageId({ vueCompilerOptions: { resolve: () => 1 } }));
+        expect(getLanguageFingerprint({ vue: options })).toBe(getLanguageFingerprint({ vue: options }));
     });
 
-    it("has no id when the options hold a symbol or a cycle", () => {
+    it("keeps the identity of options that hold a symbol or a cycle", () => {
         expect.hasAssertions();
 
-        const cyclic: { self?: unknown } = {};
+        const cyclic: { self?: unknown; vueCompilerOptions?: Record<string, unknown> } = {};
+        const withSymbol = { vueCompilerOptions: { marker: Symbol("marker") } };
 
         cyclic.self = cyclic;
 
-        expect(vueLanguageId({ vueCompilerOptions: { marker: Symbol("marker") } })).toBeUndefined();
-        expect(vueLanguageId({ vueCompilerOptions: cyclic })).toBeUndefined();
+        expect(vueLanguageId(withSymbol)).toBe(vueLanguageId(withSymbol));
+        expect(vueLanguageId(cyclic)).toBe(vueLanguageId(cyclic));
+        expect(vueLanguageId(withSymbol)).not.toBe(vueLanguageId({ vueCompilerOptions: { marker: Symbol("marker") } }));
     });
 
     it("gives the same fingerprint for equal vue options and a different one for other options", () => {
@@ -192,15 +199,64 @@ describe("shared cache identity", () => {
         expect(getConfigKey({ cwd: root, tsconfig: keepTsconfig, tsconfigRaw: { compilerOptions: { strict: false } } })).not.toBe(base);
     });
 
-    it("drops the least recently used shared cache beyond the cap", () => {
+    it("gives a different config key when the files the configuration extends differ", () => {
         expect.hasAssertions();
 
-        const oldest = getSharedContext("cap-0");
+        const raw = { compilerOptions: { strict: true } };
+        const base = getConfigKey({ cwd: root, tsconfig: keepTsconfig, tsconfigChainKey: "chain-a", tsconfigRaw: raw });
 
-        for (let index = 1; index <= 8; index += 1) {
-            getSharedContext(`cap-${String(index)}`);
+        expect(base).not.toBe(getConfigKey({ cwd: root, tsconfig: keepTsconfig, tsconfigChainKey: "chain-b", tsconfigRaw: raw }));
+        expect(base).toBe(getConfigKey({ cwd: root, tsconfig: keepTsconfig, tsconfigChainKey: "chain-a", tsconfigRaw: raw }));
+    });
+
+    it("keeps the identity of a configuration that holds a function or a cycle", () => {
+        expect.hasAssertions();
+
+        const raw = { compilerOptions: { transform: () => 1 } };
+        const base = getConfigKey({ cwd: root, tsconfig: keepTsconfig, tsconfigRaw: raw });
+
+        // The same object repeats across the modules of one build, so its programs are shared.
+        expect(base).toBe(getConfigKey({ cwd: root, tsconfig: keepTsconfig, tsconfigRaw: raw }));
+        // Another object is another configuration, even when it holds an equal function.
+        expect(base).not.toBe(getConfigKey({ cwd: root, tsconfig: keepTsconfig, tsconfigRaw: { compilerOptions: { transform: () => 1 } } }));
+
+        const cyclic: { compilerOptions?: unknown } = {};
+
+        cyclic.compilerOptions = cyclic;
+        expect(getConfigKey({ cwd: root, tsconfig: keepTsconfig, tsconfigRaw: cyclic })).toBe(
+            getConfigKey({ cwd: root, tsconfig: keepTsconfig, tsconfigRaw: cyclic }),
+        );
+    });
+});
+
+describe("shared cache budget", () => {
+    it("keeps a cache that holds no programs, however many builds run", () => {
+        expect.hasAssertions();
+
+        const oldest = getSharedContext("empty-0");
+
+        for (let index = 1; index <= MAX_SHARED_PROGRAMS; index += 1) {
+            getSharedContext(`empty-${String(index)}`);
         }
 
-        expect(getSharedContext("cap-0")).not.toBe(oldest);
+        expect(getSharedContext("empty-0")).toBe(oldest);
+    });
+
+    it("drops the least recently used cache once the retained programs pass the budget", () => {
+        expect.hasAssertions();
+
+        const coldest = getSharedContext("programs-0");
+
+        coldest.programs.push(...Array.from({ length: MAX_SHARED_PROGRAMS }, () => ({}) as ts.Program));
+
+        const warm = getSharedContext("programs-1");
+
+        warm.programs.push({} as ts.Program);
+
+        // The next build is what notices that the caches hold one program too many.
+        getSharedContext("programs-2");
+
+        expect(getSharedContext("programs-0")).not.toBe(coldest);
+        expect(getSharedContext("programs-1")).toBe(warm);
     });
 });

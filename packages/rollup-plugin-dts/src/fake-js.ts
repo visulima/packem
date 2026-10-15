@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-use-before-define, no-param-reassign, @typescript-eslint/no-shadow, func-style, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-non-null-assertion, unicorn/no-null, sonarjs/cognitive-complexity, jsdoc/match-description, @typescript-eslint/prefer-nullish-coalescing, no-plusplus, @typescript-eslint/restrict-template-expressions, sonarjs/function-return-type, sonarjs/different-types-comparison, no-return-assign, consistent-return, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-dynamic-delete, sonarjs/no-nested-assignment, sonarjs/no-empty-collection, no-secrets/no-secrets, no-await-in-loop, default-case -- this file implements a yuku-based AST transform; helper functions are hoisted as expressions to match the data flow, params are mutated for in-place rewriting, and several SonarJS / TS-strict rules clash with the in-place ESTree node rewriting this transform relies on */
+import { createHash } from "node:crypto";
 import { realpathSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import type { ExistingRawSourceMap, NormalizedOutputOptions, Plugin, RenderedChunk, SourceMapInput, TransformPluginContext, TransformResult } from "rollup";
+import type { ExistingRawSourceMap, NormalizedOutputOptions, Plugin, PluginContext, RenderedChunk, SourceMapInput, TransformPluginContext, TransformResult } from "rollup";
 import { b, is, isIdentifierName, nameOf, walk } from "yuku-ast";
 import { generate } from "yuku-codegen";
 // eslint-disable-next-line import/no-namespace -- the ESTree/TS-ESTree node types are a large flat namespace; importing them one by one would add ~40 named type imports
@@ -156,6 +157,12 @@ interface ChunkExportInfo {
 
 type NamespaceMap = Map<string, { local: t.Identifier | t.TSQualifiedName; stmt: t.ProgramStatement }>;
 
+/**
+ * Where a referenced global script lands in the output: inlined into a chunk every referencing chunk already imports, so the
+ * references between them cannot form a cycle, or written to a file of its own when the output holds no such chunk.
+ */
+type ScriptPlacement = { file: string; kind: "file"; script: InlinableScript } | { kind: "chunk"; owner: string; script: InlinableScript };
+
 const createFakeJsPlugin = (
     { cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">,
     entryChunkNames: ReadonlySet<string> = new Set<string>(),
@@ -166,10 +173,12 @@ const createFakeJsPlugin = (
     // `/// <reference path>` directives that point at a local global script, mapped to that script (see reference-directives.ts).
     const referencedScriptMap = new WeakMap<t.Comment, InlinableScript>();
     // The global scripts each module references. Kept per module, not per directive, so that any chunk can find
-    // which other chunks inline the same script (see `getScriptOwners`).
+    // which other chunks inline the same script (see `getScriptPlacements`).
     const moduleScriptsMap = new Map<string /* filename */, InlinableScript[]>();
-    // Per render: the chunk file that inlines each script, computed once from the chunk graph of that output.
-    let scriptOwners: Map<string /* script file */, string /* chunk file name */> | undefined;
+    // Per render: where each script lands in the output, computed once from the chunk graph of that output.
+    let scriptPlacements: Map<string /* script file */, ScriptPlacement> | undefined;
+    // Script files of their own that this output already holds, so several chunks emit each of them once.
+    const emittedScriptFiles = new Set<string>();
     // Leading JSDoc of specifier-based export statements, which — unlike declarations — are
     // handed to rollup verbatim and would otherwise be lost to the `comments: false` print
     // at the end of `transform`. Re-attached by name in `renderChunk`.
@@ -314,7 +323,8 @@ const createFakeJsPlugin = (
             // Invalidate the per-render type-only propagation cache so watch-mode
             // rebuilds recompute it from the freshly-populated moduleExportsMap.
             resolvedExportsByModule = undefined;
-            scriptOwners = undefined;
+            scriptPlacements = undefined;
+            emittedScriptFiles.clear();
         },
 
         async transform(code: string, id: string) {
@@ -720,15 +730,15 @@ const createFakeJsPlugin = (
         };
     }
 
-    // The chunk that inlines each script, when several chunks reference it. The other chunks reference that copy instead
-    // (see `referenceOutputFile`). Chunks are ranked in a post-order over the static import graph (roots and imports
-    // visited by file name), so a chunk comes after the chunks it imports and the owner is the referencing chunk with the
-    // lowest rank: a chunk that the others already import owns the copy, and the references always point to a lower rank,
-    // so they cannot form a cycle. Chunks that do not import each other are ordered by file name.
-    function getScriptOwners(chunks: Record<string, RenderedChunk>): Map<string, string> {
-        if (scriptOwners) return scriptOwners;
+    // Where the script each chunk references lands, when several chunks reference it. The other chunks reference that copy
+    // instead of declaring it twice (see `referenceOutputFile`). Chunks are ranked in a post-order over the static import
+    // graph (roots and imports visited by file name), so a chunk comes after the chunks it imports. The copy goes to the
+    // first ranked chunk that every referencing chunk imports — itself when it imports nothing — which is a chunk the others
+    // already load, so the references always point the way an import goes and cannot form a cycle. Without such a chunk the
+    // script gets a file of its own, so a referencing chunk never loads the other declarations of a sibling.
+    function getScriptPlacements(chunks: Record<string, RenderedChunk>): Map<string, ScriptPlacement> {
+        if (scriptPlacements) return scriptPlacements;
 
-        const owners = new Map<string, string>();
         const byFileName = new Map(Object.values(chunks).map((chunk) => [chunk.fileName, chunk]));
         const compareNames = (a: string, b: string): number => (a < b ? -1 : Number(a > b));
         const ranked: string[] = [];
@@ -746,25 +756,78 @@ const createFakeJsPlugin = (
 
         for (const fileName of [...byFileName.keys()].toSorted(compareNames)) visit(fileName);
 
-        for (const fileName of ranked) {
-            const { moduleIds } = byFileName.get(fileName) ?? { moduleIds: [] };
+        // The chunk files each chunk can load declarations from, itself included. A chunk that is not in the output (a
+        // dangling name) reaches only itself.
+        const reachByFileName = new Map<string, Set<string>>();
 
-            // Only declaration chunks inline scripts (see `renderChunk`), so only they can own one.
+        const reachOf = (fileName: string): Set<string> => {
+            let reach = reachByFileName.get(fileName);
+
+            if (reach) return reach;
+
+            // Registered before the walk, so a cycle in the import graph cannot recurse without end.
+            reach = new Set([fileName]);
+            reachByFileName.set(fileName, reach);
+
+            for (const imported of byFileName.get(fileName)?.imports ?? []) {
+                for (const reached of reachOf(imported)) reach.add(reached);
+            }
+
+            return reach;
+        };
+
+        // The chunks that reference each script, in rank order, and the script itself.
+        const referrers = new Map<string, string[]>();
+        const scriptsByFile = new Map<string, InlinableScript>();
+
+        for (const fileName of ranked) {
+            // Only declaration chunks inline scripts (see `renderChunk`), so only they can carry one.
             if (!RE_DTS.test(fileName)) continue;
 
-            for (const moduleId of moduleIds) {
+            for (const moduleId of byFileName.get(fileName)?.moduleIds ?? []) {
                 for (const script of moduleScriptsMap.get(moduleId) ?? []) {
-                    if (!owners.has(script.file)) owners.set(script.file, fileName);
+                    scriptsByFile.set(script.file, script);
+
+                    const referrerList = referrers.get(script.file);
+
+                    if (referrerList) {
+                        if (!referrerList.includes(fileName)) referrerList.push(fileName);
+                    } else {
+                        referrers.set(script.file, [fileName]);
+                    }
                 }
             }
         }
 
-        scriptOwners = owners;
+        const placements = new Map<string, ScriptPlacement>();
 
-        return owners;
+        for (const [scriptFile, scriptReferrers] of referrers) {
+            const script = scriptsByFile.get(scriptFile)!;
+            // A referencing chunk that every other referencing chunk loads takes the copy, which keeps a build that already
+            // shared a chunk where it was. Failing that — entries with nothing in common — a chunk all of them load carries
+            // it, and only when the output has neither does the script get a file of its own.
+            const owner =
+                scriptReferrers.find((referrer) => scriptReferrers.every((other) => reachOf(other).has(referrer)))
+                ?? ranked.find((fileName) => RE_DTS.test(fileName) && scriptReferrers.every((referrer) => reachOf(referrer).has(fileName)));
+
+            placements.set(
+                scriptFile,
+                owner === undefined ? { file: scriptOutputFileName(scriptFile), kind: "file", script } : { kind: "chunk", owner, script },
+            );
+        }
+
+        scriptPlacements = placements;
+
+        return placements;
     }
 
-    function renderChunk(code: string, chunk: RenderedChunk, options: NormalizedOutputOptions, meta: { chunks: Record<string, RenderedChunk> }) {
+    function renderChunk(
+        this: PluginContext,
+        code: string,
+        chunk: RenderedChunk,
+        options: NormalizedOutputOptions,
+        meta: { chunks: Record<string, RenderedChunk> },
+    ) {
         if (!RE_DTS.test(chunk.fileName)) {
             return;
         }
@@ -1017,6 +1080,9 @@ const createFakeJsPlugin = (
         const outputDirectory = options.dir ?? (options.file ? path.dirname(options.file) : process.cwd());
         const chunkOutputDirectory = path.resolve(outputDirectory, path.dirname(chunk.fileName));
 
+        // A script lands in a chunk the referencing chunks share, or in a file of its own (see `getScriptPlacements`).
+        const placements = getScriptPlacements(meta.chunks);
+
         for (const id of chunk.moduleIds) {
             const preserveComments = commentsMap.get(id);
 
@@ -1032,16 +1098,26 @@ const createFakeJsPlugin = (
                     let rebased: t.Comment;
 
                     if (script) {
-                        const owner = getScriptOwners(meta.chunks).get(script.file);
+                        const placement = placements.get(script.file);
 
-                        if (owner === undefined || owner === chunk.fileName) {
+                        if (placement === undefined || (placement.kind === "chunk" && placement.owner === chunk.fileName)) {
                             inlinedScripts.set(script.file, script);
 
                             return;
                         }
 
-                        // Another chunk already inlines this script, so reference its copy rather than declare it twice.
-                        rebased = referenceOutputFile(c, path.resolve(outputDirectory, owner), chunkOutputDirectory);
+                        if (placement.kind === "file") {
+                            // The script has a file of its own; every chunk that needs it references that file.
+                            if (!emittedScriptFiles.has(placement.file)) {
+                                emittedScriptFiles.add(placement.file);
+                                this.emitFile({ fileName: placement.file, source: placement.script.source, type: "asset" });
+                            }
+
+                            rebased = referenceOutputFile(c, path.resolve(outputDirectory, placement.file), chunkOutputDirectory);
+                        } else {
+                            // Another chunk already inlines this script, so reference its copy rather than declare it twice.
+                            rebased = referenceOutputFile(c, path.resolve(outputDirectory, placement.owner), chunkOutputDirectory);
+                        }
                     } else {
                         rebased = rebaseReferencePath(c, sourceDirectory, chunkOutputDirectory);
                     }
@@ -1053,6 +1129,13 @@ const createFakeJsPlugin = (
                     commentsValue.add(dedupeKey);
                     comments.add(rebased);
                 });
+            }
+        }
+
+        // A shared chunk carries a script its own modules never referenced, and the chunks that do reference it point here.
+        for (const placement of placements.values()) {
+            if (placement.kind === "chunk" && placement.owner === chunk.fileName) {
+                inlinedScripts.set(placement.script.file, placement.script);
             }
         }
 
@@ -1424,6 +1507,25 @@ const isSourceMapPragma = (comment: { value: string }): boolean => SOURCE_MAP_PR
 
 // Matches the `path="..."` (or single-quoted) attribute of a triple-slash reference directive.
 const REFERENCE_PATH_RE = /(\/\s*<reference\s+path=)(["'])(.+?)\2/;
+
+// Directory of the output that holds the scripts no chunk could take. The name starts with an underscore so it reads as
+// generated, and is stable per build.
+const SCRIPT_FILE_DIRECTORY = "_dts-scripts";
+
+// The `.d.ts` extension of a referenced script, and anything that is not safe in a file name.
+const RE_SCRIPT_EXTENSION = /\.d\.[cm]?ts$/u;
+const RE_UNSAFE_FILE_NAME = /[^\w.-]+/gu;
+
+/**
+ * The file a referenced global script is written to when no chunk can carry it. Built from the script's path, so it is
+ * stable across builds, and hashed, so two scripts with the same basename in different directories stay apart.
+ */
+const scriptOutputFileName = (scriptFile: string): string => {
+    const basename = path.basename(scriptFile).replace(RE_SCRIPT_EXTENSION, "").replaceAll(RE_UNSAFE_FILE_NAME, "-");
+    const hash = createHash("sha256").update(scriptFile).digest("hex").slice(0, 8);
+
+    return path.posix.join(SCRIPT_FILE_DIRECTORY, `${basename}-${hash}.d.ts`);
+};
 
 // Rebase a `/// <reference path="./foo.d.ts" />` directive so its relative path — originally
 // correct relative to `sourceDirectory` — is correct relative to `chunkOutputDirectory` where

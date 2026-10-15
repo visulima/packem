@@ -14,13 +14,12 @@ const debug = createDebug("rollup-plugin-dts:tsc");
 debug(`loaded typescript: ${ts.version}`);
 
 // Without an explicit context, builds share one program cache per language set and per tsconfig (see `getConfigKey`), so a
-// build never reuses a program created under other compiler options. A language without an id, or a configuration that
-// cannot be encoded, cannot be told apart from another build, so such a build gets a cache of its own.
+// build never reuses a program created under other compiler options. A language without an id cannot be told apart from
+// another build, so such a build gets a cache of its own.
 const contextFor = (options: TscOptions): TscContext => {
     const fingerprint = getLanguageFingerprint(options);
-    const configKey = getConfigKey(options);
 
-    return fingerprint === undefined || configKey === undefined ? createContext() : getSharedContext(JSON.stringify([fingerprint, configKey]));
+    return fingerprint === undefined ? createContext() : getSharedContext(JSON.stringify([fingerprint, getConfigKey(options)]));
 };
 
 export const tscEmit = (tscOptions: TscOptions): TscResult => {

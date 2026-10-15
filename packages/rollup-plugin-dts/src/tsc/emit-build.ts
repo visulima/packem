@@ -20,7 +20,11 @@ const buildErrors = new WeakMap<SourceFileToProjectMap, string[]>();
 const checkErrors = new WeakMap<SourceFileToProjectMap, string[]>();
 
 const getOrBuildProjects = (context: TscContext, fsSystem: ts.System, tsconfig: string, force: boolean, sourcemap: boolean): SourceFileToProjectMap => {
-    let projectMap = context.projects.get(tsconfig);
+    // A forced (`tsc --build --force`) and an incremental build of the same tsconfig produce different projects: the
+    // compiler options carry the sourcemap patch and the configuration carries the parsed files. Keying on both keeps one
+    // build from reading the other's project map.
+    const key = `${tsconfig}\0${force ? "force" : "incremental"}\0${sourcemap ? "map" : "no-map"}`;
+    let projectMap = context.projects.get(key);
 
     if (projectMap) {
         debug(`skip building projects for ${tsconfig}`);
@@ -29,7 +33,7 @@ const getOrBuildProjects = (context: TscContext, fsSystem: ts.System, tsconfig: 
     }
 
     projectMap = buildProjects(fsSystem, tsconfig, force, sourcemap);
-    context.projects.set(tsconfig, projectMap);
+    context.projects.set(key, projectMap);
 
     return projectMap;
 };

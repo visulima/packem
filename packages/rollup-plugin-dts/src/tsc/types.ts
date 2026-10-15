@@ -24,6 +24,8 @@ export interface TscOptions {
     incremental: boolean;
     sourcemap: boolean;
     tsconfig?: string;
+    /** Hash of the tsconfig file and its `extends` chain (see `getConfigKey`); internal, resolved by `resolveOptions`. */
+    tsconfigChainKey?: string;
     tsconfigRaw: TsConfigJson;
     tsMacro?: boolean;
     vue?: boolean | VueLanguageOptions;

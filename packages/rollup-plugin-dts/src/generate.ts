@@ -88,6 +88,7 @@ export const createGeneratePlugin = ({
     parallel,
     sourcemap,
     tsconfig,
+    tsconfigChainKey,
     tsconfigRaw,
     tsgo,
     tsMacro,
@@ -96,6 +97,7 @@ export const createGeneratePlugin = ({
     OptionsResolved,
     | "cwd"
     | "tsconfig"
+    | "tsconfigChainKey"
     | "tsconfigRaw"
     | "build"
     | "check"
@@ -427,6 +429,7 @@ entryChunkNames: Set<string> = new Set<string>(),
                         incremental,
                         sourcemap,
                         tsconfig,
+                        tsconfigChainKey,
                         tsconfigRaw,
                         tsMacro,
                         vue,

@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -38,6 +38,8 @@ const IMPORT_TYPE_DIRECTIVE_RE = /\/\/\/ <reference path="[^"]*import-type\.d\.t
 const STRING_MODULE_DIRECTIVE_RE = /\/\/\/ <reference path="[^"]*string-module\.d\.ts" \/>/u;
 const SHARED_OWNER_FILE_RE = /^common-.*\.d\.ts$/u;
 const SHARED_OWNER_DIRECTIVE_RE = /\/\/\/ <reference path="\.\/common-[^"]+\.d\.ts" \/>/u;
+const SHARED_SCRIPT_DIRECTORY = "_dts-scripts";
+const SHARED_SCRIPT_DIRECTIVE_RE = new RegExp(`/// <reference path="./${SHARED_SCRIPT_DIRECTORY}/[^"]+\\.d\\.ts" />`, "u");
 
 const countOf = (text: string, needle: string): number => text.split(needle).length - 1;
 
@@ -112,8 +114,8 @@ describe("triple-slash reference bundling", () => {
             await rm(temporaryDirectory, { force: true, recursive: true });
         });
 
-        it("inlines the shared script into one chunk and references that chunk from the others", async () => {
-            expect.assertions(6);
+        it("gives a script neither entry can carry a file of its own, referenced by both", async () => {
+            expect.assertions(10);
 
             const bundle = await rollup({
                 input: { a: fixture("dedupe-entry/a.d.ts"), b: fixture("dedupe-entry/b.d.ts") },
@@ -126,14 +128,23 @@ describe("triple-slash reference bundling", () => {
             const aCode = await readFile(path.join(temporaryDirectory, "a.d.ts"), "utf8");
             const bCode = await readFile(path.join(temporaryDirectory, "b.d.ts"), "utf8");
 
-            // `a` sorts first, so it owns the copy of the script; `b` points at it instead of declaring it again.
-            expect(aCode).toContain("interface Foo");
+            // Neither entry imports the other, so inlining the script into one of them would make the other
+            // load that entry's declarations. Both load a file of its own instead.
+            expect(aCode).not.toContain("interface Foo");
             expect(bCode).not.toContain("interface Foo");
-            expect(bCode).toContain('/// <reference path="./a.d.ts" />');
-            expect(bCode).not.toContain("declare global");
-            // Both entries load together without duplicate declarations.
+            expect(aCode).toMatch(SHARED_SCRIPT_DIRECTIVE_RE);
+            expect(bCode).toMatch(SHARED_SCRIPT_DIRECTIVE_RE);
+            // Neither entry declares the other's exports.
+            expect(aCode).not.toContain("declare function b");
+            expect(bCode).not.toContain("declare function a");
+
+            const scriptFiles = await readdir(path.join(temporaryDirectory, SHARED_SCRIPT_DIRECTORY));
+
+            expect(scriptFiles).toHaveLength(1);
+            await expect(readFile(path.join(temporaryDirectory, SHARED_SCRIPT_DIRECTORY, scriptFiles[0]), "utf8")).resolves.toContain("interface Foo");
+
+            // Both entries load together without duplicate declarations, and each one alone still sees `Foo` and `Maybe`.
             expect(diagnosticsOf([path.join(temporaryDirectory, "a.d.ts"), path.join(temporaryDirectory, "b.d.ts")])).toHaveLength(0);
-            // `b` alone still sees `Foo` and `Maybe` through the reference.
             expect(diagnosticsOf([path.join(temporaryDirectory, "b.d.ts")])).toHaveLength(0);
         });
 
@@ -164,6 +175,33 @@ describe("triple-slash reference bundling", () => {
             // Each entry, on its own, still loads cleanly through the shared chunk.
             expect(diagnosticsOf([path.join(outputDirectory, "a.d.ts")])).toHaveLength(0);
             expect(diagnosticsOf([path.join(outputDirectory, "b.d.ts")])).toHaveLength(0);
+        });
+
+        it("hands the script to a chunk both entries import even when that chunk does not reference it", async () => {
+            expect.assertions(5);
+
+            const outputDirectory = path.join(temporaryDirectory, "silent-owner");
+
+            const bundle = await rollup({
+                input: { a: fixture("shared-owner-silent/a.d.ts"), b: fixture("shared-owner-silent/b.d.ts") },
+                plugins: [dts({ dtsInput: true, emitDtsOnly: true, sourcemap: false, tsconfig: false })],
+            });
+
+            const { output } = await bundle.write({ dir: outputDirectory, format: "es" });
+
+            await bundle.close();
+
+            const chunks = output.filter((item): item is OutputChunk => item.type === "chunk");
+            const codeOf = (name: string): string => chunks.find((chunk) => chunk.fileName === name)?.code ?? "";
+            const owner = chunks.find((chunk) => chunk.code.includes("interface Foo"));
+
+            // Only the entries reference the script, but both import `common`, so it is the chunk they already load.
+            expect(owner?.fileName).toMatch(SHARED_OWNER_FILE_RE);
+            expect(codeOf("a.d.ts")).toMatch(SHARED_OWNER_DIRECTIVE_RE);
+            expect(codeOf("b.d.ts")).toMatch(SHARED_OWNER_DIRECTIVE_RE);
+            // The script is in that chunk rather than in a file of its own.
+            expect(chunks.filter((chunk) => chunk.fileName.includes(SHARED_SCRIPT_DIRECTORY))).toHaveLength(0);
+            expect(diagnosticsOf([path.join(outputDirectory, "a.d.ts")])).toHaveLength(0);
         });
     });
 

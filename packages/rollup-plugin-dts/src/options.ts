@@ -1,4 +1,5 @@
 /* eslint-disable import/exports-last -- exports are intentionally interleaved with helper code by topic */
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -361,6 +362,7 @@ export type OptionsResolved = Overwrite<
         logger: Logger;
         oxc: IsolatedDeclarationsOptions | false;
         tsconfig?: string;
+        tsconfigChainKey: string | undefined;
         tsconfigRaw: TsConfigJson;
         tsgo: false | { path?: string };
     }
@@ -442,7 +444,9 @@ const canReadTsconfig = (): boolean => typeof (ts as { readConfigFile?: unknown 
 // Returns `true` iff any layer explicitly sets `compilerOptions.incremental === true`
 // OR a `compilerOptions.tsBuildInfoFile` string. `incremental: false` anywhere in
 // the chain wins over later `true` values from extensions (user explicit opt-out).
-const hasExplicitIncrementalInTsconfig = (tsconfigPath: string, seen = new Set<string>()): boolean => {
+//
+// While the chain is walked, the path and raw content of every layer are fed into `hasher` (see `readTsconfigChain`).
+const walkTsconfigChain = (tsconfigPath: string, hasher: ReturnType<typeof createHash>, seen: Set<string>): boolean => {
     if (seen.has(tsconfigPath)) {
         return false;
     }
@@ -461,6 +465,10 @@ const hasExplicitIncrementalInTsconfig = (tsconfigPath: string, seen = new Set<s
     if (result.error || !result.config) {
         return false;
     }
+
+    // The path keeps two layers with identical content apart; the content makes an edit to any
+    // layer change the key, including a field the merged configuration drops (such as `references`).
+    hasher.update(tsconfigPath).update("\0").update(JSON.stringify(result.config));
 
     const config = result.config as RawTsconfig;
     const directCheck = checkCompilerOptionsIncremental(config.compilerOptions);
@@ -483,12 +491,40 @@ const hasExplicitIncrementalInTsconfig = (tsconfigPath: string, seen = new Set<s
 
         const extendedPath = resolveExtendedTsconfigPath(extend, baseDirectory);
 
-        if (extendedPath && hasExplicitIncrementalInTsconfig(extendedPath, seen)) {
+        if (extendedPath && walkTsconfigChain(extendedPath, hasher, seen)) {
             return true;
         }
     }
 
     return false;
+};
+
+interface TsconfigChain {
+    /** Whether a layer opts into a disk-writing incremental build (see `walkTsconfigChain`). */
+    explicitIncremental: boolean;
+    /** Hash of the path and the raw content of every file in the chain. */
+    key: string;
+}
+
+/**
+ * Reads the `extends` chain of a tsconfig file: the hash of the files it is made of, and whether one of them opts into
+ * incremental builds.
+ *
+ * `readTsConfig` merges the chain into the values it returns, and those merged values are part of the program cache key, so
+ * the hash is what makes the key follow the chain files themselves: an edit to a layer whose fields the merge drops (such as
+ * `references`) or normalizes away changes it, where the merged values alone would not.
+ *
+ * Returns `undefined` when the chain cannot be read, either because the tsconfig is not a file or because the classic
+ * compiler API (`ts.readConfigFile`, a JSONC reader) is not installed.
+ */
+const readTsconfigChain = (tsconfigPath: string): TsconfigChain | undefined => {
+    if (!canReadTsconfig()) {
+        return undefined;
+    }
+
+    const hasher = createHash("sha256");
+
+    return { explicitIncremental: walkTsconfigChain(tsconfigPath, hasher, new Set()), key: hasher.digest("hex") };
 };
 
 const resolveTsconfigPath = (
@@ -796,11 +832,12 @@ export const resolveOptions = ({
     // TypeScript's parser and `@visulima/tsconfig` auto-add `incremental: true`
     // whenever `composite: true` is set, which would otherwise force every
     // composite project into disk mode and leave `.tsbuildinfo` files behind.
+    const tsconfigChain = tsconfig === undefined ? undefined : readTsconfigChain(tsconfig);
     const isIncremental =
         incrementalOption
         || pluginCompilerOptions.incremental === true
         || typeof pluginCompilerOptions.tsBuildInfoFile === "string"
-        || (typeof tsconfig === "string" && hasExplicitIncrementalInTsconfig(tsconfig));
+        || tsconfigChain?.explicitIncremental === true;
     const isSourcemap = sourcemapOption ?? Boolean(compilerOptions.declarationMap);
 
     compilerOptions.declarationMap = isSourcemap;
@@ -901,6 +938,7 @@ export const resolveOptions = ({
         sideEffects,
         sourcemap: isSourcemap,
         tsconfig,
+        tsconfigChainKey: tsconfigChain?.key,
         tsconfigRaw,
         tsgo,
 
