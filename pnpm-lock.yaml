@@ -105,8 +105,8 @@ catalogs:
       specifier: ^1.0.2
       version: 1.0.2
     conventional-changelog-conventionalcommits:
-      specifier: 10.4.1
-      version: 10.4.1
+      specifier: 9.3.1
+      version: 9.3.1
     deeks:
       specifier: ^3.2.1
       version: 3.2.1
@@ -1910,7 +1910,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.1
+        version: 9.3.1
       eslint:
         specifier: catalog:lint
         version: 10.9.1(jiti@2.7.0)(supports-color@10.2.2)
@@ -2163,7 +2163,7 @@ importers:
         version: 1.0.2(@babel/core@8.0.7)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.1
+        version: 9.3.1
       cross-env:
         specifier: catalog:node
         version: 10.1.0
@@ -2464,7 +2464,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.1
+        version: 9.3.1
       esbuild:
         specifier: catalog:build
         version: 0.28.2
@@ -2545,7 +2545,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.1
+        version: 9.3.1
       eslint:
         specifier: catalog:lint
         version: 10.9.1(jiti@2.7.0)(supports-color@10.2.2)
@@ -2726,7 +2726,7 @@ importers:
         version: 4.29.3
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.1
+        version: 9.3.1
       esbuild:
         specifier: catalog:build
         version: 0.28.2
@@ -2838,7 +2838,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.1
+        version: 9.3.1
       esbuild:
         specifier: catalog:build
         version: 0.28.2
@@ -3063,7 +3063,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.1
+        version: 9.3.1
       cssnano:
         specifier: '>=9.6.0'
         version: 9.8.0(postcss@8.5.30)
@@ -3237,7 +3237,7 @@ importers:
         version: 3.3.13
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 10.4.1
+        version: 9.3.1
       diff:
         specifier: catalog:dev
         version: 9.0.0
