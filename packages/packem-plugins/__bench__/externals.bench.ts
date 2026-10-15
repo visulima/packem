@@ -1,5 +1,5 @@
 import type { InputOptions } from "rollup";
-import { bench, describe } from "vitest";
+import { test } from "vitest";
 
 import { externalsPlugin } from "../src/plugins/externals";
 
@@ -83,19 +83,19 @@ for (let index = 0; index < 200; index++) {
     edges.push([`./relative-${index}.ts`, `/project/src/rel-${index}.ts`]);
 }
 
-describe("externalsPlugin options.external over a large import graph", () => {
-    bench("resolve external decision for ~1000 distinct import edges", () => {
+test("externalsPlugin options.external over a large import graph", { timeout: 0 }, async ({ bench }) => {
+    await bench("resolve external decision for ~1000 distinct import edges", () => {
         const external = getExternalFn();
 
         for (const [id, importer] of edges) {
             external(id, importer);
         }
-    });
+    }).run();
 });
 
 // Micro-benchmark isolating the two patterns the optimization replaced, so the win
 // is directly measurable regardless of surrounding plugin overhead.
-describe("hot-path micro patterns", () => {
+test("hot-path micro patterns", { timeout: 0 }, async ({ bench }) => {
     const patternSet = new Set<RegExp>();
 
     for (let index = 0; index < 60; index++) {
@@ -105,18 +105,6 @@ describe("hot-path micro patterns", () => {
     const patternArray = [...patternSet];
     const probe = "lib-59/sub/path";
 
-    bench("isIncluded BEFORE: [...set].some(rx.test)", () => {
-        for (let index = 0; index < 1000; index++) {
-            [...patternSet].some((rx) => rx.test(probe));
-        }
-    });
-
-    bench("isIncluded AFTER: prebuilt array.some(rx.test)", () => {
-        for (let index = 0; index < 1000; index++) {
-            patternArray.some((rx) => rx.test(probe));
-        }
-    });
-
     const deps = makeDeps("dep", 120);
     const devDeps = makeDeps("dev", 120);
     const peerDeps = makeDeps("peer", 40);
@@ -124,19 +112,30 @@ describe("hot-path micro patterns", () => {
     const declaredSet = new Set<string>([...Object.keys(deps), ...Object.keys(devDeps), ...Object.keys(peerDeps), ...Object.keys(optDeps)]);
     const name = "peer-pkg-39";
 
-    bench("declared BEFORE: 4x Object.keys().includes", () => {
-        for (let index = 0; index < 1000; index++) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            Object.keys(deps).includes(name)
-                || Object.keys(devDeps).includes(name)
-                || Object.keys(peerDeps).includes(name)
-                || Object.keys(optDeps).includes(name);
-        }
-    });
-
-    bench("declared AFTER: Set.has", () => {
-        for (let index = 0; index < 1000; index++) {
-            declaredSet.has(name);
-        }
-    });
+    await bench.compare(
+        bench("isIncluded BEFORE: [...set].some(rx.test)", () => {
+            for (let index = 0; index < 1000; index++) {
+                [...patternSet].some((rx) => rx.test(probe));
+            }
+        }),
+        bench("isIncluded AFTER: prebuilt array.some(rx.test)", () => {
+            for (let index = 0; index < 1000; index++) {
+                patternArray.some((rx) => rx.test(probe));
+            }
+        }),
+        bench("declared BEFORE: 4x Object.keys().includes", () => {
+            for (let index = 0; index < 1000; index++) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                Object.keys(deps).includes(name)
+                    || Object.keys(devDeps).includes(name)
+                    || Object.keys(peerDeps).includes(name)
+                    || Object.keys(optDeps).includes(name);
+            }
+        }),
+        bench("declared AFTER: Set.has", () => {
+            for (let index = 0; index < 1000; index++) {
+                declaredSet.has(name);
+            }
+        }),
+    );
 });

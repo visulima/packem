@@ -1,4 +1,4 @@
-import { bench, describe } from "vitest";
+import { test } from "vitest";
 
 import type { DtsMap, TsModule } from "../src/generate";
 
@@ -35,19 +35,20 @@ const recomputeEntries = (dtsMap: DtsMap): string[] => [...dtsMap.values()].filt
 const readEntries = (entryIds: Set<string>): string[] => [...entryIds];
 
 for (const moduleCount of [100, 500]) {
-    describe(`tsc load entries (${moduleCount} modules, one load per module)`, () => {
+    test(`tsc load entries (${moduleCount} modules, one load per module)`, { timeout: 0 }, async ({ bench }) => {
         const { dtsMap, entryIds } = buildFixture(moduleCount);
 
-        bench("before: recompute entries from dtsMap per load (O(n^2))", () => {
-            for (let index = 0; index < moduleCount; index++) {
-                recomputeEntries(dtsMap);
-            }
-        });
-
-        bench("after: read maintained entryIds Set per load (O(n))", () => {
-            for (let index = 0; index < moduleCount; index++) {
-                readEntries(entryIds);
-            }
-        });
+        await bench.compare(
+            bench("before: recompute entries from dtsMap per load (O(n^2))", () => {
+                for (let index = 0; index < moduleCount; index++) {
+                    recomputeEntries(dtsMap);
+                }
+            }),
+            bench("after: read maintained entryIds Set per load (O(n))", () => {
+                for (let index = 0; index < moduleCount; index++) {
+                    readEntries(entryIds);
+                }
+            }),
+        );
     });
 }

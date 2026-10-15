@@ -135,8 +135,8 @@ catalogs:
       specifier: 0.153.0
       version: 0.153.0
     p-queue:
-      specifier: 9.3.4
-      version: 9.3.4
+      specifier: 9.3.5
+      version: 9.3.5
     picocolors:
       specifier: ^1.1.1
       version: 1.1.1
@@ -336,8 +336,8 @@ catalogs:
       specifier: 0.153.0
       version: 0.153.0
     p-queue:
-      specifier: 9.3.4
-      version: 9.3.4
+      specifier: 9.3.5
+      version: 9.3.5
     picomatch:
       specifier: 4.0.7
       version: 4.0.7
@@ -601,7 +601,7 @@ overrides:
   brace-expansion@<5.0.12: '>=5.0.12 <6'
   smol-toml@<1.7.1: '>=1.7.1 <2'
   browserslist@<4.28.7: '>=4.29.3'
-  chrono-node@<2.2.4: '>=2.10.2'
+  chrono-node@<2.2.4: '>=2.10.3'
   defu@<6.1.5: '>=6.1.7'
   devalue@>=5.0.0 <5.8.1: '>=6.0.2'
   diff@>=5.0.0 <5.2.2: '>=9.0.0'
@@ -2747,7 +2747,7 @@ importers:
         version: 4.1.1
       p-queue:
         specifier: catalog:dev
-        version: 9.3.4
+        version: 9.3.5
       prettier:
         specifier: catalog:lint
         version: 3.9.10
@@ -2945,7 +2945,7 @@ importers:
         version: 7.1.0
       p-queue:
         specifier: catalog:dev
-        version: 9.3.4
+        version: 9.3.5
       picocolors:
         specifier: catalog:dev
         version: 1.1.1
@@ -2984,7 +2984,7 @@ importers:
         version: 11.24.2
       p-queue:
         specifier: catalog:prod
-        version: 9.3.4
+        version: 9.3.5
       source-map-js:
         specifier: catalog:prod
         version: 1.2.2
@@ -14351,8 +14351,8 @@ packages:
     resolution: {integrity: sha512-POWdiIPmsUPGwb4FeQ4OBg46aqmcInSWe45CKDsGHiOBiVQM9chqfQTuqhuTzcg2Vz9faTI65at0KkVyVEiCHw==}
     engines: {node: '>=20'}
 
-  p-queue@9.3.4:
-    resolution: {integrity: sha512-bpTeG3CuPiOgPcDqn51QUsRYshkiKiaG+hP49tCGI0+nT92h7rqD4LPKZzP8kwab/OniQf+ntA4ta6yCp1eA0Q==}
+  p-queue@9.3.5:
+    resolution: {integrity: sha512-Lki/zhXFVmDhesBUn/yHRLW9Bte7mE7xoFHzTR8sIomV7a2z+LxYAPkGvdfidNiu4fKSfjtawixxSHcZci5QcQ==}
     engines: {node: '>=20'}
 
   p-reduce@3.0.0:
@@ -29994,7 +29994,7 @@ snapshots:
       eventemitter3: 5.0.4
       p-timeout: 7.0.2
 
-  p-queue@9.3.4:
+  p-queue@9.3.5:
     dependencies:
       eventemitter3: 5.0.4
       p-timeout: 7.0.2

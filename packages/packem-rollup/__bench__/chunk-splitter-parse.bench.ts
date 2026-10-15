@@ -1,6 +1,6 @@
 import type { ModuleInfo, PluginContext } from "rollup";
 import { parseAst } from "rollup/parseAst";
-import { bench, describe } from "vitest";
+import { test } from "vitest";
 
 import gatherExports from "../src/plugins/chunk-splitter/gather";
 import parseExports from "../src/plugins/chunk-splitter/parse";
@@ -71,36 +71,37 @@ const drain = async (iterable: AsyncGenerator<unknown>): Promise<void> => {
     }
 };
 
-describe("chunk-splitter parseExports memoization (barrel diamond)", () => {
+test("chunk-splitter parseExports memoization (barrel diamond)", { timeout: 0 }, async ({ bench }) => {
     const context = buildContext(parseAst);
 
-    bench("optimized: memoized parse (shared module parsed once)", () => {
-        const cache = new Map<string, ParsedExportInfo[]>();
+    await bench.compare(
+        bench("optimized: memoized parse (shared module parsed once)", () => {
+            const cache = new Map<string, ParsedExportInfo[]>();
 
-        // Each shared leaf is reached through every mid barrel: simulate the
-        // diamond by parsing each leaf once per path, but with the per-id memo.
-        for (let path = 0; path < MID_BARREL_COUNT; path += 1) {
-            for (const id of sharedLeafIds) {
-                parseExports(context, modules.get(id) as ModuleInfo, cache);
+            // Each shared leaf is reached through every mid barrel: simulate the
+            // diamond by parsing each leaf once per path, but with the per-id memo.
+            for (let path = 0; path < MID_BARREL_COUNT; path += 1) {
+                for (const id of sharedLeafIds) {
+                    parseExports(context, modules.get(id) as ModuleInfo, cache);
+                }
             }
-        }
-    });
-
-    bench("baseline: no memo (re-parse on every path)", () => {
-        // Same traversal, but no cache -> each shared leaf is re-parsed on every
-        // path (MID_BARREL_COUNT times), reproducing the pre-optimization cost.
-        for (let path = 0; path < MID_BARREL_COUNT; path += 1) {
-            for (const id of sharedLeafIds) {
-                parseExports(context, modules.get(id) as ModuleInfo);
+        }),
+        bench("baseline: no memo (re-parse on every path)", () => {
+            // Same traversal, but no cache -> each shared leaf is re-parsed on every
+            // path (MID_BARREL_COUNT times), reproducing the pre-optimization cost.
+            for (let path = 0; path < MID_BARREL_COUNT; path += 1) {
+                for (const id of sharedLeafIds) {
+                    parseExports(context, modules.get(id) as ModuleInfo);
+                }
             }
-        }
-    });
+        }),
+    );
 });
 
-describe("chunk-splitter gatherExports end-to-end (barrel diamond)", () => {
-    bench("optimized: full gather over diamond barrel", async () => {
+test("chunk-splitter gatherExports end-to-end (barrel diamond)", { timeout: 0 }, async ({ bench }) => {
+    await bench("optimized: full gather over diamond barrel", async () => {
         const context = buildContext(parseAst);
 
         await drain(gatherExports(context, topBarrel));
-    });
+    }).run();
 });

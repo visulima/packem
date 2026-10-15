@@ -1,5 +1,5 @@
 import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
-import { bench, describe } from "vitest";
+import { test } from "vitest";
 
 import type { BuildOutputItem } from "../src/utils/collect-build-entries";
 import { collectBuildEntries } from "../src/utils/collect-build-entries";
@@ -63,15 +63,16 @@ for (const [entryCount, importsPerEntry] of [
     [200, 20],
     [500, 30],
 ] as const) {
-    describe(`collectBuildEntries (${entryCount} entries, ${importsPerEntry} imports/entry)`, () => {
+    test(`collectBuildEntries (${entryCount} entries, ${importsPerEntry} imports/entry)`, { timeout: 0 }, async ({ bench }) => {
         const output = makeOutput(entryCount, importsPerEntry);
 
-        bench("before (.some scan)", () => {
-            collectBuildEntriesBaseline(output, makeContext(), new Map());
-        });
-
-        bench("after (Set lookup)", () => {
-            collectBuildEntries(output, makeContext(), new Map());
-        });
+        await bench.compare(
+            bench("before (.some scan)", () => {
+                collectBuildEntriesBaseline(output, makeContext(), new Map());
+            }),
+            bench("after (Set lookup)", () => {
+                collectBuildEntries(output, makeContext(), new Map());
+            }),
+        );
     });
 }

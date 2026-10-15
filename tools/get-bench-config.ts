@@ -29,6 +29,13 @@ export const getBenchConfig = (options: ViteUserConfig = {}) =>
             // blows past Vitest's 10s hook default in CI and surfaces as a hook
             // timeout rather than as the slow instrumentation it is.
             hookTimeout: 300_000,
+            // Vitest 5 runs benchmarks inside a `test()`, so this now bounds the
+            // benchmarks themselves, where before it only bounded tests. The bench
+            // project vitest derives from this config also clamps the value up to a
+            // 60s floor, so a bench that legitimately runs for minutes has to opt out
+            // per test with `{ timeout: 0 }`; several minutes is normal here (the tsc
+            // resolver bench re-parses the tsconfig per call), and pre-5 benchmarks had
+            // no wall clock deadline at all.
             testTimeout: 300_000,
             ...options.test,
             benchmark: {
