@@ -1,3 +1,83 @@
+## @visulima/packem [3.0.0](https://github.com/visulima/packem/compare/@visulima/packem@2.1.0...@visulima/packem@3.0.0) (2026-10-15)
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** updated dependencies to major versions
+
+* chore(deps): update dependency devalue@>=5.0.0 <5.8.1 to v6
+* **deps:** updated dependencies to major versions
+
+* fix(deps): update minor updates
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* chore: wip before merging renovate/patch-vue-language-tools-monorepo
+
+* fix(deps): align @vitest/coverage-v8 with vitest 4 (catalog and lockfile)
+* **deps:** updated dependencies to major versions
+
+* fix(deps): update dependency @rspack/core to ^2.2.2
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* fix(deps): update dependency nx to v23.1.3
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* chore(deps): lockfile maintenance
+
+### Features
+
+* **packem:** pkg-style standalone executables for the `exe` option ([#302](https://github.com/visulima/packem/issues/302)) ([f666694](https://github.com/visulima/packem/commit/f6666942002e944da2c1c252e53a6d565d00ec95))
+* TypeScript 7 support, custom languages, check mode and declaration bundling fixes ([#365](https://github.com/visulima/packem/issues/365)) ([be9800c](https://github.com/visulima/packem/commit/be9800ca5f3e55388fe08eae33a9feb82d58775a))
+
+### Bug Fixes
+
+* **deps:** align @vitest/coverage-v8 with vitest v4 and refresh ecosystem snapshots ([af90f0a](https://github.com/visulima/packem/commit/af90f0a2ef538efba9c14add5d0992f18eb6748e))
+* **deps:** combine open Renovate updates ([#335](https://github.com/visulima/packem/issues/335)) ([2f59d60](https://github.com/visulima/packem/commit/2f59d60c2abb5c5414fdca086309a665853516a2))
+* **deps:** combine open Renovate updates ([#336](https://github.com/visulima/packem/issues/336)) ([617408c](https://github.com/visulima/packem/commit/617408cd10f5a69cfc56e3ae8a2a67c40c836dd4)), closes [#330](https://github.com/visulima/packem/issues/330) [#324](https://github.com/visulima/packem/issues/324) [#323](https://github.com/visulima/packem/issues/323) [#322](https://github.com/visulima/packem/issues/322)
+* **deps:** update dependency @swc/core to >=1.16.1 ([#286](https://github.com/visulima/packem/issues/286)) ([e1c693c](https://github.com/visulima/packem/commit/e1c693c95a4bf181f3c6ed65628589e831d9cd22))
+* **deps:** update patch updates ([a2ee146](https://github.com/visulima/packem/commit/a2ee146d6e546c29c5351fb44324b38782349a34))
+* **deps:** update style tools ([32ea76d](https://github.com/visulima/packem/commit/32ea76dde651ac699272169d2dfc1b6b2597f2a4))
+* follow-ups for the combined dependency update ([#325](https://github.com/visulima/packem/issues/325)) ([#326](https://github.com/visulima/packem/issues/326)) ([3fb2cda](https://github.com/visulima/packem/commit/3fb2cda19d988403c053bc868dd742bdf86da1f3))
+* migrate benchmarks to the vitest 5 API (+ the last two Renovate patches) ([#376](https://github.com/visulima/packem/issues/376)) ([5ae8eca](https://github.com/visulima/packem/commit/5ae8eca327db242651bd3d2d7495a13ff2d7a808))
+* **packem:** satisfy no-generated-empty-object-type on DeepPartial ([9c58716](https://github.com/visulima/packem/commit/9c58716b65f0709aff2a9f8071694cdfdadcd8a3))
+
+### Miscellaneous Chores
+
+* **deps:** combine all pending renovate updates ([#301](https://github.com/visulima/packem/issues/301)) ([05c50b0](https://github.com/visulima/packem/commit/05c50b087cfe4a7be2841d87fb1c34ab1d85a5e1))
+* **deps:** combine open Renovate dependency updates ([#325](https://github.com/visulima/packem/issues/325)) ([e868152](https://github.com/visulima/packem/commit/e8681525470c002dca1e925c743f3a23a417b830))
+* **deps:** combine open Renovate updates (6 PRs) ([#370](https://github.com/visulima/packem/issues/370)) ([0674003](https://github.com/visulima/packem/commit/067400376b90c3ffeab0cd756a4a8f881b5d8946))
+* **deps:** combine open Renovate updates into renovate/combined ([7a3e0b4](https://github.com/visulima/packem/commit/7a3e0b41a7ccd6000e0f2efeedf841bcc56a0853))
+* **deps:** consolidate pending dependency updates ([#307](https://github.com/visulima/packem/issues/307)) ([e7abfa4](https://github.com/visulima/packem/commit/e7abfa42a56e1b427d64fe695854f1616ed81306))
+* **deps:** merge renovate branch patch-style-tools ([f1cb141](https://github.com/visulima/packem/commit/f1cb14145af01cdb2258717c35f16c1b255dc9a9))
+
+### Tests
+
+* **packem:** refresh rolldown integration snapshots ([b7e23e9](https://github.com/visulima/packem/commit/b7e23e92f6ad9857a7ebd7fea8dbab07c71f2a65))
+* **packem:** regenerate rolldown snapshots ([#304](https://github.com/visulima/packem/issues/304)) ([e63614a](https://github.com/visulima/packem/commit/e63614a76b6eade4dd74cfc639f3538b9fea096f))
+* refresh stale snapshots for ci ([b9546a5](https://github.com/visulima/packem/commit/b9546a518244636d3c25ab441c80a070a7f8b15b))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.1.0
+* **@visulima/rollup-plugin-css:** upgraded to 2.0.0
+* **@visulima/rollup-plugin-dts:** upgraded to 1.1.0
+* **@visulima/packem-rollup:** upgraded to 1.2.0
+* **@babel/core:** 8.0.1 → 8.0.7
+* **oxc-parser:** 0.147.0 → 0.153.0
+* **oxc-transform:** 0.147.0 → 0.153.0
+* **rs-module-lexer:** 2.8.0 → 2.9.0
+* **browserslist:** 4.28.8 → 4.29.3
+* **@antfu/install-pkg:** 2.0.1 → 2.1.0
+* **@clack/prompts:** 1.7.0 → 1.8.1
+* **tinyexec:** 1.3.0 → 1.3.1
+* **package-manager-detector:** ^1.8.0 → ^1.9.0
+* **cjs-module-lexer:** 2.2.1 → 2.3.0
+* **hookable:** 6.1.1 → 6.1.2
+* **html-minifier-next:** 8.3.0 → 8.10.7
+
 ## @visulima/packem [2.1.0](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0...@visulima/packem@2.1.0) (2026-09-06)
 
 ### Features
