@@ -1348,7 +1348,7 @@ exports[`packem ecosystem > should work with provided 'sitefetch' ecosystem suit
 import path from 'node:path';
 import fs from 'node:fs';
 import { encode } from 'gpt-tokenizer/model/gpt-4o';
-import { l as logger, f as fetchSite, e as ensureArray, a as formatNumber, s as serializePages } from './packem_shared/index-DVeONkvY.js';
+import { l as logger, f as fetchSite, e as ensureArray, a as formatNumber, s as serializePages } from './packem_shared/index-DCeiqxWS.js';
 
 function toArr(any) {
   return any == null ? [] : Array.isArray(any) ? any : [any];
@@ -1498,7 +1498,7 @@ function setDotProp(obj, keys, val) {
   }
 }
 function setByType(obj, transforms) {
-  for (const [key, transform] of Object.entries(transforms)) if (transform.shouldTransform) {
+  for (const [key, transform] of Object.entries(transforms)) if (transform.shouldTransform && key in obj) {
     obj[key] = [obj[key]].flat();
     if (typeof transform.transformFunction === "function") obj[key] = obj[key].map(transform.transformFunction);
   }
@@ -1551,7 +1551,6 @@ var Option = class {
     else this.isBoolean = true;
   }
 };
-let runtimeProcessArgs;
 let runtimeInfo;
 {
   let runtimeName;
@@ -1559,7 +1558,9 @@ let runtimeInfo;
   else if (typeof Bun !== "undefined" && typeof Bun.version === "string") runtimeName = "bun";
   else runtimeName = "node";
   runtimeInfo = \`\${process.platform}-\${process.arch} \${runtimeName}-\${process.version}\`;
-  runtimeProcessArgs = process.argv;
+}
+function getRuntimeProcessArgs() {
+  return process.argv;
 }
 var Command = class {
   rawName;
@@ -1863,6 +1864,7 @@ var CAC = class extends EventTarget {
   */
   parse(argv, { run = true } = {}) {
     if (!argv) {
+      const runtimeProcessArgs = getRuntimeProcessArgs();
       if (!runtimeProcessArgs) throw new Error("No argv provided and runtime process argv is not available.");
       argv = runtimeProcessArgs;
     }
@@ -2038,7 +2040,7 @@ declare function fetchSite(url: string, options: Options): Promise<FetchSiteResu
 declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 export { fetchSite, serializePages };
 ",
-  "export { f as fetchSite, s as serializePages } from './packem_shared/index-DVeONkvY.js';
+  "export { f as fetchSite, s as serializePages } from './packem_shared/index-DCeiqxWS.js';
 import 'happy-dom';
 import 'cheerio';
 ",
@@ -2612,8 +2614,8 @@ class PQueue extends EventEmitter {
         if (canInitializeInterval) {
           this.#initializeIntervalIfNeeded();
         }
-        this.emit("active");
         job();
+        this.emit("active");
         taskStarted = true;
       }
     }
