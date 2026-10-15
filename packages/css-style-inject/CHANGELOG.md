@@ -1,3 +1,14 @@
+## @visulima/css-style-inject [1.1.0](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.1...@visulima/css-style-inject@1.1.0) (2026-10-15)
+
+### Features
+
+* **packem:** pkg-style standalone executables for the `exe` option ([#302](https://github.com/visulima/packem/issues/302)) ([f666694](https://github.com/visulima/packem/commit/f6666942002e944da2c1c252e53a6d565d00ec95))
+
+### Bug Fixes
+
+* follow-ups for the combined dependency update ([#325](https://github.com/visulima/packem/issues/325)) ([#326](https://github.com/visulima/packem/issues/326)) ([3fb2cda](https://github.com/visulima/packem/commit/3fb2cda19d988403c053bc868dd742bdf86da1f3))
+* migrate benchmarks to the vitest 5 API (+ the last two Renovate patches) ([#376](https://github.com/visulima/packem/issues/376)) ([5ae8eca](https://github.com/visulima/packem/commit/5ae8eca327db242651bd3d2d7495a13ff2d7a808))
+
 ## @visulima/css-style-inject [1.0.1](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0...@visulima/css-style-inject@1.0.1) (2026-09-06)
 
 ### Bug Fixes
