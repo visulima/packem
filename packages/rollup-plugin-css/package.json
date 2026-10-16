@@ -150,7 +150,7 @@
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",
-        "cssnano": ">=9.7.0",
+        "cssnano": ">=9.8.0",
         "eslint": "catalog:lint",
         "icss-utils": "catalog:style",
         "less": "catalog:style",
