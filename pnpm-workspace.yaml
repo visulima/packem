@@ -115,7 +115,7 @@ catalogs:
   lint:
     "@anolilab/commitlint-config": 10.1.5
     "@anolilab/eslint-config": 30.0.4
-    "@anolilab/lint-staged-config": 12.0.3
+    "@anolilab/lint-staged-config": 13.0.0
     "@anolilab/prettier-config": 10.0.3
     "@anolilab/textlint-config": 13.0.6
     "@commitlint/cli": 21.2.2
