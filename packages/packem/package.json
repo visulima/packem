@@ -270,7 +270,7 @@
         "babel-plugin-transform-hook-names": "catalog:dev",
         "conventional-changelog-conventionalcommits": "catalog:dev",
         "cross-env": "catalog:node",
-        "cssnano": ">=9.7.0",
+        "cssnano": ">=9.8.0",
         "deeks": "catalog:dev",
         "detect-indent": "catalog:dev",
         "esbuild": "catalog:build",
