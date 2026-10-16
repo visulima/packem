@@ -17,6 +17,8 @@ export default defineConfig({
             // against this rollup port. Tracked separately — not a missing dir.
             "**/__tests__/rollup-plugin-dts.test.ts",
         ],
-        testTimeout: 30_000,
+        // Volar/`vue-tsc` custom-language builds run a full TS program per case and
+        // exceed 30s on slower CI runners (they were already near the old limit).
+        testTimeout: 120_000,
     },
 });

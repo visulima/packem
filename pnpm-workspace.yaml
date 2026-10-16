@@ -57,9 +57,9 @@ catalogs:
     unplugin-vue: 7.2.0
     vite: 8.2.2
   cli:
-    "@anolilab/multi-semantic-release": 4.4.23
-    "@anolilab/semantic-release-pnpm": 8.1.32
-    "@anolilab/semantic-release-preset": 13.4.34
+    "@anolilab/multi-semantic-release": 4.4.24
+    "@anolilab/semantic-release-pnpm": 8.1.33
+    "@anolilab/semantic-release-preset": 13.4.35
     commitizen: ^4.3.2
     semantic-release: 25.0.9
   dev:
@@ -67,8 +67,8 @@ catalogs:
     "@babel/core": 8.0.7
     "@babel/parser": 8.0.7
     "@mozilla/readability": ^0.6.0
-    "@oxc-parser/binding-linux-x64-gnu": 0.153.0
-    "@oxc-project/types": 0.153.0
+    "@oxc-parser/binding-linux-x64-gnu": 0.154.0
+    "@oxc-project/types": 0.154.0
     "@svgr/core": ^8.1.0
     "@swc/core": 1.16.18
     "@swc/helpers": 0.5.23
@@ -84,8 +84,8 @@ catalogs:
     lit: 3.3.3
     mime: ^4.1.1
     nodehun: ^3.0.2
-    oxc-parser: 0.153.0
-    oxc-transform: 0.153.0
+    oxc-parser: 0.154.0
+    oxc-transform: 0.154.0
     p-queue: 9.3.5
     package-manager-detector: ^1.9.0
     picocolors: ^1.1.1
@@ -109,13 +109,13 @@ catalogs:
     react: 19.3.0
     react-dom: 19.3.0
     svelte: 5.57.2
-    vue: 3.5.42
+    vue: 3.5.44
   icons:
-    lucide-static: 1.55.0
+    lucide-static: 1.56.0
   lint:
     "@anolilab/commitlint-config": 10.1.5
-    "@anolilab/eslint-config": 30.0.4
-    "@anolilab/lint-staged-config": 12.0.3
+    "@anolilab/eslint-config": 30.0.6
+    "@anolilab/lint-staged-config": 13.0.0
     "@anolilab/prettier-config": 10.0.3
     "@anolilab/textlint-config": 13.0.6
     "@commitlint/cli": 21.2.2
@@ -146,7 +146,7 @@ catalogs:
     cac: 7.1.0
     cross-env: ^10.1.0
     dts-resolver: 3.0.0
-    execa: ^10.1.0
+    execa: ^10.1.1
     glob-parent: 6.0.2
     oxc-resolver: 11.24.2
     pkg-pr-new: 0.0.91
@@ -167,12 +167,12 @@ catalogs:
     gpt-tokenizer: ^4.0.0
     happy-dom: 20.14.6
     hookable: 6.1.2
-    html-minifier-next: 8.10.7
+    html-minifier-next: 8.10.8
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.2
     obug: 2.2.1
-    oxc-parser: 0.153.0
+    oxc-parser: 0.154.0
     p-queue: 9.3.5
     picomatch: 4.0.7
     plop: 4.0.5
@@ -201,7 +201,7 @@ catalogs:
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.0-alpha.15
     clean-css: ^5.3.3
-    cssnano: 9.7.0
+    cssnano: 9.8.0
     icss-utils: ^5.1.0
     less: 4.9.1
     lightningcss: 1.33.0
@@ -478,7 +478,7 @@ auditConfig:
     - GHSA-238p-pmpm-9mq7
 
 overrides:
-  '@hono/node-server@<2.0.10': ">=2.1.4"
+  '@hono/node-server@<2.0.10': ">=2.1.5"
   ajv@>=7.0.0 <8.18.0: ">=8.20.0"
   axios@>=1.0.0 <1.18.0: ">=1.20.0"
   # nx pins axios@1.18.1 exactly, so this range has to cover it too.
@@ -509,7 +509,7 @@ overrides:
   lodash@<4.18.0: ">=4.18.0"
   lodash-es@<4.18.0: ">=4.18.0"
   markdown-it@<14.2.0: ">=15.0.2"
-  minimatch@<3.1.4: ">=5.1.9"
+  minimatch@<3.1.4: ">=7.4.9"
   minimatch@>=5.0.0 <5.1.8: ">=5.1.9"
   minimatch@>=9.0.0 <9.0.7: ">=9.0.9"
   minimatch@>=10.0.0 <10.2.3: ">=10.2.6"
