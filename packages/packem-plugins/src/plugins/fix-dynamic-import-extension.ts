@@ -1,4 +1,4 @@
-import { MagicString } from "magic-string";
+import MagicString from "magic-string";
 import type { NormalizedOutputOptions, Plugin, RenderedChunk } from "rollup";
 
 const fixDynamicImportExtension = (): Plugin =>

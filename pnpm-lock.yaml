@@ -549,8 +549,8 @@ catalogs:
       specifier: 6.1.7
       version: 6.1.7
     magic-string:
-      specifier: 1.4.3
-      version: 1.4.3
+      specifier: 0.30.21
+      version: 0.30.21
     semver:
       specifier: 7.8.5
       version: 7.8.5
@@ -2003,7 +2003,7 @@ importers:
         version: 2.7.0
       magic-string:
         specifier: catalog:utils
-        version: 1.4.3
+        version: 0.30.21
       mime:
         specifier: catalog:dev
         version: 4.1.1
@@ -2364,7 +2364,7 @@ importers:
         version: 8.10.8(@swc/core@1.16.18(@swc/helpers@0.5.23))
       magic-string:
         specifier: catalog:utils
-        version: 1.4.3
+        version: 0.30.21
       mime:
         specifier: catalog:dev
         version: 4.1.1
@@ -2632,7 +2632,7 @@ importers:
         version: 8.10.8(@swc/core@1.16.18(@swc/helpers@0.5.23))
       magic-string:
         specifier: catalog:utils
-        version: 1.4.3
+        version: 0.30.21
       oxc-resolver:
         specifier: catalog:node
         version: 11.24.2
@@ -3170,7 +3170,7 @@ importers:
         version: 3.2.12(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)(smol-toml@1.9.1)
       magic-string:
         specifier: catalog:utils
-        version: 1.4.3
+        version: 0.30.21
       obug:
         specifier: catalog:prod
         version: 2.2.1
@@ -5560,6 +5560,7 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@oxc-parser/binding-linux-x64-musl@0.140.0':
     resolution: {integrity: sha512-xRqpeI8U2sQQS1W5BMWRyMTxtagkuLG2dEWruet5lFsWHTvBth11/TpSaJatHdqVVwHN0q3uuoS9zRsGinq8hg==}

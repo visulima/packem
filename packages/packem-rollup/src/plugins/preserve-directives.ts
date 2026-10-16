@@ -11,7 +11,7 @@ import { createFilter } from "@rollup/pluginutils";
 // `SourceMapInput` still demands `string[]`, so rollup's map type no longer satisfies
 // the hooks that return it. magic-string's map is what we actually produce here.
 import type { SourceMap } from "magic-string";
-import { MagicString } from "magic-string";
+import MagicString from "magic-string";
 import type { Plugin } from "rollup";
 
 type PreserveDirectivesPluginOptions = {

@@ -268,7 +268,7 @@ catalogs:
     # magic-string 1 changed the SourceMap type in a way rollup's SourceMapInput no
     # longer accepts, so every renderChunk/transform hook returning a generated map
     # stops typechecking. Hold 0.30 until rollup's types catch up.
-    magic-string: 1.4.3
+    magic-string: 0.30.21
     semver: 7.8.5
   visulima:
     "@visulima/cerebro": 3.1.0

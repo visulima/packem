@@ -1,7 +1,7 @@
 import type { Node, ObjectExpression, Property } from "estree";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { walk } from "estree-walker";
-import { MagicString } from "magic-string";
+import MagicString from "magic-string";
 import type { Plugin } from "rollup";
 
 interface PropertyLiteralValue extends Property {

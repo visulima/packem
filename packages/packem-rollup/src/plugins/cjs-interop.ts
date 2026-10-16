@@ -1,5 +1,5 @@
 import type { Node } from "estree";
-import { MagicString } from "magic-string";
+import MagicString from "magic-string";
 import type { NormalizedOutputOptions, Plugin, ProgramNode, RenderedChunk, SourceMapInput } from "rollup";
 
 // Cheap gate: only bother parsing when the chunk plausibly assigns to
