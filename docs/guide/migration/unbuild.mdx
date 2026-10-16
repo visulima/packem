@@ -171,7 +171,7 @@ Once `packem build` produces the same `dist/`, remove `build.config.ts`.
 ## Gotchas
 
 - **A transformer is required.** unbuild picks its compiler for you; Packem makes it an explicit choice under the default Rollup backend. Add `transformer` to your config or the build will refuse to run.
-- **`emitCJS` → export conditions.** There is no `emitCJS` flag. Dual output comes from having both `import` and `require` conditions (or `.mjs`/`.cjs` extensions) in `package.json`.
+- **`emitCJS` → export conditions.** Prefer dual output from having both `import` and `require` conditions (or `.mjs`/`.cjs` extensions) in `package.json`. The `emitCJS`/`emitESM` config options exist but only matter with manual `entries`, which disable package.json inference.
 - **mkdist becomes `unbundle`.** If you used the mkdist builder for unbundled, directory-preserving output, switch to `unbundle: true` rather than expecting a bundled single file.
 - **Inlining dependencies is opt-in.** unbuild's `inlineDependencies` has no single equivalent — declared deps are external by default; use `--no-external` to inline everything, or curate `externals`.
 - **Config conversion is manual.** `packem migrate` rewrites `package.json` only and warns about `build.config.*`. Translate the config yourself using the table above.

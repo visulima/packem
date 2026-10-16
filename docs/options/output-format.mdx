@@ -7,9 +7,10 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 # Output Format
 
-Packem produces two module formats: **ESM** and **CJS**. You do not select them with a
-config option — Packem derives them from your `package.json`, along with the entry points
-and file names that go with them.
+Packem produces two module formats: **ESM** and **CJS**. Normally you do not select them
+with a config option — Packem derives them from your `package.json`, along with the entry
+points and file names that go with them. The one exception is manual `entries`, covered
+in [Manual entries](#manual-entries) below.
 
 <Callout type="warn">
 Browser global formats (IIFE, UMD) are **not supported**. See
@@ -69,6 +70,33 @@ ambiguous extensions through `type`:
 Because the format follows the file that will actually be published, the output does not
 drift from what consumers resolve. The one way to break that correspondence is to override
 `rollup.output.format` yourself — see [Browser globals](#browser-globals).
+
+## Manual entries \{#manual-entries}
+
+Setting `entries` in `packem.config.ts` disables package.json detection entirely — entry
+points *and* formats. Each manual entry needs its format set explicitly, with `esm: true`
+or `cjs: true` on the entry, or globally with the `emitESM`/`emitCJS` options:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  entries: [
+    { input: './src/index.ts', esm: true },
+  ],
+})
+```
+
+An entry with neither flag produces no output, and the build fails with a warning:
+
+```
+Entry `./src/index.ts` has neither `esm` nor `cjs` enabled and will not be built.
+```
+
+If you would rather not set formats by hand, drop the `entries` option and let Packem
+infer both from `package.json` — see [Entry Points](/docs/options/entry).
 
 ## File extensions
 
@@ -190,6 +218,12 @@ disagree. Check that `require` points at `.cjs` (or a `.js` under
 **A path in `exports` has no output.** The build only produces what `package.json`
 asks for. If a condition names a file Packem never generated, the validator lists it
 with the nearest actual output — usually a typo or a stale path from a previous setup.
+
+**Empty `dist/`, with "Emitting of ESM bundles is disabled." in the log.** Packem found
+no format to emit. Either `package.json` is missing the `exports`, `main`, `module`, or
+`bin` fields that name your future `dist/` files, or `entries` is set manually — manual
+entries skip package.json inference and need `esm: true`/`cjs: true` on the entry (or
+`emitESM`/`emitCJS` in the config). See [Manual entries](#manual-entries).
 
 **Types resolve differently from code.** Run
 [`are-the-types-wrong`](/docs/options/declaration-files) to check declarations against

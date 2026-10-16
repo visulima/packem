@@ -112,6 +112,14 @@ export default defineConfig({
 
 You can override automatic detection by specifying entries in your configuration file:
 
+<Callout type="warn">
+Setting `entries` disables automatic detection entirely — including output-format
+inference. Packem then emits only what the entries ask for. Set `esm: true` or
+`cjs: true` on each entry (or `emitESM`/`emitCJS` in the config), otherwise the entry
+produces no output and the build fails with a warning. See
+[Output Format](/docs/options/output-format).
+</Callout>
+
 ### Simple String Entries
 
 ```typescript

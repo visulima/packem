@@ -227,6 +227,8 @@ Run `npm run build` and you are done.
 
 **Entry points not found** — Make sure your `package.json` has `exports`, `main`, or `module` fields and that the matching source files exist in `src/`.
 
+**Empty `dist/` folder** — Packem found no output format to emit. Check that you have not set `entries` manually in `packem.config.ts`: manual entries disable the format inference from `package.json` and need `esm: true` or `cjs: true` on each entry. See [Output Format](/docs/options/output-format).
+
 **TypeScript errors** — Verify you have a valid `tsconfig.json` and TypeScript installed.
 
 **Build failing** — Run `packem build --verbose` for detailed error output.
