@@ -24,6 +24,6 @@ jobs:
             contents: "read"
             issues: "write" # to create the labels
             pull-requests: "write" # to read the files and apply the label
-        uses: "anolilab/workflows/.github/workflows/pr-size.yml@fb7a881926480723026a1deaa587ceaaaee7bf12" # v24.2.0
+        uses: "anolilab/workflows/.github/workflows/pr-size.yml@0a348c10fd46706cc591705d46816be19be89c3a" # v24.2.1
         with:
             target-repo: "visulima/packem"
