@@ -1,3 +1,18 @@
+## @visulima/packem [3.0.1](https://github.com/visulima/packem/compare/@visulima/packem@3.0.0...@visulima/packem@3.0.1) (2026-10-16)
+
+### Bug Fixes
+
+* **packem:** fail the build when a manual entry has no output format ([#386](https://github.com/visulima/packem/issues/386)) ([5198bfe](https://github.com/visulima/packem/commit/5198bfe5e567da24800afea96b7b201c1509ab36))
+
+### Miscellaneous Chores
+
+* **deps:** combine open Renovate updates ([#385](https://github.com/visulima/packem/issues/385)) ([c7ee6bf](https://github.com/visulima/packem/commit/c7ee6bf73081caf5eeb06832658cde50c18fb73e)), closes [#381](https://github.com/visulima/packem/issues/381) [380/#379](https://github.com/380/packem/issues/379) [#375](https://github.com/visulima/packem/issues/375) [#373](https://github.com/visulima/packem/issues/373) [#372](https://github.com/visulima/packem/issues/372) [#361](https://github.com/visulima/packem/issues/361) [#378](https://github.com/visulima/packem/issues/378) [#374](https://github.com/visulima/packem/issues/374)
+
+
+### Dependencies
+
+* **mime:** ^4.1.0 → ^4.1.1
+
 ## @visulima/packem [3.0.0](https://github.com/visulima/packem/compare/@visulima/packem@2.1.0...@visulima/packem@3.0.0) (2026-10-15)
 
 ### ⚠ BREAKING CHANGES
