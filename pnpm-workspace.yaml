@@ -67,8 +67,8 @@ catalogs:
     "@babel/core": 8.0.7
     "@babel/parser": 8.0.7
     "@mozilla/readability": ^0.6.0
-    "@oxc-parser/binding-linux-x64-gnu": 0.153.0
-    "@oxc-project/types": 0.153.0
+    "@oxc-parser/binding-linux-x64-gnu": 0.154.0
+    "@oxc-project/types": 0.154.0
     "@svgr/core": ^8.1.0
     "@swc/core": 1.16.18
     "@swc/helpers": 0.5.23
@@ -84,8 +84,8 @@ catalogs:
     lit: 3.3.3
     mime: ^4.1.1
     nodehun: ^3.0.2
-    oxc-parser: 0.153.0
-    oxc-transform: 0.153.0
+    oxc-parser: 0.154.0
+    oxc-transform: 0.154.0
     p-queue: 9.3.5
     package-manager-detector: ^1.9.0
     picocolors: ^1.1.1
@@ -172,7 +172,7 @@ catalogs:
     micromatch: ^4.0.8
     mlly: 1.8.2
     obug: 2.2.1
-    oxc-parser: 0.153.0
+    oxc-parser: 0.154.0
     p-queue: 9.3.5
     picomatch: 4.0.7
     plop: 4.0.5
@@ -201,7 +201,7 @@ catalogs:
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.0-alpha.15
     clean-css: ^5.3.3
-    cssnano: 9.7.0
+    cssnano: 9.8.0
     icss-utils: ^5.1.0
     less: 4.9.1
     lightningcss: 1.33.0
