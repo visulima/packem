@@ -2,7 +2,7 @@
  * Modified copy of https://github.com/vitejs/vite/blob/main/packages/vite/rollup.dts.config.ts#L64
  */
 import { walk } from "estree-walker";
-import MagicString from "magic-string";
+import { MagicString } from "magic-string";
 import { findStaticImports } from "mlly";
 import { parseSync } from "oxc-parser";
 import type { Plugin, PluginContext, RenderedChunk } from "rollup";

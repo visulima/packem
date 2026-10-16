@@ -1,4 +1,4 @@
-import MagicString from "magic-string";
+import { MagicString } from "magic-string";
 import type { Plugin } from "rollup";
 
 import { RE_DTS } from "./filename";

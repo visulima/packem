@@ -6,7 +6,7 @@
  * Copyright (c) 2024 Google LLC
  */
 import type { SourceMapOptions } from "magic-string";
-import MagicString from "magic-string";
+import { MagicString } from "magic-string";
 
 import type { Template, TemplatePart } from "./models.js";
 import type { ParseLiteralsOptions } from "./parse-literals.js";

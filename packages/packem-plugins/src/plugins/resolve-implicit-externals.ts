@@ -6,7 +6,7 @@ import { parsePackageJsonSync } from "@visulima/package/package-json";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { isBareSpecifier, parseSpecifier } from "@visulima/packem-share/utils";
 import { dirname, join, relative, resolve } from "@visulima/path";
-import MagicString from "magic-string";
+import { MagicString } from "magic-string";
 import type { Plugin, TransformResult } from "rollup";
 
 // Matches `from '...'` / `from "..."` / `from `...`` import/export sources.

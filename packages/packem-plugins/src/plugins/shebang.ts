@@ -2,7 +2,7 @@
 import { chmod } from "node:fs/promises";
 
 import { resolve } from "@visulima/path";
-import MagicString from "magic-string";
+import { MagicString } from "magic-string";
 import type { Plugin } from "rollup";
 
 const SHEBANG_RE = /^#![^\n]*/;
