@@ -1966,10 +1966,10 @@ importers:
         specifier: catalog:visulima
         version: 4.1.1
       '@visulima/rollup-plugin-css':
-        specifier: 2.0.0
+        specifier: 3.0.0
         version: link:../rollup-plugin-css
       '@visulima/rollup-plugin-dts':
-        specifier: 1.1.0
+        specifier: 2.0.0
         version: link:../rollup-plugin-dts
       '@visulima/tsconfig':
         specifier: catalog:visulima
@@ -2141,7 +2141,7 @@ importers:
         specifier: workspace:*
         version: link:../packem-plugins
       '@visulima/packem-rollup':
-        specifier: 1.2.0
+        specifier: 1.2.1
         version: link:../packem-rollup
       '@visulima/path':
         specifier: catalog:visulima
@@ -2622,7 +2622,7 @@ importers:
         specifier: catalog:visulima
         version: 4.0.0
       '@visulima/rollup-plugin-dts':
-        specifier: 1.1.0
+        specifier: 2.0.0
         version: link:../rollup-plugin-dts
       clean-css:
         specifier: catalog:style
