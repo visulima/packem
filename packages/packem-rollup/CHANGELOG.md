@@ -1,3 +1,12 @@
+## @visulima/packem-rollup [1.2.1](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.2.0...@visulima/packem-rollup@1.2.1) (2026-10-17)
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-dts:** upgraded to 2.0.0
+* **oxc-transform:** 0.153.0 → 0.154.0
+* **html-minifier-next:** 8.10.7 → 8.10.8
+
 ## @visulima/packem-rollup [1.2.0](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.1.0...@visulima/packem-rollup@1.2.0) (2026-10-15)
 
 ### Features
