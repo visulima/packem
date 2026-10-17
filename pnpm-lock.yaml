@@ -105,8 +105,8 @@ catalogs:
       specifier: ^1.0.2
       version: 1.0.2
     conventional-changelog-conventionalcommits:
-      specifier: 9.3.1
-      version: 9.3.1
+      specifier: 10.4.1
+      version: 10.4.1
     deeks:
       specifier: ^3.2.1
       version: 3.2.1
@@ -643,8 +643,6 @@ overrides:
   yaml@>=2.0.0 <2.8.3: '>=2.9.1'
 
 packageExtensionsChecksum: sha256-L9KhIfnXaxDFXUmdggJzY477kU1a1a59wPrKicWJzD8=
-
-pnpmfileChecksum: sha256-Wzgu78gay+v6MunApP3nY8NLqA2rjoJktL31h20yv5I=
 
 patchedDependencies:
   oxc-parser: 464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76
@@ -1910,7 +1908,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 9.3.1
+        version: 10.4.1
       eslint:
         specifier: catalog:lint
         version: 10.9.1(jiti@2.7.0)(supports-color@10.2.2)
@@ -2163,7 +2161,7 @@ importers:
         version: 1.0.2(@babel/core@8.0.7)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 9.3.1
+        version: 10.4.1
       cross-env:
         specifier: catalog:node
         version: 10.1.0
@@ -2464,7 +2462,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 9.3.1
+        version: 10.4.1
       esbuild:
         specifier: catalog:build
         version: 0.28.2
@@ -2545,7 +2543,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 9.3.1
+        version: 10.4.1
       eslint:
         specifier: catalog:lint
         version: 10.9.1(jiti@2.7.0)(supports-color@10.2.2)
@@ -2726,7 +2724,7 @@ importers:
         version: 4.29.3
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 9.3.1
+        version: 10.4.1
       esbuild:
         specifier: catalog:build
         version: 0.28.2
@@ -2838,7 +2836,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 9.3.1
+        version: 10.4.1
       esbuild:
         specifier: catalog:build
         version: 0.28.2
@@ -3063,7 +3061,7 @@ importers:
         version: 5.0.4(vitest@5.0.4)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 9.3.1
+        version: 10.4.1
       cssnano:
         specifier: '>=9.8.0'
         version: 9.8.0(postcss@8.5.30)
@@ -3237,7 +3235,7 @@ importers:
         version: 3.3.13
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
-        version: 9.3.1
+        version: 10.4.1
       diff:
         specifier: catalog:dev
         version: 9.0.0
@@ -9175,7 +9173,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       next: '>=14.0'
       rotating-file-stream: '>=3.2.9'
     peerDependenciesMeta:
@@ -12114,7 +12112,7 @@ packages:
       graphile-config: ^1.1.1
       graphql: ^16.9.0
       h3: ^1.13.0
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       ws: '>=8.22.0'
     peerDependenciesMeta:
       '@envelop/core':
