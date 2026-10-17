@@ -1,3 +1,71 @@
+## @visulima/packem [4.0.0](https://github.com/visulima/packem/compare/@visulima/packem@3.0.1...@visulima/packem@4.0.0) (2026-10-17)
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** updated dependencies to major versions
+
+* chore(deps): update dependency magic-string to v1
+* **deps:** updated dependencies to major versions
+
+* chore(deps): update dependency minimatch@<3.1.4 to v6
+* **deps:** updated dependencies to major versions
+
+* chore(deps): regenerate lockfile
+
+* fix(deps): update dependency @rspack/core to ^2.2.9
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* fix(deps): update dependency vue to v3.5.44
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* fix(deps): update patch updates
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* fix(deps): update dependency lucide-static to v1.56.0
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* fix(deps): update minor updates
+
+Signed-off-by: Renovate Bot <bot@renovateapp.com>
+
+* chore(deps): update dependency @anolilab/lint-staged-config to v13
+* **deps:** updated dependencies to major versions
+
+* chore(deps): update dependency magic-string to v1
+* **deps:** updated dependencies to major versions
+
+* chore(deps): update dependency minimatch@<3.1.4 to v6
+* **deps:** updated dependencies to major versions
+
+* chore(deps): update dependency minimatch@<3.1.4 to v7
+* **deps:** updated dependencies to major versions
+
+* chore(deps): regenerate lockfile
+
+* fix(lint): use named MagicString import for magic-string v1
+
+* revert(deps): hold magic-string at 0.30.21 (v1 breaks rollup SourceMap types)
+
+* test(rollup-plugin-dts): raise test timeout for slow Volar custom-language builds
+
+### Miscellaneous Chores
+
+* **deps:** combine open Renovate updates (10 PRs) ([#395](https://github.com/visulima/packem/issues/395)) ([4f10700](https://github.com/visulima/packem/commit/4f107009aed1decf6fa767ae01c5b123e91a32c0))
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-css:** upgraded to 3.0.0
+* **@visulima/rollup-plugin-dts:** upgraded to 2.0.0
+* **@visulima/packem-rollup:** upgraded to 1.2.1
+* **oxc-parser:** 0.153.0 → 0.154.0
+* **oxc-transform:** 0.153.0 → 0.154.0
+* **html-minifier-next:** 8.10.7 → 8.10.8
+
 ## @visulima/packem [3.0.1](https://github.com/visulima/packem/compare/@visulima/packem@3.0.0...@visulima/packem@3.0.1) (2026-10-16)
 
 ### Bug Fixes
