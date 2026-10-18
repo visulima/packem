@@ -241,7 +241,7 @@ catalogs:
   types:
     "@types/babel__core": ^7.20.5
     "@types/babel__generator": ^7.27.0
-    "@types/bun": 1.4.0
+    "@types/bun": 1.4.3
     "@types/clean-css": 4.2.11
     "@types/debug": 4.1.13
     "@types/estree": 1.0.9
@@ -251,12 +251,12 @@ catalogs:
     "@types/is-glob": ^4.0.4
     "@types/less": 3.0.8
     "@types/micromatch": ^4.0.10
-    "@types/node": 26.4.0
+    "@types/node": 26.4.1
     "@types/picomatch": ^4.0.3
     "@types/postcss-modules-local-by-default": ^4.0.2
     "@types/postcss-modules-scope": ^3.0.4
     "@types/react": 19.2.18
-    "@types/react-dom": ^19.2.5
+    "@types/react-dom": ^19.3.0
     "@types/semver": ^7.8.0
     "@types/stylus": ^0.48.43
     "@types/turndown": ^5.0.6
