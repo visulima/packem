@@ -41,8 +41,8 @@ catalogs:
     "@rollup/plugin-replace": 6.0.3
     "@rollup/plugin-wasm": 6.2.2
     "@rollup/pluginutils": 5.4.0
-    "@visulima/packem-rollup": 1.0.0-alpha.65
-    "@visulima/rollup-plugin-css": 1.0.0-alpha.45
+    "@visulima/packem-rollup": 1.0.0
+    "@visulima/rollup-plugin-css": 1.0.1
     esbuild: 0.28.2
     rolldown: 1.2.13
     rollup: 4.63.6
@@ -158,7 +158,7 @@ catalogs:
   prod:
     "@arethetypeswrong/core": ^0.18.5
     "@babel/parser": 8.0.7
-    "@visulima/packem-share": 1.0.0-alpha.46
+    "@visulima/packem-share": 1.0.1
     audit-ci: ^7.1.0
     cjs-module-lexer: 2.3.0
     clsx: ^2.1.1
@@ -199,7 +199,7 @@ catalogs:
     "@tailwindcss/oxide": 4.3.3
     "@tailwindcss/postcss": 4.3.3
     "@tailwindcss/typography": ^0.5.20
-    "@visulima/css-style-inject": 1.0.0-alpha.15
+    "@visulima/css-style-inject": 1.0.1
     clean-css: ^5.3.3
     cssnano: 9.8.0
     icss-utils: ^5.1.0
@@ -271,18 +271,18 @@ catalogs:
     magic-string: 0.30.21
     semver: 7.8.5
   visulima:
-    "@visulima/cerebro": 3.1.0
+    "@visulima/cerebro": 3.1.3
     "@visulima/colorize": 2.1.1
     "@visulima/find-cache-dir": 3.0.1
-    "@visulima/fs": 6.0.5
+    "@visulima/fs": 6.0.29
     "@visulima/humanizer": 4.0.0
-    "@visulima/package": 5.0.18
-    "@visulima/packem": 2.0.0-alpha.94
+    "@visulima/package": 5.0.43
+    "@visulima/packem": 2.0.0
     "@visulima/pail": 4.1.1
     "@visulima/path": 4.0.0
     "@visulima/source-map": 3.0.1
     "@visulima/tabular": 4.1.0
-    "@visulima/tsconfig": 3.2.12
+    "@visulima/tsconfig": 3.2.37
 dedupeInjectedDeps: true
 dedupePeerDependents: true
 disallowWorkspaceCycles: false
