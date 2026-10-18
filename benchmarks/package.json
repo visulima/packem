@@ -53,7 +53,7 @@
         "@visulima/humanizer": "catalog:visulima",
         "@visulima/packem": "workspace:*",
         "@visulima/pail": "catalog:visulima",
-        "@vitejs/plugin-react": "^6.1.1",
+        "@vitejs/plugin-react": "^6.1.2",
         "babel-loader": "^10.1.1",
         "bun": "^1.4.3",
         "bunchee": "^7.0.1",
@@ -72,7 +72,7 @@
         "tsdown": "^0.23.1",
         "tsup": "^8.5.1",
         "typescript": "^6.0.3",
-        "vite": "^8.2.2",
+        "vite": "^8.2.4",
         "webpack": "^5.111.1"
     }
 }
