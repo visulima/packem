@@ -342,7 +342,7 @@
         "postcss-modules-values": ">=4.0.0",
         "postcss-value-parser": ">=4.2.0",
         "rolldown": ">=1.2.13",
-        "rollup": ">=4.61.1",
+        "rollup": ">=4.64.6",
         "rollup-plugin-svelte": ">=7.2.3",
         "sass": ">=1.100.0",
         "sass-embedded": ">=1.100.0",
