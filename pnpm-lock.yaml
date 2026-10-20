@@ -2350,6 +2350,9 @@ importers:
       '@visulima/source-map':
         specifier: catalog:visulima
         version: 3.0.1
+      '@visulima/tsconfig':
+        specifier: catalog:visulima
+        version: 3.2.37(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)(smol-toml@1.9.1)
       cjs-module-lexer:
         specifier: catalog:prod
         version: 2.3.0
@@ -2453,9 +2456,6 @@ importers:
       '@visulima/pail':
         specifier: catalog:visulima
         version: 4.1.1
-      '@visulima/tsconfig':
-        specifier: catalog:visulima
-        version: 3.2.37(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)(smol-toml@1.9.1)
       '@vitest/coverage-v8':
         specifier: catalog:test
         version: 5.0.5(vitest@5.0.4)
