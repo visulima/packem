@@ -56,7 +56,7 @@
         "@vitejs/plugin-react": "^6.1.1",
         "babel-loader": "^10.1.1",
         "bun": "^1.4.3",
-        "bunchee": "^7.0.1",
+        "bunchee": "^7.0.2",
         "cross-env": "^10.1.0",
         "esbuild": "^0.28.2",
         "esbuild-loader": "^4.5.0",
