@@ -92,7 +92,7 @@ catalogs:
     postgraphile: 5.1.5
     rs-module-lexer: 2.9.0
     safe-stable-stringify: ^2.5.0
-    sort-package-json: 4.0.0
+    sort-package-json: 4.1.0
     stylus: ^0.64.0
     sucrase: ^3.35.1
     sugarss: 5.0.2
@@ -133,7 +133,7 @@ catalogs:
   markdown:
     turndown: 7.2.4
     turndown-plugin-gfm: ^1.0.2
-    typedoc-plugin-markdown: 4.13.1
+    typedoc-plugin-markdown: 4.14.0
   monorepo:
     nx: 23.3.0
   network:
@@ -180,7 +180,7 @@ catalogs:
     rs-module-lexer: 2.9.0
     safe-stable-stringify: ^2.5.0
     solid-js: 1.9.17
-    sort-package-json: 4.0.0
+    sort-package-json: 4.1.0
     source-map-js: ^1.2.2
     tailwind-merge: 3.7.0
     workerpool: 10.0.3
@@ -201,7 +201,7 @@ catalogs:
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.1
     clean-css: ^5.3.3
-    cssnano: 9.8.0
+    cssnano: 9.9.0
     icss-utils: ^5.1.0
     less: 4.9.1
     lightningcss: 1.33.0
@@ -219,7 +219,7 @@ catalogs:
     sass-embedded: 1.103.1
     tailwindcss: 4.3.3
   test:
-    "@codspeed/vitest-plugin": ^6.0.1
+    "@codspeed/vitest-plugin": ^6.1.0
     "@jridgewell/source-map": ^0.3.11
     "@sxzz/test-utils": 0.5.20
     "@vitest/coverage-v8": 5.0.4
