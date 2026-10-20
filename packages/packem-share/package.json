@@ -77,7 +77,11 @@
         "@visulima/colorize": "catalog:visulima",
         "@visulima/fs": "catalog:visulima",
         "@visulima/package": "catalog:visulima",
+        "@visulima/pail": "catalog:visulima",
         "@visulima/path": "catalog:visulima",
+        "@visulima/tsconfig": "catalog:visulima",
+        "hookable": "catalog:dev",
+        "jiti": "catalog:script",
         "safe-stable-stringify": "catalog:prod"
     },
     "devDependencies": {
@@ -91,15 +95,11 @@
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",
-        "@visulima/pail": "catalog:visulima",
-        "@visulima/tsconfig": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",
         "esbuild": "catalog:build",
         "eslint": "catalog:lint",
-        "hookable": "catalog:dev",
-        "jiti": "catalog:script",
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
         "rimraf": "catalog:node",
@@ -110,6 +110,7 @@
         "vitest": "catalog:test"
     },
     "peerDependencies": {
+        "esbuild": "catalog:build",
         "rollup": "catalog:build"
     },
     "engines": {

@@ -2787,9 +2787,21 @@ importers:
       '@visulima/package':
         specifier: catalog:visulima
         version: 5.0.43(ini@7.0.0)(jsonc-parser@3.3.1)(smol-toml@1.9.1)
+      '@visulima/pail':
+        specifier: catalog:visulima
+        version: 4.1.1
       '@visulima/path':
         specifier: catalog:visulima
         version: 4.0.0
+      '@visulima/tsconfig':
+        specifier: catalog:visulima
+        version: 3.2.37(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)(smol-toml@1.9.1)
+      hookable:
+        specifier: catalog:dev
+        version: 6.1.2
+      jiti:
+        specifier: catalog:script
+        version: 2.7.0
       safe-stable-stringify:
         specifier: catalog:prod
         version: 2.5.0
@@ -2824,12 +2836,6 @@ importers:
       '@types/node':
         specifier: catalog:types
         version: 26.4.1
-      '@visulima/pail':
-        specifier: catalog:visulima
-        version: 4.1.1
-      '@visulima/tsconfig':
-        specifier: catalog:visulima
-        version: 3.2.37(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)(smol-toml@1.9.1)
       '@vitest/coverage-v8':
         specifier: catalog:test
         version: 5.0.5(vitest@5.0.4)
@@ -2845,12 +2851,6 @@ importers:
       eslint:
         specifier: catalog:lint
         version: 10.12.0(jiti@2.7.0)(supports-color@10.2.2)
-      hookable:
-        specifier: catalog:dev
-        version: 6.1.2
-      jiti:
-        specifier: catalog:script
-        version: 2.7.0
       prettier:
         specifier: catalog:lint
         version: 3.9.10
