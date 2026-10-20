@@ -2624,9 +2624,6 @@ importers:
       '@visulima/rollup-plugin-dts':
         specifier: 2.0.0
         version: link:../rollup-plugin-dts
-      clean-css:
-        specifier: catalog:style
-        version: 5.3.3
       html-minifier-next:
         specifier: catalog:prod
         version: 8.10.8(@swc/core@1.16.18(@swc/helpers@0.5.23))
@@ -2691,9 +2688,6 @@ importers:
       '@types/babel__core':
         specifier: catalog:types
         version: 7.20.5
-      '@types/clean-css':
-        specifier: catalog:types
-        version: 4.2.11
       '@types/estree':
         specifier: catalog:types
         version: 1.0.9
