@@ -2205,7 +2205,7 @@ importers:
         specifier: catalog:prod
         version: 4.0.7
       postcss:
-        specifier: '>=8.5.29'
+        specifier: '>=8.5.30'
         version: 8.5.30
       postcss-custom-properties:
         specifier: catalog:style
@@ -3081,7 +3081,7 @@ importers:
         specifier: catalog:dev
         version: 4.1.1
       postcss:
-        specifier: '>=8.5.29'
+        specifier: '>=8.5.30'
         version: 8.5.30
       postcss-load-config:
         specifier: catalog:style
