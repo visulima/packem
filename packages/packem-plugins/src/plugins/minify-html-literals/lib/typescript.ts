@@ -5,9 +5,21 @@
  *
  * Copyright (c) 2024 Google LLC
  */
-import ts from "typescript";
+import { createRequire } from "node:module";
+
+import type ts from "typescript";
 
 import type { TemplatePart } from "./models.js";
+
+const requireFromHere = createRequire(import.meta.url);
+
+let typescriptModule: typeof ts | undefined;
+
+const getTypescript = (): typeof ts => {
+    typescriptModule ??= requireFromHere("typescript") as typeof ts;
+
+    return typescriptModule;
+};
 
 interface TypescriptStrategy {
     getHeadTemplatePart: (node: ts.TemplateLiteral | ts.TemplateHead) => TemplatePart;
@@ -29,7 +41,7 @@ const typescriptStrategy: TypescriptStrategy = {
         const fullText = node.getFullText(currentRoot);
         // ignore prefix spaces and comments
         const startOffset = fullText.indexOf("`") + 1;
-        const endOffset = ts.isTemplateHead(node) ? -2 : -1;
+        const endOffset = getTypescript().isTemplateHead(node) ? -2 : -1;
 
         return {
             end: node.end + endOffset,
@@ -41,7 +53,7 @@ const typescriptStrategy: TypescriptStrategy = {
         // Use text, not fullText, to avoid prefix comments, which are part of the
         // expression.
         const text = node.getText(currentRoot);
-        const endOffset = ts.isTemplateMiddle(node) ? 2 : 1;
+        const endOffset = getTypescript().isTemplateMiddle(node) ? 2 : 1;
 
         return {
             end: node.end - endOffset,
@@ -52,7 +64,7 @@ const typescriptStrategy: TypescriptStrategy = {
         };
     },
     getRootNode(source: string, fileName = ""): ts.SourceFile {
-        return ts.createSourceFile(fileName, source, ts.ScriptTarget.ESNext);
+        return getTypescript().createSourceFile(fileName, source, getTypescript().ScriptTarget.ESNext);
     },
     getTaggedTemplateTemplate(node: ts.TaggedTemplateExpression): ts.TemplateLiteral {
         return node.template;
@@ -61,7 +73,7 @@ const typescriptStrategy: TypescriptStrategy = {
         return node.tag.getText(currentRoot);
     },
     getTemplateParts(node: ts.TemplateLiteral): TemplatePart[] {
-        if (ts.isNoSubstitutionTemplateLiteral(node)) {
+        if (getTypescript().isNoSubstitutionTemplateLiteral(node)) {
             // "`string`"
             return [typescriptStrategy.getHeadTemplatePart(node)];
         }
@@ -72,11 +84,11 @@ const typescriptStrategy: TypescriptStrategy = {
             ...node.templateSpans.map((templateSpan) => typescriptStrategy.getMiddleTailTemplatePart(templateSpan.literal)),
         ];
     },
-    isTaggedTemplate: ts.isTaggedTemplateExpression,
-    isTemplate: ts.isTemplateLiteral,
+    isTaggedTemplate: (node): node is ts.TaggedTemplateExpression => getTypescript().isTaggedTemplateExpression(node),
+    isTemplate: (node): node is ts.TemplateLiteral => getTypescript().isTemplateLiteral(node),
     walkChildNodes(node: ts.Node, visit: (node: ts.Node) => void): void {
         visit(node);
-        ts.forEachChild(node, (child) => {
+        getTypescript().forEachChild(node, (child) => {
             typescriptStrategy.walkChildNodes(child, visit);
         });
     },

@@ -2392,9 +2392,6 @@ importers:
       semver:
         specifier: catalog:utils
         version: 7.8.5
-      typescript:
-        specifier: catalog:tsc
-        version: 6.0.3
       workerpool:
         specifier: catalog:prod
         version: 10.0.3
@@ -2495,6 +2492,9 @@ importers:
       semantic-release:
         specifier: catalog:cli
         version: 25.0.9(supports-color@10.2.2)(typescript@6.0.3)
+      typescript:
+        specifier: catalog:tsc
+        version: 6.0.3
       vitest:
         specifier: catalog:test
         version: 5.0.4(@types/node@26.4.0)(@vitest/coverage-v8@5.0.4)(@vitest/ui@5.0.4)(happy-dom@20.14.6)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@10.2.2))(sass-embedded@1.103.1)(sass@1.103.1)(stylus@0.64.0(supports-color@10.2.2))(sugarss@5.0.2(postcss@8.5.30))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
