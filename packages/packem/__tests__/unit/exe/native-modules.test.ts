@@ -368,19 +368,16 @@ describe("exe native modules", () => {
         // extraction path is computable by anyone holding the binary. In a shared
         // temporary directory that turns "reuse whatever is already there" into
         // "load whatever another user left there".
-        it.runIf(addonPath !== undefined && processPlatform !== "win32")(
-            "should refuse an extraction directory other users can write to",
-            async () => {
-                expect.assertions(1);
+        it.runIf(addonPath !== undefined && processPlatform !== "win32")("should refuse an extraction directory other users can write to", async () => {
+            expect.assertions(1);
 
-                const hostile = join(directory, "world-writable");
+            const hostile = join(directory, "world-writable");
 
-                mkdirSync(hostile, { recursive: true });
-                chmodSync(hostile, 0o777);
+            mkdirSync(hostile, { recursive: true });
+            chmodSync(hostile, 0o777);
 
-                await expect(runPrelude(undefined, hostile)).rejects.toThrow("writable by other users");
-            },
-        );
+            await expect(runPrelude(undefined, hostile)).rejects.toThrow("writable by other users");
+        });
 
         it.runIf(addonPath !== undefined && processPlatform !== "win32")("should refuse a symlink planted where the addon is cached", async () => {
             expect.assertions(1);
