@@ -223,8 +223,8 @@ catalogs:
     "@jridgewell/source-map": ^0.3.11
     "@sxzz/test-utils": 0.5.20
     "@vitest/coverage-v8": 5.0.5
-    "@vitest/ui": 5.0.4
-    vitest: 5.0.4
+    "@vitest/ui": 5.0.5
+    vitest: 5.0.5
   tsc:
     "@astrojs/ts-plugin": 1.10.12
     "@babel/preset-typescript": ^8.0.7
