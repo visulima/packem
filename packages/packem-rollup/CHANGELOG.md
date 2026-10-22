@@ -1,3 +1,18 @@
+## @visulima/packem-rollup [1.2.2](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.2.1...@visulima/packem-rollup@1.2.2) (2026-10-22)
+
+### Bug Fixes
+
+* **deps:** update rollup (minor) ([#404](https://github.com/visulima/packem/issues/404)) ([1ce9900](https://github.com/visulima/packem/commit/1ce9900cccb0149144e1c3acd02526f2c2e99e98))
+* **packem-rollup:** remove unused clean-css dependency ([8652fae](https://github.com/visulima/packem/commit/8652faea9e0395f372d16c09aac4bfd6081e81d0))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.1.1
+* **@visulima/rollup-plugin-dts:** upgraded to 2.0.1
+* **@visulima/fs:** 6.0.5 → 6.0.29
+* **@visulima/package:** 5.0.18 → 5.0.43
+
 ## @visulima/packem-rollup [1.2.1](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.2.0...@visulima/packem-rollup@1.2.1) (2026-10-17)
 
 
