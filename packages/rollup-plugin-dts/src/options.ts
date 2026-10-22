@@ -47,6 +47,14 @@ export interface TsgoOptions {
      * Custom path to the `tsgo` binary.
      */
     path?: string;
+
+    /**
+     * Allow tsgo to run the `contentMappers` configured in tsconfig (external processes that
+     * supply declarations for non-TypeScript files). Mappers execute code from the project's
+     * dependencies, so this is off unless set. Requires TypeScript 7.1 or later.
+     * @default false
+     */
+    runExternalCode?: boolean;
 }
 
 // #region General Options
@@ -137,7 +145,7 @@ export interface GeneralOptions {
      * - `'tsc'` whenever {@link TscOptions.vue vue} or {@link TscOptions.tsMacro tsMacro} is enabled.
      * - `'tsgo'` if {@link Options.tsgo tsgo} options are provided.
      * - `'oxc'` if {@link Options.oxc oxc} options are provided, or `isolatedDeclarations` is enabled in `compilerOptions`.
-     * - `'tsgo'` if TypeScript 7.0 (or `@typescript/native-preview`) is installed.
+     * - `'tsgo'` if TypeScript 7 (or `@typescript/native-preview`) is installed.
      * - `'tsc'` otherwise.
      * @default 'tsc'
      */
@@ -364,7 +372,7 @@ export type OptionsResolved = Overwrite<
         tsconfig?: string;
         tsconfigChainKey: string | undefined;
         tsconfigRaw: TsConfigJson;
-        tsgo: false | { path?: string };
+        tsgo: false | Pick<TsgoOptions, "path" | "runExternalCode">;
     }
 >;
 
@@ -585,13 +593,13 @@ const validateOxcCompatibility = (oxc: boolean, vue: boolean, tsMacro: boolean):
 const validateGenerator = (generator: Generator, logger: Logger): void => {
     if (generator === "tsc") {
         // The `tsc` backend uses the classic synchronous compiler API (`ts.sys`,
-        // `ts.createProgram`, …). TypeScript 7.0 (the native compiler) ships `typescript` but
+        // `ts.createProgram`, …). TypeScript 7 (the native compiler) ships `typescript` but
         // not that surface, so loading the backend would throw a cryptic `ts.sys is undefined`
         // TypeError. Fail fast with an actionable message (auto-selection already prefers `tsgo`
         // under TS7; this only triggers when `generator: "tsc"` was requested explicitly).
         if (isTS70Installed()) {
             throw new Error(
-                "[@visulima/rollup-plugin-dts] The `tsc` generator requires the classic TypeScript compiler API, which TypeScript 7.0 (the native compiler) does not provide. Use the `tsgo` generator (the default under TypeScript 7) or `oxc` instead.",
+                "[@visulima/rollup-plugin-dts] The `tsc` generator requires the classic TypeScript compiler API, which TypeScript 7 (the native compiler) does not provide. Use the `tsgo` generator (the default under TypeScript 7) or `oxc` instead.",
             );
         }
 
@@ -616,7 +624,7 @@ const validateGenerator = (generator: Generator, logger: Logger): void => {
 };
 
 // eslint-disable-next-line sonarjs/function-return-type -- the union return is the documented public contract
-const normalizeTsgo = (tsgoOption: boolean | TsgoOptions): false | { path?: string } => {
+const normalizeTsgo = (tsgoOption: boolean | TsgoOptions): false | Pick<TsgoOptions, "path" | "runExternalCode"> => {
     if (tsgoOption === false) {
         return false;
     }
@@ -630,7 +638,7 @@ const normalizeTsgo = (tsgoOption: boolean | TsgoOptions): false | { path?: stri
         return false;
     }
 
-    return { path: tsgoOption.path };
+    return { path: tsgoOption.path, ...(tsgoOption.runExternalCode !== undefined && { runExternalCode: tsgoOption.runExternalCode }) };
 };
 
 /**
@@ -764,7 +772,7 @@ const resolveGenerator = (
     if (isTS70Installed()) {
         if (languageContext.languages.length > 0) {
             throw new Error(
-                "[@visulima/rollup-plugin-dts] TypeScript 7.0 is installed, but the `tsgo` generator does not support custom languages. Enable `isolatedDeclarations` or set `generator: 'oxc'` to use Oxc instead, or install TypeScript 6.0 or below.",
+                "[@visulima/rollup-plugin-dts] TypeScript 7 is installed, but the `tsgo` generator does not support custom languages. Enable `isolatedDeclarations` or set `generator: 'oxc'` to use Oxc instead, or install TypeScript 6.0 or below.",
             );
         }
 

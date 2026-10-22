@@ -37,6 +37,13 @@ describe("buildTsgoArgs", () => {
         expect(buildTsgoArgs("/project/tsconfig.json", "/dist", "/root")).toContain("--noCheck");
         expect(buildTsgoArgs("/project/tsconfig.json", "/dist", "/root", false, true)).not.toContain("--noCheck");
     });
+
+    it("passes --runExternalCode only when content mappers are opted in", () => {
+        expect.assertions(2);
+
+        expect(buildTsgoArgs("/project/tsconfig.json", "/dist", "/root")).not.toContain("--runExternalCode");
+        expect(buildTsgoArgs("/project/tsconfig.json", "/dist", "/root", false, false, true)).toContain("--runExternalCode");
+    });
 });
 
 describe("spawnAsync", () => {
