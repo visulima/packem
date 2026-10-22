@@ -1,3 +1,19 @@
+## @visulima/rollup-plugin-dts [2.0.1](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@2.0.0...@visulima/rollup-plugin-dts@2.0.1) (2026-10-22)
+
+### Bug Fixes
+
+* **deps:** update patch updates (patch) ([#398](https://github.com/visulima/packem/issues/398)) ([dffeb62](https://github.com/visulima/packem/commit/dffeb621e1f301aa8a7bbf44b9798c730ad72cb7))
+* **deps:** update rollup (minor) ([#404](https://github.com/visulima/packem/issues/404)) ([1ce9900](https://github.com/visulima/packem/commit/1ce9900cccb0149144e1c3acd02526f2c2e99e98))
+
+### Styles
+
+* format baseline Prettier failures ([5279a7f](https://github.com/visulima/packem/commit/5279a7fb8fe0397ec62705f19b20e859079e0e7f))
+
+
+### Dependencies
+
+* **@visulima/tsconfig:** 3.2.12 → 3.2.37
+
 ## @visulima/rollup-plugin-dts [2.0.0](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.1.0...@visulima/rollup-plugin-dts@2.0.0) (2026-10-17)
 
 ### ⚠ BREAKING CHANGES
