@@ -1,3 +1,30 @@
+## @visulima/packem [4.0.1](https://github.com/visulima/packem/compare/@visulima/packem@4.0.0...@visulima/packem@4.0.1) (2026-10-22)
+
+### Bug Fixes
+
+* **deps:** update dependency postcss to v8.5.30 ([#399](https://github.com/visulima/packem/issues/399)) ([8fe57d9](https://github.com/visulima/packem/commit/8fe57d938675f29d88796264d2226b16cbbdff4d))
+* **deps:** update minor updates (minor) ([#405](https://github.com/visulima/packem/issues/405)) ([802b0a1](https://github.com/visulima/packem/commit/802b0a1dbb3f64f4743b3ef769df4463f86ba2cd))
+* **deps:** update patch updates (patch) ([#398](https://github.com/visulima/packem/issues/398)) ([dffeb62](https://github.com/visulima/packem/commit/dffeb621e1f301aa8a7bbf44b9798c730ad72cb7))
+* **deps:** update rollup (minor) ([#404](https://github.com/visulima/packem/issues/404)) ([1ce9900](https://github.com/visulima/packem/commit/1ce9900cccb0149144e1c3acd02526f2c2e99e98))
+
+### Styles
+
+* format baseline Prettier failures ([5279a7f](https://github.com/visulima/packem/commit/5279a7fb8fe0397ec62705f19b20e859079e0e7f))
+
+### Tests
+
+* **packem:** refresh rolldown integration snapshots ([cd6b5eb](https://github.com/visulima/packem/commit/cd6b5ebb50d9efba5b85c760f515e6ff1eec48a6))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.1.1
+* **@visulima/rollup-plugin-css:** upgraded to 3.0.1
+* **@visulima/rollup-plugin-dts:** upgraded to 2.0.1
+* **@visulima/packem-rollup:** upgraded to 1.2.2
+* **@visulima/cerebro:** 3.1.0 → 3.1.3
+* **@visulima/tsconfig:** 3.2.12 → 3.2.37
+
 ## @visulima/packem [4.0.0](https://github.com/visulima/packem/compare/@visulima/packem@3.0.1...@visulima/packem@4.0.0) (2026-10-17)
 
 ### ⚠ BREAKING CHANGES
