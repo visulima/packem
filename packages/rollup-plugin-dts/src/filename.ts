@@ -19,15 +19,11 @@ export const filenameJsToDts = (id: string): string => id.replace(RE_JS, ".d.$1t
  * context, `.vue` files keep their built-in `.vue.ts` mapping.
  */
 export const filenameToDts = (id: string, languageContext?: LanguageContext): string =>
-    (languageContext?.toTsFilename(id) ?? id)
-        .replace(RE_VUE, ".vue.ts")
-        .replace(RE_TS, ".d.$1ts")
-        .replace(RE_JS, ".d.$1ts")
-        .replace(RE_JSON, ".json.d.ts");
+    (languageContext?.toTsFilename(id) ?? id).replace(RE_VUE, ".vue.ts").replace(RE_TS, ".d.$1ts").replace(RE_JS, ".d.$1ts").replace(RE_JSON, ".json.d.ts");
 export const filenameDtsTo = (id: string, extension: "js" | "ts"): string => id.replace(RE_DTS, `.$1${extension}`);
 
 export const resolveTemplateFunction = (function_: ((chunk: PreRenderedChunk) => string) | string, chunk: PreRenderedChunk): string =>
-    (typeof function_ === "function" ? function_(chunk) : function_);
+    typeof function_ === "function" ? function_(chunk) : function_;
 
 export const replaceTemplateName = (template: string, name: string): string => template.replaceAll("[name]", name);
 

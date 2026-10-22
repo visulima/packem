@@ -4,7 +4,16 @@ import { realpathSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import type { ExistingRawSourceMap, NormalizedOutputOptions, Plugin, PluginContext, RenderedChunk, SourceMapInput, TransformPluginContext, TransformResult } from "rollup";
+import type {
+    ExistingRawSourceMap,
+    NormalizedOutputOptions,
+    Plugin,
+    PluginContext,
+    RenderedChunk,
+    SourceMapInput,
+    TransformPluginContext,
+    TransformResult,
+} from "rollup";
 import { b, is, isIdentifierName, nameOf, walk } from "yuku-ast";
 import { generate } from "yuku-codegen";
 // eslint-disable-next-line import/no-namespace -- the ESTree/TS-ESTree node types are a large flat namespace; importing them one by one would add ~40 named type imports
@@ -463,11 +472,11 @@ const createFakeJsPlugin = (
 
             // A doc block ahead of an `export … from` documents that export (restored by name via
             // `exportCommentsMap`), so on those only an explicit file tag makes it the file's.
-            const fileDocComments
-                = i === 0
+            const fileDocComments =
+                i === 0
                     ? statement.comments?.filter(
-                        (comment) => isDocumentationComment(comment) && (statement.type === "ImportDeclaration" || RE_FILE_DOC_TAG.test(comment.value)),
-                    )
+                          (comment) => isDocumentationComment(comment) && (statement.type === "ImportDeclaration" || RE_FILE_DOC_TAG.test(comment.value)),
+                      )
                     : undefined;
 
             if (rewriteImportExport(statement, setStatement, appendedStatements, requireAsDefault)) {
@@ -1945,7 +1954,13 @@ const declarationMeaning = (node: t.Node): DeclarationMeaning | undefined => {
 };
 
 /** Records what the top level binds: declarations with their meaning, imports, and local exports. */
-const collectBindings = async (context: TransformPluginContext, node: t.ProgramStatement, id: string, info: ModuleExports, typeofNames: Set<string>): Promise<void> => {
+const collectBindings = async (
+    context: TransformPluginContext,
+    node: t.ProgramStatement,
+    id: string,
+    info: ModuleExports,
+    typeofNames: Set<string>,
+): Promise<void> => {
     if (node.type === "ImportDeclaration") {
         // Only imports used as a `typeof` operand are ever looked up again, so only those pay for a resolve.
         if (node.specifiers.every((specifier) => !typeofNames.has(specifier.local.name))) return;
@@ -1993,7 +2008,12 @@ const collectBindings = async (context: TransformPluginContext, node: t.ProgramS
  * re-exports. `undefined` when it cannot be told (external module, namespace, cycle), which
  * callers must treat as "possibly anything".
  */
-const resolveExportMeaning = (moduleExportsMap: Map<string, ModuleExports>, moduleId: string, name: string, visited: Set<string>): DeclarationMeaning | undefined => {
+const resolveExportMeaning = (
+    moduleExportsMap: Map<string, ModuleExports>,
+    moduleId: string,
+    name: string,
+    visited: Set<string>,
+): DeclarationMeaning | undefined => {
     const key = `${moduleId}\0${name}`;
     const info = moduleExportsMap.get(moduleId);
 
@@ -2041,7 +2061,12 @@ const collectTypeofNames = (program: t.Program): Set<string> => {
     return names;
 };
 
-const collectModuleExports = async (context: TransformPluginContext, nodes: t.ProgramStatement[], id: string, typeofNames: Set<string>): Promise<ModuleExports> => {
+const collectModuleExports = async (
+    context: TransformPluginContext,
+    nodes: t.ProgramStatement[],
+    id: string,
+    typeofNames: Set<string>,
+): Promise<ModuleExports> => {
     const info: ModuleExports = {
         declared: new Map(),
         exportAlls: [],
@@ -2468,12 +2493,23 @@ const patchTsNamespace = (nodes: t.ProgramStatement[]) => {
         if (!init) return false;
 
         // rolldown: `__export({ a: () => a })` (`__exportAll` since 1.2)
-        if (init.type === "CallExpression" && init.callee.type === "Identifier" && (init.callee.name === "__export" || init.callee.name === "__exportAll") && init.arguments.length === 1 && init.arguments[0].type === "ObjectExpression") {
+        if (
+            init.type === "CallExpression"
+            && init.callee.type === "Identifier"
+            && (init.callee.name === "__export" || init.callee.name === "__exportAll")
+            && init.arguments.length === 1
+            && init.arguments[0].type === "ObjectExpression"
+        ) {
             return [
                 binding,
                 init.arguments[0].properties
                     .filter((property): property is t.ObjectProperty => property.type === "Property")
-                    .map((property) => b.ExportSpecifier({ exported: property.key as t.Identifier, local: (property.value as t.ArrowFunctionExpression).body as t.Identifier })),
+                    .map((property) =>
+                        b.ExportSpecifier({
+                            exported: property.key as t.Identifier,
+                            local: (property.value as t.ArrowFunctionExpression).body as t.Identifier,
+                        }),
+                    ),
             ];
         }
 
@@ -2484,7 +2520,8 @@ const patchTsNamespace = (nodes: t.ProgramStatement[]) => {
         if (!namespaceObject) return false;
 
         const members = namespaceObject.properties.filter(
-            (property): property is t.ObjectProperty => property.type === "Property" && !property.computed && !(property.key.type === "Identifier" && property.key.name === "__proto__"),
+            (property): property is t.ObjectProperty =>
+                property.type === "Property" && !property.computed && !(property.key.type === "Identifier" && property.key.name === "__proto__"),
         );
 
         if (members.some((property) => property.value.type !== "Identifier" || (property.key.type !== "Identifier" && property.key.type !== "Literal"))) {
@@ -2647,7 +2684,11 @@ const rewriteImportExport = (
                     attributes: [],
                     phase: null,
                     source: importEquals.moduleReference.expression,
-                    specifiers: [requireAsDefault.has(importEquals) ? b.ImportDefaultSpecifier({ local: importEquals.id }) : b.ImportNamespaceSpecifier({ local: importEquals.id })],
+                    specifiers: [
+                        requireAsDefault.has(importEquals)
+                            ? b.ImportDefaultSpecifier({ local: importEquals.id })
+                            : b.ImportNamespaceSpecifier({ local: importEquals.id }),
+                    ],
                 }),
             );
 

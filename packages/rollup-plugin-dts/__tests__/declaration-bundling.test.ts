@@ -105,7 +105,12 @@ describe("sourcemap fixes", () => {
     it("leaves no sourceMappingURL comment when declaration maps are off", async () => {
         expect.assertions(2);
 
-        const { chunks, snapshot } = await rollupBuild(fixture("file-doc-comment/index.ts"), [dts({ emitDtsOnly: true, generator: "oxc", sourcemap: false })], {}, { sourcemap: true });
+        const { chunks, snapshot } = await rollupBuild(
+            fixture("file-doc-comment/index.ts"),
+            [dts({ emitDtsOnly: true, generator: "oxc", sourcemap: false })],
+            {},
+            { sourcemap: true },
+        );
 
         expect(snapshot).not.toMatch(SOURCE_MAPPING_URL_RE);
         expect(chunks.some((chunk) => chunk.fileName.endsWith(".d.ts.map"))).toBe(false);

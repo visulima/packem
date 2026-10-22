@@ -37,7 +37,11 @@ const validateSourceMap = (sourcemap: string): void => {
 describe("source-map", () => {
     beforeAll(async () => {
         // Only this file's own output directories: `temp/` is shared with other suites running in parallel.
-        await Promise.all(["source-map-oxc", "source-map-tsc", "source-map-tsgo"].map((directory) => rm(path.join(temporaryDirectory, directory), { force: true, recursive: true })));
+        await Promise.all(
+            ["source-map-oxc", "source-map-tsc", "source-map-tsgo"].map((directory) =>
+                rm(path.join(temporaryDirectory, directory), { force: true, recursive: true }),
+            ),
+        );
     });
 
     it("oxc", async () => {
