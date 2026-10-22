@@ -292,10 +292,10 @@ interface State {
   };
 }
 interface Plugin {
-  (code: string, config: Config$1, state: State): string;
+  (code: string, config: Config$2, state: State): string;
 }
 type ConfigPlugin = string | Plugin;
-interface Config$1 {
+interface Config$2 {
   ref?: boolean;
   titleProp?: boolean;
   descProp?: boolean;
@@ -334,8 +334,8 @@ interface Config$1 {
   };
 }
 declare const transform: {
-  (code: string, config?: Config$1, state?: Partial<State>): Promise<string>;
-  sync(code: string, config?: Config$1, state?: Partial<State>): string;
+  (code: string, config?: Config$2, state?: Partial<State>): Promise<string>;
+  sync(code: string, config?: Config$2, state?: Partial<State>): string;
 };
 export { transform };
 "

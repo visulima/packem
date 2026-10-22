@@ -41,12 +41,12 @@ catalogs:
     "@rollup/plugin-replace": 6.0.3
     "@rollup/plugin-wasm": 6.2.2
     "@rollup/pluginutils": 5.4.0
-    "@visulima/packem-rollup": 1.0.0-alpha.65
-    "@visulima/rollup-plugin-css": 1.0.0-alpha.45
+    "@visulima/packem-rollup": 1.0.0
+    "@visulima/rollup-plugin-css": 1.0.1
     esbuild: 0.28.2
-    rolldown: 1.2.13
-    rollup: 4.63.6
-    rollup-plugin-dts: 6.4.1
+    rolldown: 1.2.14
+    rollup: 4.64.6
+    rollup-plugin-dts: 6.5.1
     rollup-plugin-import-trace: 1.0.1
     rollup-plugin-license: 3.7.1
     rollup-plugin-lit-css: 6.0.1
@@ -57,9 +57,9 @@ catalogs:
     unplugin-vue: 7.2.0
     vite: 8.2.4
   cli:
-    "@anolilab/multi-semantic-release": 4.4.24
-    "@anolilab/semantic-release-pnpm": 8.1.33
-    "@anolilab/semantic-release-preset": 13.4.35
+    "@anolilab/multi-semantic-release": 4.4.25
+    "@anolilab/semantic-release-pnpm": 8.1.34
+    "@anolilab/semantic-release-preset": 13.4.36
     commitizen: ^4.3.2
     semantic-release: 25.0.9
   dev:
@@ -92,7 +92,7 @@ catalogs:
     postgraphile: 5.1.5
     rs-module-lexer: 2.9.0
     safe-stable-stringify: ^2.5.0
-    sort-package-json: 4.0.0
+    sort-package-json: 4.1.0
     stylus: ^0.64.0
     sucrase: ^3.35.1
     sugarss: 5.0.2
@@ -114,15 +114,15 @@ catalogs:
     lucide-static: 1.56.0
   lint:
     "@anolilab/commitlint-config": 10.1.5
-    "@anolilab/eslint-config": 30.0.6
-    "@anolilab/lint-staged-config": 13.0.0
-    "@anolilab/prettier-config": 10.0.3
+    "@anolilab/eslint-config": 30.0.7
+    "@anolilab/lint-staged-config": 13.0.1
+    "@anolilab/prettier-config": 10.0.4
     "@anolilab/textlint-config": 13.0.6
     "@commitlint/cli": 21.2.2
     "@commitlint/config-conventional": 21.2.2
-    "@eslint/css": 2.0.0
+    "@eslint/css": 2.0.1
     "@secretlint/secretlint-rule-preset-recommend": 13.0.7
-    eslint: 10.9.1
+    eslint: 10.12.0
     husky: ^9.1.7
     lint-staged: 17.6.0
     prettier: 3.9.10
@@ -133,7 +133,7 @@ catalogs:
   markdown:
     turndown: 7.2.4
     turndown-plugin-gfm: ^1.0.2
-    typedoc-plugin-markdown: 4.13.1
+    typedoc-plugin-markdown: 4.14.0
   monorepo:
     nx: 23.3.0
   network:
@@ -158,13 +158,13 @@ catalogs:
   prod:
     "@arethetypeswrong/core": ^0.18.5
     "@babel/parser": 8.0.7
-    "@visulima/packem-share": 1.0.0-alpha.46
+    "@visulima/packem-share": 1.0.1
     audit-ci: ^7.1.0
     cjs-module-lexer: 2.3.0
     clsx: ^2.1.1
     fastest-levenshtein: 1.0.16
     get-tsconfig: 4.14.3
-    gpt-tokenizer: ^4.0.0
+    gpt-tokenizer: ^4.0.3
     happy-dom: 20.14.6
     hookable: 6.1.2
     html-minifier-next: 8.10.8
@@ -180,7 +180,7 @@ catalogs:
     rs-module-lexer: 2.9.0
     safe-stable-stringify: ^2.5.0
     solid-js: 1.9.17
-    sort-package-json: 4.0.0
+    sort-package-json: 4.1.0
     source-map-js: ^1.2.2
     tailwind-merge: 3.7.0
     workerpool: 10.0.3
@@ -199,14 +199,14 @@ catalogs:
     "@tailwindcss/oxide": 4.3.3
     "@tailwindcss/postcss": 4.3.3
     "@tailwindcss/typography": ^0.5.20
-    "@visulima/css-style-inject": 1.0.0-alpha.15
+    "@visulima/css-style-inject": 1.0.1
     clean-css: ^5.3.3
-    cssnano: 9.8.0
+    cssnano: 9.9.0
     icss-utils: ^5.1.0
     less: 4.9.1
     lightningcss: 1.33.0
     minireset.css: 0.0.7
-    postcss: 8.5.29
+    postcss: 8.5.30
     postcss-custom-properties: 15.0.4
     postcss-load-config: ^6.0.1
     postcss-modules: 9.0.1
@@ -219,12 +219,12 @@ catalogs:
     sass-embedded: 1.103.1
     tailwindcss: 4.3.3
   test:
-    "@codspeed/vitest-plugin": ^6.0.1
+    "@codspeed/vitest-plugin": ^6.1.0
     "@jridgewell/source-map": ^0.3.11
     "@sxzz/test-utils": 0.5.20
-    "@vitest/coverage-v8": 5.0.4
-    "@vitest/ui": 5.0.4
-    vitest: 5.0.4
+    "@vitest/coverage-v8": 5.0.5
+    "@vitest/ui": 5.0.5
+    vitest: 5.0.5
   tsc:
     "@astrojs/ts-plugin": 1.10.12
     "@babel/preset-typescript": ^8.0.7
@@ -241,7 +241,7 @@ catalogs:
   types:
     "@types/babel__core": ^7.20.5
     "@types/babel__generator": ^7.27.0
-    "@types/bun": 1.4.0
+    "@types/bun": 1.4.3
     "@types/clean-css": 4.2.11
     "@types/debug": 4.1.13
     "@types/estree": 1.0.9
@@ -251,12 +251,12 @@ catalogs:
     "@types/is-glob": ^4.0.4
     "@types/less": 3.0.8
     "@types/micromatch": ^4.0.10
-    "@types/node": 26.4.0
+    "@types/node": 26.4.1
     "@types/picomatch": ^4.0.3
     "@types/postcss-modules-local-by-default": ^4.0.2
     "@types/postcss-modules-scope": ^3.0.4
     "@types/react": 19.2.18
-    "@types/react-dom": ^19.2.5
+    "@types/react-dom": ^19.3.0
     "@types/semver": ^7.8.0
     "@types/stylus": ^0.48.43
     "@types/turndown": ^5.0.6
@@ -271,18 +271,18 @@ catalogs:
     magic-string: 0.30.21
     semver: 7.8.5
   visulima:
-    "@visulima/cerebro": 3.1.0
+    "@visulima/cerebro": 3.1.3
     "@visulima/colorize": 2.1.1
     "@visulima/find-cache-dir": 3.0.1
-    "@visulima/fs": 6.0.5
+    "@visulima/fs": 6.0.29
     "@visulima/humanizer": 4.0.0
-    "@visulima/package": 5.0.18
-    "@visulima/packem": 2.0.0-alpha.94
+    "@visulima/package": 5.0.43
+    "@visulima/packem": 2.0.0
     "@visulima/pail": 4.1.1
     "@visulima/path": 4.0.0
     "@visulima/source-map": 3.0.1
     "@visulima/tabular": 4.1.0
-    "@visulima/tsconfig": 3.2.12
+    "@visulima/tsconfig": 3.2.37
 dedupeInjectedDeps: true
 dedupePeerDependents: true
 disallowWorkspaceCycles: false
@@ -490,7 +490,7 @@ overrides:
   browserslist@<4.28.7: ">=4.29.3"
   chrono-node@<2.2.4: ">=2.10.3"
   defu@<6.1.5: ">=6.1.7"
-  devalue@>=5.0.0 <5.8.1: ">=6.0.2"
+  devalue@>=5.0.0 <5.8.1: ">=6.0.3"
   diff@>=5.0.0 <5.2.2: ">=9.0.0"
   esbuild@>=0.0.0 <0.28.1: ">=0.28.2"
   eslint-plugin-sonarjs@<4.2.0: ">=4.2.0"
@@ -508,7 +508,10 @@ overrides:
   js-yaml@>=4.0.0 <4.3.1: ">=4.3.1 <6"
   lodash@<4.18.0: ">=4.18.0"
   lodash-es@<4.18.0: ">=4.18.0"
-  markdown-it@<14.2.0: ">=15.0.2"
+  markdown-it@<14.2.0: ">=15.0.3"
+  markdown-it@>=14.1.0 <14.3.3: ">=14.3.3"
+  markdown-it@>=15.0.0 <15.0.3: ">=15.0.3"
+  "typedoc>markdown-it": "14.3.3"
   minimatch@<3.1.4: ">=7.4.9"
   minimatch@>=5.0.0 <5.1.8: ">=5.1.9"
   minimatch@>=9.0.0 <9.0.7: ">=9.0.9"
@@ -519,7 +522,7 @@ overrides:
   picomatch@<2.3.2: ">=2.3.2"
   picomatch@>=4.0.0 <4.0.4: ">=4.0.7"
   postcss@<8.5.23: ">=8.5.23 <9"
-  qs@<6.16.0: ">=6.16.0"
+  qs@<6.16.0: ">=6.16.1"
   shell-quote@<1.8.5: ">=1.12.0"
   # GHSA-p6vx-979v-rg4c (critical) and GHSA-jp82-f5mq-hwhp (high) are both fixed in
   # seroval 1.6.3. solid-js pins ~1.5.4, so force the patched release rather than
@@ -529,7 +532,7 @@ overrides:
   svgo@>=4.0.0 <4.0.2: ">=4.1.0"
   tmp@<0.2.7: ">=0.2.7"
   undici@<8.9.0: ">=8.9.0 <9"
-  vite@>=8.0.0 <8.0.5: ">=8.0.5"
+  vite@>=8.0.0 <8.0.5: ">=8.0.16"
   vite@>=8.2.0 <8.2.4: ">=8.2.4"
   ws@>=8.0.0 <8.21.0: ">=8.22.0"
   yaml@>=2.0.0 <2.8.3: ">=2.9.1"

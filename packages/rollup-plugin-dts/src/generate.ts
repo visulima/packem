@@ -69,59 +69,60 @@ export interface TsModule {
 /** dts filename -> ts module */
 export type DtsMap = Map<string, TsModule>;
 
-export const createGeneratePlugin = ({
-    build,
-    check,
-    customLanguages,
-    cwd,
-    eager,
-    emitDtsOnly,
-    emitJs,
-    entry,
-    exclude,
-    include,
-    incremental,
-    languageContext,
-    logger,
-    newContext,
-    oxc,
-    parallel,
-    sourcemap,
-    tsconfig,
-    tsconfigChainKey,
-    tsconfigRaw,
-    tsgo,
-    tsMacro,
-    vue,
-}: Pick<
-    OptionsResolved,
-    | "cwd"
-    | "tsconfig"
-    | "tsconfigChainKey"
-    | "tsconfigRaw"
-    | "build"
-    | "check"
-    | "customLanguages"
-    | "incremental"
-    | "languageContext"
-    | "oxc"
-    | "emitDtsOnly"
-    | "vue"
-    | "tsMacro"
-    | "parallel"
-    | "eager"
-    | "tsgo"
-    | "newContext"
-    | "emitJs"
-    | "sourcemap"
-    | "include"
-    | "exclude"
-    | "entry"
-    | "logger"
->,
-// Chunk names of the declaration entries this plugin emits, shared with the fake-js plugin so a
-// shared chunk never takes an entry's file name.
-entryChunkNames: Set<string> = new Set<string>(),
+export const createGeneratePlugin = (
+    {
+        build,
+        check,
+        customLanguages,
+        cwd,
+        eager,
+        emitDtsOnly,
+        emitJs,
+        entry,
+        exclude,
+        include,
+        incremental,
+        languageContext,
+        logger,
+        newContext,
+        oxc,
+        parallel,
+        sourcemap,
+        tsconfig,
+        tsconfigChainKey,
+        tsconfigRaw,
+        tsgo,
+        tsMacro,
+        vue,
+    }: Pick<
+        OptionsResolved,
+        | "cwd"
+        | "tsconfig"
+        | "tsconfigChainKey"
+        | "tsconfigRaw"
+        | "build"
+        | "check"
+        | "customLanguages"
+        | "incremental"
+        | "languageContext"
+        | "oxc"
+        | "emitDtsOnly"
+        | "vue"
+        | "tsMacro"
+        | "parallel"
+        | "eager"
+        | "tsgo"
+        | "newContext"
+        | "emitJs"
+        | "sourcemap"
+        | "include"
+        | "exclude"
+        | "entry"
+        | "logger"
+    >,
+    // Chunk names of the declaration entries this plugin emits, shared with the fake-js plugin so a
+    // shared chunk never takes an entry's file name.
+    entryChunkNames: Set<string> = new Set<string>(),
 ): Plugin => {
     const filter = include || exclude ? createFilter(include, exclude) : null;
 

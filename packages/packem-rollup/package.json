@@ -115,7 +115,6 @@
         "@visulima/packem-share": "1.1.0",
         "@visulima/path": "catalog:visulima",
         "@visulima/rollup-plugin-dts": "2.0.0",
-        "clean-css": "catalog:style",
         "html-minifier-next": "catalog:prod",
         "magic-string": "catalog:utils",
         "oxc-resolver": "catalog:node",
@@ -139,7 +138,6 @@
         "@swc/core": "catalog:dev",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/babel__core": "catalog:types",
-        "@types/clean-css": "catalog:types",
         "@types/estree": "catalog:types",
         "@types/html-minifier-next": "catalog:types",
         "@types/node": "catalog:types",
@@ -171,7 +169,7 @@
     "peerDependencies": {
         "@swc/core": "*",
         "esbuild": "*",
-        "rollup": ">=4.61.1",
+        "rollup": ">=4.64.6",
         "sucrase": "*"
     },
     "peerDependenciesMeta": {

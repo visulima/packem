@@ -51,17 +51,15 @@ describe("check option", () => {
         it("does not type-check by default", async () => {
             expect.assertions(1);
 
-            await expect(
-                buildDeclarations(errorEntry, { emitDtsOnly: true, generator: "tsc", tsconfig: errorTsconfig }),
-            ).resolves.toMatch(DECLARATION_RE);
+            await expect(buildDeclarations(errorEntry, { emitDtsOnly: true, generator: "tsc", tsconfig: errorTsconfig })).resolves.toMatch(DECLARATION_RE);
         });
 
         it("fails the build with the diagnostic code when check is true", async () => {
             expect.assertions(1);
 
-            await expect(
-                buildDeclarations(errorEntry, { check: true, emitDtsOnly: true, generator: "tsc", tsconfig: errorTsconfig }),
-            ).rejects.toThrow(TS2322_RE);
+            await expect(buildDeclarations(errorEntry, { check: true, emitDtsOnly: true, generator: "tsc", tsconfig: errorTsconfig })).rejects.toThrow(
+                TS2322_RE,
+            );
         });
 
         it("fails the project build in build mode when check is true", async () => {
@@ -75,9 +73,9 @@ describe("check option", () => {
         it("builds a valid source when check is true", async () => {
             expect.assertions(1);
 
-            await expect(
-                buildDeclarations(validEntry, { check: true, emitDtsOnly: true, generator: "tsc", tsconfig: validTsconfig }),
-            ).resolves.toMatch(DECLARATION_RE);
+            await expect(buildDeclarations(validEntry, { check: true, emitDtsOnly: true, generator: "tsc", tsconfig: validTsconfig })).resolves.toMatch(
+                DECLARATION_RE,
+            );
         });
 
         it("fails a second build-mode check when the edited source looks older than the build info", async () => {
@@ -128,25 +126,25 @@ describe("check option", () => {
         it("does not type-check by default", async () => {
             expect.assertions(1);
 
-            await expect(
-                buildDeclarations(errorEntry, { emitDtsOnly: true, tsconfig: errorTsconfig, tsgo: { path: tsgoPath } }),
-            ).resolves.toMatch(DECLARATION_RE);
+            await expect(buildDeclarations(errorEntry, { emitDtsOnly: true, tsconfig: errorTsconfig, tsgo: { path: tsgoPath } })).resolves.toMatch(
+                DECLARATION_RE,
+            );
         });
 
         it("fails the build with the diagnostic code when check is true", async () => {
             expect.assertions(1);
 
-            await expect(
-                buildDeclarations(errorEntry, { check: true, emitDtsOnly: true, tsconfig: errorTsconfig, tsgo: { path: tsgoPath } }),
-            ).rejects.toThrow(TS2322_RE);
+            await expect(buildDeclarations(errorEntry, { check: true, emitDtsOnly: true, tsconfig: errorTsconfig, tsgo: { path: tsgoPath } })).rejects.toThrow(
+                TS2322_RE,
+            );
         });
 
         it("builds a valid source when check is true", async () => {
             expect.assertions(1);
 
-            await expect(
-                buildDeclarations(validEntry, { check: true, emitDtsOnly: true, tsconfig: validTsconfig, tsgo: { path: tsgoPath } }),
-            ).resolves.toMatch(DECLARATION_RE);
+            await expect(buildDeclarations(validEntry, { check: true, emitDtsOnly: true, tsconfig: validTsconfig, tsgo: { path: tsgoPath } })).resolves.toMatch(
+                DECLARATION_RE,
+            );
         });
     });
 
@@ -156,9 +154,9 @@ describe("check option", () => {
 
             const logger = createLogger();
 
-            await expect(
-                buildDeclarations(errorEntry, { check: true, emitDtsOnly: true, logger, oxc: true, tsconfig: errorTsconfig }),
-            ).resolves.toMatch(DECLARATION_RE);
+            await expect(buildDeclarations(errorEntry, { check: true, emitDtsOnly: true, logger, oxc: true, tsconfig: errorTsconfig })).resolves.toMatch(
+                DECLARATION_RE,
+            );
             expect(logger.warn).toHaveBeenCalledTimes(1);
             expect(logger.warn).toHaveBeenCalledWith(expect.stringMatching(CHECK_WARNING_RE));
         });

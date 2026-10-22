@@ -180,13 +180,14 @@ export class LanguageContext {
                 }
             }
 
-            const setup = setups.length > 0
-                ? (language: never) => {
-                      for (const setupFunction of setups) {
-                          setupFunction(language);
+            const setup =
+                setups.length > 0
+                    ? (language: never) => {
+                          for (const setupFunction of setups) {
+                              setupFunction(language);
+                          }
                       }
-                  }
-                : undefined;
+                    : undefined;
 
             return { languagePlugins: plugins, setup };
         });
