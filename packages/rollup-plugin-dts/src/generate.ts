@@ -216,7 +216,7 @@ export const createGeneratePlugin = (
 
             if (tsgo) {
                 tsgoBuilds++;
-                tsgoRun ??= runTsgo(rootDir, tsconfig, sourcemap, tsgo.path, tsconfigRaw, logger, check);
+                tsgoRun ??= runTsgo(rootDir, tsconfig, sourcemap, tsgo.path, tsconfigRaw, logger, check, tsgo.runExternalCode);
                 tsgoDist = await tsgoRun;
             } else if (!oxc) {
                 // tsc

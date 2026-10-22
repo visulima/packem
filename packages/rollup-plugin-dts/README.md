@@ -55,7 +55,7 @@ When unset, the generator is inferred:
 - `'tsc'` whenever `vue`, `tsMacro`, or a Volar-based entry in `customLanguages` is used (they require the TypeScript compiler API).
 - `'tsgo'` if `tsgo` options are provided.
 - `'oxc'` if `oxc` options are provided, or `isolatedDeclarations` is enabled in `compilerOptions`.
-- `'tsgo'` if TypeScript 7.0 (or `@typescript/native-preview`) is installed.
+- `'tsgo'` if TypeScript 7 (or `@typescript/native-preview`) is installed.
 - `'tsc'` otherwise.
 
 **Default:** `'tsc'`
@@ -280,9 +280,17 @@ This option is automatically enabled when `isolatedDeclarations` in `compilerOpt
 
 Enables DTS generation using [`tsgo`](https://github.com/microsoft/typescript-go).
 
-To use this option, ensure that `@typescript/native-preview` is installed as a dependency.
+To use this option, install TypeScript 7 as a dependency (`@typescript/native-preview` works with older versions).
 
 `tsconfigRaw` and `compilerOptions` options will be ignored when this option is enabled.
+
+`tsgo.runExternalCode` (default `false`) passes `--runExternalCode` to tsgo, which lets it run the `contentMappers` configured in tsconfig. Mappers execute code from your dependencies, so the option must be set explicitly. Requires TypeScript 7.1 or later; TypeScript 7.0 rejects the flag. If tsconfig declares `contentMappers` without this option, tsgo fails with `TS18068` ("Content mappers require the '--runExternalCode' command line flag"). Declarations for mapped files are not yet verified end to end.
+
+```ts
+dts({
+    tsgo: { runExternalCode: true },
+});
+```
 
 ### Custom Languages
 

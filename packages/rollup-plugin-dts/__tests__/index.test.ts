@@ -17,6 +17,7 @@ const STUB_LIB_IMPORT_RE = /import\(['"]stub_lib['"]\)\.LibType/u;
 // Type-only exports may be emitted either inline (`export { type X }`) or
 // normalized (`export type { X }`); both are accepted.
 const TYPE_TASK_WRAPPER_RE = /export\s+type\s*\{[^}]*\bTaskWrapper\b|export\s*\{[^}]*\btype\s+TaskWrapper\b/u;
+const TS7_NATIVE_COMPILER_RE = /TypeScript 7 \(the native compiler\)/u;
 const TYPE_TASK_RE = /export\s+type\s*\{[^}]*\bTask\b|export\s*\{[^}]*\btype\s+Task\b/u;
 const TYPE_FOO_RE = /export\s+type\s*\{[^}]*\bFoo\b|export\s*\{[^}]*\btype\s+Foo\b/u;
 const EXPORT_BRACE_RE = /export\s*\{/u;
@@ -993,7 +994,7 @@ describe("dts plugin", () => {
             const spy = vi.spyOn(tsgoModule, "isTS70Installed").mockReturnValue(true);
 
             try {
-                expect(() => resolveOptions({ generator: "tsc", tsconfig: false })).toThrow(/TypeScript 7\.0/);
+                expect(() => resolveOptions({ generator: "tsc", tsconfig: false })).toThrow(TS7_NATIVE_COMPILER_RE);
             } finally {
                 spy.mockRestore();
             }

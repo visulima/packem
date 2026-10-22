@@ -132,7 +132,14 @@ export const getTsgoPathFromNodeModules = (logger: Logger = console): string => 
  *
  * Kept as a pure function so the flag wiring can be unit-tested without spawning a process.
  */
-export const buildTsgoArgs = (project: string | undefined, tsgoDist: string, rootDirectory: string, sourcemap?: boolean, check = false): string[] => [
+export const buildTsgoArgs = (
+    project: string | undefined,
+    tsgoDist: string,
+    rootDirectory: string,
+    sourcemap?: boolean,
+    check = false,
+    runExternalCode = false,
+): string[] => [
     "--noEmit",
     "false",
     "--declaration",
@@ -144,6 +151,8 @@ export const buildTsgoArgs = (project: string | undefined, tsgoDist: string, roo
     rootDirectory,
     ...(check ? [] : ["--noCheck"]),
     ...(sourcemap ? ["--declarationMap"] : []),
+    // Content mappers from tsconfig run as external processes; tsgo refuses them without this flag.
+    ...(runExternalCode ? ["--runExternalCode"] : []),
 ];
 
 export const getTsgoEmitRoot = (rootDirectory: string): string => path.parse(rootDirectory).root;
@@ -156,6 +165,7 @@ export const runTsgo = async (
     tsconfigRaw?: TsConfigJson,
     logger: Logger = console,
     check = false,
+    runExternalCode = false,
 ): Promise<string> => {
     debug("[tsgo] rootDir", rootDirectory);
 
@@ -205,7 +215,7 @@ export const runTsgo = async (
     // Root the emit at the filesystem root so every declaration lands in the temp outDir: with a
     // narrower rootDir tsgo writes files outside it (e.g. workspace packages resolved to their
     // sources) next to those sources. `getTsgoEmitRoot` is shared with the reader in generate.ts.
-    const args = buildTsgoArgs(project, tsgoDist, getTsgoEmitRoot(rootDirectory), sourcemap, check);
+    const args = buildTsgoArgs(project, tsgoDist, getTsgoEmitRoot(rootDirectory), sourcemap, check, runExternalCode);
 
     debug("[tsgo] args %o", args);
 
