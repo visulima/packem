@@ -1,3 +1,17 @@
+## @visulima/packem-share [1.1.1](https://github.com/visulima/packem/compare/@visulima/packem-share@1.1.0...@visulima/packem-share@1.1.1) (2026-10-22)
+
+### Bug Fixes
+
+* **packem-share:** declare runtime type dependencies ([8ca3259](https://github.com/visulima/packem/commit/8ca3259cd16d1a154bd6a307be885b4852e876f9))
+
+
+### Dependencies
+
+* **rollup:** 4.63.6 → 4.64.6
+* **@visulima/fs:** 6.0.5 → 6.0.29
+* **@visulima/package:** 5.0.18 → 5.0.43
+* **@visulima/tsconfig:** 3.2.12 → 3.2.37
+
 ## @visulima/packem-share [1.1.0](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.1...@visulima/packem-share@1.1.0) (2026-10-15)
 
 ### Features
