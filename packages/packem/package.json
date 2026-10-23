@@ -349,7 +349,7 @@
         "stylus": ">=0.64.0",
         "sucrase": ">=3.35.1",
         "typedoc": ">=0.28.20",
-        "typedoc-plugin-markdown": ">=4.14.0",
+        "typedoc-plugin-markdown": ">=4.14.1",
         "typedoc-plugin-rename-defaults": ">=0.7.3",
         "typescript": ">=6.0.3",
         "unplugin-vue": ">=7.2.0"
