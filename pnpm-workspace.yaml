@@ -282,7 +282,7 @@ catalogs:
     "@visulima/path": 4.0.0
     "@visulima/source-map": 3.0.1
     "@visulima/tabular": 4.1.0
-    "@visulima/tsconfig": 3.2.37
+    "@visulima/tsconfig": 3.2.38
 dedupeInjectedDeps: true
 dedupePeerDependents: true
 disallowWorkspaceCycles: false
