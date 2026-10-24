@@ -206,7 +206,7 @@ catalogs:
     less: 4.9.1
     lightningcss: 1.33.0
     minireset.css: 0.0.7
-    postcss: 8.5.30
+    postcss: 8.5.31
     postcss-custom-properties: 15.0.4
     postcss-load-config: ^6.0.1
     postcss-modules: 9.0.1
