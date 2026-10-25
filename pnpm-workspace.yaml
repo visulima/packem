@@ -57,9 +57,9 @@ catalogs:
     unplugin-vue: 7.2.0
     vite: 8.2.4
   cli:
-    "@anolilab/multi-semantic-release": 4.4.25
-    "@anolilab/semantic-release-pnpm": 8.1.34
-    "@anolilab/semantic-release-preset": 13.4.36
+    "@anolilab/multi-semantic-release": 4.6.0
+    "@anolilab/semantic-release-pnpm": 8.1.35
+    "@anolilab/semantic-release-preset": 13.4.37
     commitizen: ^4.3.2
     semantic-release: 25.0.9
   dev:
@@ -67,8 +67,8 @@ catalogs:
     "@babel/core": 8.0.7
     "@babel/parser": 8.0.7
     "@mozilla/readability": ^0.6.0
-    "@oxc-parser/binding-linux-x64-gnu": 0.154.0
-    "@oxc-project/types": 0.154.0
+    "@oxc-parser/binding-linux-x64-gnu": 0.155.0
+    "@oxc-project/types": 0.155.0
     "@svgr/core": ^8.1.0
     "@swc/core": 1.16.18
     "@swc/helpers": 0.5.23
@@ -84,8 +84,8 @@ catalogs:
     lit: 3.3.3
     mime: ^4.1.1
     nodehun: ^3.0.2
-    oxc-parser: 0.154.0
-    oxc-transform: 0.154.0
+    oxc-parser: 0.155.0
+    oxc-transform: 0.155.0
     p-queue: 9.3.5
     package-manager-detector: ^1.9.0
     picocolors: ^1.1.1
@@ -118,11 +118,11 @@ catalogs:
     "@anolilab/lint-staged-config": 13.0.1
     "@anolilab/prettier-config": 10.0.4
     "@anolilab/textlint-config": 13.0.6
-    "@commitlint/cli": 21.2.2
-    "@commitlint/config-conventional": 21.2.2
+    "@commitlint/cli": 21.2.4
+    "@commitlint/config-conventional": 21.2.4
     "@eslint/css": 2.0.1
     "@secretlint/secretlint-rule-preset-recommend": 13.0.7
-    eslint: 10.12.0
+    eslint: 10.13.0
     husky: ^9.1.7
     lint-staged: 17.6.0
     prettier: 3.9.10
@@ -133,11 +133,11 @@ catalogs:
   markdown:
     turndown: 7.2.4
     turndown-plugin-gfm: ^1.0.2
-    typedoc-plugin-markdown: 4.14.0
+    typedoc-plugin-markdown: 4.14.1
   monorepo:
     nx: 23.3.0
   network:
-    browserslist: 4.29.3
+    browserslist: 4.29.4
     browserslist-config-anolilab: 9.0.1
   node:
     "@antfu/install-pkg": 2.1.0
@@ -146,7 +146,7 @@ catalogs:
     cac: 7.1.0
     cross-env: ^10.1.0
     dts-resolver: 3.0.0
-    execa: ^10.1.1
+    execa: ^10.2.0
     glob-parent: 6.0.2
     oxc-resolver: 11.24.2
     pkg-pr-new: 0.0.91
@@ -164,15 +164,15 @@ catalogs:
     clsx: ^2.1.1
     fastest-levenshtein: 1.0.16
     get-tsconfig: 4.14.3
-    gpt-tokenizer: ^4.0.3
-    happy-dom: 20.14.6
+    gpt-tokenizer: ^4.1.0
+    happy-dom: 21.0.4
     hookable: 6.1.2
-    html-minifier-next: 8.10.8
+    html-minifier-next: 8.11.0
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.2
     obug: 2.2.1
-    oxc-parser: 0.154.0
+    oxc-parser: 0.155.0
     p-queue: 9.3.5
     picomatch: 4.0.7
     plop: 4.0.5
@@ -206,7 +206,7 @@ catalogs:
     less: 4.9.1
     lightningcss: 1.33.0
     minireset.css: 0.0.7
-    postcss: 8.5.30
+    postcss: 8.5.31
     postcss-custom-properties: 15.0.4
     postcss-load-config: ^6.0.1
     postcss-modules: 9.0.1
@@ -282,7 +282,7 @@ catalogs:
     "@visulima/path": 4.0.0
     "@visulima/source-map": 3.0.1
     "@visulima/tabular": 4.1.0
-    "@visulima/tsconfig": 3.2.37
+    "@visulima/tsconfig": 3.2.38
 dedupeInjectedDeps: true
 dedupePeerDependents: true
 disallowWorkspaceCycles: false
@@ -487,21 +487,21 @@ overrides:
   brace-expansion@<5.0.12: ">=5.0.12 <6"
   # nx pins smol-toml@1.6.1 exactly; GHSA-7w5x-hrqm-74c2 is fixed in 1.7.1.
   smol-toml@<1.7.1: ">=1.7.1 <2"
-  browserslist@<4.28.7: ">=4.29.3"
+  browserslist@<4.28.7: ">=4.29.4"
   chrono-node@<2.2.4: ">=2.10.3"
   defu@<6.1.5: ">=6.1.7"
   devalue@>=5.0.0 <5.8.1: ">=6.0.3"
   diff@>=5.0.0 <5.2.2: ">=9.0.0"
   esbuild@>=0.0.0 <0.28.1: ">=0.28.2"
   eslint-plugin-sonarjs@<4.2.0: ">=4.2.0"
-  fast-uri@<3.1.6: ">=3.1.6 <5"
+  fast-uri@<3.1.9: ">=3.1.9 <4"
   flatted@<3.4.2: ">=3.4.4"
   follow-redirects@<1.16.1: ">=1.16.1"
   http-cache-semantics@<=4.2.0: ">=4.3.0 <5"
   form-data@>=4.0.0 <4.0.6: ">=4.0.6"
   glob@>=10.0.0 <10.5.0: ">=13.0.6"
   handlebars@>=4.0.0 <4.7.9: ">=4.7.10"
-  happy-dom@>=15.0.0 <20.8.8: ">=20.14.6"
+  happy-dom@>=15.0.0 <21.0.4: ">=21.0.4"
   hono@<4.12.34: ">=4.12.34 <5"
   immutable@>=5.0.0 <5.1.8: ">=5.1.9"
   ip-address@<10.3.1: ">=10.3.1 <11"
@@ -527,12 +527,12 @@ overrides:
   # GHSA-p6vx-979v-rg4c (critical) and GHSA-jp82-f5mq-hwhp (high) are both fixed in
   # seroval 1.6.3. solid-js pins ~1.5.4, so force the patched release rather than
   # hiding the advisories from `pnpm audit` workspace-wide.
-  seroval@<1.6.3: ">=1.6.9"
+  seroval@<1.6.3: ">=1.6.11"
   svelte@<5.55.7: ">=5.57.2"
   svgo@>=4.0.0 <4.0.2: ">=4.1.0"
   tmp@<0.2.7: ">=0.2.7"
-  undici@<8.9.0: ">=8.9.0 <9"
-  vite@>=8.0.0 <8.0.5: ">=8.0.16"
+  undici@<8.12.2: ">=8.12.2 <9"
+  vite@>=8.0.0 <8.0.5: ">=8.3.5"
   vite@>=8.2.0 <8.2.4: ">=8.2.4"
   ws@>=8.0.0 <8.21.0: ">=8.22.0"
   yaml@>=2.0.0 <2.8.3: ">=2.9.1"
