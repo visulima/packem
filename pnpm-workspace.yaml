@@ -40,7 +40,7 @@ catalogs:
     "@rollup/plugin-node-resolve": 16.0.3
     "@rollup/plugin-replace": 6.0.3
     "@rollup/plugin-wasm": 6.2.2
-    "@rollup/pluginutils": 5.4.0
+    "@rollup/pluginutils": 5.5.1
     "@visulima/packem-rollup": 1.0.0
     "@visulima/rollup-plugin-css": 1.0.1
     esbuild: 0.28.2
