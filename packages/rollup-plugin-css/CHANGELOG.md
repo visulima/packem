@@ -1,3 +1,23 @@
+## @visulima/rollup-plugin-css [3.0.2](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@3.0.1...@visulima/rollup-plugin-css@3.0.2) (2026-10-26)
+
+### Bug Fixes
+
+* **deps:** update all dependencies to latest ([#419](https://github.com/visulima/packem/issues/419)) ([4573e39](https://github.com/visulima/packem/commit/4573e396cdcdb268d06108d97435039402072d79)), closes [/#region](https://github.com/visulima///issues/region) [rolldown#11235](https://github.com/visulima/rolldown/issues/11235)
+
+### Miscellaneous Chores
+
+* **deps:** combine open Renovate updates (8 PRs) ([#416](https://github.com/visulima/packem/issues/416)) ([a776b8b](https://github.com/visulima/packem/commit/a776b8b2326850d03a4049eb8545432e5f4180d6)), closes [#410](https://github.com/visulima/packem/issues/410) [#401](https://github.com/visulima/packem/issues/401) [#398](https://github.com/visulima/packem/issues/398) [#399](https://github.com/visulima/packem/issues/399) [#402](https://github.com/visulima/packem/issues/402) [#415](https://github.com/visulima/packem/issues/415) [#405](https://github.com/visulima/packem/issues/405) [#403](https://github.com/visulima/packem/issues/403)
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.1.2
+* **@rollup/pluginutils:** 5.4.0 → 5.5.1
+* **p-queue:** 9.3.5 → 10.0.0
+* **@visulima/fs:** 6.0.29 → 7.0.0
+* **@visulima/package:** 5.0.43 → 6.0.0
+* **@visulima/path:** 4.0.0 → 5.0.0
+
 ## @visulima/rollup-plugin-css [3.0.1](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@3.0.0...@visulima/rollup-plugin-css@3.0.1) (2026-10-22)
 
 ### Bug Fixes
