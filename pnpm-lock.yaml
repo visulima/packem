@@ -643,6 +643,8 @@ overrides:
   ws@>=8.0.0 <8.21.0: '>=8.22.0'
   yaml@>=2.0.0 <2.8.3: '>=2.9.1'
 
+packageExtensionsChecksum: sha256-kDoYTE5/S31yc/hlb9EMF82fbIxvfSGDXrIt91L1I0Y=
+
 pnpmfileChecksum: sha256-Wzgu78gay+v6MunApP3nY8NLqA2rjoJktL31h20yv5I=
 
 patchedDependencies:
@@ -21380,6 +21382,7 @@ snapshots:
   '@semantic-release/release-notes-generator@14.1.1(semantic-release@25.0.9(supports-color@10.2.2)(typescript@6.0.3))(supports-color@10.2.2)':
     dependencies:
       conventional-changelog-angular: 8.3.1
+      conventional-changelog-conventionalcommits: 9.3.1
       conventional-changelog-writer: 8.4.0
       conventional-commits-filter: 5.0.0
       conventional-commits-parser: 6.4.0
