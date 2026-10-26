@@ -1,3 +1,22 @@
+## @visulima/rollup-plugin-dts [2.1.0](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@2.0.1...@visulima/rollup-plugin-dts@2.1.0) (2026-10-26)
+
+### Features
+
+* **rollup-plugin-dts:** support TypeScript 7.1 content mappers in the tsgo backend ([a73a00b](https://github.com/visulima/packem/commit/a73a00b9653dab1468b6c001db2d1a331a147aa5))
+
+### Bug Fixes
+
+* **deps:** update all dependencies to latest ([#419](https://github.com/visulima/packem/issues/419)) ([4573e39](https://github.com/visulima/packem/commit/4573e396cdcdb268d06108d97435039402072d79)), closes [/#region](https://github.com/visulima///issues/region) [rolldown#11235](https://github.com/visulima/rolldown/issues/11235)
+
+
+### Dependencies
+
+* **@rollup/pluginutils:** 5.4.0 → 5.5.1
+* **oxc-transform:** 0.154.0 → 0.155.0
+* **obug:** 2.2.1 → 3.0.0
+* **@visulima/path:** 4.0.0 → 5.0.0
+* **@visulima/tsconfig:** 3.2.37 → 3.2.38
+
 ## @visulima/rollup-plugin-dts [2.0.1](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@2.0.0...@visulima/rollup-plugin-dts@2.0.1) (2026-10-22)
 
 ### Bug Fixes
