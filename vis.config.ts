@@ -10,6 +10,10 @@ import { defineConfig } from "@visulima/vis/config";
 //
 // The `"!packem"` entries in packages/*/project.json are ignored by vis for now
 // (https://github.com/visulima/vis/issues/51): affected runs select a superset of what nx did.
+//
+// The root test scripts pass `--no-color`: vis forces FORCE_COLOR=1 into every task even
+// without a TTY (https://github.com/visulima/vis/issues/53), and packem's integration tests
+// match the CLI's uncoloured output.
 export default defineConfig({
     defaultBase: "main",
     namedInputs: {

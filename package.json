@@ -40,12 +40,12 @@
         "plop": "plop",
         "prepare": "is-ci || husky || exit 0",
         "sort-package-json": "sort-package-json packages/**/package.json examples/**/package.json benchmarks/package.json ./package.json",
-        "test": "vis run test --query \"tag=type:package\"",
-        "test:affected": "vis affected test --fail-fast --query \"tag=type:package\"",
+        "test": "vis run test --no-color --query \"tag=type:package\"",
+        "test:affected": "vis affected test --no-color --fail-fast --query \"tag=type:package\"",
         "test:affected:bench": "vis affected test:bench --fail-fast --query \"tag=type:package\"",
-        "test:affected:coverage": "vis affected test:coverage --fail-fast --query \"tag=type:package\"",
+        "test:affected:coverage": "vis affected test:coverage --no-color --fail-fast --query \"tag=type:package\"",
         "test:bench": "vis run test:bench",
-        "test:coverage": "vis run test:coverage --fail-fast --query \"tag=type:package\""
+        "test:coverage": "vis run test:coverage --no-color --fail-fast --query \"tag=type:package\""
     },
     "browserslist": [
         "extends browserslist-config-anolilab"
