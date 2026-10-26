@@ -1964,16 +1964,16 @@ importers:
         specifier: catalog:visulima
         version: 4.0.1(@visulima/find-cache-dir@4.0.0)(@visulima/pail@6.0.0)(github-slugger@2.0.0)
       '@visulima/packem-share':
-        specifier: 1.1.1
+        specifier: 1.1.2
         version: link:../packem-share
       '@visulima/pail':
         specifier: catalog:visulima
         version: 6.0.0
       '@visulima/rollup-plugin-css':
-        specifier: 3.0.1
+        specifier: 3.0.2
         version: link:../rollup-plugin-css
       '@visulima/rollup-plugin-dts':
-        specifier: 2.0.1
+        specifier: 2.1.0
         version: link:../rollup-plugin-dts
       '@visulima/tsconfig':
         specifier: catalog:visulima
@@ -2145,7 +2145,7 @@ importers:
         specifier: workspace:*
         version: link:../packem-plugins
       '@visulima/packem-rollup':
-        specifier: 1.2.2
+        specifier: 1.2.3
         version: link:../packem-rollup
       '@visulima/path':
         specifier: catalog:visulima
@@ -2617,13 +2617,13 @@ importers:
         specifier: catalog:visulima
         version: 6.0.0(ini@7.0.0)(jsonc-parser@3.3.1)(smol-toml@1.9.1)
       '@visulima/packem-share':
-        specifier: 1.1.1
+        specifier: 1.1.2
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
         version: 5.0.0
       '@visulima/rollup-plugin-dts':
-        specifier: 2.0.1
+        specifier: 2.1.0
         version: link:../rollup-plugin-dts
       html-minifier-next:
         specifier: catalog:prod
@@ -2963,7 +2963,7 @@ importers:
         specifier: catalog:visulima
         version: 6.0.0(ini@7.0.0)(jsonc-parser@3.3.1)(smol-toml@1.9.1)
       '@visulima/packem-share':
-        specifier: 1.1.1
+        specifier: 1.1.2
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
