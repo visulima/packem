@@ -1,3 +1,30 @@
+## @visulima/packem [4.0.2](https://github.com/visulima/packem/compare/@visulima/packem@4.0.1...@visulima/packem@4.0.2) (2026-10-26)
+
+### Bug Fixes
+
+* **deps:** update all dependencies to latest ([#419](https://github.com/visulima/packem/issues/419)) ([4573e39](https://github.com/visulima/packem/commit/4573e396cdcdb268d06108d97435039402072d79)), closes [/#region](https://github.com/visulima///issues/region) [rolldown#11235](https://github.com/visulima/rolldown/issues/11235)
+
+### Miscellaneous Chores
+
+* **deps:** combine open Renovate updates (8 PRs) ([#416](https://github.com/visulima/packem/issues/416)) ([a776b8b](https://github.com/visulima/packem/commit/a776b8b2326850d03a4049eb8545432e5f4180d6)), closes [#410](https://github.com/visulima/packem/issues/410) [#401](https://github.com/visulima/packem/issues/401) [#398](https://github.com/visulima/packem/issues/398) [#399](https://github.com/visulima/packem/issues/399) [#402](https://github.com/visulima/packem/issues/402) [#415](https://github.com/visulima/packem/issues/415) [#405](https://github.com/visulima/packem/issues/405) [#403](https://github.com/visulima/packem/issues/403)
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.1.2
+* **@visulima/rollup-plugin-css:** upgraded to 3.0.2
+* **@visulima/rollup-plugin-dts:** upgraded to 2.1.0
+* **@visulima/packem-rollup:** upgraded to 1.2.3
+* **@rollup/pluginutils:** 5.4.0 → 5.5.1
+* **@babel/core:** 8.0.7 → 8.0.9
+* **oxc-parser:** 0.154.0 → 0.155.0
+* **oxc-transform:** 0.154.0 → 0.155.0
+* **browserslist:** 4.29.3 → 4.29.4
+* **html-minifier-next:** 8.10.8 → 9.1.0
+* **@visulima/cerebro:** 3.1.3 → 4.0.1
+* **@visulima/pail:** 4.1.1 → 6.0.0
+* **@visulima/tsconfig:** 3.2.37 → 3.2.38
+
 ## @visulima/packem [4.0.1](https://github.com/visulima/packem/compare/@visulima/packem@4.0.0...@visulima/packem@4.0.1) (2026-10-22)
 
 ### Bug Fixes
