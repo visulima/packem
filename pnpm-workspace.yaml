@@ -465,6 +465,14 @@ onlyBuiltDependencies:
   - oxc-resolver
   - rs-module-lexer
   - unrs-resolver
+packageExtensions:
+  # The generator loads its preset from its own location before the package's, which finds
+  # the hoisted copy: 10.x, via @commitlint/config-conventional. 10 needs
+  # conventional-changelog-writer 9, the generator renders with writer 8, and the release
+  # then fails at generateNotes with "Missing helper". Drop this once the generator moves to writer 9.
+  "@semantic-release/release-notes-generator@14":
+    dependencies:
+      conventional-changelog-conventionalcommits: 9.3.1
 auditConfig:
   ignoreGhsas:
     # GHSA-vfj7-8cjw-p6xm (braces stack exhaustion) has no fix: the advisory covers <=3.0.3
