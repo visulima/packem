@@ -1,3 +1,17 @@
+## @visulima/packem-share [1.1.2](https://github.com/visulima/packem/compare/@visulima/packem-share@1.1.1...@visulima/packem-share@1.1.2) (2026-10-26)
+
+
+### Dependencies
+
+* **rollup:** 4.64.6 → 4.65.0
+* **safe-stable-stringify:** ^2.5.0 → ^3.0.0
+* **@visulima/colorize:** 2.1.1 → 3.0.0
+* **@visulima/fs:** 6.0.29 → 7.0.0
+* **@visulima/package:** 5.0.43 → 6.0.0
+* **@visulima/pail:** 4.1.1 → 6.0.0
+* **@visulima/path:** 4.0.0 → 5.0.0
+* **@visulima/tsconfig:** 3.2.37 → 3.2.38
+
 ## @visulima/packem-share [1.1.1](https://github.com/visulima/packem/compare/@visulima/packem-share@1.1.0...@visulima/packem-share@1.1.1) (2026-10-22)
 
 ### Bug Fixes
