@@ -465,13 +465,6 @@ onlyBuiltDependencies:
   - oxc-resolver
   - rs-module-lexer
   - unrs-resolver
-packageExtensions:
-  # @visulima/fs 7 keeps YAML reading behind an optional @visulima/yaml peer (2.0.0), which
-  # pnpm never installs on its own. @anolilab/lint-staged-config reads a YAML config
-  # through it, so its config loader throws ERR_MODULE_NOT_FOUND without this.
-  "@anolilab/lint-staged-config":
-    dependencies:
-      "@visulima/yaml": 2.0.0
 auditConfig:
   ignoreGhsas:
     # GHSA-vfj7-8cjw-p6xm (braces stack exhaustion) has no fix: the advisory covers <=3.0.3
