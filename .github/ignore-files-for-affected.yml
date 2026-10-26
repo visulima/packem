@@ -1,0 +1,36 @@
+.github/**
+plop/**
+.husky/**
+.vis/**
+examples/**
+# benchmarks/projects/react-synthetic alone is ~5k committed files. vis computes
+# affected projects from git refs, not from this list, so the benchmark files
+# only ever feed the changed-files output we interpolate downstream (codecov
+# affected-files). Including them there overflows the OS arg/env limit (spawn
+# E2BIG: "/usr/bin/bash ... Argument list too long"). The bench project is
+# excluded from build/test/lint anyway.
+benchmarks/**
+.czrc
+.editorconfig
+.gitattributes
+.gitignore
+.lintstagedrc.cjs
+.lintstagedrc.cjs
+.npmignore
+.prettierignore
+.prettierrc.cjs
+.secretlintignore
+.secretlintrc.cjs
+.textlintignore
+.textlintrc
+.yamllint.yaml
+audit-ci.jsonc
+codecov.yml
+commitlint.config.cjs
+vis.config.ts
+plop.js
+pnpm-lock.yaml
+pnpm-workspace.yaml
+tsconfig.base.json
+tsconfig.eslint.json
+tsconfig.json

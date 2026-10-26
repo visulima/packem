@@ -261,11 +261,11 @@ const getTransformer = memoize(async (name: string) => {
 Multi-level caching for build artifacts:
 
 ```typescript
-// Nx workspace-level caching
+// vis workspace-level caching
 // Rollup plugin-level caching
 // Transformer-level caching
 const cache = new LayeredCache([
-  new NxCache(),
+  new VisCache(),
   new RollupCache(),
   new TransformerCache(),
 ]);

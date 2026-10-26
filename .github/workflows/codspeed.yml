@@ -17,10 +17,6 @@ concurrency:
 permissions:
     contents: "read" # to fetch code (actions/checkout)
 
-env:
-    NX_BRANCH: "${{ github.event.number || github.ref_name }}"
-    NX_RUN_GROUP: "${{ github.run_id }}"
-
 jobs:
     # PR-only gate: a docs-only PR skips the whole install/build/bench job. Push
     # runs are never gated — CodSpeed needs a complete baseline on every branch
@@ -73,17 +69,15 @@ jobs:
             - name: "Git checkout"
               uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
               with:
-                  # Full history so `nx affected` can resolve the PR base ref.
+                  # Full history so `vis affected` can resolve the PR base ref.
                   fetch-depth: 0
                   persist-credentials: false
-
-            - name: "Derive appropriate SHAs for base and head for `nx affected` commands"
-              id: "setSHAs"
-              uses: "nrwl/nx-set-shas@e602fada7ad5987b0f7b1905e7a99ea1c661514c" # v5.1.0
 
             - name: "Setup resources and environment"
               uses: "anolilab/workflows/step/setup@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
               with:
+                  # Nothing restores an nx cache any more; vis's task cache is not kept between runs.
+                  enable-nx-cache: "false"
                   node-version: "22.x"
                   cache-prefix: "codspeed-discover"
                   run-npm-audit: "false"
@@ -98,16 +92,21 @@ jobs:
               env:
                   EVENT_NAME: "${{ github.event_name }}"
               run: |
-                  if [ "$EVENT_NAME" = "pull_request" ]; then
-                      projects=$(pnpm exec nx show projects --affected --withTarget=test:bench --json 2>/dev/null | grep -E '^\[' | tail -n 1)
-                  else
-                      projects=$(pnpm exec nx show projects --withTarget=test:bench --json 2>/dev/null | grep -E '^\[' | tail -n 1)
-                  fi
+                  # Called directly, not through `pnpm exec`, whose banner would corrupt the JSON.
+                  vis="./node_modules/.bin/vis"
 
                   # `benchmarks` owns a test:bench target too, but it is the end-to-end
                   # build comparison: it measures wall-clock, must run sequentially on one
-                  # machine, and has nothing for CodSpeed to instrument.
-                  projects=$(echo "${projects:-[]}" | jq -c '[.[] | select(. != "benchmarks")]')
+                  # machine, and has nothing for CodSpeed to instrument. The type:package
+                  # tag leaves it out.
+                  all=$("$vis" action-graph test:bench --json --query "tag=type:package" | jq -c '[.tasks[] | {project: .target.project, root: .projectRoot}]')
+
+                  if [ "$EVENT_NAME" = "pull_request" ]; then
+                      roots=$("$vis" affected test:bench --sparse-checkout --query "tag=type:package" | jq -R . | jq -sc .)
+                      projects=$(jq -nc --argjson all "$all" --argjson roots "$roots" '[$all[] | select(.root | IN($roots[])) | .project]')
+                  else
+                      projects=$(echo "$all" | jq -c '[.[].project]')
+                  fi
 
                   if [ "$projects" = "[]" ]; then
                       echo "No affected bench projects."
@@ -149,13 +148,15 @@ jobs:
             - name: "Git checkout"
               uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
               with:
-                  # Full history so `nx affected` can resolve the PR base ref.
+                  # Full history so `vis affected` can resolve the PR base ref.
                   fetch-depth: 0
                   persist-credentials: false
 
             - name: "Setup resources and environment"
               uses: "anolilab/workflows/step/setup@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
               with:
+                  # Nothing restores an nx cache any more; vis's task cache is not kept between runs.
+                  enable-nx-cache: "false"
                   node-version: "22.x"
                   cache-prefix: "codspeed"
                   install-node-gyp: "true"
@@ -167,7 +168,7 @@ jobs:
             - name: "Build packages"
               run: "pnpm run build:prod:packages"
 
-            # `--skip-nx-cache` is deliberate: a cache hit would short-circuit the run
+            # `--no-cache` is deliberate: a cache hit would short-circuit the run
             # and hand CodSpeed no measurements at all.
             - name: "Run benchmark"
               env:
@@ -175,4 +176,4 @@ jobs:
               uses: "CodSpeedHQ/action@f22792bfac16f3e14eb9fbea76f4a48e9cc22b93" # v4.19.1
               with:
                   mode: "simulation"
-                  run: "pnpm exec nx run \"$BENCH_PROJECT\":test:bench --skip-nx-cache"
+                  run: "pnpm exec vis run test:bench --projects=${BENCH_PROJECT} --no-cache"
