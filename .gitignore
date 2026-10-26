@@ -61,13 +61,11 @@ storybook-static/
 # Optional textlint cache
 .textlintcache
 
-# Nx cache
-.nx/
+# vis run history and summaries (the task cache itself lives in node_modules/.cache/vis)
+.vis/
 
 # Package build output
 dist
-
-.nx/cache
 
 packages/packem/__fixtures__/ecosystem/**/packem.config.ts
 packages/rollup-plugin-dts/tests/**/temp/**
@@ -76,7 +74,6 @@ packages/rollup-plugin-dts/tests/**/temp/**
 .cursorignore
 .vscode/
 .codiumai.toml
-.github/instructions/nx.instructions.md
 
 packages/rollup-plugin-dts/__tests__/temp
 

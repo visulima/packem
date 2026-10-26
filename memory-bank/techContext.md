@@ -6,7 +6,7 @@
 - **Node.js**: 18+ (LTS support)
 - **TypeScript**: 5.8+ (latest features including isolated declarations)
 - **Rollup**: Core bundling engine for reliable output
-- **Nx**: Monorepo management and build orchestration
+- **vis**: Monorepo task orchestration, caching and affected detection
 - **pnpm**: Package manager with workspace support
 - **Vitest**: Testing framework for unit and integration tests
 
@@ -80,7 +80,7 @@ packages/packem/src/
 
 ### Development Workflow
 
-#### Nx Workspace Benefits
+#### vis Workspace Benefits
 - **Caching**: Intelligent build caching across packages
 - **Dependency Graph**: Clear project relationships
 - **Parallel Execution**: Efficient task running
@@ -122,7 +122,7 @@ packages/packem/src/
 - **Transformer Choice**: esbuild for speed, SWC for features, OXC for cutting-edge
 - **Parallel Processing**: Multi-core utilization where possible
 - **Incremental Builds**: Watch mode optimization
-- **Caching**: Nx-level and Rollup-level caching
+- **Caching**: vis task-level and Rollup-level caching
 
 ### Bundle Optimization
 - **Tree Shaking**: Dead code elimination

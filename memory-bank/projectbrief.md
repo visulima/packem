@@ -17,7 +17,7 @@ To provide a zero-configuration bundler that generates multiple bundles (CommonJ
 - **Modern Features**: Dynamic imports, WebAssembly, React Server Components
 
 ## Repository Structure
-- **Monorepo**: Nx workspace with pnpm package manager
+- **Monorepo**: pnpm workspace orchestrated by vis
 - **Main Package**: `packages/packem` - The core bundler
 - **Examples**: Extensive examples in `examples/` directory
 - **Tools**: Bundle lens and TypeDoc plugins
@@ -31,7 +31,7 @@ To provide a zero-configuration bundler that generates multiple bundles (CommonJ
 ## Technical Foundation
 - Built on Rollup for reliable bundling
 - Supports Node.js 18+ and TypeScript 5.8+
-- Uses Nx for monorepo management
+- Uses vis for monorepo task orchestration
 - Comprehensive test suite with Vitest
 - ESLint and TypeScript for code quality
 

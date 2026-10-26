@@ -22,8 +22,6 @@ permissions:
     contents: "read" # to fetch code (actions/checkout)
 
 env:
-    NX_BRANCH: "${{ github.event.number }}"
-    NX_RUN_GROUP: "${{ github.run_id }}"
     HEAD_REF: "${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}"
     HEAD_REPOSITORY: "${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}"
 
@@ -101,18 +99,16 @@ jobs:
                   EMAIL: "github-actions[bot]@users.noreply.github.com"
               with:
                   # Number of commits to fetch. 0 indicates all history for all branches and tags.
-                  # Pulls all commits (needed for NX)
+                  # Pulls all commits (needed for `vis affected`)
                   fetch-depth: 0
                   persist-credentials: false
-
-            - name: "Derive appropriate SHAs for base and head for `nx affected` commands"
-              id: "setSHAs"
-              uses: "nrwl/nx-set-shas@e602fada7ad5987b0f7b1905e7a99ea1c661514c" # v5.1.0
 
             - name: "Setup resources and environment"
               id: "setup"
               uses: "anolilab/workflows/step/setup@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
               with:
+                  # Nothing restores an nx cache any more; vis's task cache is not kept between runs.
+                  enable-nx-cache: "false"
                   node-version: "${{ matrix.node_version }}"
                   # The matrix spans node versions npm@latest (12.x, engines
                   # `^22.22 || ^24.15 || >=26`) refuses to install on, which fails the whole
@@ -131,24 +127,22 @@ jobs:
                   "SKIP_CHECK": "true" # is used to skip the check for the node version
                   "HUSKY": 0 # disable husky hooks on ci
 
-            # Temporary solution until Nx solve this https://github.com/nrwl/nx/issues/22259
+            # Feeds codecov's per-project affected filter below.
             - name: "Get changed files"
               id: "files"
               uses: "tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96" # v47.0.6
               with:
-                  files_ignore_from_source_file: ".github/ignore-files-for-nx-affected.yml"
-                  base_sha: "${{ steps.setSHAs.outputs.base }}"
+                  files_ignore_from_source_file: ".github/ignore-files-for-affected.yml"
                   separator: ","
 
-            # nx computes affected projects from NX_BASE/NX_HEAD (set by nx-set-shas).
-            # Passing the whole changed-file list via --files overflows the OS arg limit
-            # (spawn E2BIG) on large diffs and fails the job before anything runs.
+            # vis resolves the affected base from the GitHub event itself
+            # (origin/<base ref> on a pull request, event.before on a push).
             - name: "Build"
               shell: "bash"
               run: |
                   if [[ "${{ matrix.bundler }}" == "rolldown" ]]; then
                       # The rolldown integration suite is the full packem suite (not
-                      # nx-affected), so build every package it depends on.
+                      # vis-affected), so build every package it depends on.
                       pnpm run build:packages
                   else
                       pnpm run build:affected:packages
@@ -164,10 +158,6 @@ jobs:
                   else
                       pnpm run test:affected
                   fi
-
-            - name: "Prepare nx cache"
-              shell: "bash"
-              run: "if [ -d .nx/cache ]; then tar -cf - .nx/cache | lz4 > /tmp/nx_cache.tar.lz4; else echo 'No nx cache to package.'; fi" # compress nx cache
 
             - name: "Upload code coverage to codecov"
               if: "matrix.bundler == 'rollup' && matrix.os == 'ubuntu-latest' && matrix.node_version == 22"
@@ -203,6 +193,8 @@ jobs:
             - name: "Setup resources and environment"
               uses: "anolilab/workflows/step/setup@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
               with:
+                  # Nothing restores an nx cache any more; vis's task cache is not kept between runs.
+                  enable-nx-cache: "false"
                   node-version: "24"
                   upgrade-npm-version: "false"
                   install-packages: "false"

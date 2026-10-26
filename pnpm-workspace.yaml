@@ -13,6 +13,9 @@ packages:
   - "packages/**"
   - "tools/typescript-7"
   - "examples/**"
+  # pnpm already matches `benchmarks` itself through `benchmarks/**`, but vis does not
+  # (https://github.com/visulima/vis/issues/50), so list it explicitly.
+  - "benchmarks"
   - "benchmarks/**"
 allowBuilds:
   "@parcel/watcher": true
@@ -22,7 +25,6 @@ allowBuilds:
   lmdb: true
   msgpackr-extract: true
   nodehun: true
-  nx: true
   rs-module-lexer: true
   unrs-resolver: true
 
@@ -139,7 +141,7 @@ catalogs:
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.14.1
   monorepo:
-    nx: 24.0.1
+    "@visulima/vis": 6.1.3
   network:
     browserslist: 4.29.4
     browserslist-config-anolilab: 10.0.0
@@ -461,7 +463,6 @@ onlyBuiltDependencies:
   - less
   - node-sass
   - nodehun
-  - nx
   - oxc-resolver
   - rs-module-lexer
   - unrs-resolver
@@ -493,11 +494,10 @@ overrides:
   '@hono/node-server@<2.0.10': ">=2.1.5"
   ajv@>=7.0.0 <8.18.0: ">=8.20.0"
   axios@>=1.0.0 <1.18.0: ">=1.20.0"
-  # nx pins axios@1.18.1 exactly, so this range has to cover it too.
   axios@>=1.0.0 <1.20.0: ">=1.20.0"
   body-parser@>=2.0.0 <2.3.0: ">=2.3.0"
   brace-expansion@<5.0.12: ">=5.0.12 <6"
-  # nx pins smol-toml@1.6.1 exactly; GHSA-7w5x-hrqm-74c2 is fixed in 1.7.1.
+  # GHSA-7w5x-hrqm-74c2 is fixed in 1.7.1.
   smol-toml@<1.7.1: ">=1.7.1 <2"
   browserslist@<4.28.7: ">=4.29.4"
   chrono-node@<2.2.4: ">=2.10.3"

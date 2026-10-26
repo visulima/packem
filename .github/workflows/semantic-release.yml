@@ -73,6 +73,8 @@ jobs:
               id: "setup"
               uses: "anolilab/workflows/step/setup@1641a17797e6e1dc3eaf9b462c3c0dae91ab071d" # v20.2.12
               with:
+                  # Nothing restores an nx cache any more; vis's task cache is not kept between runs.
+                  enable-nx-cache: "false"
                   node-version: "22.x"
                   cache-prefix: "semantic-release"
                   install-node-gyp: "true"
@@ -87,10 +89,6 @@ jobs:
             #  env:
             #      # @TODO: This is used to skip the css test with the production build, till a good solution is found
             #      PACKEM_PRODUCTION_BUILD: "true"
-
-            - name: "Prepare nx cache"
-              shell: "bash"
-              run: "if [ -d .nx/cache ]; then tar -cf - .nx/cache | lz4 > /tmp/nx_cache.tar.lz4; else echo 'No nx cache to package.'; fi" # compress nx cache
 
             # - name: "Upload code coverage to codecov"
             #  uses: "anolilab/workflows/step/codecov@d11bc32c7774bbdc35e4f89af140bc49ce4f9f68" # v15.1.1

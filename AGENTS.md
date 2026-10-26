@@ -6,7 +6,7 @@ command here is worse than none. For project narrative and design history see
 
 ## Repository layout
 
-A pnpm + nx monorepo. Workspace packages live under `packages/`:
+A pnpm + [vis](https://github.com/visulima/vis) monorepo (task config in `vis.config.ts`). Workspace packages live under `packages/`:
 
 | Package             | Role                                                                           |
 | ------------------- | ------------------------------------------------------------------------------ |
