@@ -32,7 +32,7 @@ autoInstallPeers: true
 
 catalogs:
   build:
-    "@rollup/plugin-alias": 6.0.0
+    "@rollup/plugin-alias": 6.0.1
     "@rollup/plugin-commonjs": 29.0.3
     "@rollup/plugin-dynamic-import-vars": 2.1.5
     "@rollup/plugin-inject": 5.0.5
@@ -40,12 +40,16 @@ catalogs:
     "@rollup/plugin-node-resolve": 16.0.3
     "@rollup/plugin-replace": 6.0.3
     "@rollup/plugin-wasm": 6.2.2
-    "@rollup/pluginutils": 5.4.0
+    "@rollup/pluginutils": 5.5.1
     "@visulima/packem-rollup": 1.0.0
     "@visulima/rollup-plugin-css": 1.0.1
     esbuild: 0.28.2
+    # Held at 1.2.14: 1.2.15 replaced the `//#region`/`//#endregion` module markers with bare
+    # `// <module id>` comments (rolldown#11235). packem's stripRolldownRegionCommentsPlugin, the
+    # integration-test normalizer and the rolldown output layout all rely on the region pairs, so
+    # taking 1.2.15 is a backend migration (likely `attachDebugInfo: "none"`), not a bump.
     rolldown: 1.2.14
-    rollup: 4.64.6
+    rollup: 4.65.0
     rollup-plugin-dts: 6.5.1
     rollup-plugin-import-trace: 1.0.1
     rollup-plugin-license: 3.7.1
@@ -54,28 +58,28 @@ catalogs:
     rollup-plugin-pure: ^0.4.0
     rollup-plugin-svelte: ^7.2.3
     rollup-plugin-visualizer: 7.1.1
-    unplugin-vue: 7.2.0
-    vite: 8.2.4
+    unplugin-vue: 8.0.0
+    vite: 8.3.5
   cli:
-    "@anolilab/multi-semantic-release": 4.6.0
-    "@anolilab/semantic-release-pnpm": 8.1.35
-    "@anolilab/semantic-release-preset": 13.4.37
+    "@anolilab/multi-semantic-release": 4.6.1
+    "@anolilab/semantic-release-pnpm": 8.1.36
+    "@anolilab/semantic-release-preset": 13.4.38
     commitizen: ^4.3.2
     semantic-release: 25.0.9
   dev:
     "@arethetypeswrong/cli": ^0.18.5
-    "@babel/core": 8.0.7
-    "@babel/parser": 8.0.7
+    "@babel/core": 8.0.9
+    "@babel/parser": 8.0.8
     "@mozilla/readability": ^0.6.0
     "@oxc-parser/binding-linux-x64-gnu": 0.155.0
     "@oxc-project/types": 0.155.0
     "@svgr/core": ^8.1.0
-    "@swc/core": 1.16.18
+    "@swc/core": 1.16.20
     "@swc/helpers": 0.5.23
     "@swc/types": 0.1.28
     babel-plugin-transform-hook-names: ^1.0.2
     babel-preset-solid: 1.9.16
-    conventional-changelog-conventionalcommits: 9.3.1
+    conventional-changelog-conventionalcommits: 10.4.1
     deeks: ^3.2.1
     detect-indent: ^7.0.2
     diff: 9.0.0
@@ -86,12 +90,12 @@ catalogs:
     nodehun: ^3.0.2
     oxc-parser: 0.155.0
     oxc-transform: 0.155.0
-    p-queue: 9.3.5
+    p-queue: 10.0.0
     package-manager-detector: ^1.9.0
     picocolors: ^1.1.1
     postgraphile: 5.1.5
     rs-module-lexer: 2.9.0
-    safe-stable-stringify: ^2.5.0
+    safe-stable-stringify: ^3.0.0
     sort-package-json: 4.1.0
     stylus: ^0.64.0
     sucrase: ^3.35.1
@@ -105,29 +109,29 @@ catalogs:
     "@radix-ui/react-tooltip": ^1.4.1
     "@vue/language-core": 3.3.13
     babel-plugin-react-compiler: 1.0.0
-    preact: 10.29.8
-    react: 19.3.0
-    react-dom: 19.3.0
+    preact: 11.0.2
+    react: 19.3.1
+    react-dom: 19.3.1
     svelte: 5.57.2
     vue: 3.5.44
   icons:
-    lucide-static: 1.56.0
+    lucide-static: 1.61.0
   lint:
-    "@anolilab/commitlint-config": 10.1.5
-    "@anolilab/eslint-config": 30.0.7
-    "@anolilab/lint-staged-config": 13.0.1
-    "@anolilab/prettier-config": 10.0.4
-    "@anolilab/textlint-config": 13.0.6
+    "@anolilab/commitlint-config": 11.0.0
+    "@anolilab/eslint-config": 31.0.0
+    "@anolilab/lint-staged-config": 14.0.0
+    "@anolilab/prettier-config": 11.0.0
+    "@anolilab/textlint-config": 14.0.0
     "@commitlint/cli": 21.2.4
     "@commitlint/config-conventional": 21.2.4
     "@eslint/css": 2.0.1
-    "@secretlint/secretlint-rule-preset-recommend": 13.0.7
+    "@secretlint/secretlint-rule-preset-recommend": 13.1.0
     eslint: 10.13.0
     husky: ^9.1.7
     lint-staged: 17.6.0
     prettier: 3.9.10
     publint: 0.3.25
-    secretlint: 13.0.7
+    secretlint: 13.1.0
     tailwind-csstree: 0.4.1
     textlint: 15.8.0
   markdown:
@@ -135,10 +139,10 @@ catalogs:
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.14.1
   monorepo:
-    nx: 23.3.0
+    nx: 24.0.1
   network:
     browserslist: 4.29.4
-    browserslist-config-anolilab: 9.0.1
+    browserslist-config-anolilab: 10.0.0
   node:
     "@antfu/install-pkg": 2.1.0
     "@babel/preset-env": 8.0.7
@@ -146,10 +150,10 @@ catalogs:
     cac: 7.1.0
     cross-env: ^10.1.0
     dts-resolver: 3.0.0
-    execa: ^10.2.0
+    execa: ^10.2.1
     glob-parent: 6.0.2
     oxc-resolver: 11.24.2
-    pkg-pr-new: 0.0.91
+    pkg-pr-new: 0.0.92
     rimraf: 6.1.3
     tinyexec: 1.3.1
     tinyglobby: 0.2.17
@@ -157,7 +161,7 @@ catalogs:
     package-manager-detector: ^1.9.0
   prod:
     "@arethetypeswrong/core": ^0.18.5
-    "@babel/parser": 8.0.7
+    "@babel/parser": 8.0.8
     "@visulima/packem-share": 1.0.1
     audit-ci: ^7.1.0
     cjs-module-lexer: 2.3.0
@@ -167,18 +171,18 @@ catalogs:
     gpt-tokenizer: ^4.1.0
     happy-dom: 21.0.4
     hookable: 6.1.2
-    html-minifier-next: 8.11.0
+    html-minifier-next: 9.1.0
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.2
-    obug: 2.2.1
+    obug: 3.0.0
     oxc-parser: 0.155.0
-    p-queue: 9.3.5
+    p-queue: 10.0.0
     picomatch: 4.0.7
     plop: 4.0.5
     preline: 5.0.0
     rs-module-lexer: 2.9.0
-    safe-stable-stringify: ^2.5.0
+    safe-stable-stringify: ^3.0.0
     solid-js: 1.9.17
     sort-package-json: 4.1.0
     source-map-js: ^1.2.2
@@ -215,8 +219,8 @@ catalogs:
     postcss-modules-scope: ^3.2.1
     postcss-modules-values: ^4.0.0
     postcss-value-parser: ^4.2.0
-    sass: 1.103.1
-    sass-embedded: 1.103.1
+    sass: 1.106.1
+    sass-embedded: 1.106.1
     tailwindcss: 4.3.3
   test:
     "@codspeed/vitest-plugin": ^6.1.0
@@ -230,7 +234,7 @@ catalogs:
     "@babel/preset-typescript": ^8.0.7
     "@total-typescript/ts-reset": ^0.6.1
     "@ts-macro/tsc": 0.3.7
-    "@volar/typescript": 2.4.28
+    "@volar/typescript": 2.4.30
     # The workspace uses the classic TypeScript compiler (5/6 API): the `tsc` dts backend,
     # vue-tsc, @volar/typescript and @ts-macro/tsc all wrap it. TypeScript 7 is the native
     # (Go) compiler with a different, minimal API those tools cannot use, so it must NOT be
@@ -241,21 +245,20 @@ catalogs:
   types:
     "@types/babel__core": ^7.20.5
     "@types/babel__generator": ^7.27.0
-    "@types/bun": 1.4.3
+    "@types/bun": 1.4.4
     "@types/clean-css": 4.2.11
     "@types/debug": 4.1.13
     "@types/estree": 1.0.9
     "@types/glob-parent": ^5.1.3
-    "@types/html-minifier-next": 4.1.0
     "@types/icss-utils": ^5.1.2
     "@types/is-glob": ^4.0.4
     "@types/less": 3.0.8
     "@types/micromatch": ^4.0.10
-    "@types/node": 26.4.1
+    "@types/node": 26.6.5
     "@types/picomatch": ^4.0.3
     "@types/postcss-modules-local-by-default": ^4.0.2
     "@types/postcss-modules-scope": ^3.0.4
-    "@types/react": 19.2.18
+    "@types/react": 19.3.0
     "@types/react-dom": ^19.3.0
     "@types/semver": ^7.8.0
     "@types/stylus": ^0.48.43
@@ -340,26 +343,18 @@ minimumReleaseAgeExclude:
   - rolldown@1.2.0
   - vue@3.5.40
   - axios@1.18.0
-  - brace-expansion@5.0.7
-  - js-yaml@4.3.0
+  - brace-expansion@5.0.7 || 5.0.8 || 5.0.9
+  - js-yaml@4.3.0 || 4.3.1
   - shell-quote@1.8.5
   - body-parser@2.3.0
-  - hono@4.12.27
-  - '@hono/node-server@2.0.5'
+  - hono@4.12.27 || 4.13.1
+  - '@hono/node-server@2.0.5 || 2.0.10'
   - immutable@5.1.8
   - svgo@4.0.2
-  - fast-uri@3.1.4
-  - '@hono/node-server@2.0.10'
-  - fast-uri@3.1.3
-  - postcss@8.5.18
-  - brace-expansion@5.0.8
-  - brace-expansion@5.0.9
-  - fast-uri@3.1.5
-  - hono@4.13.1
+  - fast-uri@3.1.3 || 3.1.4 || 3.1.5
+  - postcss@8.5.18 || 8.5.26
   - ip-address@10.4.0
-  - js-yaml@4.3.1
   - nanoid@3.3.17
-  - postcss@8.5.26
   - undici@8.10.0
   - '@mui/core-downloads-tracker@9.4.0'
   - '@mui/material@9.4.0'
@@ -414,7 +409,7 @@ minimumReleaseAgeExclude:
   - cssnano-utils@7.0.0
   - cssnano@9.0.0
   - happy-dom@20.11.12
-  - html-minifier-next@8.3.0
+  - html-minifier-next@8.3.0 || 9.1.0
   - lint-staged@17.4.1
   - postcss-colormin@9.0.0
   - postcss-convert-values@9.0.0
@@ -445,6 +440,18 @@ minimumReleaseAgeExclude:
   - rollup@4.63.1
   - stylehacks@9.0.0
   - webpack@5.110.1
+  - '@secretlint/config-creator@13.1.0'
+  - '@secretlint/config-loader@13.1.0'
+  - '@secretlint/core@13.1.0'
+  - '@secretlint/formatter@13.1.0'
+  - '@secretlint/node@13.1.0'
+  - '@secretlint/profiler@13.1.0'
+  - '@secretlint/resolver@13.1.0'
+  - '@secretlint/secretlint-rule-preset-recommend@13.1.0'
+  - '@secretlint/source-creator@13.1.0'
+  - '@secretlint/types@13.1.0'
+  - '@secretlint/walker@13.1.0'
+  - secretlint@13.1.0
 
 onlyBuiltDependencies:
   - "@parcel/watcher"
@@ -459,12 +466,12 @@ onlyBuiltDependencies:
   - rs-module-lexer
   - unrs-resolver
 packageExtensions:
-  # @visulima/fs 6 moved YAML reading behind an optional @visulima/yaml peer, which
+  # @visulima/fs 7 keeps YAML reading behind an optional @visulima/yaml peer (2.0.0), which
   # pnpm never installs on its own. @anolilab/lint-staged-config reads a YAML config
   # through it, so its config loader throws ERR_MODULE_NOT_FOUND without this.
   "@anolilab/lint-staged-config":
     dependencies:
-      "@visulima/yaml": 1.0.0
+      "@visulima/yaml": 2.0.0
 auditConfig:
   ignoreGhsas:
     # GHSA-vfj7-8cjw-p6xm (braces stack exhaustion) has no fix: the advisory covers <=3.0.3
@@ -550,16 +557,6 @@ peerDependencyRules:
 
   allowedVersions:
     # vite 8 not yet in rollup-plugin-import-trace's peer range
-
-    # @anolilab/* configs pin exact prettier/secretlint/textlint; widen to current catalog
-    "@anolilab/commitlint-config>@commitlint/cli": "^21.0.0"
-    "@anolilab/eslint-config>@eslint/css": "^1.0.0"
-    "@anolilab/eslint-config>tailwind-csstree": "^0.1.0"
-    "@anolilab/lint-staged-config>lint-staged": "^17.0.0"
-    "@anolilab/lint-staged-config>prettier": "^3.8.0"
-    "@anolilab/lint-staged-config>secretlint": "^13.0.0"
-    "@anolilab/prettier-config>prettier": "^3.8.0"
-    "@anolilab/textlint-config>textlint": "^15.5.0"
 
     # postgraphile stack is pulled in only by packem's externals integration test
     "@dataplan/pg>graphql": "^15.0.0"

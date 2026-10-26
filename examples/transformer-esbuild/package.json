@@ -34,7 +34,7 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "react": "^19.2.8"
+        "react": "^19.3.1"
     },
     "devDependencies": {
         "@types/react": "^19.2.18",

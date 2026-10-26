@@ -91,5 +91,8 @@
     "parallel": 5,
     "defaultBase": "main",
     "$schema": "./node_modules/nx/schemas/nx-schema.json",
-    "analytics": false
+    "analytics": false,
+    "affected": {
+        "legacy": true
+    }
 }
