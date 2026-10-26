@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
-import { rm } from "node:fs/promises";
+import { cp, mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -141,9 +142,17 @@ describe("build mode", () => {
     it("does not warn about a solution tsconfig that only holds references", async () => {
         expect.assertions(1);
 
-        const root = path.resolve(dirname, "fixtures/composite-refs-incremental");
+        // tsc.test.ts builds the same fixture into its `temp/` from another worker, and each
+        // test wipes `temp/` first, so building in place races it. Work on a private copy.
+        const copyRoot = await mkdtemp(path.join(tmpdir(), "packem-dts-"));
+        const root = path.join(copyRoot, "composite-refs-incremental");
 
-        await rm(path.resolve(root, "temp"), { force: true, recursive: true });
+        const fixtureRoot = path.resolve(dirname, "fixtures/composite-refs-incremental");
+
+        await cp(fixtureRoot, root, {
+            filter: (source) => path.relative(fixtureRoot, source).split(path.sep)[0] !== "temp",
+            recursive: true,
+        });
 
         const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
@@ -156,6 +165,7 @@ describe("build mode", () => {
             expect(warn.mock.calls.map((call) => String(call[0])).filter((message) => COMPOSITE_ROOT_WARNING_RE.test(message))).toStrictEqual([]);
         } finally {
             warn.mockRestore();
+            await rm(copyRoot, { force: true, recursive: true });
         }
     });
 });
