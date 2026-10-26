@@ -28,8 +28,8 @@
 ### Development Tools
 - **ESLint**: Code linting with comprehensive rules
 - **Prettier**: Code formatting (via ESLint integration)
-- **Husky**: Git hooks for quality gates
-- **Lint-staged**: Pre-commit linting
+- **vis hooks**: Git hooks for quality gates (`.vis/hooks`)
+- **vis staged**: Pre-commit checks on staged files
 - **Commitlint**: Conventional commit enforcement
 
 ## Architecture Overview
