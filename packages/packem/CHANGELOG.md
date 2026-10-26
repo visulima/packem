@@ -1,3 +1,13 @@
+## @visulima/packem [4.0.3](https://github.com/visulima/packem/compare/@visulima/packem@4.0.2...@visulima/packem@4.0.3) (2026-10-26)
+
+### Bug Fixes
+
+* **deps:** update dependency @swc/core to >=1.16.20 ([#420](https://github.com/visulima/packem/issues/420)) ([64b04b0](https://github.com/visulima/packem/commit/64b04b0b9b0961b52b62a98f4b0e534fb1f76beb))
+
+### Build System
+
+* migrate the monorepo from nx to vis ([#432](https://github.com/visulima/packem/issues/432)) ([c1d4867](https://github.com/visulima/packem/commit/c1d4867ab442a22f964d6014947ea17b61e8d318))
+
 ## @visulima/packem [4.0.2](https://github.com/visulima/packem/compare/@visulima/packem@4.0.1...@visulima/packem@4.0.2) (2026-10-26)
 
 ### Bug Fixes
