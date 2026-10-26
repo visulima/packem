@@ -106,7 +106,7 @@
         "eslint": "catalog:lint",
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
-        "rolldown": ">=1.2.14",
+        "rolldown": "catalog:build",
         "rollup": "catalog:build",
         "rollup-plugin-dts": "catalog:build",
         "tsx": "catalog:script",
@@ -119,7 +119,7 @@
         "@ts-macro/tsc": "catalog:tsc",
         "@typescript/native-preview": ">=7.0.0-dev.20260707.2",
         "rolldown": ">=1.2.14",
-        "rollup": ">=4.64.6",
+        "rollup": ">=4.65.0",
         "typescript": "^6.0.3 || ^7.0.0",
         "vue-tsc": "catalog:tsc"
     },

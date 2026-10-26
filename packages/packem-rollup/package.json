@@ -139,7 +139,6 @@
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/babel__core": "catalog:types",
         "@types/estree": "catalog:types",
-        "@types/html-minifier-next": "catalog:types",
         "@types/node": "catalog:types",
         "@types/semver": "catalog:types",
         "@visulima/packem-plugins": "workspace:*",
@@ -169,7 +168,7 @@
     "peerDependencies": {
         "@swc/core": "*",
         "esbuild": "*",
-        "rollup": ">=4.64.6",
+        "rollup": ">=4.65.0",
         "sucrase": "*"
     },
     "peerDependenciesMeta": {

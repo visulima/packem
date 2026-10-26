@@ -35,7 +35,7 @@
         "solid-js": "^1.9.15"
     },
     "devDependencies": {
-        "@babel/core": "^8.0.1",
+        "@babel/core": "^8.0.9",
         "@babel/preset-env": "^8.0.2",
         "@babel/preset-typescript": "^8.0.1",
         "@visulima/packem": "workspace:*",
