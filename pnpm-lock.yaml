@@ -622,7 +622,7 @@ overrides:
   markdown-it@>=14.1.0 <14.3.3: '>=14.3.3'
   markdown-it@>=15.0.0 <15.0.3: '>=15.0.3'
   typedoc>markdown-it: 14.3.3
-  minimatch@<3.1.4: '>=7.4.9'
+  minimatch@<3.1.4: '>=8.0.7'
   minimatch@>=5.0.0 <5.1.8: '>=5.1.9'
   minimatch@>=9.0.0 <9.0.7: '>=9.0.9'
   minimatch@>=10.0.0 <10.2.3: '>=10.2.6'
@@ -644,8 +644,6 @@ overrides:
   yaml@>=2.0.0 <2.8.3: '>=2.9.1'
 
 packageExtensionsChecksum: sha256-kDoYTE5/S31yc/hlb9EMF82fbIxvfSGDXrIt91L1I0Y=
-
-pnpmfileChecksum: sha256-Wzgu78gay+v6MunApP3nY8NLqA2rjoJktL31h20yv5I=
 
 patchedDependencies:
   oxc-parser: 464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76
@@ -9052,7 +9050,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       next: '>=14.0'
       rotating-file-stream: '>=3.2.9'
     peerDependenciesMeta:
@@ -9086,7 +9084,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       next: '>=14.0'
       rotating-file-stream: '>=3.2.9'
     peerDependenciesMeta:
@@ -12025,7 +12023,7 @@ packages:
       graphile-config: ^1.1.1
       graphql: ^16.9.0
       h3: ^1.13.0
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       ws: '>=8.22.0'
     peerDependenciesMeta:
       '@envelop/core':
