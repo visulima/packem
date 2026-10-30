@@ -50,7 +50,7 @@ catalogs:
     # `// <module id>` comments (rolldown#11235). packem's stripRolldownRegionCommentsPlugin, the
     # integration-test normalizer and the rolldown output layout all rely on the region pairs, so
     # taking 1.2.15 is a backend migration (likely `attachDebugInfo: "none"`), not a bump.
-    rolldown: 1.2.14
+    rolldown: 1.2.15
     rollup: 4.65.0
     rollup-plugin-dts: 6.5.1
     rollup-plugin-import-trace: 1.0.1
@@ -88,7 +88,7 @@ catalogs:
     estree-walker: ^3.0.3
     hookable: 6.1.2
     lit: 3.3.3
-    mime: ^4.1.1
+    mime: ^4.1.2
     nodehun: ^3.0.2
     oxc-parser: 0.155.0
     oxc-transform: 0.155.0
@@ -114,7 +114,7 @@ catalogs:
     preact: 11.0.2
     react: 19.3.1
     react-dom: 19.3.1
-    svelte: 5.57.2
+    svelte: 5.57.3
     vue: 3.5.44
   icons:
     lucide-static: 1.61.0
@@ -143,7 +143,7 @@ catalogs:
   monorepo:
     "@visulima/vis": 6.1.3
   network:
-    browserslist: 4.29.4
+    browserslist: 4.29.5
     browserslist-config-anolilab: 10.0.0
   node:
     "@antfu/install-pkg": 2.1.0
@@ -499,7 +499,7 @@ overrides:
   brace-expansion@<5.0.12: ">=5.0.12 <6"
   # GHSA-7w5x-hrqm-74c2 is fixed in 1.7.1.
   smol-toml@<1.7.1: ">=1.7.1 <2"
-  browserslist@<4.28.7: ">=4.29.4"
+  browserslist@<4.28.7: ">=4.29.5"
   chrono-node@<2.2.4: ">=2.10.3"
   defu@<6.1.5: ">=6.1.7"
   devalue@>=5.0.0 <5.8.1: ">=6.0.3"
@@ -508,7 +508,7 @@ overrides:
   eslint-plugin-sonarjs@<4.2.0: ">=4.2.0"
   fast-uri@<3.1.9: ">=3.1.9 <4"
   flatted@<3.4.2: ">=3.4.4"
-  follow-redirects@<1.16.1: ">=1.16.1"
+  follow-redirects@<1.16.1: ">=1.16.2"
   http-cache-semantics@<=4.2.0: ">=4.3.0 <5"
   form-data@>=4.0.0 <4.0.6: ">=4.0.6"
   glob@>=10.0.0 <10.5.0: ">=13.0.6"
@@ -539,8 +539,8 @@ overrides:
   # GHSA-p6vx-979v-rg4c (critical) and GHSA-jp82-f5mq-hwhp (high) are both fixed in
   # seroval 1.6.3. solid-js pins ~1.5.4, so force the patched release rather than
   # hiding the advisories from `pnpm audit` workspace-wide.
-  seroval@<1.6.3: ">=1.6.11"
-  svelte@<5.55.7: ">=5.57.2"
+  seroval@<1.6.3: ">=1.6.12"
+  svelte@<5.55.7: ">=5.57.3"
   svgo@>=4.0.0 <4.0.2: ">=4.1.0"
   tmp@<0.2.7: ">=0.2.7"
   undici@<8.12.2: ">=8.12.2 <9"
