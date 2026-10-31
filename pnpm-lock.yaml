@@ -594,7 +594,7 @@ overrides:
   ajv@>=7.0.0 <8.18.0: '>=8.20.0'
   axios@>=1.0.0 <1.18.0: '>=1.20.0'
   axios@>=1.0.0 <1.20.0: '>=1.20.0'
-  body-parser@>=2.0.0 <2.3.0: '>=2.3.0'
+  body-parser@>=2.0.0 <2.4.0: '>=2.4.0'
   brace-expansion@<5.0.12: '>=5.0.12 <6'
   smol-toml@<1.7.1: '>=1.7.1 <2'
   browserslist@<4.28.7: '>=4.29.4'
@@ -633,7 +633,7 @@ overrides:
   postcss@<8.5.23: '>=8.5.23 <9'
   qs@<6.16.0: '>=6.16.1'
   shell-quote@<1.8.5: '>=1.12.0'
-  seroval@<1.6.3: '>=1.6.11'
+  seroval@<1.6.3: '>=1.6.12'
   svelte@<5.55.7: '>=5.57.2'
   svgo@>=4.0.0 <4.0.2: '>=4.1.0'
   tmp@<0.2.7: '>=0.2.7'
@@ -3319,6 +3319,7 @@ packages:
       eslint-plugin-astro: 3.2.1
       eslint-plugin-format: '>=2.0.1'
       eslint-plugin-jsx-a11y: ^6.10.2
+      eslint-plugin-n: '*'
       eslint-plugin-oxlint: 1.89.0
       eslint-plugin-playwright: ^0.16.0 || ^0.18.0 || ^2.0.0
       eslint-plugin-react: ^7.37.5
@@ -3356,6 +3357,8 @@ packages:
       eslint-plugin-format:
         optional: true
       eslint-plugin-jsx-a11y:
+        optional: true
+      eslint-plugin-n:
         optional: true
       eslint-plugin-oxlint:
         optional: true
@@ -8950,6 +8953,7 @@ packages:
     hasBin: true
     peerDependencies:
       '@arethetypeswrong/core': '>=0.18.5'
+      '@babel/core': '*'
       '@ckeditor/typedoc-plugins': '*'
       '@swc/core': '>=1.16.18'
       '@tailwindcss/node': 4.3.3
@@ -8983,6 +8987,8 @@ packages:
       which-pm-runs: '*'
     peerDependenciesMeta:
       '@arethetypeswrong/core':
+        optional: true
+      '@babel/core':
         optional: true
       '@ckeditor/typedoc-plugins':
         optional: true
@@ -9911,6 +9917,11 @@ packages:
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
+    peerDependencies:
+      ajv: '>=8.20.0'
+    peerDependenciesMeta:
+      ajv:
+        optional: true
 
   ajv-keywords@5.1.0:
     resolution: {integrity: sha512-YCS/JNFAUyr5vAuhk1DWm1CBxRHW9LbJ2ozWeemrIqpbsqKjHVxYPyi5GC0rjZIT5JxJ3virVTS8wk4i/Z+krw==}
@@ -15733,10 +15744,10 @@ packages:
     resolution: {integrity: sha512-kiDK/Tb8IWZ61WEU8pA2PDmAuw37gKph9Y77OZlD56mg0Y2g0Bg7gZ1HeHhs5d40w+nRoUq/wj08V26ilbez9g==}
     engines: {node: '>=10'}
     peerDependencies:
-      seroval: '>=1.6.11'
+      seroval: '>=1.6.12'
 
-  seroval@1.6.9:
-    resolution: {integrity: sha512-UeEzHwAK+yl0YLbsvROV1t5yMYEwZZ0CfKYxDvUgS2fO9Vxdf8djqVIB+OuVpuawRNPqw68LE1Du/GMsW2ZPqA==}
+  seroval@1.6.12:
+    resolution: {integrity: sha512-CqbIVfk/7GL3ITwZI55lcPbpQbjHZ2DD5cUj4iH7E9YsCfHNJV1mx7yNp86Z84w5IpmkZZS/2s5vPOWmVWSdQg==}
     engines: {node: '>=10'}
 
   set-function-length@1.2.2:
@@ -31270,11 +31281,11 @@ snapshots:
 
   serialize-javascript@7.1.2: {}
 
-  seroval-plugins@1.6.9(seroval@1.6.9):
+  seroval-plugins@1.6.9(seroval@1.6.12):
     dependencies:
-      seroval: 1.6.9
+      seroval: 1.6.12
 
-  seroval@1.6.9: {}
+  seroval@1.6.12: {}
 
   set-function-length@1.2.2:
     dependencies:
@@ -31382,8 +31393,8 @@ snapshots:
   solid-js@1.9.17:
     dependencies:
       csstype: 3.2.3
-      seroval: 1.6.9
-      seroval-plugins: 1.6.9(seroval@1.6.9)
+      seroval: 1.6.12
+      seroval-plugins: 1.6.9(seroval@1.6.12)
 
   sort-object-keys@2.1.0: {}
 
