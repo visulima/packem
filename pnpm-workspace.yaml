@@ -141,7 +141,7 @@ catalogs:
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.14.1
   monorepo:
-    "@visulima/vis": 6.1.3
+    "@visulima/vis": 6.1.4
   network:
     browserslist: 4.29.4
     browserslist-config-anolilab: 10.0.0
@@ -286,7 +286,7 @@ catalogs:
     # differ from the workspace packem version, or linkWorkspacePackages links packages/packem
     # (even through an `npm:` alias) and a clean checkout has no dist/ to build anything with.
     # Workspace packem is 4.0.1, so the newest usable builder is 4.0.0.
-    "@visulima/packem": 4.0.0
+    "@visulima/packem": 4.0.3
     "@visulima/pail": 6.0.0
     "@visulima/path": 5.0.0
     "@visulima/source-map": 3.0.1
