@@ -256,7 +256,7 @@ catalogs:
     "@types/is-glob": ^4.0.4
     "@types/less": 3.0.8
     "@types/micromatch": ^4.0.10
-    "@types/node": 26.6.5
+    "@types/node": 26.6.6
     "@types/picomatch": ^4.0.3
     "@types/postcss-modules-local-by-default": ^4.0.2
     "@types/postcss-modules-scope": ^3.0.4
