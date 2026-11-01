@@ -51,7 +51,7 @@ catalogs:
     # integration-test normalizer and the rolldown output layout all rely on the region pairs, so
     # taking 1.2.15 is a backend migration (likely `attachDebugInfo: "none"`), not a bump.
     rolldown: 1.2.14
-    rollup: 4.65.0
+    rollup: 4.65.1
     rollup-plugin-dts: 6.5.1
     rollup-plugin-import-trace: 1.0.1
     rollup-plugin-license: 3.7.1
