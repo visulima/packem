@@ -61,8 +61,13 @@ storybook-static/
 # Optional textlint cache
 .textlintcache
 
-# vis run history and summaries (the task cache itself lives in node_modules/.cache/vis)
-.vis/
+# vis run history and summaries (the task cache itself lives in node_modules/.cache/vis).
+# Hooks and generator templates under .vis/ are checked in; the generated hook
+# dispatcher under .vis/hooks/_/ is not.
+.vis/*
+!.vis/hooks/
+!.vis/templates/
+.vis/hooks/_/
 
 # Package build output
 dist

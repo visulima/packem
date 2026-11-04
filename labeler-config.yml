@@ -45,7 +45,7 @@
           - any-glob-to-any-file:
                 - "tools/**/*"
                 - "scripts/**/*"
-                - "plop/**/*"
+                - ".vis/**/*"
 "area: dependencies":
     - changed-files:
           - any-glob-to-any-file:

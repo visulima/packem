@@ -1,6 +1,4 @@
 .github/**
-plop/**
-.husky/**
 .vis/**
 examples/**
 # benchmarks/projects/react-synthetic alone is ~5k committed files. vis computes
@@ -14,8 +12,6 @@ benchmarks/**
 .editorconfig
 .gitattributes
 .gitignore
-.lintstagedrc.cjs
-.lintstagedrc.cjs
 .npmignore
 .prettierignore
 .prettierrc.cjs
@@ -28,7 +24,6 @@ audit-ci.jsonc
 codecov.yml
 commitlint.config.cjs
 vis.config.ts
-plop.js
 pnpm-lock.yaml
 pnpm-workspace.yaml
 tsconfig.base.json

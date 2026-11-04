@@ -125,7 +125,6 @@ jobs:
                   "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": true
                   "CYPRESS_INSTALL_BINARY": true
                   "SKIP_CHECK": "true" # is used to skip the check for the node version
-                  "HUSKY": 0 # disable husky hooks on ci
 
             # Feeds codecov's per-project affected filter below.
             - name: "Get changed files"
@@ -207,7 +206,6 @@ jobs:
                   "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": true
                   "CYPRESS_INSTALL_BINARY": true
                   "SKIP_CHECK": "true"
-                  "HUSKY": 0
 
             - name: "Build"
               shell: "bash"

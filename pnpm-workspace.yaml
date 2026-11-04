@@ -121,7 +121,6 @@ catalogs:
   lint:
     "@anolilab/commitlint-config": 11.0.0
     "@anolilab/eslint-config": 31.0.0
-    "@anolilab/lint-staged-config": 14.0.0
     "@anolilab/prettier-config": 11.0.0
     "@anolilab/textlint-config": 14.0.0
     "@commitlint/cli": 21.2.4
@@ -129,8 +128,6 @@ catalogs:
     "@eslint/css": 2.0.1
     "@secretlint/secretlint-rule-preset-recommend": 13.1.0
     eslint: 10.13.0
-    husky: ^9.1.7
-    lint-staged: 17.6.0
     prettier: 3.9.10
     publint: 0.3.25
     secretlint: 13.1.0
@@ -181,7 +178,6 @@ catalogs:
     oxc-parser: 0.155.0
     p-queue: 10.0.0
     picomatch: 4.0.7
-    plop: 4.0.5
     preline: 5.0.0
     rs-module-lexer: 2.9.0
     safe-stable-stringify: ^3.0.0
@@ -412,7 +408,6 @@ minimumReleaseAgeExclude:
   - cssnano@9.0.0
   - happy-dom@20.11.12
   - html-minifier-next@8.3.0 || 9.1.0
-  - lint-staged@17.4.1
   - postcss-colormin@9.0.0
   - postcss-convert-values@9.0.0
   - postcss-discard-comments@9.0.0

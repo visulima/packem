@@ -1,8 +1,5 @@
 import { defineConfig } from "@visulima/vis/config";
 
-// Secure defaults are applied automatically by defineConfig().
-// You only need to add allowBuilds for packages with build scripts.
-// Run 'vis check --security-config' to see all active settings.
 // Root scripts select projects with `--query "tag=type:package"` (packages/*). vis has no
 // .nxignore equivalent or glob queries (https://github.com/visulima/vis/issues/52), and the
 // fixtures under packages/packem/__fixtures__/ecosystem are workspace packages whose `test`
@@ -72,6 +69,14 @@ export default defineConfig({
     // CI runs the suite on node 22, 24 and 25 on purpose; never let vis swap in the .nvmrc node.
     toolchain: {
         autoInstall: false,
+    },
+    // Pre-commit checks (`vis staged`, run from .vis/hooks/pre-commit after `vis secrets --staged`).
+    // Ported from the @anolilab/lint-staged-config groups this repo had enabled.
+    staged: {
+        "**/package.json": "pnpm exec sort-package-json",
+        "**/*.{cts,ts,mts,tsx,ctsx}": "node scripts/staged.mjs typecheck",
+        "**/?(*.){test,spec}.?(c|m)[jt]s?(x)": "node scripts/staged.mjs test",
+        "**/__tests__/**/*.?(c|m)[jt]s?(x)": "node scripts/staged.mjs test",
     },
     taskRunner: {
         parallel: 5,
