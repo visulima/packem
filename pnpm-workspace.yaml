@@ -71,7 +71,7 @@ catalogs:
   dev:
     "@arethetypeswrong/cli": ^0.18.5
     "@babel/core": 8.1.0
-    "@babel/parser": 8.0.8
+    "@babel/parser": 8.0.10
     "@mozilla/readability": ^0.6.0
     "@oxc-parser/binding-linux-x64-gnu": 0.157.0
     "@oxc-project/types": 0.157.0
@@ -163,7 +163,7 @@ catalogs:
     package-manager-detector: ^1.9.0
   prod:
     "@arethetypeswrong/core": ^0.18.5
-    "@babel/parser": 8.0.8
+    "@babel/parser": 8.0.10
     "@visulima/packem-share": 1.0.1
     audit-ci: ^7.1.0
     cjs-module-lexer: 2.3.0
