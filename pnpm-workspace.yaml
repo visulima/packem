@@ -545,7 +545,7 @@ overrides:
   # resolves these to 11 and eslint fails to load (see GHSA-g3hv-75wg-m249 in ignoreGhsas).
   minimatch@<3.1.4: ">=7.4.9 <11"
   minimatch@>=5.0.0 <5.1.8: ">=5.1.9 <6"
-  minimatch@>=9.0.0 <9.0.7: ">=9.0.9 <11"
+  minimatch@>=9.0.0 <9.0.7: ">=9.0.9 <12"
   minimatch@>=10.0.0 <10.2.3: ">=10.2.6 <11"
   # exact pin, not a floor: see the cooldown note above 3.3.17 in minimumReleaseAgeExclude
   nanoid@>=3.0.0 <4: "3.3.20"
