@@ -9,11 +9,11 @@ const fixDynamicImportExtension = (): Plugin =>
                 const magicString = new MagicString(code);
                 const extension = outputOptions.format === "es" ? "mjs" : "cjs";
                 // Only the string literal that is the whole argument of one `import(...)`: the
-                // specifier may not contain a quote, and it must close with the quote it opened
-                // with. A lazy `.*?` let a match run past the call, so on a minified one-line chunk
-                // any later `".ts")` literal (`read("app.ts")`) was rewritten too. `.d.ts` is kept.
-                // `import` must not follow `.`, `?.` or an identifier character, so a method call
-                // such as `loader.import("./schema.ts")` is not taken for a dynamic import.
+                // specifier may not contain a quote and must close with the quote it opened with,
+                // so a later `".ts")` literal on the same minified line (`read("app.ts")`) is left
+                // alone. `.d.ts` is kept. `import` must not follow `.`, `?.` or an identifier
+                // character, so a method call such as `loader.import("./schema.ts")` is not taken
+                // for a dynamic import.
                 const regex = /((?<![\w$.])import\(\s*(["'`])[^"'`]*?)(?<!\.d)(\.ts)(?=\2\s*\))/g;
 
                 let hasChanged = false;
