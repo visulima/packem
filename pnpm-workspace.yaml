@@ -489,6 +489,17 @@ auditConfig:
     # micromark-extension-math, which requires ^0.16.0 (latest release still does);
     # the fix is in >=0.18.2. No untrusted markdown is rendered.
     - GHSA-238p-pmpm-9mq7
+    # deepmerge (prototype poisoning in mergeObject) has no fix: the advisory covers
+    # 4.2.0-4.3.1 and 4.3.1 is the latest release. Reached only from the private benchmarks
+    # package via @rollup/plugin-node-resolve and bunchee, which still require ^4.2.2 in their
+    # latest releases. Only our own rollup config objects are merged.
+    - GHSA-gcqx-w48m-w2h4
+    # minimatch globparts DoS: fixed only in 11.0.1, with no 10.x backport. 11 removed makeRe(),
+    # Minimatch#set and Minimatch#matchOne(), which the latest eslint-plugin-import-x (4.17.1,
+    # `^9.0.3 || ^10.1.2`), typedoc (0.28.20, `^10.2.5`) and glob 7 (commitizen) still call, so
+    # forcing 11 breaks eslint and typedoc. Reached only from dev tooling (eslint, typedoc,
+    # commitizen, textlint), whose patterns come from our own config.
+    - GHSA-g3hv-75wg-m249
 
 overrides:
   '@hono/node-server@<2.0.10': ">=2.1.5"
