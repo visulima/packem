@@ -101,6 +101,24 @@ describe(fixDynamicImportExtension, () => {
             expect(result).toBeUndefined();
         });
 
+        it("should not rewrite a method named import", () => {
+            expect.assertions(1);
+
+            const code = 'loader.import("./schema.ts");loader?.import( "./other.ts" );reimport("./x.ts");$import("./y.ts");';
+            const result = renderChunk(code, {} as RenderedChunk, { format: "es", sourcemap: false } as NormalizedOutputOptions);
+
+            expect(result).toBeUndefined();
+        });
+
+        it("should still rewrite a dynamic import after an operator", () => {
+            expect.assertions(1);
+
+            const code = 'const m=await import("./a.ts"),n=()=>import("./b.ts");';
+            const result = renderChunk(code, {} as RenderedChunk, { format: "es", sourcemap: false } as NormalizedOutputOptions);
+
+            expect(result?.code).toBe('const m=await import("./a.mjs"),n=()=>import("./b.mjs");');
+        });
+
         it("should allow whitespace inside the import call", () => {
             expect.assertions(1);
 

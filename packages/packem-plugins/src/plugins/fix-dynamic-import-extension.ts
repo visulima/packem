@@ -12,7 +12,9 @@ const fixDynamicImportExtension = (): Plugin =>
                 // specifier may not contain a quote, and it must close with the quote it opened
                 // with. A lazy `.*?` let a match run past the call, so on a minified one-line chunk
                 // any later `".ts")` literal (`read("app.ts")`) was rewritten too. `.d.ts` is kept.
-                const regex = /(import\(\s*(["'`])[^"'`]*?)(?<!\.d)(\.ts)(?=\2\s*\))/g;
+                // `import` must not follow `.`, `?.` or an identifier character, so a method call
+                // such as `loader.import("./schema.ts")` is not taken for a dynamic import.
+                const regex = /((?<![\w$.])import\(\s*(["'`])[^"'`]*?)(?<!\.d)(\.ts)(?=\2\s*\))/g;
 
                 let hasChanged = false;
                 let match;
