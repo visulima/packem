@@ -543,7 +543,7 @@ overrides:
   # Capped below 11: minimatch 11 removed makeRe(), Minimatch#set and Minimatch#matchOne(),
   # which eslint-plugin-import-x, typedoc and glob 7/8 still call. Uncapped, a lockfile refresh
   # resolves these to 11 and eslint fails to load (see GHSA-g3hv-75wg-m249 in ignoreGhsas).
-  minimatch@<3.1.4: ">=7.4.9 <11"
+  minimatch@<3.1.4: ">=7.4.9 <12"
   minimatch@>=5.0.0 <5.1.8: ">=5.1.9 <6"
   minimatch@>=9.0.0 <9.0.7: ">=9.0.9 <11"
   minimatch@>=10.0.0 <10.2.3: ">=10.2.6 <11"
