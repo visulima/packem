@@ -1,3 +1,18 @@
 {
     extends: ["github>anolilab/renovate-config"],
+    packageRules: [
+        {
+            // rolldown 1.2.15 removed the `//#region` markers packem relies on (rolldown#11235);
+            // keep it on 1.2.14 until that is resolved. See the note above `rolldown` in pnpm-workspace.yaml.
+            matchPackageNames: ["rolldown"],
+            allowedVersions: "<=1.2.14",
+        },
+        {
+            // minimatch 11 removes makeRe(), which eslint-plugin-import-x, typedoc and glob 7/8 still
+            // call, so the overrides stay below 11 (GHSA-g3hv-75wg-m249 is in auditConfig.ignoreGhsas).
+            // Override keys carry their range (`minimatch@<3.1.4`), so match those too.
+            matchPackageNames: ["minimatch", "minimatch@*"],
+            allowedVersions: "<11",
+        },
+    ],
 }
