@@ -34,7 +34,7 @@ exports[`browserslist-to-esbuild > works by passing browsers as string 1`] = `
 [
   "chrome155",
   "edge154",
-  "firefox157",
+  "firefox158",
   "ie10",
   "ios26.6",
   "opera134",
