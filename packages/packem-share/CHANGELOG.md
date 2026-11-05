@@ -1,3 +1,14 @@
+## @visulima/packem-share [1.1.3](https://github.com/visulima/packem/compare/@visulima/packem-share@1.1.2...@visulima/packem-share@1.1.3) (2026-11-05)
+
+### Build System
+
+* migrate the monorepo from nx to vis ([#432](https://github.com/visulima/packem/issues/432)) ([c1d4867](https://github.com/visulima/packem/commit/c1d4867ab442a22f964d6014947ea17b61e8d318))
+
+
+### Dependencies
+
+* **rollup:** 4.65.0 → 4.67.4
+
 ## @visulima/packem-share [1.1.2](https://github.com/visulima/packem/compare/@visulima/packem-share@1.1.1...@visulima/packem-share@1.1.2) (2026-10-26)
 
 
