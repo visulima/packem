@@ -1,3 +1,9 @@
+## @visulima/packem [4.0.5](https://github.com/visulima/packem/compare/@visulima/packem@4.0.4...@visulima/packem@4.0.5) (2026-11-05)
+
+### Bug Fixes
+
+* **deps:** update dependency @swc/core to >=1.16.21 ([#455](https://github.com/visulima/packem/issues/455)) ([0565f83](https://github.com/visulima/packem/commit/0565f83473e764430eed2cc6b89284412300d97c))
+
 ## @visulima/packem [4.0.4](https://github.com/visulima/packem/compare/@visulima/packem@4.0.3...@visulima/packem@4.0.4) (2026-11-05)
 
 ### Bug Fixes
