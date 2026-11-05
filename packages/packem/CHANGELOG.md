@@ -1,3 +1,26 @@
+## @visulima/packem [4.0.4](https://github.com/visulima/packem/compare/@visulima/packem@4.0.3...@visulima/packem@4.0.4) (2026-11-05)
+
+### Bug Fixes
+
+* **deps:** update all dependencies and fix pnpm audit ([#451](https://github.com/visulima/packem/issues/451)) ([ab64920](https://github.com/visulima/packem/commit/ab64920bd6143a456f144137959477bc07e14159))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.1.3
+* **@visulima/rollup-plugin-css:** upgraded to 3.0.3
+* **@visulima/rollup-plugin-dts:** upgraded to 2.1.1
+* **@visulima/packem-rollup:** upgraded to 1.2.4
+* **@babel/core:** 8.0.9 → 8.1.0
+* **mime:** ^4.1.1 → ^4.1.2
+* **oxc-parser:** 0.155.0 → 0.157.0
+* **oxc-transform:** 0.155.0 → 0.157.0
+* **browserslist:** 4.29.4 → 4.29.5
+* **html-minifier-next:** 9.1.0 → 9.1.2
+* **@tailwindcss/node:** 4.3.3 → 4.3.4
+* **@tailwindcss/oxide:** 4.3.3 → 4.3.4
+* **magic-string:** 0.30.21 → 1.4.5
+
 ## @visulima/packem [4.0.3](https://github.com/visulima/packem/compare/@visulima/packem@4.0.2...@visulima/packem@4.0.3) (2026-10-26)
 
 ### Bug Fixes
