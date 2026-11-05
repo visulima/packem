@@ -1,3 +1,24 @@
+## @visulima/rollup-plugin-dts [2.1.1](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@2.1.0...@visulima/rollup-plugin-dts@2.1.1) (2026-11-05)
+
+### Bug Fixes
+
+* **deps:** update all dependencies and fix pnpm audit ([#451](https://github.com/visulima/packem/issues/451)) ([ab64920](https://github.com/visulima/packem/commit/ab64920bd6143a456f144137959477bc07e14159))
+
+### Tests
+
+* **rollup-plugin-dts:** stop two suites racing on one fixture temp dir ([#433](https://github.com/visulima/packem/issues/433)) ([03d93ec](https://github.com/visulima/packem/commit/03d93ec0df5e2d512ba3dd0cb8dfded6e54a4d98))
+
+### Build System
+
+* migrate the monorepo from nx to vis ([#432](https://github.com/visulima/packem/issues/432)) ([c1d4867](https://github.com/visulima/packem/commit/c1d4867ab442a22f964d6014947ea17b61e8d318))
+
+
+### Dependencies
+
+* **oxc-transform:** 0.155.0 → 0.157.0
+* **vue-tsc:** 3.3.13 → 3.3.14
+* **magic-string:** 0.30.21 → 1.4.5
+
 ## @visulima/rollup-plugin-dts [2.1.0](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@2.0.1...@visulima/rollup-plugin-dts@2.1.0) (2026-10-26)
 
 ### Features
