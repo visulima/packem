@@ -324,7 +324,7 @@
     },
     "peerDependencies": {
         "@arethetypeswrong/core": ">=0.18.5",
-        "@swc/core": ">=1.16.20",
+        "@swc/core": ">=1.16.21",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
         "@visulima/packem-rollup": "1.2.4",
