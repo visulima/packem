@@ -508,10 +508,15 @@ overrides:
   eslint-plugin-sonarjs@<4.2.0: ">=4.2.0"
   fast-uri@<3.1.9: ">=3.1.9 <4"
   flatted@<3.4.2: ">=3.4.4"
-  follow-redirects@<1.16.1: ">=1.16.1"
+  # GHSA-mrwp-f3q8-3g9p (high) is fixed in 1.16.2; reached via http-proxy (postgraphile) and
+  # axios (@codspeed/core), neither of which has a release requiring it yet.
+  follow-redirects@<1.16.2: ">=1.16.2 <2"
   http-cache-semantics@<=4.2.0: ">=4.3.0 <5"
   form-data@>=4.0.0 <4.0.6: ">=4.0.6"
-  glob@>=10.0.0 <10.5.0: ">=13.0.6"
+  # GHSA-3g3m-2fjr-6pw4 covers glob 9.0.0-14.0.1 and is fixed only in 14.0.2. stylus (^10.4.5)
+  # and textlint (^13.0.6) are both on their latest release and use only the stable
+  # glob()/sync() entry points, which glob 14 keeps.
+  glob@>=9.0.0 <14.0.2: ">=14.0.2 <15"
   handlebars@>=4.0.0 <4.7.9: ">=4.7.10"
   happy-dom@>=15.0.0 <21.0.4: ">=21.0.4"
   hono@<4.12.34: ">=4.12.34 <5"
