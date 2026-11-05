@@ -1,4 +1,4 @@
-import MagicString from "magic-string";
+import { MagicString } from "magic-string";
 import type { ESMExport, ParsedStaticImport } from "mlly";
 import { findExports, findStaticImports, parseStaticImport } from "mlly";
 import type { Span } from "oxc-parser";

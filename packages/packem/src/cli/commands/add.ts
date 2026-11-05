@@ -7,7 +7,7 @@ import { readFile, writeFile } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
 import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
-import MagicString from "magic-string";
+import { MagicString } from "magic-string";
 import { exec } from "tinyexec";
 
 import findPackemFile from "../../config/utils/find-packem-file";

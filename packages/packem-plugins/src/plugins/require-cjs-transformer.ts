@@ -4,7 +4,7 @@ import process from "node:process";
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { init } from "cjs-module-lexer";
-import MagicString from "magic-string";
+import { MagicString } from "magic-string";
 import { parseSync } from "oxc-parser";
 import type { NormalizedOutputOptions, Plugin, RenderedChunk, ResolvedId, SourceMapInput } from "rollup";
 

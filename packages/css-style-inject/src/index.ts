@@ -4,7 +4,7 @@ interface SSRInjectData {
 }
 
 declare global {
-    // eslint-disable-next-line vars-on-top, no-underscore-dangle, @typescript-eslint/naming-convention
+    // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
     var __styleInject_SSR_MODULES: SSRInjectData[] | undefined;
 }
 

@@ -51,7 +51,7 @@ catalogs:
     # integration-test normalizer and the rolldown output layout all rely on the region pairs, so
     # taking 1.2.15 is a backend migration (likely `attachDebugInfo: "none"`), not a bump.
     rolldown: 1.2.14
-    rollup: 4.65.0
+    rollup: 4.67.4
     rollup-plugin-dts: 6.5.1
     rollup-plugin-import-trace: 1.0.1
     rollup-plugin-license: 3.7.1
@@ -60,24 +60,24 @@ catalogs:
     rollup-plugin-pure: ^0.4.0
     rollup-plugin-svelte: ^7.2.3
     rollup-plugin-visualizer: 7.1.1
-    unplugin-vue: 8.0.0
+    unplugin-vue: 8.0.1
     vite: 8.3.5
   cli:
-    "@anolilab/multi-semantic-release": 4.6.1
-    "@anolilab/semantic-release-pnpm": 8.1.36
-    "@anolilab/semantic-release-preset": 13.4.38
+    "@anolilab/multi-semantic-release": 4.6.3
+    "@anolilab/semantic-release-pnpm": 8.1.37
+    "@anolilab/semantic-release-preset": 13.4.39
     commitizen: ^4.3.2
     semantic-release: 25.0.9
   dev:
     "@arethetypeswrong/cli": ^0.18.5
-    "@babel/core": 8.0.9
+    "@babel/core": 8.1.0
     "@babel/parser": 8.0.8
     "@mozilla/readability": ^0.6.0
-    "@oxc-parser/binding-linux-x64-gnu": 0.155.0
-    "@oxc-project/types": 0.155.0
+    "@oxc-parser/binding-linux-x64-gnu": 0.157.0
+    "@oxc-project/types": 0.157.0
     "@svgr/core": ^8.1.0
-    "@swc/core": 1.16.20
-    "@swc/helpers": 0.5.23
+    "@swc/core": 1.16.21
+    "@swc/helpers": 0.5.24
     "@swc/types": 0.1.28
     babel-plugin-transform-hook-names: ^1.0.2
     babel-preset-solid: 1.9.16
@@ -88,14 +88,14 @@ catalogs:
     estree-walker: ^3.0.3
     hookable: 6.1.2
     lit: 3.3.3
-    mime: ^4.1.1
+    mime: ^4.1.2
     nodehun: ^3.0.2
-    oxc-parser: 0.155.0
-    oxc-transform: 0.155.0
+    oxc-parser: 0.157.0
+    oxc-transform: 0.157.0
     p-queue: 10.0.0
     package-manager-detector: ^1.9.0
     picocolors: ^1.1.1
-    postgraphile: 5.1.5
+    postgraphile: 5.2.1
     rs-module-lexer: 2.9.0
     safe-stable-stringify: ^3.0.0
     sort-package-json: 4.1.0
@@ -109,18 +109,18 @@ catalogs:
   frontend:
     "@babel/preset-react": ^8.0.1
     "@radix-ui/react-tooltip": ^1.4.1
-    "@vue/language-core": 3.3.13
+    "@vue/language-core": 3.3.14
     babel-plugin-react-compiler: 1.0.0
-    preact: 11.0.2
+    preact: 11.1.1
     react: 19.3.1
     react-dom: 19.3.1
-    svelte: 5.57.2
+    svelte: 5.57.3
     vue: 3.5.44
   icons:
-    lucide-static: 1.61.0
+    lucide-static: 1.68.0
   lint:
     "@anolilab/commitlint-config": 11.0.0
-    "@anolilab/eslint-config": 31.0.0
+    "@anolilab/eslint-config": 31.0.2
     "@anolilab/lint-staged-config": 14.0.0
     "@anolilab/prettier-config": 11.0.0
     "@anolilab/textlint-config": 14.0.0
@@ -128,22 +128,22 @@ catalogs:
     "@commitlint/config-conventional": 21.2.4
     "@eslint/css": 2.0.1
     "@secretlint/secretlint-rule-preset-recommend": 13.1.0
-    eslint: 10.13.0
+    eslint: 10.14.0
     husky: ^9.1.7
     lint-staged: 17.6.0
     prettier: 3.9.10
     publint: 0.3.25
     secretlint: 13.1.0
-    tailwind-csstree: 0.4.1
+    tailwind-csstree: 0.4.2
     textlint: 15.8.0
   markdown:
     turndown: 7.2.4
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.14.1
   monorepo:
-    "@visulima/vis": 6.1.3
+    "@visulima/vis": 6.6.0
   network:
-    browserslist: 4.29.4
+    browserslist: 4.29.5
     browserslist-config-anolilab: 10.0.0
   node:
     "@antfu/install-pkg": 2.1.0
@@ -155,8 +155,8 @@ catalogs:
     execa: ^10.2.1
     glob-parent: 6.0.2
     oxc-resolver: 11.24.2
-    pkg-pr-new: 0.0.92
-    rimraf: 6.1.3
+    pkg-pr-new: 0.0.93
+    rimraf: 6.1.4
     tinyexec: 1.3.1
     tinyglobby: 0.2.17
   peer:
@@ -173,19 +173,19 @@ catalogs:
     gpt-tokenizer: ^4.1.0
     happy-dom: 21.0.4
     hookable: 6.1.2
-    html-minifier-next: 9.1.0
+    html-minifier-next: 9.1.2
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.2
     obug: 3.0.0
-    oxc-parser: 0.155.0
+    oxc-parser: 0.157.0
     p-queue: 10.0.0
     picomatch: 4.0.7
     plop: 4.0.5
     preline: 5.0.0
     rs-module-lexer: 2.9.0
     safe-stable-stringify: ^3.0.0
-    solid-js: 1.9.17
+    solid-js: 1.9.18
     sort-package-json: 4.1.0
     source-map-js: ^1.2.2
     tailwind-merge: 3.7.0
@@ -201,9 +201,9 @@ catalogs:
     "@csstools/css-tokenizer": 4.0.2
     "@csstools/postcss-slow-plugins": 3.0.0
     "@tailwindcss/forms": 0.5.11
-    "@tailwindcss/node": 4.3.3
-    "@tailwindcss/oxide": 4.3.3
-    "@tailwindcss/postcss": 4.3.3
+    "@tailwindcss/node": 4.3.4
+    "@tailwindcss/oxide": 4.3.4
+    "@tailwindcss/postcss": 4.3.4
     "@tailwindcss/typography": ^0.5.20
     "@visulima/css-style-inject": 1.0.1
     clean-css: ^5.3.3
@@ -212,7 +212,7 @@ catalogs:
     less: 4.9.1
     lightningcss: 1.33.0
     minireset.css: 0.0.7
-    postcss: 8.5.31
+    postcss: 8.5.32
     postcss-custom-properties: 15.0.4
     postcss-load-config: ^6.0.1
     postcss-modules: 9.0.1
@@ -221,16 +221,16 @@ catalogs:
     postcss-modules-scope: ^3.2.1
     postcss-modules-values: ^4.0.0
     postcss-value-parser: ^4.2.0
-    sass: 1.106.1
-    sass-embedded: 1.106.1
-    tailwindcss: 4.3.3
+    sass: 1.107.1
+    sass-embedded: 1.107.1
+    tailwindcss: 4.3.4
   test:
     "@codspeed/vitest-plugin": ^6.1.0
     "@jridgewell/source-map": ^0.3.11
     "@sxzz/test-utils": 0.5.20
-    "@vitest/coverage-v8": 5.0.5
-    "@vitest/ui": 5.0.5
-    vitest: 5.0.5
+    "@vitest/coverage-v8": 5.1.0
+    "@vitest/ui": 5.1.0
+    vitest: 5.1.0
   tsc:
     "@astrojs/ts-plugin": 1.10.12
     "@babel/preset-typescript": ^8.0.7
@@ -243,20 +243,20 @@ catalogs:
     # the workspace `typescript`. TS 7 lives in the private `tools/typescript-7` package and is
     # linked into integration-test fixtures as `typescript` when PACKEM_TEST_TYPESCRIPT=7.
     typescript: 6.0.3
-    vue-tsc: 3.3.13
+    vue-tsc: 3.3.14
   types:
     "@types/babel__core": ^7.20.5
     "@types/babel__generator": ^7.27.0
     "@types/bun": 1.4.4
     "@types/clean-css": 4.2.11
     "@types/debug": 4.1.13
-    "@types/estree": 1.0.9
+    "@types/estree": 1.0.10
     "@types/glob-parent": ^5.1.3
     "@types/icss-utils": ^5.1.2
     "@types/is-glob": ^4.0.4
     "@types/less": 3.0.8
     "@types/micromatch": ^4.0.10
-    "@types/node": 26.6.5
+    "@types/node": 26.6.6
     "@types/picomatch": ^4.0.3
     "@types/postcss-modules-local-by-default": ^4.0.2
     "@types/postcss-modules-scope": ^3.0.4
@@ -270,11 +270,8 @@ catalogs:
   utils:
     cheerio: 1.2.0
     defu: 6.1.7
-    # magic-string 1 changed the SourceMap type in a way rollup's SourceMapInput no
-    # longer accepts, so every renderChunk/transform hook returning a generated map
-    # stops typechecking. Hold 0.30 until rollup's types catch up.
-    magic-string: 0.30.21
-    semver: 7.8.5
+    magic-string: 1.4.5
+    semver: 7.8.6
   visulima:
     "@visulima/cerebro": 4.0.1
     "@visulima/colorize": 3.0.0
@@ -285,8 +282,11 @@ catalogs:
     # Bootstrap builder: the packages build with the published packem from the registry. It must
     # differ from the workspace packem version, or linkWorkspacePackages links packages/packem
     # (even through an `npm:` alias) and a clean checkout has no dist/ to build anything with.
-    # Workspace packem is 4.0.1, so the newest usable builder is 4.0.0.
-    "@visulima/packem": 4.0.0
+    # The same applies to its internal deps (packem-rollup, packem-share, rollup-plugin-css,
+    # rollup-plugin-dts): they are exact pins, so any that match a workspace version get linked
+    # to an unbuilt workspace package. Workspace packem is 4.0.3, and 4.0.2 pins the current
+    # workspace versions of all four, so the newest usable builder is 4.0.1.
+    "@visulima/packem": 4.0.1
     "@visulima/pail": 6.0.0
     "@visulima/path": 5.0.0
     "@visulima/source-map": 3.0.1
@@ -489,6 +489,17 @@ auditConfig:
     # micromark-extension-math, which requires ^0.16.0 (latest release still does);
     # the fix is in >=0.18.2. No untrusted markdown is rendered.
     - GHSA-238p-pmpm-9mq7
+    # deepmerge (prototype poisoning in mergeObject) has no fix: the advisory covers
+    # 4.2.0-4.3.1 and 4.3.1 is the latest release. Reached only from the private benchmarks
+    # package via @rollup/plugin-node-resolve and bunchee, which still require ^4.2.2 in their
+    # latest releases. Only our own rollup config objects are merged.
+    - GHSA-gcqx-w48m-w2h4
+    # minimatch globparts DoS: fixed only in 11.0.1, with no 10.x backport. 11 removed makeRe(),
+    # Minimatch#set and Minimatch#matchOne(), which the latest eslint-plugin-import-x (4.17.1,
+    # `^9.0.3 || ^10.1.2`), typedoc (0.28.20, `^10.2.5`) and glob 7 (commitizen) still call, so
+    # forcing 11 breaks eslint and typedoc. Reached only from dev tooling (eslint, typedoc,
+    # commitizen, textlint), whose patterns come from our own config.
+    - GHSA-g3hv-75wg-m249
 
 overrides:
   '@hono/node-server@<2.0.10': ">=2.1.5"
@@ -508,10 +519,15 @@ overrides:
   eslint-plugin-sonarjs@<4.2.0: ">=4.2.0"
   fast-uri@<3.1.9: ">=3.1.9 <4"
   flatted@<3.4.2: ">=3.4.4"
-  follow-redirects@<1.16.1: ">=1.16.1"
+  # GHSA-mrwp-f3q8-3g9p (high) is fixed in 1.16.2; reached via http-proxy (postgraphile) and
+  # axios (@codspeed/core), neither of which has a release requiring it yet.
+  follow-redirects@<1.16.2: ">=1.16.2 <2"
   http-cache-semantics@<=4.2.0: ">=4.3.0 <5"
   form-data@>=4.0.0 <4.0.6: ">=4.0.6"
-  glob@>=10.0.0 <10.5.0: ">=13.0.6"
+  # GHSA-3g3m-2fjr-6pw4 covers glob 9.0.0-14.0.1 and is fixed only in 14.0.2. stylus (^10.4.5)
+  # and textlint (^13.0.6) are both on their latest release and use only the stable
+  # glob()/sync() entry points, which glob 14 keeps.
+  glob@>=9.0.0 <14.0.2: ">=14.0.2 <15"
   handlebars@>=4.0.0 <4.7.9: ">=4.7.10"
   happy-dom@>=15.0.0 <21.0.4: ">=21.0.4"
   hono@<4.12.34: ">=4.12.34 <5"
@@ -524,10 +540,13 @@ overrides:
   markdown-it@>=14.1.0 <14.3.3: ">=14.3.3"
   markdown-it@>=15.0.0 <15.0.3: ">=15.0.3"
   "typedoc>markdown-it": "14.3.3"
-  minimatch@<3.1.4: ">=7.4.9"
-  minimatch@>=5.0.0 <5.1.8: ">=5.1.9"
-  minimatch@>=9.0.0 <9.0.7: ">=9.0.9"
-  minimatch@>=10.0.0 <10.2.3: ">=10.2.6"
+  # Capped below 11: minimatch 11 removed makeRe(), Minimatch#set and Minimatch#matchOne(),
+  # which eslint-plugin-import-x, typedoc and glob 7/8 still call. Uncapped, a lockfile refresh
+  # resolves these to 11 and eslint fails to load (see GHSA-g3hv-75wg-m249 in ignoreGhsas).
+  minimatch@<3.1.4: ">=7.4.9 <11"
+  minimatch@>=5.0.0 <5.1.8: ">=5.1.9 <6"
+  minimatch@>=9.0.0 <9.0.7: ">=9.0.9 <11"
+  minimatch@>=10.0.0 <10.2.3: ">=10.2.6 <11"
   # exact pin, not a floor: see the cooldown note above 3.3.17 in minimumReleaseAgeExclude
   nanoid@>=3.0.0 <4: "3.3.20"
   path-to-regexp@>=8.0.0 <8.4.0: ">=8.4.2"
@@ -550,7 +569,10 @@ overrides:
   yaml@>=2.0.0 <2.8.3: ">=2.9.1"
 
 patchedDependencies:
-  oxc-parser: patches/oxc-parser.patch
+  # Re-adds the `parseAsync` export that oxc-parser dropped in 0.155.0. Scoped to >=0.155.0:
+  # 0.154.0 (pulled in by the bootstrap @visulima/packem) still ships it, and patching it twice
+  # declares `parseAsync` twice, a SyntaxError on import.
+  oxc-parser@>=0.155.0: patches/oxc-parser.patch
 
 peerDependencyRules:
   # vite is an optional peer of vitest/@vitest/mocker and rollup-plugin-import-trace.

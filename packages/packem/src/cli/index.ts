@@ -16,7 +16,7 @@ import createMigrateCommand from "./commands/migrate";
  * package's supported engines: Node 22.22+/24.10+). Failures are non-fatal.
  */
 try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
+    // eslint-disable-next-line @typescript-eslint/no-require-imports,n/global-require
     const nodeModule = require("node:module") as { enableCompileCache?: () => unknown };
 
     nodeModule.enableCompileCache?.();
