@@ -270,10 +270,7 @@ catalogs:
   utils:
     cheerio: 1.2.0
     defu: 6.1.7
-    # magic-string 1 changed the SourceMap type in a way rollup's SourceMapInput no
-    # longer accepts, so every renderChunk/transform hook returning a generated map
-    # stops typechecking. Hold 0.30 until rollup's types catch up.
-    magic-string: 0.30.21
+    magic-string: 1.4.5
     semver: 7.8.6
   visulima:
     "@visulima/cerebro": 4.0.1

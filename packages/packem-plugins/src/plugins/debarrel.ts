@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
-import MagicString from "magic-string";
+import { MagicString } from "magic-string";
 import type { Plugin, PluginContext, TransformResult } from "rollup";
 import type { ExportSpecifier, ImportSpecifier } from "rs-module-lexer";
 // eslint-disable-next-line import/no-namespace
