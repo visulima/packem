@@ -50,7 +50,7 @@ catalogs:
     # `// <module id>` comments (rolldown#11235). packem's stripRolldownRegionCommentsPlugin, the
     # integration-test normalizer and the rolldown output layout all rely on the region pairs, so
     # taking 1.2.15 is a backend migration (likely `attachDebugInfo: "none"`), not a bump.
-    rolldown: 1.2.14
+    rolldown: 1.2.16
     rollup: 4.67.4
     rollup-plugin-dts: 6.5.1
     rollup-plugin-import-trace: 1.0.1
@@ -510,7 +510,7 @@ overrides:
   brace-expansion@<5.0.12: ">=5.0.12 <6"
   # GHSA-7w5x-hrqm-74c2 is fixed in 1.7.1.
   smol-toml@<1.7.1: ">=1.7.1 <2"
-  browserslist@<4.28.7: ">=4.29.4"
+  browserslist@<4.28.7: ">=4.29.5"
   chrono-node@<2.2.4: ">=2.10.3"
   defu@<6.1.5: ">=6.1.7"
   devalue@>=5.0.0 <5.8.1: ">=6.0.3"
@@ -559,13 +559,13 @@ overrides:
   # seroval 1.6.3. solid-js pins ~1.5.4, so force the patched release rather than
   # hiding the advisories from `pnpm audit` workspace-wide.
   seroval@<1.6.3: ">=1.7.6"
-  svelte@<5.55.7: ">=5.57.2"
+  svelte@<5.55.7: ">=5.57.3"
   svgo@>=4.0.0 <4.0.2: ">=4.1.0"
   tmp@<0.2.7: ">=0.2.7"
   undici@<8.12.2: ">=8.12.2 <9"
   vite@>=8.0.0 <8.0.5: ">=8.3.5"
   vite@>=8.2.0 <8.2.4: ">=8.2.4"
-  ws@>=8.0.0 <8.21.0: ">=8.22.0"
+  ws@>=8.0.0 <8.21.0: ">=8.22.1"
   yaml@>=2.0.0 <2.8.3: ">=2.9.1"
 
 patchedDependencies:
