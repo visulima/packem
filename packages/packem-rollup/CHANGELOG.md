@@ -1,3 +1,23 @@
+## @visulima/packem-rollup [1.2.4](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.2.3...@visulima/packem-rollup@1.2.4) (2026-11-05)
+
+### Bug Fixes
+
+* **deps:** update all dependencies and fix pnpm audit ([#451](https://github.com/visulima/packem/issues/451)) ([ab64920](https://github.com/visulima/packem/commit/ab64920bd6143a456f144137959477bc07e14159))
+
+### Build System
+
+* migrate the monorepo from nx to vis ([#432](https://github.com/visulima/packem/issues/432)) ([c1d4867](https://github.com/visulima/packem/commit/c1d4867ab442a22f964d6014947ea17b61e8d318))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.1.3
+* **@visulima/rollup-plugin-dts:** upgraded to 2.1.1
+* **@babel/core:** 8.0.9 → 8.1.0
+* **oxc-transform:** 0.155.0 → 0.157.0
+* **html-minifier-next:** 9.1.0 → 9.1.2
+* **magic-string:** 0.30.21 → 1.4.5
+
 ## @visulima/packem-rollup [1.2.3](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.2.2...@visulima/packem-rollup@1.2.3) (2026-10-26)
 
 ### Bug Fixes
