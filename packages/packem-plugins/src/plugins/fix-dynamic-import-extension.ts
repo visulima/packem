@@ -8,15 +8,18 @@ const fixDynamicImportExtension = (): Plugin =>
             if (outputOptions.format === "es" || outputOptions.format === "cjs") {
                 const magicString = new MagicString(code);
                 const extension = outputOptions.format === "es" ? "mjs" : "cjs";
-                // Match .ts extensions but exclude .d.ts (negative lookbehind)
-                const regex = /(import\(.*?)(?<!\.d)(\.ts)(?=['"`]\))/g;
+                // Only the string literal that is the whole argument of one `import(...)`: the
+                // specifier may not contain a quote, and it must close with the quote it opened
+                // with. A lazy `.*?` let a match run past the call, so on a minified one-line chunk
+                // any later `".ts")` literal (`read("app.ts")`) was rewritten too. `.d.ts` is kept.
+                const regex = /(import\(\s*(["'`])[^"'`]*?)(?<!\.d)(\.ts)(?=\2\s*\))/g;
 
                 let hasChanged = false;
                 let match;
 
                 // eslint-disable-next-line no-cond-assign
                 while ((match = regex.exec(code)) !== null) {
-                    const [, beforeExtension, tsExtension] = match;
+                    const [, beforeExtension, , tsExtension] = match;
 
                     if (beforeExtension && tsExtension) {
                         const start = match.index + beforeExtension.length;

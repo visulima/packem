@@ -73,6 +73,43 @@ describe(fixDynamicImportExtension, () => {
             expect(result?.code).toBe("import('./module1.mjs'); import('./module2.mjs');");
         });
 
+        it("should leave a later .ts string literal on the same line alone", () => {
+            expect.assertions(1);
+
+            // A minified chunk is one line: the dynamic import comes first, unrelated literals follow.
+            const code = 'const m=import("./module.ts");read("app.ts");names.filter(n=>n.endsWith(".ts"));';
+            const result = renderChunk(code, {} as RenderedChunk, { format: "es", sourcemap: false } as NormalizedOutputOptions);
+
+            expect(result?.code).toBe('const m=import("./module.mjs");read("app.ts");names.filter(n=>n.endsWith(".ts"));');
+        });
+
+        it("should not rewrite a .ts literal that is not the import argument", () => {
+            expect.assertions(1);
+
+            const code = 'await import("@scope/pkg");const target=join(dir,"entry.ts");';
+            const result = renderChunk(code, {} as RenderedChunk, { format: "es", sourcemap: false } as NormalizedOutputOptions);
+
+            expect(result).toBeUndefined();
+        });
+
+        it("should keep the import's own quote pairing", () => {
+            expect.assertions(1);
+
+            const code = "import('./a\"b.ts\")')";
+            const result = renderChunk(code, {} as RenderedChunk, { format: "es", sourcemap: false } as NormalizedOutputOptions);
+
+            expect(result).toBeUndefined();
+        });
+
+        it("should allow whitespace inside the import call", () => {
+            expect.assertions(1);
+
+            const code = "import( './module.ts' )";
+            const result = renderChunk(code, {} as RenderedChunk, { format: "es", sourcemap: false } as NormalizedOutputOptions);
+
+            expect(result?.code).toBe("import( './module.mjs' )");
+        });
+
         it("should return undefined when no .ts extensions in dynamic imports", () => {
             expect.assertions(1);
 
