@@ -590,7 +590,7 @@ catalogs:
       version: 3.2.38
 
 overrides:
-  '@hono/node-server@<2.0.10': '>=2.1.5'
+  '@hono/node-server@<2.0.10': '>=2.1.6'
   ajv@>=7.0.0 <8.18.0: '>=8.20.0'
   axios@>=1.0.0 <1.18.0: '>=1.21.0'
   axios@>=1.0.0 <1.20.0: '>=1.21.0'
@@ -633,7 +633,7 @@ overrides:
   postcss@<8.5.23: '>=8.5.23 <9'
   qs@<6.16.0: '>=6.17.1'
   shell-quote@<1.8.5: '>=1.12.0'
-  seroval@<1.6.3: '>=1.7.6'
+  seroval@<1.6.3: '>=1.7.7'
   svelte@<5.55.7: '>=5.57.3'
   svgo@>=4.0.0 <4.0.2: '>=4.1.0'
   tmp@<0.2.7: '>=0.2.7'
@@ -644,8 +644,6 @@ overrides:
   yaml@>=2.0.0 <2.8.3: '>=2.9.1'
 
 packageExtensionsChecksum: sha256-kDoYTE5/S31yc/hlb9EMF82fbIxvfSGDXrIt91L1I0Y=
-
-pnpmfileChecksum: sha256-Wzgu78gay+v6MunApP3nY8NLqA2rjoJktL31h20yv5I=
 
 patchedDependencies:
   oxc-parser@>=0.155.0: 464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76
@@ -9300,7 +9298,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       next: '>=14.0'
       rotating-file-stream: '>=3.2.9'
     peerDependenciesMeta:
@@ -9334,7 +9332,7 @@ packages:
       elysia: '>=1.0'
       express: '>=4.0'
       fastify: '>=4.0'
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       next: '>=14.0'
       rotating-file-stream: '>=3.2.9'
     peerDependenciesMeta:
@@ -12353,7 +12351,7 @@ packages:
       graphile-config: ^1.1.2
       graphql: ^16.9.0
       h3: ^1.13.0
-      hono: '>=4.12.34'
+      hono: '>=4.12.34 <5'
       ws: '>=8.22.1'
     peerDependenciesMeta:
       '@envelop/core':
@@ -16121,7 +16119,7 @@ packages:
     resolution: {integrity: sha512-+reiwp/lYxiyctSrdvX7OQ1YLrcbWYgBiZrhSFL+V43b0/DGRLNVSDyZINbQe+tWplPOI2fw2dPrdv6hcc09kQ==}
     engines: {node: '>=10'}
     peerDependencies:
-      seroval: '>=1.7.6'
+      seroval: '>=1.7.7'
 
   seroval@1.6.12:
     resolution: {integrity: sha512-CqbIVfk/7GL3ITwZI55lcPbpQbjHZ2DD5cUj4iH7E9YsCfHNJV1mx7yNp86Z84w5IpmkZZS/2s5vPOWmVWSdQg==}
