@@ -502,7 +502,7 @@ auditConfig:
     - GHSA-g3hv-75wg-m249
 
 overrides:
-  '@hono/node-server@<2.0.10': ">=2.1.5"
+  '@hono/node-server@<2.0.10': ">=2.1.6"
   ajv@>=7.0.0 <8.18.0: ">=8.20.0"
   axios@>=1.0.0 <1.18.0: ">=1.21.0"
   axios@>=1.0.0 <1.20.0: ">=1.21.0"
@@ -558,7 +558,7 @@ overrides:
   # GHSA-p6vx-979v-rg4c (critical) and GHSA-jp82-f5mq-hwhp (high) are both fixed in
   # seroval 1.6.3. solid-js pins ~1.5.4, so force the patched release rather than
   # hiding the advisories from `pnpm audit` workspace-wide.
-  seroval@<1.6.3: ">=1.7.6"
+  seroval@<1.6.3: ">=1.7.7"
   svelte@<5.55.7: ">=5.57.3"
   svgo@>=4.0.0 <4.0.2: ">=4.1.0"
   tmp@<0.2.7: ">=0.2.7"
