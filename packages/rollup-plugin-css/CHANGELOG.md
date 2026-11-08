@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-css [3.0.4](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@3.0.3...@visulima/rollup-plugin-css@3.0.4) (2026-11-08)
+
+### Bug Fixes
+
+* **deps:** update dependency postcss to >=8.5.32 ([#465](https://github.com/visulima/packem/issues/465)) ([8461fa5](https://github.com/visulima/packem/commit/8461fa50f566236510a46522895f1adb456f1ffe))
+
 ## @visulima/rollup-plugin-css [3.0.3](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@3.0.2...@visulima/rollup-plugin-css@3.0.3) (2026-11-05)
 
 ### Bug Fixes
