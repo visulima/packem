@@ -1970,7 +1970,7 @@ importers:
         specifier: catalog:visulima
         version: 6.0.0
       '@visulima/rollup-plugin-css':
-        specifier: 3.0.3
+        specifier: 3.0.4
         version: link:../rollup-plugin-css
       '@visulima/rollup-plugin-dts':
         specifier: 2.1.1
