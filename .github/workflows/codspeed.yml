@@ -30,7 +30,7 @@ jobs:
             packages: "${{ steps.changes.outputs.packages }}"
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43" # v2.22.3
+              uses: "step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a" # v2.22.4
               with:
                   egress-policy: "audit"
 
@@ -62,7 +62,7 @@ jobs:
             matrix: "${{ steps.affected.outputs.matrix }}"
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43" # v2.22.3
+              uses: "step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a" # v2.22.4
               with:
                   egress-policy: "audit"
 
@@ -141,7 +141,7 @@ jobs:
             id-token: "write" # required for OIDC authentication with CodSpeed
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43" # v2.22.3
+              uses: "step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a" # v2.22.4
               with:
                   egress-policy: "audit"
 
@@ -173,7 +173,7 @@ jobs:
             - name: "Run benchmark"
               env:
                   BENCH_PROJECT: "${{ matrix.project }}"
-              uses: "CodSpeedHQ/action@61efe07e57e55bedeab750c434504de272a56e8c" # v5.6.1
+              uses: "CodSpeedHQ/action@af75f77f17a054769abefaa42fe8dc2975469b5f" # v5.6.3
               with:
                   mode: "simulation"
                   run: "pnpm exec vis run test:bench --projects=${BENCH_PROJECT} --no-cache"
