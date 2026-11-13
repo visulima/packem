@@ -120,7 +120,7 @@ catalogs:
     lucide-static: 1.68.0
   lint:
     "@anolilab/commitlint-config": 11.0.0
-    "@anolilab/eslint-config": 31.0.2
+    "@anolilab/eslint-config": 31.0.3
     "@anolilab/lint-staged-config": 14.0.0
     "@anolilab/prettier-config": 11.0.0
     "@anolilab/textlint-config": 14.0.0
@@ -137,7 +137,7 @@ catalogs:
     tailwind-csstree: 0.4.2
     textlint: 15.8.0
   markdown:
-    turndown: 7.2.4
+    turndown: 7.2.5
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.14.1
   monorepo:
@@ -170,7 +170,7 @@ catalogs:
     clsx: ^2.1.1
     fastest-levenshtein: 1.0.16
     get-tsconfig: 4.14.3
-    gpt-tokenizer: ^4.1.0
+    gpt-tokenizer: ^4.1.1
     happy-dom: 21.0.4
     hookable: 6.1.2
     html-minifier-next: 9.1.2
@@ -225,7 +225,7 @@ catalogs:
     sass-embedded: 1.107.1
     tailwindcss: 4.3.4
   test:
-    "@codspeed/vitest-plugin": ^6.1.0
+    "@codspeed/vitest-plugin": ^6.1.1
     "@jridgewell/source-map": ^0.3.11
     "@sxzz/test-utils": 0.5.20
     "@vitest/coverage-v8": 5.1.0
@@ -236,7 +236,7 @@ catalogs:
     "@babel/preset-typescript": ^8.0.7
     "@total-typescript/ts-reset": ^0.6.1
     "@ts-macro/tsc": 0.3.7
-    "@volar/typescript": 2.4.30
+    "@volar/typescript": 2.4.31
     # The workspace uses the classic TypeScript compiler (5/6 API): the `tsc` dts backend,
     # vue-tsc, @volar/typescript and @ts-macro/tsc all wrap it. TypeScript 7 is the native
     # (Go) compiler with a different, minimal API those tools cannot use, so it must NOT be
@@ -502,10 +502,10 @@ auditConfig:
     - GHSA-g3hv-75wg-m249
 
 overrides:
-  '@hono/node-server@<2.0.10': ">=2.1.5"
+  '@hono/node-server@<2.0.10': ">=2.1.6"
   ajv@>=7.0.0 <8.18.0: ">=8.20.0"
-  axios@>=1.0.0 <1.18.0: ">=1.21.0"
-  axios@>=1.0.0 <1.20.0: ">=1.21.0"
+  axios@>=1.0.0 <1.18.0: ">=1.21.1"
+  axios@>=1.0.0 <1.20.0: ">=1.21.1"
   body-parser@>=2.0.0 <2.4.0: ">=2.4.0"
   brace-expansion@<5.0.12: ">=5.0.12 <6"
   # GHSA-7w5x-hrqm-74c2 is fixed in 1.7.1.
@@ -531,7 +531,7 @@ overrides:
   handlebars@>=4.0.0 <4.7.9: ">=4.7.10"
   happy-dom@>=15.0.0 <21.0.4: ">=21.0.4"
   hono@<4.12.34: ">=4.12.34 <5"
-  immutable@>=5.0.0 <5.1.8: ">=5.1.9"
+  immutable@>=5.0.0 <5.1.8: ">=5.1.10"
   ip-address@<10.3.1: ">=10.3.1 <11"
   js-yaml@>=4.0.0 <4.3.1: ">=4.3.1 <6"
   lodash@<4.18.0: ">=4.18.0"
@@ -558,14 +558,14 @@ overrides:
   # GHSA-p6vx-979v-rg4c (critical) and GHSA-jp82-f5mq-hwhp (high) are both fixed in
   # seroval 1.6.3. solid-js pins ~1.5.4, so force the patched release rather than
   # hiding the advisories from `pnpm audit` workspace-wide.
-  seroval@<1.6.3: ">=1.7.6"
+  seroval@<1.6.3: ">=1.7.10"
   svelte@<5.55.7: ">=5.57.3"
   svgo@>=4.0.0 <4.0.2: ">=4.1.0"
   tmp@<0.2.7: ">=0.2.7"
   undici@<8.12.2: ">=8.12.2 <9"
   vite@>=8.0.0 <8.0.5: ">=8.3.5"
   vite@>=8.2.0 <8.2.4: ">=8.2.4"
-  ws@>=8.0.0 <8.21.0: ">=8.22.1"
+  ws@>=8.0.0 <8.21.0: ">=8.22.2"
   yaml@>=2.0.0 <2.8.3: ">=2.9.1"
 
 patchedDependencies:
