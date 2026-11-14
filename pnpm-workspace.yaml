@@ -286,7 +286,7 @@ catalogs:
     # rollup-plugin-dts): they are exact pins, so any that match a workspace version get linked
     # to an unbuilt workspace package. Workspace packem is 4.0.3, and 4.0.2 pins the current
     # workspace versions of all four, so the newest usable builder is 4.0.1.
-    "@visulima/packem": 4.0.1
+    "@visulima/packem": 4.0.6
     "@visulima/pail": 6.0.0
     "@visulima/path": 5.0.0
     "@visulima/source-map": 3.0.1
