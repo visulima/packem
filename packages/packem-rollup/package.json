@@ -168,7 +168,7 @@
     "peerDependencies": {
         "@swc/core": "*",
         "esbuild": "*",
-        "rollup": ">=4.65.0",
+        "rollup": ">=4.68.2",
         "sucrase": "*"
     },
     "peerDependenciesMeta": {
