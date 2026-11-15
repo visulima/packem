@@ -273,12 +273,12 @@ catalogs:
     magic-string: 1.4.5
     semver: 7.8.6
   visulima:
-    "@visulima/cerebro": 4.0.1
+    "@visulima/cerebro": 4.0.2
     "@visulima/colorize": 3.0.0
     "@visulima/find-cache-dir": 4.0.0
-    "@visulima/fs": 7.0.0
+    "@visulima/fs": 7.0.1
     "@visulima/humanizer": 4.0.0
-    "@visulima/package": 6.0.0
+    "@visulima/package": 6.0.1
     # Bootstrap builder: the packages build with the published packem from the registry. It must
     # differ from the workspace packem version, or linkWorkspacePackages links packages/packem
     # (even through an `npm:` alias) and a clean checkout has no dist/ to build anything with.
@@ -286,12 +286,12 @@ catalogs:
     # rollup-plugin-dts): they are exact pins, so any that match a workspace version get linked
     # to an unbuilt workspace package. Workspace packem is 4.0.3, and 4.0.2 pins the current
     # workspace versions of all four, so the newest usable builder is 4.0.1.
-    "@visulima/packem": 4.0.1
-    "@visulima/pail": 6.0.0
+    "@visulima/packem": 4.0.6
+    "@visulima/pail": 6.0.1
     "@visulima/path": 5.0.0
     "@visulima/source-map": 3.0.1
     "@visulima/tabular": 4.1.0
-    "@visulima/tsconfig": 3.2.38
+    "@visulima/tsconfig": 3.2.39
 dedupeInjectedDeps: true
 dedupePeerDependents: true
 disallowWorkspaceCycles: false
