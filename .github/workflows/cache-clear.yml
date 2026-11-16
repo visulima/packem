@@ -12,6 +12,6 @@ permissions:
 
 jobs:
     cleanup-branch-cache:
-        uses: "anolilab/workflows/.github/workflows/cleanup-branch-cache.yml@1f3a7f7e561f7690fe19dea5d2ed225def53c908" # v26.0.6
+        uses: "anolilab/workflows/.github/workflows/cleanup-branch-cache.yml@c591192cfee03092dfd5e3e2857f1a83b129464b" # v26.0.9
         with:
             target-repo: "visulima/packem"
