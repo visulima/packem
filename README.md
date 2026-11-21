@@ -64,6 +64,10 @@ If you would like to help take a look at the [list of issues](https://github.com
 -   [Daniel Bannert](https://github.com/prisis)
 -   [All Contributors](https://github.com/anolilab/node-mono-library-template/graphs/contributors)
 
+## Need help with your build?
+
+Packem is maintained by [Daniel Bannert](https://github.com/prisis). If you want your library's build and release process set up or sped up, he takes on contract work through Anolilab: [release process optimization](https://anolilab.com/services/release-process-optimization?utm_source=github&utm_medium=readme&utm_campaign=packem).
+
 ## License
 
 The visulima packem is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT)
