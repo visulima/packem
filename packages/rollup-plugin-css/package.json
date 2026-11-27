@@ -177,8 +177,8 @@
         "vitest": "catalog:test"
     },
     "peerDependencies": {
-        "@csstools/css-parser-algorithms": ">=4.0.2",
-        "@csstools/css-tokenizer": ">=4.0.2",
+        "@csstools/css-parser-algorithms": ">=4.0.3",
+        "@csstools/css-tokenizer": ">=4.0.3",
         "@csstools/postcss-slow-plugins": ">=3.0.0",
         "@tailwindcss/node": ">=4.3.3",
         "@tailwindcss/oxide": ">=4.3.3",
