@@ -46,11 +46,11 @@ catalogs:
       specifier: 1.0.1
       version: 1.0.1
     rollup-plugin-license:
-      specifier: 3.7.1
-      version: 3.7.1
+      specifier: 3.7.2
+      version: 3.7.2
     rollup-plugin-lit-css:
-      specifier: 6.0.1
-      version: 6.0.1
+      specifier: 6.0.3
+      version: 6.0.3
     rollup-plugin-polyfill-node:
       specifier: 0.13.0
       version: 0.13.0
@@ -881,8 +881,8 @@ importers:
         specifier: ^6.2.1
         version: 6.2.1(esbuild@0.28.2)(rollup@4.68.8)(supports-color@10.2.2)
       rollup-plugin-swc3:
-        specifier: ^0.12.1
-        version: 0.12.1(@swc/core@1.16.21(@swc/helpers@0.5.24))(rollup@4.68.8)
+        specifier: ^0.12.3
+        version: 0.12.3(@swc/core@1.16.21(@swc/helpers@0.5.24))(rollup@4.68.8)
       swc-loader:
         specifier: ^0.2.7
         version: 0.2.7(@swc/core@1.16.21(@swc/helpers@0.5.24))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.24))(clean-css@5.3.3)(cssnano@9.9.0(postcss@8.5.32))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(svgo@4.1.0)(uglify-js@3.19.3))
@@ -2026,7 +2026,7 @@ importers:
         version: 1.9.0
       rollup-plugin-license:
         specifier: catalog:build
-        version: 3.7.1(picomatch@4.0.7)(rollup@4.68.8)
+        version: 3.7.2(picomatch@4.0.7)(rollup@4.68.8)
       rollup-plugin-svelte:
         specifier: '>=7.2.3'
         version: 7.2.3(rollup@4.68.8)(svelte@5.57.3(@typescript-eslint/types@8.72.0))
@@ -2258,7 +2258,7 @@ importers:
         version: 6.5.1(rollup@4.68.8)(typescript@6.0.3)
       rollup-plugin-lit-css:
         specifier: catalog:build
-        version: 6.0.1(postcss@8.5.32)(rollup@4.68.8)
+        version: 6.0.3(postcss@8.5.32)(rollup@4.68.8)
       rollup-plugin-polyfill-node:
         specifier: catalog:build
         version: 0.13.0(rollup@4.68.8)
@@ -2390,7 +2390,7 @@ importers:
         version: 1.2.14
       rollup-plugin-license:
         specifier: catalog:build
-        version: 3.7.1(picomatch@4.0.7)(rollup@4.68.8)
+        version: 3.7.2(picomatch@4.0.7)(rollup@4.68.8)
       rs-module-lexer:
         specifier: catalog:prod
         version: 2.9.0
@@ -4739,8 +4739,8 @@ packages:
     resolution: {integrity: sha512-IkO+/KEUvwbVpiURZg+P7zF74z5Jxe0UgJxVni+RtoHQ6IZieXaO02kmadomap/q+l6bc/jdPGGqTjhuZnuz1Q==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@fastify/deepmerge@2.0.2':
-    resolution: {integrity: sha512-3wuLdX5iiiYeZWP6bQrjqhrcvBIf0NHbQH1Ur1WbHvoiuTYUEItgygea3zs8aHpiitn0lOB8gX20u1qO+FDm7Q==}
+  '@fastify/deepmerge@3.2.4':
+    resolution: {integrity: sha512-kc8GQq5gX9RRhw0rov3DMrN8wS8yRlxJRdDzsYwwdBV/wazuVgc/1K7CKL90tlvu3RlHan6Y0R0aE3nJtBz2eQ==}
 
   '@floating-ui/core@1.8.0':
     resolution: {integrity: sha512-0CIZ5itps/8x7BG8dEIhs53BvCUH2PCoogtakwRTut+Arm58sJooJ0AuZhLw2HJYIR5cMLNPBSS728sPho2khQ==}
@@ -6432,8 +6432,8 @@ packages:
     resolution: {integrity: sha512-4EDEmvxWtgsCnnVeBvtFIFZtUhPPt1+bA9JrSwU4Sa//6oKtzCSlGGXYJr44OD9aGISymbieJ4mCKHUygUDU+g==}
     engines: {node: '>=18'}
 
-  '@pwrs/lit-css@4.1.0':
-    resolution: {integrity: sha512-h4FGHzbiposqASNcdzofgsROa0r27DbpknyImJmMIUvCU4B0M+STLbEW76dnNKjwFB9mQMe1O4YonRUyBIujPg==}
+  '@pwrs/lit-css@5.0.0':
+    resolution: {integrity: sha512-CCgVEUXEQ/6f9Qq0r99fWllutIhbumyAcWqc/cSTS5fjuLpnU3p6NqGspJBh7xLeXZBMmPzy+U18r6N12otR5A==}
 
   '@quansync/fs@1.1.0':
     resolution: {integrity: sha512-qAPG/t3HqML1TlN7sY/pTbEjzFVAKsMjNNMGheyDosro+kT4iw2KCUoHcVdmliwWjorm4elZbgNQyU2eD97eDg==}
@@ -11988,6 +11988,10 @@ packages:
   fast-equals@4.0.3:
     resolution: {integrity: sha512-G3BSX9cfKttjr+2o1O22tYMLq0DPluZnYtq1rXumE1SpL/F/SLIfHx08WYQoWSIpeMYf8sRbJ8++71+v6Pnxfg==}
 
+  fast-fnv1a@1.0.0:
+    resolution: {integrity: sha512-Y7iaFmz24pNJX+nqXgDuyHYFTfV9XPWJRfqp0hlG0Xuz1vKnelwLwvmKkbvVVvp5WzYWnrovBTLdk2PWkOYzCg==}
+    engines: {node: ^22.15.0 || ^23.8.0 || >=24.0.0}
+
   fast-glob@3.3.3:
     resolution: {integrity: sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==}
     engines: {node: '>=8.6.0'}
@@ -12112,6 +12116,10 @@ packages:
     resolution: {integrity: sha512-kWyh8ADvHBFz6ua5xYOPnUroZTT/bwWfrCeL0Wj1dzG4/YOmOcfJ99W8dOVyyynJN35rZ9aCOtHChqQovV7yog==}
     engines: {node: '>=6'}
 
+  fnv1a52@1.0.0:
+    resolution: {integrity: sha512-dUnV6Uok578HuGYTC/EM0LqeXewXBCHsh/kmLkdcqN1zgSy7K3gCIrshPBS5JwW20XSaRv4Vnz7z8lMjOV8jWw==}
+    engines: {node: '>=18.0.0'}
+
   follow-redirects@1.16.2:
     resolution: {integrity: sha512-/kVP2U8z596Ia0gwFrwyIeo74ta5aVmSeU1FfAUMAmcEP5EP7zydmag3SLiN64NaRKef3lxsq7i/g7ltJQDGow==}
     engines: {node: '>=4.0'}
@@ -12144,6 +12152,9 @@ packages:
   format@0.2.2:
     resolution: {integrity: sha512-wzsgA6WOq+09wrU1tsJ09udeR/YZRaeArL9e1wPbFg3GG2yDnC2ldKpxs4xunpFF9DgqCqOIra3bc1HWrJ37Ww==}
     engines: {node: '>=0.4.x'}
+
+  foxts@5.9.2:
+    resolution: {integrity: sha512-f8U+YM046CwNmmpOm1KxtiD6cOviSxPXFR4r2HatyelIjbPoLktcSi9ty1caH63jvoC6NGdF7SUvribD5Qf8CQ==}
 
   framer-motion@13.5.1:
     resolution: {integrity: sha512-HeWOaeHD3kyTSIEMT6+nw7fBn4saIfxxabZyAITbycAl4xr1kzGJKIvGt/OWghSlvIA9qTnZ1zTGelHAe6S8DA==}
@@ -15750,8 +15761,14 @@ packages:
     peerDependencies:
       rollup: ^1.0.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
 
-  rollup-plugin-lit-css@6.0.1:
-    resolution: {integrity: sha512-jQPN1J4nAJRLO/DYwPQf57UBuTv1rnvoGlTKB5AgTNKnkpHS3JM/kam5YE7t0nlvCm2O+LWAo3igtUqvecGf2w==}
+  rollup-plugin-license@3.7.2:
+    resolution: {integrity: sha512-xsEifZTR9xIFzgXqhNEoWmdM8mwLyEynXr50krGTCv/OhBAXS8+YFDWpD7pdT3Q1DZdt9T9yu7sACEfYiRdq8A==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.0.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
+
+  rollup-plugin-lit-css@6.0.3:
+    resolution: {integrity: sha512-nVD9rx59IBJZnDOc3VutuEKbhrTLrcT7aNFx/CNcz6SDNxHv9+ZFeCLm36bzcORAG8ajXu3iUrvgssGCXPVxYQ==}
 
   rollup-plugin-polyfill-node@0.13.0:
     resolution: {integrity: sha512-FYEvpCaD5jGtyBuBFcQImEGmTxDTPbiHjJdrYIp+mFIwgXiXabxvKUK7ZT9P31ozu2Tqm9llYQMRWsfvTMTAOw==}
@@ -15770,8 +15787,8 @@ packages:
       rollup: '>=2.0.0'
       svelte: '>=5.57.3'
 
-  rollup-plugin-swc3@0.12.1:
-    resolution: {integrity: sha512-iNV1T432XvyejZ19/41C2gLbXxEOiiJynPPAFF0WzwwFT5FHx7SstAp0yjJRLyrbZjfIhoWJVl3hX3c3Stv/GQ==}
+  rollup-plugin-swc3@0.12.3:
+    resolution: {integrity: sha512-FLP5P9892CtRqwvYc+iW3SxFjqLTEyc0j6CVeL47loNZHvD5o1S/jSqQcFEOkPb6kPWr4VYY022AxLkAo2D1DQ==}
     engines: {node: '>=16'}
     peerDependencies:
       '@swc/core': '>=1.2.165'
@@ -19696,7 +19713,7 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@fastify/deepmerge@2.0.2': {}
+  '@fastify/deepmerge@3.2.4': {}
 
   '@floating-ui/core@1.8.0':
     dependencies:
@@ -21326,7 +21343,7 @@ snapshots:
     dependencies:
       tinyexec: 1.3.1
 
-  '@pwrs/lit-css@4.1.0(postcss@8.5.32)':
+  '@pwrs/lit-css@5.0.0(postcss@8.5.32)':
     dependencies:
       cssnano: 7.1.9(postcss@8.5.32)
     transitivePeerDependencies:
@@ -25575,7 +25592,7 @@ snapshots:
       pretty-bytes: 7.2.0
       rollup: 4.68.8
       rollup-plugin-dts: 6.5.1(rollup@4.68.8)(typescript@6.0.3)
-      rollup-plugin-swc3: 0.12.1(@swc/core@1.16.21(@swc/helpers@0.5.24))(rollup@4.68.8)
+      rollup-plugin-swc3: 0.12.3(@swc/core@1.16.21(@swc/helpers@0.5.24))(rollup@4.68.8)
       rollup-preserve-directives: 1.1.3(rollup@4.68.8)
       tinyglobby: 0.2.17
       tslib: 2.9.1
@@ -27296,6 +27313,8 @@ snapshots:
 
   fast-equals@4.0.3: {}
 
+  fast-fnv1a@1.0.0: {}
+
   fast-glob@3.3.3:
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -27432,6 +27451,8 @@ snapshots:
 
   flru@1.0.2: {}
 
+  fnv1a52@1.0.0: {}
+
   follow-redirects@1.16.2(debug@4.4.3(supports-color@10.2.2)):
     optionalDependencies:
       debug: 4.4.3(supports-color@10.2.2)
@@ -27457,6 +27478,11 @@ snapshots:
       mime-types: 2.1.35
 
   format@0.2.2: {}
+
+  foxts@5.9.2:
+    dependencies:
+      fast-fnv1a: 1.0.0
+      fnv1a52: 1.0.0
 
   framer-motion@13.5.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
@@ -31785,9 +31811,23 @@ snapshots:
     transitivePeerDependencies:
       - picomatch
 
-  rollup-plugin-lit-css@6.0.1(postcss@8.5.32)(rollup@4.68.8):
+  rollup-plugin-license@3.7.2(picomatch@4.0.7)(rollup@4.68.8):
     dependencies:
-      '@pwrs/lit-css': 4.1.0(postcss@8.5.32)
+      commenting: 1.1.0
+      fdir: 6.5.0(picomatch@4.0.7)
+      lodash: 4.18.1
+      magic-string: 0.30.21
+      moment: 2.31.0
+      package-name-regex: 2.0.6
+      rollup: 4.68.8
+      spdx-expression-validate: 2.0.0
+      spdx-satisfies: 5.0.1
+    transitivePeerDependencies:
+      - picomatch
+
+  rollup-plugin-lit-css@6.0.3(postcss@8.5.32)(rollup@4.68.8):
+    dependencies:
+      '@pwrs/lit-css': 5.0.0(postcss@8.5.32)
       '@rollup/pluginutils': 5.5.1(rollup@4.68.8)
     transitivePeerDependencies:
       - postcss
@@ -31840,12 +31880,14 @@ snapshots:
       svelte: 5.57.3(@typescript-eslint/types@8.72.1)
     optional: true
 
-  rollup-plugin-swc3@0.12.1(@swc/core@1.16.21(@swc/helpers@0.5.24))(rollup@4.68.8):
+  rollup-plugin-swc3@0.12.3(@swc/core@1.16.21(@swc/helpers@0.5.24))(rollup@4.68.8):
     dependencies:
       '@dual-bundle/import-meta-resolve': 4.2.1
-      '@fastify/deepmerge': 2.0.2
+      '@fastify/deepmerge': 3.2.4
       '@rollup/pluginutils': 5.5.1(rollup@4.68.8)
       '@swc/core': 1.16.21(@swc/helpers@0.5.24)
+      '@swc/types': 0.1.28
+      foxts: 5.9.2
       get-tsconfig: 4.14.3
       rollup: 4.68.8
       rollup-preserve-directives: 1.1.3(rollup@4.68.8)
