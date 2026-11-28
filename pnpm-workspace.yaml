@@ -61,7 +61,7 @@ catalogs:
     rollup-plugin-svelte: ^7.2.3
     rollup-plugin-visualizer: 7.3.0
     unplugin-vue: 8.0.1
-    vite: 8.3.5
+    vite: 8.3.8
   cli:
     "@anolilab/multi-semantic-release": 4.6.3
     "@anolilab/semantic-release-pnpm": 8.1.37
@@ -563,8 +563,8 @@ overrides:
   svgo@>=4.0.0 <4.0.2: ">=4.1.0"
   tmp@<0.2.7: ">=0.2.7"
   undici@<8.12.2: ">=8.12.2 <9"
-  vite@>=8.0.0 <8.0.5: ">=8.3.5"
-  vite@>=8.2.0 <8.2.4: ">=8.2.4"
+  vite@>=8.0.0 <8.0.5: ">=8.3.8"
+  vite@>=8.2.0 <8.2.4: ">=8.2.6"
   ws@>=8.0.0 <8.21.0: ">=8.22.1"
   yaml@>=2.0.0 <2.8.3: ">=2.9.1"
 
